@@ -7,6 +7,7 @@ import {
   seleccionarTarea,
   quitarSeleccionTarea,
 } from '@/datos/repositorio'
+import { esSemanaPasada, semanaActual } from '@/dominio/semana'
 
 function texto(form: FormData, clave: string): string {
   const v = form.get(clave)
@@ -36,6 +37,7 @@ export async function seleccionarTareaAccion(form: FormData) {
   const anio = Number(texto(form, 'anio'))
   const semana = Number(texto(form, 'semana'))
   if (id && Number.isInteger(anio) && Number.isInteger(semana)) {
+    if (esSemanaPasada(anio, semana, semanaActual())) return
     await seleccionarTarea(id, anio, semana)
   }
   revalidatePath('/tareas')

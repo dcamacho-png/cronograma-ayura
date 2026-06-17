@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { listarAreas, listarFincas, listarTareasPendientes } from '@/datos/repositorio'
-import { siguienteSemana, semanaAnterior, semanaActual } from '@/dominio/semana'
+import { siguienteSemana, semanaAnterior, semanaActual, esSemanaPasada } from '@/dominio/semana'
 import {
   crearTareaAccion,
   eliminarTareaAccion,
@@ -29,6 +29,7 @@ export default async function TareasPage({
   const semanaRaw = Number(sp.semana)
   const anio = sp.anio && Number.isInteger(anioRaw) ? anioRaw : hoy.anio
   const semana = sp.semana && Number.isInteger(semanaRaw) ? semanaRaw : hoy.semana
+  const pasada = esSemanaPasada(anio, semana, hoy)
 
   const [fincas, tareas] = await Promise.all([
     listarFincas(),
@@ -64,6 +65,12 @@ export default async function TareasPage({
         <span className="text-gray-500">(eliges para qué semana seleccionar)</span>
       </div>
 
+      {pasada && (
+        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
+          🔒 Semana cerrada — no puedes seleccionar tareas para una semana pasada. (Sí puedes administrar el banco.)
+        </div>
+      )}
+
       <div className="mb-4 rounded-xl border p-4">
         <h2 className="mb-3 font-semibold">Tareas pendientes</h2>
         {tareas.length === 0 ? (
@@ -78,22 +85,23 @@ export default async function TareasPage({
                     <div className="font-medium">{t.descripcion}</div>
                     <div className="text-xs text-gray-500">{t.finca ? `Finca: ${t.finca.nombre}` : 'Sin finca'}</div>
                   </div>
-                  {seleccionada ? (
-                    <>
-                      <span className="rounded-full bg-[#1d8a55] px-3 py-1 text-xs font-bold text-white">➡️ Semana {semana}</span>
+                  {seleccionada && (
+                    <span className="rounded-full bg-[#1d8a55] px-3 py-1 text-xs font-bold text-white">➡️ Semana {semana}</span>
+                  )}
+                  {!pasada &&
+                    (seleccionada ? (
                       <form action={quitarSeleccionTareaAccion}>
                         <input type="hidden" name="id" value={t.id} />
                         <button className="rounded bg-gray-100 px-3 py-1 text-sm">Quitar</button>
                       </form>
-                    </>
-                  ) : (
-                    <form action={seleccionarTareaAccion}>
-                      <input type="hidden" name="id" value={t.id} />
-                      <input type="hidden" name="anio" value={anio} />
-                      <input type="hidden" name="semana" value={semana} />
-                      <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">Seleccionar para semana {semana}</button>
-                    </form>
-                  )}
+                    ) : (
+                      <form action={seleccionarTareaAccion}>
+                        <input type="hidden" name="id" value={t.id} />
+                        <input type="hidden" name="anio" value={anio} />
+                        <input type="hidden" name="semana" value={semana} />
+                        <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">Seleccionar para semana {semana}</button>
+                      </form>
+                    ))}
                   <form action={eliminarTareaAccion}>
                     <input type="hidden" name="id" value={t.id} />
                     <button className="text-sm text-red-600 hover:underline">eliminar</button>
