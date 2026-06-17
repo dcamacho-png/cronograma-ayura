@@ -3,7 +3,7 @@ import { listarAreas, listarMotivos, listarActividades } from '@/datos/repositor
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana } from '@/dominio/semana'
 import { porcentajeCumplimiento, porcentajeReprogramadas, colorSemaforo } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
-import { marcarEstadoAccion, reprogramarAccion } from './acciones'
+import { registrarAccion } from './acciones'
 import { InfoLotes } from '../_componentes/info-lotes'
 
 const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
@@ -120,45 +120,41 @@ export default async function CumplimientoPage({
               <div className="mb-2 font-medium">{a.descripcion}</div>
               <InfoLotes lotes={a.lotes} className="mb-2" />
 
-              <form action={marcarEstadoAccion} className="flex flex-wrap items-end gap-2">
-                <input type="hidden" name="id" value={a.id} />
-                <label className="flex flex-col text-xs">
-                  Estado
-                  <select name="estado" defaultValue={a.estado} className="rounded border p-1 text-sm">
-                    {ESTADOS.map((e) => (
-                      <option key={e.valor} value={e.valor}>{e.etiqueta}</option>
-                    ))}
-                  </select>
-                </label>
-                <label className="flex flex-col text-xs">
-                  Motivo
-                  <select name="motivoId" defaultValue={a.motivoId ?? ''} className="rounded border p-1 text-sm">
-                    <option value="">—</option>
-                    {motivos.map((m) => (
-                      <option key={m.id} value={m.id}>{m.nombre}</option>
-                    ))}
-                  </select>
-                </label>
-                <label className="flex flex-1 flex-col text-xs">
-                  Nota
-                  <input name="nota" defaultValue={a.nota ?? ''} className="rounded border p-1 text-sm" />
-                </label>
-                <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">
-                  Guardar
-                </button>
-              </form>
-
-              {a._count.derivadas > 0 ? (
-                <p className="mt-2 text-sm text-gray-500">🔄 Ya reprogramada a la semana siguiente</p>
-              ) : (
-                <form action={reprogramarAccion} className="mt-2">
+              {a.estado === 'PENDIENTE' ? (
+                <form action={registrarAccion} className="flex flex-wrap items-end gap-2">
                   <input type="hidden" name="id" value={a.id} />
-                  <input type="hidden" name="anio" value={anio} />
-                  <input type="hidden" name="semana" value={semana} />
-                  <button className="text-sm text-blue-700 hover:underline">
-                    🔄 Reprogramar a la semana {proxima.semana}
-                  </button>
+                  <label className="flex flex-col text-xs">
+                    Estado
+                    <select name="estado" required defaultValue="" className="rounded border p-1 text-sm">
+                      <option value="">— marcar —</option>
+                      <option value="CUMPLIDA">✅ Cumplida</option>
+                      <option value="NO_CUMPLIDA">🔴 No cumplida</option>
+                      <option value="PARCIAL">🟡 Parcial</option>
+                      <option value="REPROGRAMADA">🔄 Reprogramada</option>
+                    </select>
+                  </label>
+                  <label className="flex flex-col text-xs">
+                    Motivo
+                    <select name="motivoId" defaultValue="" className="rounded border p-1 text-sm">
+                      <option value="">—</option>
+                      {motivos.map((m) => (
+                        <option key={m.id} value={m.id}>{m.nombre}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="flex flex-1 flex-col text-xs">
+                    Observación / lo que faltó
+                    <input name="nota" placeholder="(para parcial o reprogramada)" className="rounded border p-1 text-sm" />
+                  </label>
+                  <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">Registrar</button>
                 </form>
+              ) : (
+                <div className="flex flex-wrap items-center gap-2 text-sm">
+                  <span className="font-semibold">{ESTADOS.find((e) => e.valor === a.estado)?.etiqueta ?? a.estado}</span>
+                  {a.motivo && <span className="text-gray-500">· {a.motivo.nombre}</span>}
+                  {a.nota && <span className="text-gray-500">· {a.nota}</span>}
+                  <span className="text-xs text-gray-400">🔒 registrada</span>
+                </div>
               )}
             </li>
           ))}
