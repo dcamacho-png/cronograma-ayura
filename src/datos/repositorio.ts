@@ -80,6 +80,9 @@ export async function reprogramarActividad(
 ) {
   const origen = await prisma.actividad.findUnique({ where: { id } })
   if (!origen) return null
+  // Evitar reprogramar dos veces la misma actividad.
+  const yaReprogramada = await prisma.actividad.findFirst({ where: { origenId: id } })
+  if (yaReprogramada) return yaReprogramada
   const datos = datosReprogramacion(origen as unknown as ActividadDominio, anioDestino, semanaDestino)
   return prisma.actividad.create({ data: datos })
 }
@@ -114,4 +117,28 @@ export function listarActividadesDeSemanas(semanas: { anio: number; semana: numb
     include: { area: true, motivo: true },
     orderBy: [{ anio: 'asc' }, { semana: 'asc' }],
   })
+}
+
+// Actualiza los campos editables de una actividad (descripción y turno).
+export function actualizarActividad(id: string, descripcion: string, turno: string) {
+  return prisma.actividad.update({
+    where: { id },
+    data: { descripcion, turno },
+  })
+}
+
+export function eliminarArea(id: string) {
+  return prisma.area.delete({ where: { id } })
+}
+export function eliminarFinca(id: string) {
+  return prisma.finca.delete({ where: { id } })
+}
+export function eliminarMotivo(id: string) {
+  return prisma.motivo.delete({ where: { id } })
+}
+export function eliminarMaquina(id: string) {
+  return prisma.maquina.delete({ where: { id } })
+}
+export function eliminarResponsable(id: string) {
+  return prisma.responsable.delete({ where: { id } })
 }
