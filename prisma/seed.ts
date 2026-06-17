@@ -1,5 +1,8 @@
 import 'dotenv/config'
 import { PrismaClient } from '@prisma/client'
+import { readFileSync } from 'node:fs'
+const lotes: { nombre: string; finca: string | null; hectareas: number | null; tipoPasto: string | null }[] =
+  JSON.parse(readFileSync(new URL('./lotes.json', import.meta.url), 'utf-8'))
 
 const prisma = new PrismaClient()
 
@@ -73,6 +76,18 @@ async function main() {
     await prisma.motivo.upsert({ where: { nombre }, update: {}, create: { nombre } })
   }
 
+  // Lotes (potreros): upsert por nombre; finca por nombre.
+  for (const l of lotes) {
+    if (!l.finca) continue
+    const finca = await prisma.finca.findUnique({ where: { nombre: l.finca } })
+    if (!finca) continue
+    await prisma.lote.upsert({
+      where: { nombre: l.nombre },
+      update: {},
+      create: { nombre: l.nombre, fincaId: finca.id, hectareas: l.hectareas, tipoPasto: l.tipoPasto },
+    })
+  }
+
   const totalResponsables = await prisma.responsable.count()
   if (totalResponsables === 0) {
     for (const [nombreArea, nombres] of Object.entries(RESPONSABLES)) {
@@ -103,8 +118,9 @@ async function main() {
     prisma.maquina.count(),
     prisma.actividadEstipulada.count(),
   ])
+  const totalLotes = await prisma.lote.count()
   console.log(
-    `Seed listo: ${areas} áreas, ${fincas} fincas, ${motivos} motivos, ${responsables} responsables, ${maquinas} máquinas, ${estipuladas} actividades estipuladas.`,
+    `Seed listo: ${areas} áreas, ${fincas} fincas, ${motivos} motivos, ${responsables} responsables, ${maquinas} máquinas, ${estipuladas} actividades estipuladas, ${totalLotes} lotes.`,
   )
 }
 
