@@ -99,3 +99,8 @@ model Tarea {
 
   @@index([areaId, estado])
 }
+
+model ActividadEstipulada {
+  id     String @id @default(cuid())
+  nombre String @unique
+}
