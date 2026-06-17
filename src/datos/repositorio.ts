@@ -149,3 +149,67 @@ export function eliminarMaquina(id: string) {
 export function eliminarResponsable(id: string) {
   return prisma.responsable.delete({ where: { id } })
 }
+
+// ---- Banco de tareas ----
+
+export function listarTareasPendientes(areaId: string) {
+  return prisma.tarea.findMany({
+    where: { areaId, estado: 'PENDIENTE' },
+    include: { finca: true },
+    orderBy: { descripcion: 'asc' },
+  })
+}
+
+export function crearTarea(areaId: string, descripcion: string, fincaId: string | null) {
+  return prisma.tarea.create({ data: { areaId, descripcion, fincaId } })
+}
+
+export function eliminarTarea(id: string) {
+  return prisma.tarea.delete({ where: { id } })
+}
+
+export function seleccionarTarea(id: string, anio: number, semana: number) {
+  return prisma.tarea.update({ where: { id }, data: { anioSel: anio, semanaSel: semana } })
+}
+
+export function quitarSeleccionTarea(id: string) {
+  return prisma.tarea.update({ where: { id }, data: { anioSel: null, semanaSel: null } })
+}
+
+export function tareasPorAsignar(areaId: string, anio: number, semana: number) {
+  return prisma.tarea.findMany({
+    where: { areaId, estado: 'PENDIENTE', anioSel: anio, semanaSel: semana },
+    include: { finca: true },
+    orderBy: { descripcion: 'asc' },
+  })
+}
+
+// Asigna una tarea: crea la actividad (vinculada) y marca la tarea como PROGRAMADA.
+export async function asignarTarea(
+  tareaId: string,
+  responsableId: string,
+  dia: number,
+  fincaId: string,
+) {
+  const tarea = await prisma.tarea.findUnique({ where: { id: tareaId } })
+  if (!tarea || tarea.anioSel === null || tarea.semanaSel === null) return null
+  const anio = tarea.anioSel
+  const semana = tarea.semanaSel
+  return prisma.$transaction(async (tx) => {
+    const actividad = await tx.actividad.create({
+      data: {
+        anio,
+        semana,
+        dia,
+        descripcion: tarea.descripcion,
+        turno: '',
+        areaId: tarea.areaId,
+        fincaId,
+        responsableId,
+        tareaId: tarea.id,
+      },
+    })
+    await tx.tarea.update({ where: { id: tarea.id }, data: { estado: 'PROGRAMADA' } })
+    return actividad
+  })
+}
