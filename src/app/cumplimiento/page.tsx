@@ -117,6 +117,9 @@ export default async function CumplimientoPage({
                 )}
               </div>
               <div className="mb-2 font-medium">{a.descripcion}</div>
+              {a.lotes.length > 0 && (
+                <div className="mb-2 text-xs text-gray-500">Lote: {a.lotes.map((l) => l.nombre).join(', ')}</div>
+              )}
 
               <form action={marcarEstadoAccion} className="flex flex-wrap items-end gap-2">
                 <input type="hidden" name="id" value={a.id} />

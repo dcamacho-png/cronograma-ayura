@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada } from '@/datos/repositorio'
+import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, crearLote, eliminarLote } from '@/datos/repositorio'
 
 function texto(form: FormData, clave: string): string {
   const v = form.get(clave)
@@ -95,5 +95,21 @@ export async function renombrarActividadEstipuladaAccion(form: FormData) {
   const id = texto(form, 'id')
   const nombre = texto(form, 'nombre')
   if (id && nombre) await intentar(() => renombrarActividadEstipulada(id, nombre))
+  revalidatePath('/configuracion')
+}
+
+export async function crearLoteAccion(form: FormData) {
+  const nombre = texto(form, 'nombre')
+  const fincaId = texto(form, 'fincaId')
+  const haTxt = texto(form, 'hectareas')
+  const hectareas = haTxt && Number.isFinite(Number(haTxt)) ? Number(haTxt) : null
+  const tipoPasto = texto(form, 'tipoPasto') || null
+  if (nombre && fincaId) await intentar(() => crearLote(nombre, fincaId, hectareas, tipoPasto))
+  revalidatePath('/configuracion')
+}
+
+export async function eliminarLoteAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (id) await intentar(() => eliminarLote(id))
   revalidatePath('/configuracion')
 }

@@ -5,6 +5,7 @@ import {
   listarMaquinas,
   listarResponsablesTodos,
   listarActividadesEstipuladas,
+  listarLotes,
 } from '@/datos/repositorio'
 import {
   crearAreaAccion,
@@ -20,16 +21,19 @@ import {
   crearActividadEstipuladaAccion,
   eliminarActividadEstipuladaAccion,
   renombrarActividadEstipuladaAccion,
+  crearLoteAccion,
+  eliminarLoteAccion,
 } from './acciones'
 
 export default async function ConfiguracionPage() {
-  const [areas, fincas, motivos, maquinas, responsables, estipuladas] = await Promise.all([
+  const [areas, fincas, motivos, maquinas, responsables, estipuladas, lotes] = await Promise.all([
     listarAreas(),
     listarFincas(),
     listarMotivos(),
     listarMaquinas(),
     listarResponsablesTodos(),
     listarActividadesEstipuladas(),
+    listarLotes(),
   ])
 
   return (
@@ -167,6 +171,37 @@ export default async function ConfiguracionPage() {
           </ul>
           <form action={crearActividadEstipuladaAccion} className="flex gap-2">
             <input name="nombre" required placeholder="Nueva actividad de maquinaria" className="flex-1 rounded border p-2 text-sm" />
+            <button className="rounded bg-[#11603a] px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
+          </form>
+        </section>
+
+        {/* Lotes / Potreros */}
+        <section className="rounded-xl border p-4 md:col-span-2">
+          <h2 className="mb-2 font-semibold">Lotes / Potreros</h2>
+          <p className="mb-3 text-xs text-gray-500">{lotes.length} lotes. Al crear actividades eliges el lote y la finca queda automática.</p>
+          <ul className="mb-3 max-h-72 space-y-1 overflow-y-auto">
+            {lotes.map((l) => (
+              <li key={l.id} className="flex items-center gap-2 text-sm">
+                <span className="flex-1">
+                  {l.nombre}
+                  <span className="text-gray-500"> · {l.finca.nombre}{l.hectareas ? ` · ${l.hectareas} ha` : ''}{l.tipoPasto ? ` · ${l.tipoPasto}` : ''}</span>
+                </span>
+                <form action={eliminarLoteAccion}>
+                  <input type="hidden" name="id" value={l.id} />
+                  <button className="text-gray-400 hover:text-red-600" title="Eliminar" aria-label="Eliminar">✕</button>
+                </form>
+              </li>
+            ))}
+          </ul>
+          <form action={crearLoteAccion} className="flex flex-wrap items-end gap-2">
+            <input name="nombre" required placeholder="Nombre del lote" className="flex-1 rounded border p-2 text-sm" />
+            <select name="fincaId" required className="rounded border p-2 text-sm">
+              {fincas.map((f) => (
+                <option key={f.id} value={f.id}>{f.nombre}</option>
+              ))}
+            </select>
+            <input name="hectareas" type="number" step="0.01" placeholder="ha" className="w-20 rounded border p-2 text-sm" />
+            <input name="tipoPasto" placeholder="Tipo de pasto" className="rounded border p-2 text-sm" />
             <button className="rounded bg-[#11603a] px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
           </form>
         </section>
