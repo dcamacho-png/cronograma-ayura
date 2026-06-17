@@ -29,8 +29,10 @@ export default async function ProgramarPage({
   const areaId = sp.area && areas.some((a) => a.id === sp.area) ? sp.area : areas[0].id
   const areaActual = areas.find((a) => a.id === areaId)!
   const hoy = semanaActual()
-  const anio = sp.anio ? Number(sp.anio) : hoy.anio
-  const semana = sp.semana ? Number(sp.semana) : hoy.semana
+  const anioRaw = Number(sp.anio)
+  const semanaRaw = Number(sp.semana)
+  const anio = sp.anio && Number.isInteger(anioRaw) ? anioRaw : hoy.anio
+  const semana = sp.semana && Number.isInteger(semanaRaw) ? semanaRaw : hoy.semana
 
   const [responsables, fincas, maquinas, actividades] = await Promise.all([
     listarResponsablesPorArea(areaId),
@@ -123,6 +125,11 @@ export default async function ProgramarPage({
       )}
 
       <h2 className="mb-2 text-lg font-semibold">Agregar actividad</h2>
+      {responsables.length === 0 ? (
+        <p className="text-sm text-gray-500">
+          Para agregar actividades, esta área primero necesita responsables.
+        </p>
+      ) : (
       <form action={crearActividadAccion} className="grid grid-cols-2 gap-3 rounded-lg border p-4 md:grid-cols-3">
         <input type="hidden" name="areaId" value={areaId} />
         <input type="hidden" name="anio" value={anio} />
@@ -206,6 +213,7 @@ export default async function ProgramarPage({
           </button>
         </div>
       </form>
+      )}
     </main>
   )
 }
