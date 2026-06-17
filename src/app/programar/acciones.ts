@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { crearActividad, eliminarActividad, duplicarSemana, crearResponsable, actualizarActividad, asignarTarea } from '@/datos/repositorio'
-import { semanaAnterior } from '@/dominio/semana'
+import { semanaAnterior, esSemanaPasada, semanaActual } from '@/dominio/semana'
 
 function texto(form: FormData, clave: string): string {
   const v = form.get(clave)
@@ -23,6 +23,7 @@ export async function crearActividadAccion(form: FormData) {
   const areaId = texto(form, 'areaId')
   const anio = Number(texto(form, 'anio'))
   const semana = Number(texto(form, 'semana'))
+  if (esSemanaPasada(anio, semana, semanaActual())) return
   await crearActividad({
     areaId,
     anio,
@@ -50,6 +51,7 @@ export async function duplicarSemanaAccion(form: FormData) {
   const areaId = texto(form, 'areaId')
   const anio = Number(texto(form, 'anio'))
   const semana = Number(texto(form, 'semana'))
+  if (esSemanaPasada(anio, semana, semanaActual())) return
   const previa = semanaAnterior(anio, semana)
   await duplicarSemana(areaId, previa.anio, previa.semana, anio, semana)
   revalidatePath('/programar')

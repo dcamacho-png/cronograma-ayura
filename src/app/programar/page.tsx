@@ -7,7 +7,7 @@ import {
   listarActividades,
   tareasPorAsignar,
 } from '@/datos/repositorio'
-import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana } from '@/dominio/semana'
+import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, esSemanaPasada } from '@/dominio/semana'
 import { crearActividadAccion, eliminarActividadAccion, duplicarSemanaAccion, crearResponsableAccion, actualizarActividadAccion, asignarTareaAccion } from './acciones'
 
 const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
@@ -34,6 +34,7 @@ export default async function ProgramarPage({
   const semanaRaw = Number(sp.semana)
   const anio = sp.anio && Number.isInteger(anioRaw) ? anioRaw : hoy.anio
   const semana = sp.semana && Number.isInteger(semanaRaw) ? semanaRaw : hoy.semana
+  const pasada = esSemanaPasada(anio, semana, hoy)
 
   const [responsables, fincas, maquinas, actividades, porAsignar] = await Promise.all([
     listarResponsablesPorArea(areaId),
@@ -78,28 +79,38 @@ export default async function ProgramarPage({
         <Link href={url(areaId, proxima.anio, proxima.semana)} className="rounded border px-3 py-1 text-sm">
           Semana {proxima.semana} →
         </Link>
-        <form action={duplicarSemanaAccion} className="ml-auto">
-          <input type="hidden" name="areaId" value={areaId} />
-          <input type="hidden" name="anio" value={anio} />
-          <input type="hidden" name="semana" value={semana} />
-          <button className="rounded bg-gray-100 px-3 py-1 text-sm hover:bg-gray-200">
-            ⧉ Duplicar semana anterior
-          </button>
-        </form>
+        {!pasada && (
+          <form action={duplicarSemanaAccion} className="ml-auto">
+            <input type="hidden" name="areaId" value={areaId} />
+            <input type="hidden" name="anio" value={anio} />
+            <input type="hidden" name="semana" value={semana} />
+            <button className="rounded bg-gray-100 px-3 py-1 text-sm hover:bg-gray-200">
+              ⧉ Duplicar semana anterior
+            </button>
+          </form>
+        )}
       </div>
 
-      <form action={crearResponsableAccion} className="mb-5 flex flex-wrap items-end gap-2">
-        <input type="hidden" name="areaId" value={areaId} />
-        <label className="flex flex-col text-xs">
-          Agregar responsable a {areaActual.nombre}
-          <input name="nombre" required className="rounded border p-2 text-sm" placeholder="Nombre del responsable" />
-        </label>
-        <button className="rounded bg-[#11603a] px-3 py-2 text-sm font-semibold text-white">
-          + Responsable
-        </button>
-      </form>
+      {pasada && (
+        <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
+          🔒 Semana cerrada — solo lectura. No se puede modificar la programación de una semana pasada.
+        </div>
+      )}
 
-      {porAsignar.length > 0 && (
+      {!pasada && (
+        <form action={crearResponsableAccion} className="mb-5 flex flex-wrap items-end gap-2">
+          <input type="hidden" name="areaId" value={areaId} />
+          <label className="flex flex-col text-xs">
+            Agregar responsable a {areaActual.nombre}
+            <input name="nombre" required className="rounded border p-2 text-sm" placeholder="Nombre del responsable" />
+          </label>
+          <button className="rounded bg-[#11603a] px-3 py-2 text-sm font-semibold text-white">
+            + Responsable
+          </button>
+        </form>
+      )}
+
+      {!pasada && porAsignar.length > 0 && (
         <div className="mb-6 rounded-xl border border-blue-200 bg-blue-50 p-4">
           <h2 className="mb-3 font-semibold text-blue-900">📌 Tareas por asignar — semana {semana}</h2>
           {responsables.length === 0 ? (
@@ -162,16 +173,25 @@ export default async function ProgramarPage({
                       <td key={dia} className="border p-2 align-top">
                         {celdas.map((a) => (
                           <div key={a.id} className="mb-1 rounded bg-green-50 p-1">
-                            <form action={actualizarActividadAccion} className="flex flex-col gap-1">
-                              <input type="hidden" name="id" value={a.id} />
-                              <input name="descripcion" defaultValue={a.descripcion} className="rounded border p-1 text-xs" />
-                              <input name="turno" defaultValue={a.turno} placeholder="turno" className="rounded border p-1 text-xs" />
-                              <button className="self-start text-xs font-semibold text-[#11603a] hover:underline">guardar</button>
-                            </form>
-                            <form action={eliminarActividadAccion} className="mt-1 inline">
-                              <input type="hidden" name="id" value={a.id} />
-                              <button className="text-xs text-red-600 hover:underline">eliminar</button>
-                            </form>
+                            {pasada ? (
+                              <>
+                                <div>{a.descripcion}</div>
+                                {a.turno && <div className="text-xs text-gray-500">{a.turno}</div>}
+                              </>
+                            ) : (
+                              <>
+                                <form action={actualizarActividadAccion} className="flex flex-col gap-1">
+                                  <input type="hidden" name="id" value={a.id} />
+                                  <input name="descripcion" defaultValue={a.descripcion} className="rounded border p-1 text-xs" />
+                                  <input name="turno" defaultValue={a.turno} placeholder="turno" className="rounded border p-1 text-xs" />
+                                  <button className="self-start text-xs font-semibold text-[#11603a] hover:underline">guardar</button>
+                                </form>
+                                <form action={eliminarActividadAccion} className="mt-1 inline">
+                                  <input type="hidden" name="id" value={a.id} />
+                                  <button className="text-xs text-red-600 hover:underline">eliminar</button>
+                                </form>
+                              </>
+                            )}
                           </div>
                         ))}
                       </td>
@@ -184,95 +204,99 @@ export default async function ProgramarPage({
         </div>
       )}
 
-      <h2 className="mb-2 text-lg font-semibold">Agregar actividad</h2>
-      {responsables.length === 0 ? (
-        <p className="text-sm text-gray-500">
-          Para agregar actividades, esta área primero necesita responsables.
-        </p>
-      ) : (
-      <form action={crearActividadAccion} className="grid grid-cols-2 gap-3 rounded-lg border p-4 md:grid-cols-3">
-        <input type="hidden" name="areaId" value={areaId} />
-        <input type="hidden" name="anio" value={anio} />
-        <input type="hidden" name="semana" value={semana} />
+      {!pasada && (
+        <>
+          <h2 className="mb-2 text-lg font-semibold">Agregar actividad</h2>
+          {responsables.length === 0 ? (
+            <p className="text-sm text-gray-500">
+              Para agregar actividades, esta área primero necesita responsables.
+            </p>
+          ) : (
+          <form action={crearActividadAccion} className="grid grid-cols-2 gap-3 rounded-lg border p-4 md:grid-cols-3">
+            <input type="hidden" name="areaId" value={areaId} />
+            <input type="hidden" name="anio" value={anio} />
+            <input type="hidden" name="semana" value={semana} />
 
-        <label className="flex flex-col text-sm">
-          Responsable
-          <select name="responsableId" required className="rounded border p-2">
-            {responsables.map((r) => (
-              <option key={r.id} value={r.id}>{r.nombre}</option>
-            ))}
-          </select>
-        </label>
-
-        <label className="flex flex-col text-sm">
-          Día
-          <select name="dia" required className="rounded border p-2">
-            {DIAS.map((d, i) => (
-              <option key={d} value={i + 1}>{d}</option>
-            ))}
-          </select>
-        </label>
-
-        <label className="flex flex-col text-sm">
-          Finca
-          <select name="fincaId" required className="rounded border p-2">
-            {fincas.map((f) => (
-              <option key={f.id} value={f.id}>{f.nombre}</option>
-            ))}
-          </select>
-        </label>
-
-        <label className="col-span-2 flex flex-col text-sm md:col-span-2">
-          Actividad
-          <input name="descripcion" required className="rounded border p-2" placeholder="Ej: Siembra de pasto" />
-        </label>
-
-        <label className="flex flex-col text-sm">
-          Turno
-          <input name="turno" className="rounded border p-2" placeholder="7am-4pm" />
-        </label>
-
-        {esMaquinaria && (
-          <>
             <label className="flex flex-col text-sm">
-              Máquina
-              <select name="maquinaId" className="rounded border p-2">
-                <option value="">—</option>
-                {maquinas.map((m) => (
-                  <option key={m.id} value={m.id}>{m.nombre}{m.operario ? ` (${m.operario})` : ''}</option>
+              Responsable
+              <select name="responsableId" required className="rounded border p-2">
+                {responsables.map((r) => (
+                  <option key={r.id} value={r.id}>{r.nombre}</option>
                 ))}
               </select>
             </label>
+
             <label className="flex flex-col text-sm">
-              Área de la tarea
-              <select name="areaTareaId" className="rounded border p-2">
-                <option value="">—</option>
-                {areas.map((a) => (
-                  <option key={a.id} value={a.id}>{a.nombre}</option>
+              Día
+              <select name="dia" required className="rounded border p-2">
+                {DIAS.map((d, i) => (
+                  <option key={d} value={i + 1}>{d}</option>
                 ))}
               </select>
             </label>
-            <label className="flex flex-col text-sm">
-              Horas (H.R)
-              <input name="horas" type="number" step="0.1" className="rounded border p-2" />
-            </label>
-            <label className="flex flex-col text-sm">
-              Hectáreas (ha)
-              <input name="hectareas" type="number" step="0.1" className="rounded border p-2" />
-            </label>
-            <label className="flex flex-col text-sm">
-              Plan B
-              <input name="planB" className="rounded border p-2" />
-            </label>
-          </>
-        )}
 
-        <div className="col-span-2 md:col-span-3">
-          <button className="rounded bg-[#11603a] px-4 py-2 text-sm font-semibold text-white">
-            + Agregar
-          </button>
-        </div>
-      </form>
+            <label className="flex flex-col text-sm">
+              Finca
+              <select name="fincaId" required className="rounded border p-2">
+                {fincas.map((f) => (
+                  <option key={f.id} value={f.id}>{f.nombre}</option>
+                ))}
+              </select>
+            </label>
+
+            <label className="col-span-2 flex flex-col text-sm md:col-span-2">
+              Actividad
+              <input name="descripcion" required className="rounded border p-2" placeholder="Ej: Siembra de pasto" />
+            </label>
+
+            <label className="flex flex-col text-sm">
+              Turno
+              <input name="turno" className="rounded border p-2" placeholder="7am-4pm" />
+            </label>
+
+            {esMaquinaria && (
+              <>
+                <label className="flex flex-col text-sm">
+                  Máquina
+                  <select name="maquinaId" className="rounded border p-2">
+                    <option value="">—</option>
+                    {maquinas.map((m) => (
+                      <option key={m.id} value={m.id}>{m.nombre}{m.operario ? ` (${m.operario})` : ''}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="flex flex-col text-sm">
+                  Área de la tarea
+                  <select name="areaTareaId" className="rounded border p-2">
+                    <option value="">—</option>
+                    {areas.map((a) => (
+                      <option key={a.id} value={a.id}>{a.nombre}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="flex flex-col text-sm">
+                  Horas (H.R)
+                  <input name="horas" type="number" step="0.1" className="rounded border p-2" />
+                </label>
+                <label className="flex flex-col text-sm">
+                  Hectáreas (ha)
+                  <input name="hectareas" type="number" step="0.1" className="rounded border p-2" />
+                </label>
+                <label className="flex flex-col text-sm">
+                  Plan B
+                  <input name="planB" className="rounded border p-2" />
+                </label>
+              </>
+            )}
+
+            <div className="col-span-2 md:col-span-3">
+              <button className="rounded bg-[#11603a] px-4 py-2 text-sm font-semibold text-white">
+                + Agregar
+              </button>
+            </div>
+          </form>
+          )}
+        </>
       )}
     </main>
   )
