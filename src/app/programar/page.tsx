@@ -1,14 +1,13 @@
 import Link from 'next/link'
 import {
   listarAreas,
-  listarMaquinas,
   listarResponsablesPorArea,
   listarActividades,
   tareasPorAsignar,
   listarLotes,
 } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, esSemanaPasada } from '@/dominio/semana'
-import { crearActividadAccion, eliminarActividadAccion, duplicarSemanaAccion, crearResponsableAccion, asignarTareaAccion } from './acciones'
+import { eliminarActividadAccion, duplicarSemanaAccion, crearResponsableAccion, asignarTareaAccion } from './acciones'
 import { SelectLote } from '../_componentes/select-lote'
 import { InfoLotes } from '../_componentes/info-lotes'
 
@@ -38,9 +37,8 @@ export default async function ProgramarPage({
   const semana = sp.semana && Number.isInteger(semanaRaw) ? semanaRaw : hoy.semana
   const pasada = esSemanaPasada(anio, semana, hoy)
 
-  const [responsables, maquinas, actividades, porAsignar, lotes] = await Promise.all([
+  const [responsables, actividades, porAsignar, lotes] = await Promise.all([
     listarResponsablesPorArea(areaId),
-    listarMaquinas(),
     listarActividades(areaId, anio, semana),
     tareasPorAsignar(areaId, anio, semana),
     listarLotes(),
@@ -53,8 +51,6 @@ export default async function ProgramarPage({
   const previa = semanaAnterior(anio, semana)
   const proxima = siguienteSemana(anio, semana)
   const url = (a: string, an: number, se: number) => `/programar?area=${a}&anio=${an}&semana=${se}`
-  const esMaquinaria = areaActual.nombre.toLowerCase().includes('maquinaria')
-
   return (
     <main className="mx-auto max-w-6xl p-6">
       <h1 className="mb-4 text-2xl font-bold text-[#11603a]">Programar semana</h1>
@@ -196,96 +192,6 @@ export default async function ProgramarPage({
         </div>
       )}
 
-      {!pasada && (
-        <>
-          <h2 className="mb-2 text-lg font-semibold">Agregar actividad</h2>
-          {responsables.length === 0 ? (
-            <p className="text-sm text-gray-500">
-              Para agregar actividades, esta área primero necesita responsables.
-            </p>
-          ) : (
-          <form action={crearActividadAccion} className="grid grid-cols-2 gap-3 rounded-lg border p-4 md:grid-cols-3">
-            <input type="hidden" name="areaId" value={areaId} />
-            <input type="hidden" name="anio" value={anio} />
-            <input type="hidden" name="semana" value={semana} />
-
-            <label className="flex flex-col text-sm">
-              Responsable
-              <select name="responsableId" required className="rounded border p-2">
-                {responsables.map((r) => (
-                  <option key={r.id} value={r.id}>{r.nombre}</option>
-                ))}
-              </select>
-            </label>
-
-            <label className="flex flex-col text-sm">
-              Día
-              <select name="dia" required className="rounded border p-2">
-                {DIAS.map((d, i) => (
-                  <option key={d} value={i + 1}>{d}</option>
-                ))}
-              </select>
-            </label>
-
-            <label className="flex flex-col text-sm">
-              Lote
-              <SelectLote lotes={lotes} name="loteId" required />
-            </label>
-
-            <label className="col-span-2 flex flex-col text-sm md:col-span-2">
-              Actividad
-              <input name="descripcion" required className="rounded border p-2" placeholder="Ej: Siembra de pasto" />
-            </label>
-
-            <label className="flex flex-col text-sm">
-              Turno
-              <input name="turno" className="rounded border p-2" placeholder="7am-4pm" />
-            </label>
-
-            {esMaquinaria && (
-              <>
-                <label className="flex flex-col text-sm">
-                  Máquina
-                  <select name="maquinaId" className="rounded border p-2">
-                    <option value="">—</option>
-                    {maquinas.map((m) => (
-                      <option key={m.id} value={m.id}>{m.nombre}{m.operario ? ` (${m.operario})` : ''}</option>
-                    ))}
-                  </select>
-                </label>
-                <label className="flex flex-col text-sm">
-                  Área de la tarea
-                  <select name="areaTareaId" className="rounded border p-2">
-                    <option value="">—</option>
-                    {areas.map((a) => (
-                      <option key={a.id} value={a.id}>{a.nombre}</option>
-                    ))}
-                  </select>
-                </label>
-                <label className="flex flex-col text-sm">
-                  Horas (H.R)
-                  <input name="horas" type="number" step="0.1" className="rounded border p-2" />
-                </label>
-                <label className="flex flex-col text-sm">
-                  Hectáreas (ha)
-                  <input name="hectareas" type="number" step="0.1" className="rounded border p-2" />
-                </label>
-                <label className="flex flex-col text-sm">
-                  Plan B
-                  <input name="planB" className="rounded border p-2" />
-                </label>
-              </>
-            )}
-
-            <div className="col-span-2 md:col-span-3">
-              <button className="rounded bg-[#11603a] px-4 py-2 text-sm font-semibold text-white">
-                + Agregar
-              </button>
-            </div>
-          </form>
-          )}
-        </>
-      )}
     </main>
   )
 }
