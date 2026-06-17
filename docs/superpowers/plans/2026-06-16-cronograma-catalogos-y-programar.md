@@ -69,10 +69,12 @@ git commit -m "feat: cliente Prisma único"
 - Create: `prisma/seed.ts`
 - Modify: `package.json` (script `db:seed`)
 
-- [ ] **Step 1: Instalar tsx**
+- [ ] **Step 1: Instalar tsx y dotenv**
 
-Run: `npm install -D tsx`
-Expected: `tsx` en devDependencies.
+Run: `npm install -D tsx dotenv`
+Expected: `tsx` y `dotenv` en devDependencies. (Pueden ya estar instalados; el comando es idempotente.)
+
+> Nota: el seed corre con `tsx`, que NO carga `.env` automáticamente (eso lo hace la CLI de Prisma). Por eso el script empieza con `import 'dotenv/config'`. La app Next sí carga `.env` sola, así que `src/datos/prisma.ts` no lo necesita.
 
 - [ ] **Step 2: Agregar el script en `package.json`**
 
@@ -86,6 +88,7 @@ En `"scripts"`, agregar:
 Datos tomados del Excel real del cliente. Catálogos con nombre único se hacen con `upsert` (idempotente); responsables y máquinas solo se crean si aún no hay ninguno.
 
 ```typescript
+import 'dotenv/config'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
