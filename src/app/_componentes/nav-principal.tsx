@@ -8,6 +8,7 @@ export function NavPrincipal() {
         <nav className="flex gap-4 text-sm">
           <Link href="/programar" className="hover:underline">Programar</Link>
           <Link href="/cumplimiento" className="hover:underline">Cumplimiento</Link>
+          <Link href="/resumen" className="hover:underline">Resumen</Link>
         </nav>
       </div>
     </header>
