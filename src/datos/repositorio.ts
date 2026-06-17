@@ -1,5 +1,6 @@
 import { prisma } from './prisma'
 import { duplicarActividades, datosReprogramacion } from '@/dominio/programacion'
+import { turnoPorDia } from '@/dominio/turno'
 import type { BorradorActividad } from '@/dominio/programacion'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
 
@@ -215,7 +216,7 @@ export async function asignarTarea(
         semana,
         dia,
         descripcion: tarea.descripcion,
-        turno: tarea.turno,
+        turno: tarea.turno.trim() || turnoPorDia(dia),
         areaId: tarea.areaId,
         fincaId: primer.fincaId,
         responsableId,

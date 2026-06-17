@@ -48,8 +48,8 @@ export function FormNuevaTareaMaquinaria({
         <input name="otra" placeholder="Escribe otra si no está en la lista" className="rounded border p-2" />
       </label>
       <label className="flex flex-col text-sm">
-        Turno
-        <input name="turno" placeholder="7am-4pm" className="rounded border p-2" />
+        Turno (opcional)
+        <input name="turno" placeholder="por defecto según el día" className="rounded border p-2" />
       </label>
       <label className="flex flex-col text-sm">
         {esFertilizacion ? 'Lotes (fertilización — mantén Ctrl/⌘ para varios)' : 'Lote'}
