@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const ENLACES = [
+  { href: '/tareas', texto: 'Tareas' },
   { href: '/programar', texto: 'Programar' },
   { href: '/cumplimiento', texto: 'Cumplimiento' },
   { href: '/resumen', texto: 'Resumen' },
