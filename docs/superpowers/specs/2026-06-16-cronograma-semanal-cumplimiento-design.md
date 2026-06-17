@@ -89,7 +89,9 @@ Las actividades del área de maquinaria llevan campos adicionales:
      actividad.
 3. **Resumen semanal** 📅
    - % cumplido del área (semáforo + número grande).
-   - 🔄 Lista de actividades que se cambiaron/reprogramaron, con su motivo.
+   - 🔄 Lista de actividades que se cambiaron/reprogramaron, con su motivo y un
+     **semáforo por veces reprogramada** (verde → rojo).
+   - **% de actividades reprogramadas** de la semana.
    - ⭐ **Ranking de responsables**: top 3 y los 3 más bajos, por **% de
      cumplimiento** (el % de SUS actividades asignadas que cumplió). Escala de
      estrellas.
@@ -97,6 +99,8 @@ Las actividades del área de maquinaria llevan campos adicionales:
    - % de cumplimiento **por área** (barras con semáforo).
    - **Tendencia semana a semana** (gráfica de línea).
    - Motivos más frecuentes del mes.
+   - **% de actividades reprogramadas** del mes y las actividades con más
+     reprogramaciones (semáforo verde → rojo).
 5. **Configuración** — editar áreas, fincas, responsables, máquinas y catálogo de
    motivos.
 
@@ -112,6 +116,20 @@ Las actividades del área de maquinaria llevan campos adicionales:
 - **Por área (mensual):** promedio de cumplimiento de las actividades del área en
   el mes.
 - **Tendencia:** % de cumplimiento por cada semana del mes.
+- **% de actividades reprogramadas:** cuántas de las actividades del período son
+  reprogramaciones (arrastradas de una semana anterior), sobre el total. Es un
+  indicador de "salud" de la programación.
+- **Semáforo por veces reprogramada** (alerta visual por actividad):
+
+  | Veces reprogramada | Color |
+  | --- | --- |
+  | 1 vez | 🟢 Verde |
+  | 2 veces | 🟡 Amarillo |
+  | 3 veces | 🟠 Naranja |
+  | 4 o más | 🔴 Rojo |
+
+  Una actividad que se reprograma muchas veces salta a la vista en rojo, para
+  decidir qué hacer con ella.
 
 ## 7. Arquitectura (Opción A — app web con base de datos)
 
