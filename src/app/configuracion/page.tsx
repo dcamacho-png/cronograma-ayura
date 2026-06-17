@@ -11,6 +11,11 @@ import {
   crearMotivoAccion,
   crearMaquinaAccion,
   crearResponsableAccion,
+  eliminarAreaAccion,
+  eliminarFincaAccion,
+  eliminarMotivoAccion,
+  eliminarMaquinaAccion,
+  eliminarResponsableAccion,
 } from './acciones'
 
 export default async function ConfiguracionPage() {
@@ -26,7 +31,7 @@ export default async function ConfiguracionPage() {
     <main className="mx-auto max-w-6xl p-6">
       <h1 className="mb-4 text-2xl font-bold text-[#11603a]">Configuración</h1>
       <p className="mb-6 text-sm text-gray-500">
-        Agrega los catálogos del cronograma. (Por ahora solo se pueden agregar, no eliminar.)
+        Agrega o elimina los catálogos. (Los que están en uso no se pueden eliminar.)
       </p>
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -35,7 +40,13 @@ export default async function ConfiguracionPage() {
           <h2 className="mb-2 font-semibold">Áreas</h2>
           <ul className="mb-3 flex flex-wrap gap-2">
             {areas.map((a) => (
-              <li key={a.id} className="rounded bg-gray-100 px-2 py-1 text-sm">{a.nombre}</li>
+              <li key={a.id} className="flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-sm">
+                <span>{a.nombre}</span>
+                <form action={eliminarAreaAccion}>
+                  <input type="hidden" name="id" value={a.id} />
+                  <button className="text-gray-400 hover:text-red-600" title="Eliminar" aria-label="Eliminar">✕</button>
+                </form>
+              </li>
             ))}
           </ul>
           <form action={crearAreaAccion} className="flex gap-2">
@@ -49,7 +60,13 @@ export default async function ConfiguracionPage() {
           <h2 className="mb-2 font-semibold">Fincas</h2>
           <ul className="mb-3 flex flex-wrap gap-2">
             {fincas.map((f) => (
-              <li key={f.id} className="rounded bg-gray-100 px-2 py-1 text-sm">{f.nombre}</li>
+              <li key={f.id} className="flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-sm">
+                <span>{f.nombre}</span>
+                <form action={eliminarFincaAccion}>
+                  <input type="hidden" name="id" value={f.id} />
+                  <button className="text-gray-400 hover:text-red-600" title="Eliminar" aria-label="Eliminar">✕</button>
+                </form>
+              </li>
             ))}
           </ul>
           <form action={crearFincaAccion} className="flex gap-2">
@@ -63,7 +80,13 @@ export default async function ConfiguracionPage() {
           <h2 className="mb-2 font-semibold">Motivos</h2>
           <ul className="mb-3 flex flex-wrap gap-2">
             {motivos.map((m) => (
-              <li key={m.id} className="rounded bg-gray-100 px-2 py-1 text-sm">{m.nombre}</li>
+              <li key={m.id} className="flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-sm">
+                <span>{m.nombre}</span>
+                <form action={eliminarMotivoAccion}>
+                  <input type="hidden" name="id" value={m.id} />
+                  <button className="text-gray-400 hover:text-red-600" title="Eliminar" aria-label="Eliminar">✕</button>
+                </form>
+              </li>
             ))}
           </ul>
           <form action={crearMotivoAccion} className="flex gap-2">
@@ -77,8 +100,12 @@ export default async function ConfiguracionPage() {
           <h2 className="mb-2 font-semibold">Máquinas</h2>
           <ul className="mb-3 space-y-1 text-sm">
             {maquinas.map((m) => (
-              <li key={m.id} className="rounded bg-gray-100 px-2 py-1">
-                {m.nombre}{m.operario ? ` · ${m.operario}` : ''}
+              <li key={m.id} className="flex items-center gap-1 rounded bg-gray-100 px-2 py-1">
+                <span>{m.nombre}{m.operario ? ` · ${m.operario}` : ''}</span>
+                <form action={eliminarMaquinaAccion}>
+                  <input type="hidden" name="id" value={m.id} />
+                  <button className="text-gray-400 hover:text-red-600" title="Eliminar" aria-label="Eliminar">✕</button>
+                </form>
               </li>
             ))}
           </ul>
@@ -94,8 +121,12 @@ export default async function ConfiguracionPage() {
           <h2 className="mb-2 font-semibold">Responsables</h2>
           <ul className="mb-3 flex flex-wrap gap-2">
             {responsables.map((r) => (
-              <li key={r.id} className="rounded bg-gray-100 px-2 py-1 text-sm">
-                {r.nombre} <span className="text-gray-500">· {r.area.nombre}</span>
+              <li key={r.id} className="flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-sm">
+                <span>{r.nombre} <span className="text-gray-500">· {r.area.nombre}</span></span>
+                <form action={eliminarResponsableAccion}>
+                  <input type="hidden" name="id" value={r.id} />
+                  <button className="text-gray-400 hover:text-red-600" title="Eliminar" aria-label="Eliminar">✕</button>
+                </form>
               </li>
             ))}
           </ul>
