@@ -1,5 +1,5 @@
 import { prisma } from './prisma'
-import { duplicarActividades } from '@/dominio/programacion'
+import { duplicarActividades, datosReprogramacion } from '@/dominio/programacion'
 import type { BorradorActividad } from '@/dominio/programacion'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
 
@@ -52,4 +52,29 @@ export async function duplicarSemana(
   if (borradores.length === 0) return 0
   await prisma.$transaction(borradores.map((b) => prisma.actividad.create({ data: b })))
   return borradores.length
+}
+
+// Marca el estado de una actividad (y su motivo/nota).
+export function marcarEstado(
+  id: string,
+  estado: string,
+  motivoId: string | null,
+  nota: string | null,
+) {
+  return prisma.actividad.update({
+    where: { id },
+    data: { estado, motivoId, nota },
+  })
+}
+
+// Crea la copia reprogramada de una actividad en la semana destino.
+export async function reprogramarActividad(
+  id: string,
+  anioDestino: number,
+  semanaDestino: number,
+) {
+  const origen = await prisma.actividad.findUnique({ where: { id } })
+  if (!origen) return null
+  const datos = datosReprogramacion(origen as unknown as ActividadDominio, anioDestino, semanaDestino)
+  return prisma.actividad.create({ data: datos })
 }
