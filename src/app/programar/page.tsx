@@ -7,7 +7,7 @@ import {
   listarLotes,
 } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, esSemanaPasada } from '@/dominio/semana'
-import { eliminarActividadAccion, duplicarSemanaAccion, crearResponsableAccion, asignarTareaAccion } from './acciones'
+import { duplicarSemanaAccion, crearResponsableAccion, asignarTareaAccion } from './acciones'
 import { InfoLotes } from '../_componentes/info-lotes'
 import { AsignarTareaForm } from './asignar-tarea-form'
 
@@ -162,12 +162,6 @@ export default async function ProgramarPage({
                             <div>{a.descripcion}</div>
                             {a.turno && <div className="text-xs text-gray-500">{a.turno}</div>}
                             <InfoLotes lotes={a.lotes} className="mt-1" />
-                            {!pasada && (
-                              <form action={eliminarActividadAccion} className="mt-1 inline">
-                                <input type="hidden" name="id" value={a.id} />
-                                <button className="text-xs text-red-600 hover:underline">eliminar</button>
-                              </form>
-                            )}
                           </div>
                         ))}
                       </td>
