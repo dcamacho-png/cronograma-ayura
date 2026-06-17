@@ -14,6 +14,12 @@ function textoOpcional(form: FormData, clave: string): string | null {
   const v = texto(form, clave)
   return v === '' ? null : v
 }
+function numeroOpcional(form: FormData, clave: string): number | null {
+  const v = texto(form, clave)
+  if (v === '') return null
+  const n = Number(v)
+  return Number.isFinite(n) ? n : null
+}
 
 export async function marcarEstadoAccion(form: FormData) {
   const id = texto(form, 'id')
@@ -37,6 +43,11 @@ export async function registrarAccion(form: FormData) {
   const id = texto(form, 'id')
   const estado = texto(form, 'estado')
   if (!id || !ESTADOS_VALIDOS.includes(estado) || estado === 'PENDIENTE') return
-  await registrarCumplimiento(id, estado, textoOpcional(form, 'motivoId'), textoOpcional(form, 'nota'))
+  const motivoId = textoOpcional(form, 'motivoId')
+  // motivo obligatorio cuando NO es cumplida
+  if (estado !== 'CUMPLIDA' && !motivoId) return
+  const nota = textoOpcional(form, 'nota')
+  const haFaltante = numeroOpcional(form, 'haFaltante')
+  await registrarCumplimiento(id, estado, motivoId, nota, haFaltante)
   revalidatePath('/cumplimiento')
 }

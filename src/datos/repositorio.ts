@@ -277,10 +277,11 @@ export async function registrarCumplimiento(
   estado: string,
   motivoId: string | null,
   nota: string | null,
+  haFaltante: number | null,
 ) {
   const act = await prisma.actividad.findUnique({ where: { id }, include: { lotes: true } })
   if (!act || act.estado !== 'PENDIENTE') return null // ya registrada / bloqueada
-  await prisma.actividad.update({ where: { id }, data: { estado, motivoId, nota } })
+  await prisma.actividad.update({ where: { id }, data: { estado, motivoId, nota, haFaltante } })
   if (estado === 'PARCIAL' || estado === 'REPROGRAMADA') {
     const yaExiste = await prisma.actividad.findFirst({ where: { origenId: id } })
     if (!yaExiste) {
@@ -293,7 +294,7 @@ export async function registrarCumplimiento(
           descripcion: act.descripcion,
           turno: act.turno,
           estado: 'REPROGRAMADA',
-          nota: nota ? `Faltante: ${nota}` : null,
+          nota: nota ? `Faltante: ${nota}${haFaltante ? ` (${haFaltante} ha)` : ''}` : null,
           vecesReprogramada: act.vecesReprogramada + 1,
           origenId: act.id,
           areaId: act.areaId,
