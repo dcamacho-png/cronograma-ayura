@@ -42,6 +42,9 @@ export default async function TareasPage({
     listarLotes(),
   ])
 
+  const seleccionadas = tareas.filter((t) => t.anioSel === anio && t.semanaSel === semana)
+  const enBanco = tareas.filter((t) => !(t.anioSel === anio && t.semanaSel === semana))
+
   const previa = semanaAnterior(anio, semana)
   const proxima = siguienteSemana(anio, semana)
   const url = (a: string, an: number, se: number) => `/tareas?area=${a}&anio=${an}&semana=${se}`
@@ -77,47 +80,68 @@ export default async function TareasPage({
         </div>
       )}
 
+      <p className="mb-3 text-xs text-gray-500">
+        {seleccionadas.length} seleccionadas para esta semana · {enBanco.length} en el banco
+      </p>
+
       <div className="mb-4 rounded-xl border p-4">
-        <h2 className="mb-3 font-semibold">Tareas pendientes</h2>
-        {tareas.length === 0 ? (
-          <p className="text-sm text-gray-500">No hay tareas en el banco de esta área. Agrega una abajo.</p>
+        <h2 className="mb-3 font-semibold text-[#11603a]">📌 Seleccionadas para la semana {semana}</h2>
+        {seleccionadas.length === 0 ? (
+          <p className="text-sm text-gray-500">Ninguna seleccionada todavía. Elige del banco de abajo.</p>
         ) : (
           <ul className="divide-y">
-            {tareas.map((t) => {
-              const seleccionada = t.anioSel === anio && t.semanaSel === semana
-              return (
-                <li key={t.id} className="flex flex-wrap items-center gap-3 py-3">
-                  <div className="flex-1">
-                    <div className="font-medium">
-                      {t.descripcion}
-                      {t.turno ? <span className="text-xs font-normal text-gray-500"> · {t.turno}</span> : null}
-                    </div>
-                    <InfoLotes lotes={t.lotes} />
-                  </div>
-                  {seleccionada && (
-                    <span className="rounded-full bg-[#1d8a55] px-3 py-1 text-xs font-bold text-white">➡️ Semana {semana}</span>
-                  )}
-                  {!pasada &&
-                    (seleccionada ? (
-                      <form action={quitarSeleccionTareaAccion}>
-                        <input type="hidden" name="id" value={t.id} />
-                        <button className="rounded bg-gray-100 px-3 py-1 text-sm">Quitar</button>
-                      </form>
-                    ) : (
-                      <form action={seleccionarTareaAccion}>
-                        <input type="hidden" name="id" value={t.id} />
-                        <input type="hidden" name="anio" value={anio} />
-                        <input type="hidden" name="semana" value={semana} />
-                        <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">Seleccionar para semana {semana}</button>
-                      </form>
-                    ))}
-                  <form action={eliminarTareaAccion}>
+            {seleccionadas.map((t) => (
+              <li key={t.id} className="flex flex-wrap items-center gap-3 py-3">
+                <div className="flex-1">
+                  <div className="font-medium">{t.descripcion}</div>
+                  <InfoLotes lotes={t.lotes} />
+                </div>
+                <span className="rounded-full bg-[#1d8a55] px-3 py-1 text-xs font-bold text-white">➡️ Semana {semana}</span>
+                {!pasada && (
+                  <form action={quitarSeleccionTareaAccion}>
                     <input type="hidden" name="id" value={t.id} />
-                    <button className="text-sm text-red-600 hover:underline">eliminar</button>
+                    <button className="rounded bg-gray-100 px-3 py-1 text-sm">Quitar</button>
                   </form>
-                </li>
-              )
-            })}
+                )}
+                <form action={eliminarTareaAccion}>
+                  <input type="hidden" name="id" value={t.id} />
+                  <button className="text-sm text-red-600 hover:underline">eliminar</button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div className="mb-4 rounded-xl border p-4">
+        <h2 className="mb-3 font-semibold">📋 Banco (sin programar / otras semanas)</h2>
+        {enBanco.length === 0 ? (
+          <p className="text-sm text-gray-500">El banco está vacío.</p>
+        ) : (
+          <ul className="divide-y">
+            {enBanco.map((t) => (
+              <li key={t.id} className="flex flex-wrap items-center gap-3 py-3">
+                <div className="flex-1">
+                  <div className="font-medium">{t.descripcion}</div>
+                  <InfoLotes lotes={t.lotes} />
+                </div>
+                {t.semanaSel !== null && (
+                  <span className="rounded-full bg-gray-200 px-3 py-1 text-xs font-semibold text-gray-600">➡️ S{t.semanaSel}</span>
+                )}
+                {!pasada && (
+                  <form action={seleccionarTareaAccion}>
+                    <input type="hidden" name="id" value={t.id} />
+                    <input type="hidden" name="anio" value={anio} />
+                    <input type="hidden" name="semana" value={semana} />
+                    <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">Seleccionar para semana {semana}</button>
+                  </form>
+                )}
+                <form action={eliminarTareaAccion}>
+                  <input type="hidden" name="id" value={t.id} />
+                  <button className="text-sm text-red-600 hover:underline">eliminar</button>
+                </form>
+              </li>
+            ))}
           </ul>
         )}
       </div>
