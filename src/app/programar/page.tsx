@@ -5,9 +5,10 @@ import {
   listarMaquinas,
   listarResponsablesPorArea,
   listarActividades,
+  tareasPorAsignar,
 } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana } from '@/dominio/semana'
-import { crearActividadAccion, eliminarActividadAccion, duplicarSemanaAccion, crearResponsableAccion, actualizarActividadAccion } from './acciones'
+import { crearActividadAccion, eliminarActividadAccion, duplicarSemanaAccion, crearResponsableAccion, actualizarActividadAccion, asignarTareaAccion } from './acciones'
 
 const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
 
@@ -34,11 +35,12 @@ export default async function ProgramarPage({
   const anio = sp.anio && Number.isInteger(anioRaw) ? anioRaw : hoy.anio
   const semana = sp.semana && Number.isInteger(semanaRaw) ? semanaRaw : hoy.semana
 
-  const [responsables, fincas, maquinas, actividades] = await Promise.all([
+  const [responsables, fincas, maquinas, actividades, porAsignar] = await Promise.all([
     listarResponsablesPorArea(areaId),
     listarFincas(),
     listarMaquinas(),
     listarActividades(areaId, anio, semana),
+    tareasPorAsignar(areaId, anio, semana),
   ])
 
   const fechas = fechasDeSemana(anio, semana)
@@ -96,6 +98,42 @@ export default async function ProgramarPage({
           + Responsable
         </button>
       </form>
+
+      {porAsignar.length > 0 && (
+        <div className="mb-6 rounded-xl border border-blue-200 bg-blue-50 p-4">
+          <h2 className="mb-3 font-semibold text-blue-900">📌 Tareas por asignar — semana {semana}</h2>
+          {responsables.length === 0 ? (
+            <p className="text-sm text-blue-900">Primero agrega responsables a esta área para poder asignar.</p>
+          ) : (
+            <ul className="space-y-2">
+              {porAsignar.map((t) => (
+                <li key={t.id}>
+                  <form action={asignarTareaAccion} className="flex flex-wrap items-end gap-2">
+                    <input type="hidden" name="tareaId" value={t.id} />
+                    <span className="min-w-[160px] flex-1 font-medium">{t.descripcion}</span>
+                    <select name="responsableId" required className="rounded border p-1 text-sm">
+                      {responsables.map((r) => (
+                        <option key={r.id} value={r.id}>{r.nombre}</option>
+                      ))}
+                    </select>
+                    <select name="dia" required className="rounded border p-1 text-sm">
+                      {DIAS.map((d, i) => (
+                        <option key={d} value={i + 1}>{d}</option>
+                      ))}
+                    </select>
+                    <select name="fincaId" required defaultValue={t.fincaId ?? ''} className="rounded border p-1 text-sm">
+                      {fincas.map((f) => (
+                        <option key={f.id} value={f.id}>{f.nombre}</option>
+                      ))}
+                    </select>
+                    <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">Asignar →</button>
+                  </form>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
       {responsables.length === 0 ? (
         <p className="mb-6 text-sm text-gray-500">Esta área no tiene responsables. Las actividades se listan abajo.</p>
