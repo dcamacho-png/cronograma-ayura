@@ -7,7 +7,7 @@ import {
   listarActividades,
 } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual } from '@/dominio/semana'
-import { crearActividadAccion, eliminarActividadAccion, duplicarSemanaAccion } from './acciones'
+import { crearActividadAccion, eliminarActividadAccion, duplicarSemanaAccion, crearResponsableAccion } from './acciones'
 
 const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
 
@@ -81,6 +81,17 @@ export default async function ProgramarPage({
           </button>
         </form>
       </div>
+
+      <form action={crearResponsableAccion} className="mb-5 flex flex-wrap items-end gap-2">
+        <input type="hidden" name="areaId" value={areaId} />
+        <label className="flex flex-col text-xs">
+          Agregar responsable a {areaActual.nombre}
+          <input name="nombre" required className="rounded border p-2 text-sm" placeholder="Nombre del responsable" />
+        </label>
+        <button className="rounded bg-[#11603a] px-3 py-2 text-sm font-semibold text-white">
+          + Responsable
+        </button>
+      </form>
 
       {responsables.length === 0 ? (
         <p className="mb-6 text-sm text-gray-500">Esta área no tiene responsables. Las actividades se listan abajo.</p>

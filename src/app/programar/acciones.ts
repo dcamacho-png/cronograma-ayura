@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { crearActividad, eliminarActividad, duplicarSemana } from '@/datos/repositorio'
+import { crearActividad, eliminarActividad, duplicarSemana, crearResponsable } from '@/datos/repositorio'
 import { semanaAnterior } from '@/dominio/semana'
 
 function texto(form: FormData, clave: string): string {
@@ -52,5 +52,13 @@ export async function duplicarSemanaAccion(form: FormData) {
   const semana = Number(texto(form, 'semana'))
   const previa = semanaAnterior(anio, semana)
   await duplicarSemana(areaId, previa.anio, previa.semana, anio, semana)
+  revalidatePath('/programar')
+}
+
+export async function crearResponsableAccion(form: FormData) {
+  const nombre = texto(form, 'nombre')
+  const areaId = texto(form, 'areaId')
+  if (!nombre || !areaId) return
+  await crearResponsable(nombre, areaId)
   revalidatePath('/programar')
 }

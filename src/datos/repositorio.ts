@@ -67,6 +67,11 @@ export function marcarEstado(
   })
 }
 
+// Crea un responsable nuevo en un área.
+export function crearResponsable(nombre: string, areaId: string) {
+  return prisma.responsable.create({ data: { nombre, areaId } })
+}
+
 // Crea la copia reprogramada de una actividad en la semana destino.
 export async function reprogramarActividad(
   id: string,
