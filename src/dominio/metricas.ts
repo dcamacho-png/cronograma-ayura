@@ -1,5 +1,20 @@
 import type { Actividad, Estado } from './tipos'
 
+// Agrupa actividades por una clave derivada de cada actividad.
+function agrupar<K extends string>(
+  actividades: Actividad[],
+  clave: (a: Actividad) => K,
+): Map<K, Actividad[]> {
+  const grupos = new Map<K, Actividad[]>()
+  for (const a of actividades) {
+    const k = clave(a)
+    const lista = grupos.get(k) ?? []
+    lista.push(a)
+    grupos.set(k, lista)
+  }
+  return grupos
+}
+
 // Peso de un estado para el cálculo de cumplimiento.
 // null = el estado no se evalúa (PENDIENTE, REPROGRAMADA).
 export function pesoEstado(estado: Estado): number | null {
@@ -7,7 +22,15 @@ export function pesoEstado(estado: Estado): number | null {
     case 'CUMPLIDA': return 1
     case 'PARCIAL': return 0.5
     case 'NO_CUMPLIDA': return 0
-    default: return null
+    case 'PENDIENTE':
+    case 'REPROGRAMADA':
+      return null
+    default: {
+      // Si se agrega un nuevo Estado y no se decide su peso aquí,
+      // esto provoca un error de compilación a propósito.
+      const _exhaustivo: never = estado
+      return _exhaustivo
+    }
   }
 }
 
@@ -38,29 +61,22 @@ export interface FilaRanking {
 }
 
 // Ranking de responsables por % de cumplimiento.
-// Devuelve los 3 mejores y los 3 más bajos (mayor a menor % en cada grupo).
+// Devuelve los 3 mejores y los 3 más bajos, SIN que una persona
+// aparezca en ambos grupos (importante cuando hay pocos responsables).
 export function rankingResponsables(
   actividades: Actividad[],
 ): { top: FilaRanking[]; bajos: FilaRanking[] } {
-  const porResp = new Map<string, Actividad[]>()
-  for (const a of actividades) {
-    const lista = porResp.get(a.responsableId) ?? []
-    lista.push(a)
-    porResp.set(a.responsableId, lista)
-  }
-
   const filas: FilaRanking[] = []
-  for (const [responsableId, acts] of porResp) {
+  for (const [responsableId, acts] of agrupar(actividades, (a) => a.responsableId)) {
     const pct = porcentajeCumplimiento(acts)
     if (pct === null) continue
     filas.push({ responsableId, porcentaje: pct, estrellas: estrellas(pct) })
   }
-
   filas.sort((a, b) => b.porcentaje - a.porcentaje)
-  return {
-    top: filas.slice(0, 3),
-    bajos: filas.slice(-3),
-  }
+  const top = filas.slice(0, 3)
+  const idsTop = new Set(top.map((f) => f.responsableId))
+  const bajos = filas.filter((f) => !idsTop.has(f.responsableId)).slice(-3)
+  return { top, bajos }
 }
 
 // % de actividades que son reprogramaciones (vecesReprogramada > 0).
@@ -88,14 +104,8 @@ export interface FilaArea {
 
 // % de cumplimiento agrupado por área.
 export function cumplimientoPorArea(actividades: Actividad[]): FilaArea[] {
-  const porArea = new Map<string, Actividad[]>()
-  for (const a of actividades) {
-    const lista = porArea.get(a.areaId) ?? []
-    lista.push(a)
-    porArea.set(a.areaId, lista)
-  }
   const filas: FilaArea[] = []
-  for (const [areaId, acts] of porArea) {
+  for (const [areaId, acts] of agrupar(actividades, (a) => a.areaId)) {
     filas.push({ areaId, porcentaje: porcentajeCumplimiento(acts) })
   }
   return filas
@@ -109,15 +119,8 @@ export interface PuntoTendencia {
 
 // % de cumplimiento por semana, ordenado cronológicamente.
 export function tendenciaSemanal(actividades: Actividad[]): PuntoTendencia[] {
-  const porSemana = new Map<string, Actividad[]>()
-  for (const a of actividades) {
-    const clave = `${a.anio}-${a.semana}`
-    const lista = porSemana.get(clave) ?? []
-    lista.push(a)
-    porSemana.set(clave, lista)
-  }
   const puntos: PuntoTendencia[] = []
-  for (const acts of porSemana.values()) {
+  for (const acts of agrupar(actividades, (a) => `${a.anio}-${a.semana}`).values()) {
     puntos.push({
       anio: acts[0].anio,
       semana: acts[0].semana,

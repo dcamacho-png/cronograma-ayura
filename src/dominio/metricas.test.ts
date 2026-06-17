@@ -75,9 +75,9 @@ describe('rankingResponsables', () => {
     const { top, bajos } = rankingResponsables(acts)
     expect(top.map((f) => f.responsableId)).toEqual(['A', 'B', 'D'])
     expect(top[0]).toEqual({ responsableId: 'A', porcentaje: 100, estrellas: 5 })
-    // los 3 más bajos en orden de mayor a menor %
-    expect(bajos.map((f) => f.responsableId)).toEqual(['B', 'D', 'C'])
-    expect(bajos[2]).toEqual({ responsableId: 'C', porcentaje: 0, estrellas: 1 })
+    // bajos excluye a quienes ya están en top
+    expect(bajos.map((f) => f.responsableId)).toEqual(['C'])
+    expect(bajos[0]).toEqual({ responsableId: 'C', porcentaje: 0, estrellas: 1 })
   })
 
   it('ignora responsables sin actividades evaluadas', () => {
@@ -146,5 +146,36 @@ describe('tendenciaSemanal', () => {
       { anio: 2026, semana: 24, porcentaje: 50 },
       { anio: 2026, semana: 25, porcentaje: 100 },
     ])
+  })
+})
+
+describe('rankingResponsables (sin solapamiento)', () => {
+  it('una misma persona no aparece en top y en bajos a la vez', () => {
+    const acts: Actividad[] = [
+      act({ responsableId: 'A', estado: 'CUMPLIDA' }),     // A = 100
+      act({ responsableId: 'B', estado: 'CUMPLIDA' }),     // B = 100
+      act({ responsableId: 'C', estado: 'PARCIAL' }),      // C = 50
+      act({ responsableId: 'D', estado: 'PARCIAL' }),      // D = 50
+      act({ responsableId: 'E', estado: 'NO_CUMPLIDA' }),  // E = 0
+    ]
+    const { top, bajos } = rankingResponsables(acts)
+    expect(top.map((f) => f.responsableId)).toEqual(['A', 'B', 'C'])
+    expect(bajos.map((f) => f.responsableId)).toEqual(['D', 'E'])
+    const idsTop = new Set(top.map((f) => f.responsableId))
+    expect(bajos.some((f) => idsTop.has(f.responsableId))).toBe(false)
+  })
+})
+
+describe('estrellas (borde inferior)', () => {
+  it('estrellas(0) es 1', () => {
+    expect(estrellas(0)).toBe(1)
+  })
+})
+
+describe('cumplimientoPorArea (porcentaje null)', () => {
+  it('incluye áreas con porcentaje null cuando no hay actividades evaluadas', () => {
+    const acts = [act({ areaId: 'admin', estado: 'PENDIENTE' })]
+    const filas = cumplimientoPorArea(acts)
+    expect(filas).toContainEqual({ areaId: 'admin', porcentaje: null })
   })
 })
