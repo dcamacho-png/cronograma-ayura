@@ -27,7 +27,7 @@ export async function reprogramarAccion(form: FormData) {
   const id = texto(form, 'id')
   const anio = Number(texto(form, 'anio'))
   const semana = Number(texto(form, 'semana'))
-  if (!id || !Number.isInteger(anio) || !Number.isInteger(semana)) return
+  if (!id || !anio || !semana || !Number.isInteger(anio) || !Number.isInteger(semana)) return
   const prox = siguienteSemana(anio, semana)
   await reprogramarActividad(id, prox.anio, prox.semana)
   revalidatePath('/cumplimiento')
