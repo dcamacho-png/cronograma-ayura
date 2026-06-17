@@ -87,3 +87,8 @@ export function fechasDeSemana(anio: number, semana: number): Date[] {
     return d
   })
 }
+
+// ¿La semana (anio, semana) es estrictamente anterior a la semana de referencia?
+export function esSemanaPasada(anio: number, semana: number, referencia: Semana): boolean {
+  return anio < referencia.anio || (anio === referencia.anio && semana < referencia.semana)
+}

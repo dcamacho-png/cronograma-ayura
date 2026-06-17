@@ -64,3 +64,24 @@ describe('fechasDeSemana', () => {
     expect(f[6].toISOString().slice(0, 10)).toBe('2026-06-21')
   })
 })
+
+import { esSemanaPasada } from './semana'
+
+describe('esSemanaPasada', () => {
+  const ref = { anio: 2026, semana: 25 }
+  it('una semana anterior del mismo año es pasada', () => {
+    expect(esSemanaPasada(2026, 24, ref)).toBe(true)
+  })
+  it('la semana actual no es pasada', () => {
+    expect(esSemanaPasada(2026, 25, ref)).toBe(false)
+  })
+  it('una semana futura no es pasada', () => {
+    expect(esSemanaPasada(2026, 26, ref)).toBe(false)
+  })
+  it('un año anterior es pasada', () => {
+    expect(esSemanaPasada(2025, 52, ref)).toBe(true)
+  })
+  it('un año futuro no es pasada', () => {
+    expect(esSemanaPasada(2027, 1, ref)).toBe(false)
+  })
+})
