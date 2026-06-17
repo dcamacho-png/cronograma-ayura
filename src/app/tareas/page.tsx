@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { listarAreas, listarLotes, listarTareasPendientes, listarActividadesEstipuladas } from '@/datos/repositorio'
 import { SelectLote } from '../_componentes/select-lote'
+import { InfoLotes } from '../_componentes/info-lotes'
 import { FormNuevaTareaMaquinaria } from './form-nueva-tarea-maquinaria'
 import { siguienteSemana, semanaAnterior, semanaActual, esSemanaPasada } from '@/dominio/semana'
 import {
@@ -87,8 +88,11 @@ export default async function TareasPage({
               return (
                 <li key={t.id} className="flex flex-wrap items-center gap-3 py-3">
                   <div className="flex-1">
-                    <div className="font-medium">{t.descripcion}</div>
-                    <div className="text-xs text-gray-500">{t.finca ? `Finca: ${t.finca.nombre}` : 'Sin finca'}</div>
+                    <div className="font-medium">
+                      {t.descripcion}
+                      {t.turno ? <span className="text-xs font-normal text-gray-500"> · {t.turno}</span> : null}
+                    </div>
+                    <InfoLotes lotes={t.lotes} />
                   </div>
                   {seleccionada && (
                     <span className="rounded-full bg-[#1d8a55] px-3 py-1 text-xs font-bold text-white">➡️ Semana {semana}</span>
@@ -135,6 +139,10 @@ export default async function TareasPage({
           <label className="flex flex-col text-sm">
             Lote (opcional)
             <SelectLote lotes={lotes} name="loteId" />
+          </label>
+          <label className="flex flex-col text-sm">
+            Turno
+            <input name="turno" placeholder="7am-4pm" className="rounded border p-2" />
           </label>
           <button className="rounded bg-[#11603a] px-4 py-2 text-sm font-semibold text-white">+ Agregar al banco</button>
         </form>
