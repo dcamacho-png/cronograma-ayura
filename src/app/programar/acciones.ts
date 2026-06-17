@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { crearActividad, eliminarActividad, duplicarSemana, crearResponsable } from '@/datos/repositorio'
+import { crearActividad, eliminarActividad, duplicarSemana, crearResponsable, actualizarActividad } from '@/datos/repositorio'
 import { semanaAnterior } from '@/dominio/semana'
 
 function texto(form: FormData, clave: string): string {
@@ -60,5 +60,14 @@ export async function crearResponsableAccion(form: FormData) {
   const areaId = texto(form, 'areaId')
   if (!nombre || !areaId) return
   await crearResponsable(nombre, areaId)
+  revalidatePath('/programar')
+}
+
+export async function actualizarActividadAccion(form: FormData) {
+  const id = texto(form, 'id')
+  const descripcion = texto(form, 'descripcion')
+  const turno = texto(form, 'turno')
+  if (!id || !descripcion) return
+  await actualizarActividad(id, descripcion, turno)
   revalidatePath('/programar')
 }

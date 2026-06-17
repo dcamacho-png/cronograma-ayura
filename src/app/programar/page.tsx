@@ -6,8 +6,8 @@ import {
   listarResponsablesPorArea,
   listarActividades,
 } from '@/datos/repositorio'
-import { siguienteSemana, semanaAnterior, semanaActual } from '@/dominio/semana'
-import { crearActividadAccion, eliminarActividadAccion, duplicarSemanaAccion, crearResponsableAccion } from './acciones'
+import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana } from '@/dominio/semana'
+import { crearActividadAccion, eliminarActividadAccion, duplicarSemanaAccion, crearResponsableAccion, actualizarActividadAccion } from './acciones'
 
 const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
 
@@ -40,6 +40,10 @@ export default async function ProgramarPage({
     listarMaquinas(),
     listarActividades(areaId, anio, semana),
   ])
+
+  const fechas = fechasDeSemana(anio, semana)
+  const fmtFecha = (f: Date) =>
+    new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(f)
 
   const previa = semanaAnterior(anio, semana)
   const proxima = siguienteSemana(anio, semana)
@@ -101,8 +105,11 @@ export default async function ProgramarPage({
             <thead>
               <tr>
                 <th className="border bg-gray-50 p-2 text-left">Responsable</th>
-                {DIAS.map((d) => (
-                  <th key={d} className="border bg-gray-50 p-2 text-left">{d}</th>
+                {DIAS.map((d, i) => (
+                  <th key={d} className="border bg-gray-50 p-2 text-left">
+                    {d}
+                    <div className="text-xs font-normal text-gray-400">{fmtFecha(fechas[i])}</div>
+                  </th>
                 ))}
               </tr>
             </thead>
@@ -117,9 +124,13 @@ export default async function ProgramarPage({
                       <td key={dia} className="border p-2 align-top">
                         {celdas.map((a) => (
                           <div key={a.id} className="mb-1 rounded bg-green-50 p-1">
-                            <div>{a.descripcion}</div>
-                            {a.turno && <div className="text-xs text-gray-500">{a.turno}</div>}
-                            <form action={eliminarActividadAccion} className="inline">
+                            <form action={actualizarActividadAccion} className="flex flex-col gap-1">
+                              <input type="hidden" name="id" value={a.id} />
+                              <input name="descripcion" defaultValue={a.descripcion} className="rounded border p-1 text-xs" />
+                              <input name="turno" defaultValue={a.turno} placeholder="turno" className="rounded border p-1 text-xs" />
+                              <button className="self-start text-xs font-semibold text-[#11603a] hover:underline">guardar</button>
+                            </form>
+                            <form action={eliminarActividadAccion} className="mt-1 inline">
                               <input type="hidden" name="id" value={a.id} />
                               <button className="text-xs text-red-600 hover:underline">eliminar</button>
                             </form>
