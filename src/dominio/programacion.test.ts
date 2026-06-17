@@ -53,3 +53,41 @@ describe('duplicarActividades', () => {
     expect(duplicarActividades(origen, 2026, 26)).toHaveLength(3)
   })
 })
+
+import { datosReprogramacion } from './programacion'
+
+describe('datosReprogramacion', () => {
+  it('crea la copia para la semana destino, en estado REPROGRAMADA y subiendo el contador', () => {
+    const origen = act({ id: 'a1', vecesReprogramada: 0, dia: 3, descripcion: 'Fumigación' })
+    const d = datosReprogramacion(origen, 2026, 26)
+    expect(d.anio).toBe(2026)
+    expect(d.semana).toBe(26)
+    expect(d.dia).toBe(3)
+    expect(d.descripcion).toBe('Fumigación')
+    expect(d.estado).toBe('REPROGRAMADA')
+    expect(d.vecesReprogramada).toBe(1)
+    expect(d.origenId).toBe('a1')
+  })
+
+  it('si ya venía reprogramada, sigue subiendo el contador', () => {
+    const origen = act({ id: 'a2', vecesReprogramada: 2 })
+    const d = datosReprogramacion(origen, 2026, 27)
+    expect(d.vecesReprogramada).toBe(3)
+    expect(d.origenId).toBe('a2')
+  })
+
+  it('conserva los campos de maquinaria y no arrastra motivo/nota', () => {
+    const origen = act({
+      id: 'a3', maquinaId: 'm1', areaTareaId: 'maiz', horas: 5, hectareas: 7, planB: 'Rastra',
+      motivoId: 'clima', nota: 'llovió',
+    })
+    const d = datosReprogramacion(origen, 2027, 1)
+    expect(d.maquinaId).toBe('m1')
+    expect(d.areaTareaId).toBe('maiz')
+    expect(d.horas).toBe(5)
+    expect(d.hectareas).toBe(7)
+    expect(d.planB).toBe('Rastra')
+    expect('motivoId' in d).toBe(false)
+    expect('nota' in d).toBe(false)
+  })
+})
