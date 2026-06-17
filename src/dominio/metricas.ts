@@ -130,3 +130,20 @@ export function tendenciaSemanal(actividades: Actividad[]): PuntoTendencia[] {
   puntos.sort((a, b) => a.anio - b.anio || a.semana - b.semana)
   return puntos
 }
+
+export interface ConteoMotivo {
+  motivoId: string
+  conteo: number
+}
+
+// Cuenta las actividades por motivo (ignora las que no tienen), de mayor a menor.
+export function motivosFrecuentes(actividades: Actividad[]): ConteoMotivo[] {
+  const conteo = new Map<string, number>()
+  for (const a of actividades) {
+    if (!a.motivoId) continue
+    conteo.set(a.motivoId, (conteo.get(a.motivoId) ?? 0) + 1)
+  }
+  return [...conteo.entries()]
+    .map(([motivoId, c]) => ({ motivoId, conteo: c }))
+    .sort((a, b) => b.conteo - a.conteo)
+}

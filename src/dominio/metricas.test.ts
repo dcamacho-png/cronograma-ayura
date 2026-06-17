@@ -179,3 +179,23 @@ describe('cumplimientoPorArea (porcentaje null)', () => {
     expect(filas).toContainEqual({ areaId: 'admin', porcentaje: null })
   })
 })
+
+import { motivosFrecuentes } from './metricas'
+
+describe('motivosFrecuentes', () => {
+  it('cuenta por motivoId e ignora actividades sin motivo, ordenado desc', () => {
+    const acts = [
+      act({ motivoId: 'clima' }),
+      act({ motivoId: 'clima' }),
+      act({ motivoId: 'maquina' }),
+      act({ motivoId: null }),
+    ]
+    expect(motivosFrecuentes(acts)).toEqual([
+      { motivoId: 'clima', conteo: 2 },
+      { motivoId: 'maquina', conteo: 1 },
+    ])
+  })
+  it('devuelve lista vacía si no hay motivos', () => {
+    expect(motivosFrecuentes([act({ motivoId: null })])).toEqual([])
+  })
+})
