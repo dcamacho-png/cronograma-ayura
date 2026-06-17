@@ -140,10 +140,6 @@ export default async function TareasPage({
             Lote (opcional)
             <SelectLote lotes={lotes} name="loteId" />
           </label>
-          <label className="flex flex-col text-sm">
-            Turno (opcional)
-            <input name="turno" placeholder="por defecto según el día" className="rounded border p-2" />
-          </label>
           <button className="rounded bg-[#11603a] px-4 py-2 text-sm font-semibold text-white">+ Agregar al banco</button>
         </form>
       )}

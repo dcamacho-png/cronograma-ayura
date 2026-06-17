@@ -8,8 +8,8 @@ import {
 } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, esSemanaPasada } from '@/dominio/semana'
 import { eliminarActividadAccion, duplicarSemanaAccion, crearResponsableAccion, asignarTareaAccion } from './acciones'
-import { SelectLote } from '../_componentes/select-lote'
 import { InfoLotes } from '../_componentes/info-lotes'
+import { AsignarTareaForm } from './asignar-tarea-form'
 
 const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
 
@@ -117,26 +117,14 @@ export default async function ProgramarPage({
             <ul className="space-y-2">
               {porAsignar.map((t) => (
                 <li key={t.id}>
-                  <form action={asignarTareaAccion} className="flex flex-wrap items-end gap-2">
-                    <input type="hidden" name="tareaId" value={t.id} />
-                    <span className="min-w-[160px] flex-1 font-medium">{t.descripcion}</span>
-                    <select name="responsableId" required className="rounded border p-1 text-sm">
-                      {responsables.map((r) => (
-                        <option key={r.id} value={r.id}>{r.nombre}</option>
-                      ))}
-                    </select>
-                    <select name="dia" required className="rounded border p-1 text-sm">
-                      {DIAS.map((d, i) => (
-                        <option key={d} value={i + 1}>{d}</option>
-                      ))}
-                    </select>
-                    {t.lotes.length > 0 ? (
-                      <span className="text-xs text-gray-600">Lote(s): {t.lotes.map((l) => l.nombre).join(', ')}</span>
-                    ) : (
-                      <SelectLote lotes={lotes} name="loteId" required />
-                    )}
-                    <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">Asignar →</button>
-                  </form>
+                  <AsignarTareaForm
+                    tareaId={t.id}
+                    descripcion={t.descripcion}
+                    lotesTarea={t.lotes}
+                    responsables={responsables}
+                    lotes={lotes}
+                    accion={asignarTareaAccion}
+                  />
                 </li>
               ))}
             </ul>
