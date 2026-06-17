@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Area {
+  id            String        @id @default(cuid())
+  nombre        String        @unique
+  actividades   Actividad[]   @relation("AreaDeActividad")
+  tareasMaquina Actividad[]   @relation("AreaDeTarea")
+  responsables  Responsable[]
+}
+
+model Finca {
+  id          String      @id @default(cuid())
+  nombre      String      @unique
+  actividades Actividad[]
+}
+
+model Responsable {
+  id          String      @id @default(cuid())
+  nombre      String
+  areaId      String
+  area        Area        @relation(fields: [areaId], references: [id])
+  actividades Actividad[]
+}
+
+model Maquina {
+  id          String      @id @default(cuid())
+  nombre      String
+  operario    String?
+  actividades Actividad[]
+}
+
+model Motivo {
+  id          String      @id @default(cuid())
+  nombre      String      @unique
+  actividades Actividad[]
+}
+
+model Actividad {
+  id                String   @id @default(cuid())
+  anio              Int
+  semana            Int
+  dia               Int      // 1=lunes ... 7=domingo
+  descripcion       String
+  turno             String   @default("")
+  estado            String   @default("PENDIENTE")
+  nota              String?
+  vecesReprogramada Int      @default(0)
+
+  areaId        String
+  area          Area    @relation("AreaDeActividad", fields: [areaId], references: [id])
+  fincaId       String
+  finca         Finca   @relation(fields: [fincaId], references: [id])
+  responsableId String
+  responsable   Responsable @relation(fields: [responsableId], references: [id])
+  motivoId      String?
+  motivo        Motivo?  @relation(fields: [motivoId], references: [id])
+
+  // Reprogramación: relación a sí misma (la actividad de origen).
+  origenId String?
+  origen   Actividad?  @relation("Reprogramacion", fields: [origenId], references: [id])
+  derivadas Actividad[] @relation("Reprogramacion")
+
+  // Campos de maquinaria (opcionales).
+  maquinaId  String?
+  maquina    Maquina? @relation(fields: [maquinaId], references: [id])
+  areaTareaId String?
+  areaTarea   Area?   @relation("AreaDeTarea", fields: [areaTareaId], references: [id])
+  horas      Float?
+  hectareas  Float?
+  planB      String?
+
+  @@index([anio, semana, areaId])
+}
