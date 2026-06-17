@@ -4,7 +4,16 @@
       "Read(//tmp/**)",
       "Bash(pip list *)",
       "Bash(pip install *)",
-      "Bash(python3)"
+      "Bash(python3)",
+      "Bash(git -C /home/derlly/projects/cronograma log --oneline -3)",
+      "Bash(npx create-next-app@latest *)",
+      "Bash(mkdir -p /tmp/cronograma_hold)",
+      "Bash(mv /home/derlly/projects/cronograma/.hold/docs /home/derlly/projects/cronograma/.hold/mockups /tmp/cronograma_hold/)",
+      "Bash(mv /tmp/cronograma_hold/docs /tmp/cronograma_hold/mockups /home/derlly/projects/cronograma/)",
+      "Bash(rmdir /tmp/cronograma_hold)",
+      "Bash(npm run *)",
+      "Bash(git -C /home/derlly/projects/cronograma add -A)",
+      "Bash(git -C /home/derlly/projects/cronograma commit -m \"chore: andamiaje inicial Next.js + TypeScript + Tailwind\")"
     ]
   }
 }
