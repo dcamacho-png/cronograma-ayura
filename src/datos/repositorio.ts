@@ -162,14 +162,14 @@ export function listarTareasPendientes(areaId: string) {
   })
 }
 
-export async function crearTarea(areaId: string, descripcion: string, loteIds: string[], turno: string) {
+export async function crearTarea(areaId: string, descripcion: string, loteIds: string[]) {
   let fincaId: string | null = null
   if (loteIds.length > 0) {
     const primer = await prisma.lote.findUnique({ where: { id: loteIds[0] } })
     fincaId = primer?.fincaId ?? null
   }
   return prisma.tarea.create({
-    data: { areaId, descripcion, turno, fincaId, lotes: { connect: loteIds.map((id) => ({ id })) } },
+    data: { areaId, descripcion, fincaId, lotes: { connect: loteIds.map((id) => ({ id })) } },
   })
 }
 
@@ -199,6 +199,7 @@ export async function asignarTarea(
   responsableId: string,
   dia: number,
   loteIdFallback: string | null,
+  turno: string,
 ) {
   const tarea = await prisma.tarea.findUnique({ where: { id: tareaId }, include: { lotes: true } })
   if (!tarea || tarea.anioSel === null || tarea.semanaSel === null) return null
@@ -216,7 +217,7 @@ export async function asignarTarea(
         semana,
         dia,
         descripcion: tarea.descripcion,
-        turno: tarea.turno.trim() || turnoPorDia(dia),
+        turno: turno.trim() || turnoPorDia(dia),
         areaId: tarea.areaId,
         fincaId: primer.fincaId,
         responsableId,
