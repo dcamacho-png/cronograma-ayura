@@ -20,7 +20,10 @@
       "Bash(git -C /home/derlly/projects/cronograma status)",
       "Bash(node -e \"const p=require\\('./package.json'\\);console.log\\('next',p.dependencies.next,'| react',p.dependencies.react\\)\")",
       "Bash(npm test *)",
-      "Bash(git -C /home/derlly/projects/cronograma commit -m \"chore: configurar Vitest\")"
+      "Bash(git -C /home/derlly/projects/cronograma commit -m \"chore: configurar Vitest\")",
+      "Bash(git *)",
+      "Bash(node -e \"const p=require\\('./package.json'\\);console.log\\(JSON.stringify\\({test:p.scripts.test,watch:p.scripts['test:watch'],vitest:p.devDependencies.vitest}\\)\\)\")",
+      "Bash(npx tsc *)"
     ]
   }
 }
