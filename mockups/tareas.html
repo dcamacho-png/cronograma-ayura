@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banco de Tareas — Maqueta</title>
+<style>
+  :root{ --verde:#11603a; --verde2:#1d8a55; --linea:#e5e7eb; --gris:#6b7280; --fondo:#f4f6f9; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--fondo);color:#1f2937}
+  header{background:var(--verde);color:#fff;padding:12px 20px;display:flex;gap:12px;align-items:center}
+  header .logo{font-size:18px}
+  nav{display:flex;gap:6px;background:#fff;padding:0 14px;border-bottom:1px solid var(--linea);overflow-x:auto}
+  nav button{border:0;background:none;padding:13px 14px;font-size:14px;cursor:pointer;color:var(--gris);border-bottom:3px solid transparent;white-space:nowrap}
+  nav button.activo{color:var(--verde);border-bottom-color:var(--verde);font-weight:700}
+  main{max-width:1000px;margin:0 auto;padding:20px}
+  .panel{display:none}.panel.activo{display:block}
+  h1{font-size:20px;color:var(--verde);margin-bottom:12px}
+  .pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .pill{border-radius:999px;padding:5px 12px;font-size:13px;background:#eef2f7;color:#374151}
+  .pill.on{background:var(--verde);color:#fff}
+  .semana{display:flex;gap:10px;align-items:center;margin-bottom:16px;font-size:14px}
+  .semana .nav{border:1px solid var(--linea);border-radius:8px;padding:4px 10px;background:#fff;cursor:pointer}
+  .card{background:#fff;border:1px solid var(--linea);border-radius:12px;padding:14px;margin-bottom:14px}
+  .card h2{font-size:15px;margin-bottom:10px}
+  .tarea{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--linea)}
+  .tarea:last-child{border-bottom:0}
+  .tarea .desc{flex:1}
+  .tarea .meta{font-size:12px;color:var(--gris)}
+  .btn{border:0;border-radius:8px;padding:6px 11px;font-size:13px;cursor:pointer}
+  .btn.primario{background:var(--verde);color:#fff}
+  .btn.gris{background:#eef2f7;color:#374151}
+  .btn.link{background:none;color:#b91c1c;padding:6px 4px}
+  .badge{font-size:12px;font-weight:700;color:#fff;background:var(--verde2);border-radius:999px;padding:3px 10px}
+  .agregar{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .agregar input,.agregar select{border:1px solid var(--linea);border-radius:8px;padding:8px;font-size:13px}
+  .agregar input.desc{flex:1;min-width:200px}
+  .aviso{background:#fff8e1;border:1px solid #f3e2a8;color:#7a5c00;padding:9px 12px;border-radius:10px;font-size:13px;margin-bottom:16px}
+  .porasignar{background:#eef6ff;border:1px solid #cfe0fb;border-radius:12px;padding:14px;margin-bottom:18px}
+  .porasignar h2{color:#1e40af;font-size:15px;margin-bottom:10px}
+  .asignar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 0;border-bottom:1px dashed #cfe0fb}
+  .asignar:last-child{border-bottom:0}
+  .asignar .desc{flex:1;min-width:160px;font-weight:600}
+  .asignar select{border:1px solid #cfe0fb;border-radius:7px;padding:6px;font-size:12.5px}
+  table{width:100%;border-collapse:collapse;font-size:13px;background:#fff;border:1px solid var(--linea);border-radius:10px;overflow:hidden}
+  th,td{border:1px solid var(--linea);padding:8px;text-align:left;vertical-align:top}
+  th{background:#f8fafc;font-size:12px}
+  .act{background:#e6f6ec;border-radius:6px;padding:4px;margin-bottom:4px;font-size:12px}
+  .flow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;background:#fff;border:1px solid var(--linea);border-radius:10px;padding:12px;margin-bottom:18px}
+  .flow .paso{background:#eef2f7;border-radius:8px;padding:6px 10px}
+  .flow .fl{color:var(--verde2);font-weight:700}
+</style>
+</head>
+<body>
+<header><span class="logo">🌱</span> <b>Cronograma Ayurá</b> <span style="opacity:.8;font-size:13px">· maqueta de Tareas</span></header>
+<nav>
+  <button onclick="ir(this,'tareas')" class="activo">🗂️ Tareas (banco)</button>
+  <button onclick="ir(this,'programar')">📋 Programar</button>
+</nav>
+<main>
+
+  <div class="aviso">🔎 Esto es una <b>maqueta</b> para que veas la idea. Los botones no funcionan; los datos son de ejemplo.</div>
+
+  <div class="flow">
+    <span class="paso">1. Anotas tareas en el banco</span>
+    <span class="fl">→</span>
+    <span class="paso">2. Eliges cuáles para la semana</span>
+    <span class="fl">→</span>
+    <span class="paso">3. En Programar las asignas a responsable y día</span>
+    <span class="fl">→</span>
+    <span class="paso">4. Entran a la grilla y salen del banco</span>
+  </div>
+
+  <!-- ===== TAREAS ===== -->
+  <section class="panel activo" id="tareas">
+    <h1>🗂️ Banco de tareas</h1>
+    <div class="pills">
+      <span class="pill on">Ganadería ceba</span>
+      <span class="pill">Maquinaria</span>
+      <span class="pill">Maíz</span>
+      <span class="pill">Riego</span>
+      <span class="pill">Nelore</span>
+    </div>
+    <div class="semana">
+      <span class="nav">← Semana 24</span>
+      <b>Semana 25 · 2026</b>
+      <span class="nav">Semana 26 →</span>
+      <span style="color:var(--gris)">(eliges para qué semana seleccionar)</span>
+    </div>
+
+    <div class="card">
+      <h2>Tareas pendientes — Ganadería ceba</h2>
+
+      <div class="tarea">
+        <div class="desc">Reparar cerca de la laguna<div class="meta">Finca: Entremontes</div></div>
+        <span class="badge">➡️ Semana 25</span>
+        <button class="btn gris">Quitar</button>
+        <button class="btn link">eliminar</button>
+      </div>
+
+      <div class="tarea">
+        <div class="desc">Repartir sal en potreros del norte<div class="meta">Finca: Acajure</div></div>
+        <span class="badge">➡️ Semana 25</span>
+        <button class="btn gris">Quitar</button>
+        <button class="btn link">eliminar</button>
+      </div>
+
+      <div class="tarea">
+        <div class="desc">Fumigar espartillo La Tira<div class="meta">Finca: Acajure</div></div>
+        <button class="btn primario">Seleccionar para semana 25</button>
+        <button class="btn link">eliminar</button>
+      </div>
+
+      <div class="tarea">
+        <div class="desc">Limpieza de bebederos<div class="meta">Sin finca asignada</div></div>
+        <button class="btn primario">Seleccionar para semana 25</button>
+        <button class="btn link">eliminar</button>
+      </div>
+
+      <div class="agregar">
+        <input class="desc" placeholder="Nueva tarea… (ej: Arreglo de saladero)">
+        <select><option>Finca (opcional)</option><option>Entremontes</option><option>Acajure</option><option>Normandia</option></select>
+        <button class="btn primario">+ Agregar al banco</button>
+      </div>
+    </div>
+    <p style="font-size:12.5px;color:var(--gris)">Las que tienen <span class="badge" style="font-size:11px">➡️ Semana 25</span> ya están elegidas para esa semana y aparecerán en <b>Programar</b> listas para asignar.</p>
+  </section>
+
+  <!-- ===== PROGRAMAR ===== -->
+  <section class="panel" id="programar">
+    <h1>📋 Programar semana</h1>
+    <div class="pills">
+      <span class="pill on">Ganadería ceba</span>
+      <span class="pill">Maquinaria</span>
+      <span class="pill">Maíz</span>
+    </div>
+    <div class="semana"><span class="nav">← Semana 24</span><b>Semana 25 · 2026</b><span class="nav">Semana 26 →</span></div>
+
+    <div class="porasignar">
+      <h2>📌 Tareas por asignar — semana 25 (vienen del banco)</h2>
+      <div class="asignar">
+        <span class="desc">Reparar cerca de la laguna</span>
+        <select><option>Responsable…</option><option>David Zuleta</option><option>Duván Peña</option></select>
+        <select><option>Día…</option><option>Lun</option><option>Mar</option><option>Mié</option></select>
+        <select><option>Entremontes</option><option>Acajure</option></select>
+        <button class="btn primario">Asignar →</button>
+      </div>
+      <div class="asignar">
+        <span class="desc">Repartir sal en potreros del norte</span>
+        <select><option>Responsable…</option><option>David Zuleta</option><option>Duván Peña</option></select>
+        <select><option>Día…</option><option>Lun</option><option>Mar</option><option>Mié</option></select>
+        <select><option>Acajure</option><option>Entremontes</option></select>
+        <button class="btn primario">Asignar →</button>
+      </div>
+      <p style="font-size:12px;color:#1e40af;margin-top:8px">Al pulsar <b>Asignar</b>, la tarea baja a la grilla y sale de esta lista (queda "programada").</p>
+    </div>
+
+    <table>
+      <thead><tr><th>Responsable</th><th>Lun 15 jun</th><th>Mar 16 jun</th><th>Mié 17 jun</th><th>Jue 18 jun</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><b>David Zuleta</b></td>
+          <td><div class="act">Siembra de pasto<br><span style="color:#6b7280">7am-4pm</span></div></td>
+          <td></td>
+          <td><div class="act">Repartida de sal general</div></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><b>Duván Peña</b></td>
+          <td></td>
+          <td><div class="act">Apoyo corral y despacho</div></td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:12.5px;color:var(--gris);margin-top:10px">La grilla de siempre. Las tareas asignadas aparecen aquí como actividades normales (se les marca cumplimiento, etc.).</p>
+  </section>
+
+</main>
+<script>
+function ir(b,id){document.querySelectorAll('nav button').forEach(x=>x.classList.remove('activo'));b.classList.add('activo');document.querySelectorAll('.panel').forEach(p=>p.classList.remove('activo'));document.getElementById(id).classList.add('activo');window.scrollTo(0,0)}
+</script>
+</body>
+</html>
