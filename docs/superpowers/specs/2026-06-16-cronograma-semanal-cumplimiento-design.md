@@ -53,6 +53,10 @@ tendencias.
   - **Estado:** Pendiente · ✅ Cumplida · 🟡 Parcial · 🔴 No cumplida · 🔄 Reprogramada
   - **Motivo** (obligatorio si Parcial / No cumplida / Reprogramada)
   - Nota corta (opcional)
+  - **Veces reprogramada** — contador que se incrementa cada vez que la
+    actividad se arrastra a otra semana (trazabilidad).
+  - **Origen** — referencia a la actividad de la semana anterior de la que
+    proviene (cuando es una reprogramación), para seguir su historia.
 
 ### Maquinaria (caso especial)
 
@@ -71,6 +75,18 @@ Las actividades del área de maquinaria llevan campos adicionales:
    actividades. Botón **"duplicar semana anterior"** para no empezar de cero.
 2. **Registrar cumplimiento** — la misma grilla; al cerrar el día/semana se marca
    estado + motivo de cada actividad.
+   - **Flujo al marcar 🔴 No cumplida (o 🟡 Parcial):** la app pide el **motivo**
+     (+ nota) y luego pregunta **"¿Deseas reprogramarla para la próxima
+     semana?"**. Si la respuesta es sí:
+     - La actividad **se copia a la semana siguiente** como 🔄 Reprogramada,
+       conservando descripción, responsable, área, finca y campos de maquinaria
+       (queda lista para ajustar el día/turno).
+     - Se incrementa el contador **"veces reprogramada"** y se guarda el
+       **origen** (la actividad de la que proviene).
+   - El mismo flujo aplica al revisar las **reprogramadas**: si tampoco se
+     cumplen, pueden volver a arrastrarse a la semana siguiente, sumando al
+     contador. Así queda la trazabilidad de cuántas veces se ha movido una
+     actividad.
 3. **Resumen semanal** 📅
    - % cumplido del área (semáforo + número grande).
    - 🔄 Lista de actividades que se cambiaron/reprogramaron, con su motivo.
