@@ -8,7 +8,7 @@ import {
   listarLotes,
 } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, esSemanaPasada } from '@/dominio/semana'
-import { crearActividadAccion, eliminarActividadAccion, duplicarSemanaAccion, crearResponsableAccion, actualizarActividadAccion, asignarTareaAccion } from './acciones'
+import { crearActividadAccion, eliminarActividadAccion, duplicarSemanaAccion, crearResponsableAccion, asignarTareaAccion } from './acciones'
 import { SelectLote } from '../_componentes/select-lote'
 import { InfoLotes } from '../_componentes/info-lotes'
 
@@ -175,26 +175,15 @@ export default async function ProgramarPage({
                       <td key={dia} className="border p-2 align-top">
                         {celdas.map((a) => (
                           <div key={a.id} className="mb-1 rounded bg-green-50 p-1">
-                            {pasada ? (
-                              <>
-                                <div>{a.descripcion}</div>
-                                {a.turno && <div className="text-xs text-gray-500">{a.turno}</div>}
-                              </>
-                            ) : (
-                              <>
-                                <form action={actualizarActividadAccion} className="flex flex-col gap-1">
-                                  <input type="hidden" name="id" value={a.id} />
-                                  <input name="descripcion" defaultValue={a.descripcion} className="rounded border p-1 text-xs" />
-                                  <input name="turno" defaultValue={a.turno} placeholder="turno" className="rounded border p-1 text-xs" />
-                                  <button className="self-start text-xs font-semibold text-[#11603a] hover:underline">guardar</button>
-                                </form>
-                                <form action={eliminarActividadAccion} className="mt-1 inline">
-                                  <input type="hidden" name="id" value={a.id} />
-                                  <button className="text-xs text-red-600 hover:underline">eliminar</button>
-                                </form>
-                              </>
-                            )}
+                            <div>{a.descripcion}</div>
+                            {a.turno && <div className="text-xs text-gray-500">{a.turno}</div>}
                             <InfoLotes lotes={a.lotes} className="mt-1" />
+                            {!pasada && (
+                              <form action={eliminarActividadAccion} className="mt-1 inline">
+                                <input type="hidden" name="id" value={a.id} />
+                                <button className="text-xs text-red-600 hover:underline">eliminar</button>
+                              </form>
+                            )}
                           </div>
                         ))}
                       </td>
