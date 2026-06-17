@@ -80,3 +80,50 @@ export function colorSemaforo(veces: number): ColorSemaforo {
   if (veces === 3) return 'naranja'
   return 'rojo'
 }
+
+export interface FilaArea {
+  areaId: string
+  porcentaje: number | null
+}
+
+// % de cumplimiento agrupado por área.
+export function cumplimientoPorArea(actividades: Actividad[]): FilaArea[] {
+  const porArea = new Map<string, Actividad[]>()
+  for (const a of actividades) {
+    const lista = porArea.get(a.areaId) ?? []
+    lista.push(a)
+    porArea.set(a.areaId, lista)
+  }
+  const filas: FilaArea[] = []
+  for (const [areaId, acts] of porArea) {
+    filas.push({ areaId, porcentaje: porcentajeCumplimiento(acts) })
+  }
+  return filas
+}
+
+export interface PuntoTendencia {
+  anio: number
+  semana: number
+  porcentaje: number | null
+}
+
+// % de cumplimiento por semana, ordenado cronológicamente.
+export function tendenciaSemanal(actividades: Actividad[]): PuntoTendencia[] {
+  const porSemana = new Map<string, Actividad[]>()
+  for (const a of actividades) {
+    const clave = `${a.anio}-${a.semana}`
+    const lista = porSemana.get(clave) ?? []
+    lista.push(a)
+    porSemana.set(clave, lista)
+  }
+  const puntos: PuntoTendencia[] = []
+  for (const acts of porSemana.values()) {
+    puntos.push({
+      anio: acts[0].anio,
+      semana: acts[0].semana,
+      porcentaje: porcentajeCumplimiento(acts),
+    })
+  }
+  puntos.sort((a, b) => a.anio - b.anio || a.semana - b.semana)
+  return puntos
+}

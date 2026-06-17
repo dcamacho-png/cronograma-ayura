@@ -118,3 +118,33 @@ describe('colorSemaforo', () => {
     expect(colorSemaforo(7)).toBe('rojo')
   })
 })
+
+import { cumplimientoPorArea, tendenciaSemanal } from './metricas'
+
+describe('cumplimientoPorArea', () => {
+  it('calcula el % por cada área', () => {
+    const acts = [
+      act({ areaId: 'maiz', estado: 'CUMPLIDA' }),
+      act({ areaId: 'maiz', estado: 'NO_CUMPLIDA' }),  // maiz = 50
+      act({ areaId: 'riego', estado: 'CUMPLIDA' }),    // riego = 100
+    ]
+    const filas = cumplimientoPorArea(acts)
+    expect(filas).toContainEqual({ areaId: 'maiz', porcentaje: 50 })
+    expect(filas).toContainEqual({ areaId: 'riego', porcentaje: 100 })
+  })
+})
+
+describe('tendenciaSemanal', () => {
+  it('calcula el % por semana, ordenado cronológicamente', () => {
+    const acts = [
+      act({ anio: 2026, semana: 24, estado: 'CUMPLIDA' }),
+      act({ anio: 2026, semana: 24, estado: 'NO_CUMPLIDA' }), // S24 = 50
+      act({ anio: 2026, semana: 25, estado: 'CUMPLIDA' }),    // S25 = 100
+    ]
+    const puntos = tendenciaSemanal(acts)
+    expect(puntos).toEqual([
+      { anio: 2026, semana: 24, porcentaje: 50 },
+      { anio: 2026, semana: 25, porcentaje: 100 },
+    ])
+  })
+})
