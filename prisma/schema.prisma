@@ -58,8 +58,8 @@ model Actividad {
 
   areaId        String
   area          Area    @relation("AreaDeActividad", fields: [areaId], references: [id])
-  fincaId       String
-  finca         Finca   @relation(fields: [fincaId], references: [id])
+  fincaId       String?
+  finca         Finca?  @relation(fields: [fincaId], references: [id])
   responsableId String
   responsable   Responsable @relation(fields: [responsableId], references: [id])
   motivoId      String?
