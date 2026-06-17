@@ -89,3 +89,32 @@ describe('rankingResponsables', () => {
     expect(top.map((f) => f.responsableId)).toEqual(['A'])
   })
 })
+
+import { porcentajeReprogramadas, colorSemaforo } from './metricas'
+
+describe('porcentajeReprogramadas', () => {
+  it('calcula el % de actividades con vecesReprogramada > 0', () => {
+    const acts = [
+      act({ vecesReprogramada: 0 }),
+      act({ vecesReprogramada: 1 }),
+      act({ vecesReprogramada: 3 }),
+      act({ vecesReprogramada: 0 }),
+    ]
+    // 2 de 4 -> 50
+    expect(porcentajeReprogramadas(acts)).toBe(50)
+  })
+  it('devuelve 0 con lista vacía', () => {
+    expect(porcentajeReprogramadas([])).toBe(0)
+  })
+})
+
+describe('colorSemaforo', () => {
+  it('asigna color según las veces reprogramada', () => {
+    expect(colorSemaforo(0)).toBe('ninguno')
+    expect(colorSemaforo(1)).toBe('verde')
+    expect(colorSemaforo(2)).toBe('amarillo')
+    expect(colorSemaforo(3)).toBe('naranja')
+    expect(colorSemaforo(4)).toBe('rojo')
+    expect(colorSemaforo(7)).toBe('rojo')
+  })
+})

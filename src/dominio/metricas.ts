@@ -62,3 +62,21 @@ export function rankingResponsables(
     bajos: filas.slice(-3),
   }
 }
+
+// % de actividades que son reprogramaciones (vecesReprogramada > 0).
+export function porcentajeReprogramadas(actividades: Actividad[]): number {
+  if (actividades.length === 0) return 0
+  const reprog = actividades.filter((a) => a.vecesReprogramada > 0).length
+  return Math.round((reprog / actividades.length) * 100)
+}
+
+export type ColorSemaforo = 'ninguno' | 'verde' | 'amarillo' | 'naranja' | 'rojo'
+
+// Color de alerta según cuántas veces se ha reprogramado la actividad.
+export function colorSemaforo(veces: number): ColorSemaforo {
+  if (veces <= 0) return 'ninguno'
+  if (veces === 1) return 'verde'
+  if (veces === 2) return 'amarillo'
+  if (veces === 3) return 'naranja'
+  return 'rojo'
+}
