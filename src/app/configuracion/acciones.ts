@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable } from '@/datos/repositorio'
+import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada } from '@/datos/repositorio'
 
 function texto(form: FormData, clave: string): string {
   const v = form.get(clave)
@@ -76,5 +76,24 @@ export async function eliminarMaquinaAccion(form: FormData) {
 export async function eliminarResponsableAccion(form: FormData) {
   const id = texto(form, 'id')
   if (id) await intentar(() => eliminarResponsable(id))
+  revalidatePath('/configuracion')
+}
+
+export async function crearActividadEstipuladaAccion(form: FormData) {
+  const nombre = texto(form, 'nombre')
+  if (nombre) await intentar(() => crearActividadEstipulada(nombre))
+  revalidatePath('/configuracion')
+}
+
+export async function eliminarActividadEstipuladaAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (id) await intentar(() => eliminarActividadEstipulada(id))
+  revalidatePath('/configuracion')
+}
+
+export async function renombrarActividadEstipuladaAccion(form: FormData) {
+  const id = texto(form, 'id')
+  const nombre = texto(form, 'nombre')
+  if (id && nombre) await intentar(() => renombrarActividadEstipulada(id, nombre))
   revalidatePath('/configuracion')
 }

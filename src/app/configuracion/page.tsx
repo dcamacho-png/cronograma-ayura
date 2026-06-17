@@ -4,6 +4,7 @@ import {
   listarMotivos,
   listarMaquinas,
   listarResponsablesTodos,
+  listarActividadesEstipuladas,
 } from '@/datos/repositorio'
 import {
   crearAreaAccion,
@@ -16,15 +17,19 @@ import {
   eliminarMotivoAccion,
   eliminarMaquinaAccion,
   eliminarResponsableAccion,
+  crearActividadEstipuladaAccion,
+  eliminarActividadEstipuladaAccion,
+  renombrarActividadEstipuladaAccion,
 } from './acciones'
 
 export default async function ConfiguracionPage() {
-  const [areas, fincas, motivos, maquinas, responsables] = await Promise.all([
+  const [areas, fincas, motivos, maquinas, responsables, estipuladas] = await Promise.all([
     listarAreas(),
     listarFincas(),
     listarMotivos(),
     listarMaquinas(),
     listarResponsablesTodos(),
+    listarActividadesEstipuladas(),
   ])
 
   return (
@@ -137,6 +142,31 @@ export default async function ConfiguracionPage() {
                 <option key={a.id} value={a.id}>{a.nombre}</option>
               ))}
             </select>
+            <button className="rounded bg-[#11603a] px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
+          </form>
+        </section>
+
+        {/* Actividades de maquinaria (estipuladas) */}
+        <section className="rounded-xl border p-4 md:col-span-2">
+          <h2 className="mb-2 font-semibold">Actividades de maquinaria (estipuladas)</h2>
+          <p className="mb-3 text-xs text-gray-500">Estas aparecen en el desplegable de Tareas cuando el área es Maquinaria.</p>
+          <ul className="mb-3 space-y-1">
+            {estipuladas.map((e) => (
+              <li key={e.id} className="flex items-center gap-2">
+                <form action={renombrarActividadEstipuladaAccion} className="flex flex-1 items-center gap-1">
+                  <input type="hidden" name="id" value={e.id} />
+                  <input name="nombre" defaultValue={e.nombre} className="flex-1 rounded border p-1 text-sm" />
+                  <button className="text-xs font-semibold text-[#11603a] hover:underline">guardar</button>
+                </form>
+                <form action={eliminarActividadEstipuladaAccion}>
+                  <input type="hidden" name="id" value={e.id} />
+                  <button className="text-gray-400 hover:text-red-600" title="Eliminar" aria-label="Eliminar">✕</button>
+                </form>
+              </li>
+            ))}
+          </ul>
+          <form action={crearActividadEstipuladaAccion} className="flex gap-2">
+            <input name="nombre" required placeholder="Nueva actividad de maquinaria" className="flex-1 rounded border p-2 text-sm" />
             <button className="rounded bg-[#11603a] px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
           </form>
         </section>
