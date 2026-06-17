@@ -21,6 +21,7 @@ model Finca {
   nombre      String      @unique
   actividades Actividad[]
   tareas      Tarea[]
+  lotes       Lote[]
 }
 
 model Responsable {
@@ -79,6 +80,7 @@ model Actividad {
   horas      Float?
   hectareas  Float?
   planB      String?
+  lotes      Lote[]
 
   @@index([anio, semana, areaId])
 }
@@ -94,6 +96,8 @@ model Tarea {
   area        Area        @relation(fields: [areaId], references: [id])
   fincaId     String?
   finca       Finca?      @relation(fields: [fincaId], references: [id])
+  loteId      String?
+  lote        Lote?       @relation(fields: [loteId], references: [id])
 
   actividades Actividad[]
 
@@ -103,4 +107,17 @@ model Tarea {
 model ActividadEstipulada {
   id     String @id @default(cuid())
   nombre String @unique
+}
+
+model Lote {
+  id          String      @id @default(cuid())
+  nombre      String      @unique
+  hectareas   Float?
+  tipoPasto   String?
+  fincaId     String
+  finca       Finca       @relation(fields: [fincaId], references: [id])
+  actividades Actividad[]
+  tareas      Tarea[]
+
+  @@index([fincaId])
 }
