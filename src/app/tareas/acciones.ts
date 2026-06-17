@@ -20,7 +20,8 @@ function textoOpcional(form: FormData, clave: string): string | null {
 
 export async function crearTareaAccion(form: FormData) {
   const areaId = texto(form, 'areaId')
-  const descripcion = texto(form, 'descripcion')
+  const descripcion =
+    textoOpcional(form, 'otra') ?? textoOpcional(form, 'estipulada') ?? texto(form, 'descripcion')
   if (!areaId || !descripcion) return
   await crearTarea(areaId, descripcion, textoOpcional(form, 'fincaId'))
   revalidatePath('/tareas')

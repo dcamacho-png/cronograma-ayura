@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { listarAreas, listarFincas, listarTareasPendientes } from '@/datos/repositorio'
+import { listarAreas, listarFincas, listarTareasPendientes, listarActividadesEstipuladas } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, esSemanaPasada } from '@/dominio/semana'
 import {
   crearTareaAccion,
@@ -24,6 +24,8 @@ export default async function TareasPage({
   }
 
   const areaId = sp.area && areas.some((a) => a.id === sp.area) ? sp.area : areas[0].id
+  const areaActual = areas.find((a) => a.id === areaId)!
+  const esMaquinaria = areaActual.nombre.toLowerCase().includes('maquinaria')
   const hoy = semanaActual()
   const anioRaw = Number(sp.anio)
   const semanaRaw = Number(sp.semana)
@@ -31,9 +33,10 @@ export default async function TareasPage({
   const semana = sp.semana && Number.isInteger(semanaRaw) ? semanaRaw : hoy.semana
   const pasada = esSemanaPasada(anio, semana, hoy)
 
-  const [fincas, tareas] = await Promise.all([
+  const [fincas, tareas, estipuladas] = await Promise.all([
     listarFincas(),
     listarTareasPendientes(areaId),
+    listarActividadesEstipuladas(),
   ])
 
   const previa = semanaAnterior(anio, semana)
@@ -115,10 +118,28 @@ export default async function TareasPage({
 
       <form action={crearTareaAccion} className="flex flex-wrap items-end gap-2 rounded-xl border p-4">
         <input type="hidden" name="areaId" value={areaId} />
-        <label className="flex flex-1 flex-col text-sm">
-          Nueva tarea
-          <input name="descripcion" required placeholder="Ej: Arreglo de saladero" className="rounded border p-2" />
-        </label>
+        {esMaquinaria ? (
+          <>
+            <label className="flex flex-col text-sm">
+              Actividad (lista)
+              <select name="estipulada" className="rounded border p-2">
+                <option value="">— elegir —</option>
+                {estipuladas.map((e) => (
+                  <option key={e.id} value={e.nombre}>{e.nombre}</option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-1 flex-col text-sm">
+              Otra (opcional)
+              <input name="otra" placeholder="Escribe otra si no está en la lista" className="rounded border p-2" />
+            </label>
+          </>
+        ) : (
+          <label className="flex flex-1 flex-col text-sm">
+            Nueva tarea
+            <input name="descripcion" required placeholder="Ej: Arreglo de saladero" className="rounded border p-2" />
+          </label>
+        )}
         <label className="flex flex-col text-sm">
           Finca (opcional)
           <select name="fincaId" className="rounded border p-2">
