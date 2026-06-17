@@ -51,6 +51,8 @@ export default async function CumplimientoPage({
     listarActividades(areaId, anio, semana),
   ])
 
+  const pendientes = actividades.filter((a) => a.estado === 'PENDIENTE').length
+
   const dominio = actividades as unknown as ActividadDominio[]
   const pct = porcentajeCumplimiento(dominio)
   const pctRep = porcentajeReprogramadas(dominio)
@@ -85,9 +87,18 @@ export default async function CumplimientoPage({
           ← Semana {previa.semana}
         </Link>
         <span className="font-semibold">Semana {semana} · {anio}</span>
-        <Link href={url(areaId, proxima.anio, proxima.semana)} className="rounded border px-3 py-1 text-sm">
-          Semana {proxima.semana} →
-        </Link>
+        {pendientes > 0 ? (
+          <span
+            className="cursor-not-allowed rounded border px-3 py-1 text-sm text-gray-300"
+            title="Registra todas las actividades para pasar a la siguiente semana"
+          >
+            Semana {proxima.semana} →
+          </span>
+        ) : (
+          <Link href={url(areaId, proxima.anio, proxima.semana)} className="rounded border px-3 py-1 text-sm">
+            Semana {proxima.semana} →
+          </Link>
+        )}
         <span className="ml-auto rounded bg-gray-100 px-3 py-1 text-sm">
           Cumplido: <b>{pct === null ? '—' : `${pct}%`}</b>
         </span>
@@ -95,6 +106,12 @@ export default async function CumplimientoPage({
           Reprogramadas: <b>{pctRep}%</b>
         </span>
       </div>
+
+      {pendientes > 0 && (
+        <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
+          ⚠️ Faltan <b>{pendientes}</b> actividad(es) por registrar esta semana. Regístralas para pasar a la siguiente semana.
+        </div>
+      )}
 
       {actividades.length === 0 ? (
         <p className="text-sm text-gray-500">
