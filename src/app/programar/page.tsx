@@ -133,7 +133,11 @@ export default async function ProgramarPage({
                         <option key={d} value={i + 1}>{d}</option>
                       ))}
                     </select>
-                    <SelectLote lotes={lotes} name="loteId" required defaultValue={t.loteId ?? ''} />
+                    {t.lotes.length > 0 ? (
+                      <span className="text-xs text-gray-600">Lote(s): {t.lotes.map((l) => l.nombre).join(', ')}</span>
+                    ) : (
+                      <SelectLote lotes={lotes} name="loteId" required />
+                    )}
                     <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">Asignar →</button>
                   </form>
                 </li>
