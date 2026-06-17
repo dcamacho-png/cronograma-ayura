@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { listarAreas, listarLotes, listarTareasPendientes, listarActividadesEstipuladas } from '@/datos/repositorio'
 import { SelectLote } from '../_componentes/select-lote'
+import { FormNuevaTareaMaquinaria } from './form-nueva-tarea-maquinaria'
 import { siguienteSemana, semanaAnterior, semanaActual, esSemanaPasada } from '@/dominio/semana'
 import {
   crearTareaAccion,
@@ -117,36 +118,27 @@ export default async function TareasPage({
         )}
       </div>
 
-      <form action={crearTareaAccion} className="flex flex-wrap items-end gap-2 rounded-xl border p-4">
-        <input type="hidden" name="areaId" value={areaId} />
-        {esMaquinaria ? (
-          <>
-            <label className="flex flex-col text-sm">
-              Actividad (lista)
-              <select name="estipulada" className="rounded border p-2">
-                <option value="">— elegir —</option>
-                {estipuladas.map((e) => (
-                  <option key={e.id} value={e.nombre}>{e.nombre}</option>
-                ))}
-              </select>
-            </label>
-            <label className="flex flex-1 flex-col text-sm">
-              Otra (opcional)
-              <input name="otra" placeholder="Escribe otra si no está en la lista" className="rounded border p-2" />
-            </label>
-          </>
-        ) : (
+      {esMaquinaria ? (
+        <FormNuevaTareaMaquinaria
+          areaId={areaId}
+          estipuladas={estipuladas}
+          lotes={lotes}
+          accion={crearTareaAccion}
+        />
+      ) : (
+        <form action={crearTareaAccion} className="flex flex-wrap items-end gap-2 rounded-xl border p-4">
+          <input type="hidden" name="areaId" value={areaId} />
           <label className="flex flex-1 flex-col text-sm">
             Nueva tarea
             <input name="descripcion" required placeholder="Ej: Arreglo de saladero" className="rounded border p-2" />
           </label>
-        )}
-        <label className="flex flex-col text-sm">
-          Lote (opcional)
-          <SelectLote lotes={lotes} name="loteId" />
-        </label>
-        <button className="rounded bg-[#11603a] px-4 py-2 text-sm font-semibold text-white">+ Agregar al banco</button>
-      </form>
+          <label className="flex flex-col text-sm">
+            Lote (opcional)
+            <SelectLote lotes={lotes} name="loteId" />
+          </label>
+          <button className="rounded bg-[#11603a] px-4 py-2 text-sm font-semibold text-white">+ Agregar al banco</button>
+        </form>
+      )}
     </main>
   )
 }
