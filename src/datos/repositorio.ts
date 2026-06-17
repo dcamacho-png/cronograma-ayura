@@ -103,3 +103,15 @@ export function crearMaquina(nombre: string, operario: string | null) {
 export function listarResponsablesTodos() {
   return prisma.responsable.findMany({ include: { area: true }, orderBy: { nombre: 'asc' } })
 }
+
+// Actividades de un conjunto de semanas (todas las áreas), para el tablero mensual.
+export function listarActividadesDeSemanas(semanas: { anio: number; semana: number }[]) {
+  if (semanas.length === 0) {
+    return prisma.actividad.findMany({ where: { id: '' } }) // lista vacía
+  }
+  return prisma.actividad.findMany({
+    where: { OR: semanas.map((s) => ({ anio: s.anio, semana: s.semana })) },
+    include: { area: true, motivo: true },
+    orderBy: [{ anio: 'asc' }, { semana: 'asc' }],
+  })
+}
