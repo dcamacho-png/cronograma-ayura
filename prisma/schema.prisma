@@ -88,6 +88,7 @@ model Actividad {
 model Tarea {
   id          String      @id @default(cuid())
   descripcion String
+  turno       String      @default("")
   estado      String      @default("PENDIENTE")
   anioSel     Int?
   semanaSel   Int?
