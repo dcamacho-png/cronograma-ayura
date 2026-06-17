@@ -1,14 +1,15 @@
 import Link from 'next/link'
 import {
   listarAreas,
-  listarFincas,
   listarMaquinas,
   listarResponsablesPorArea,
   listarActividades,
   tareasPorAsignar,
+  listarLotes,
 } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, esSemanaPasada } from '@/dominio/semana'
 import { crearActividadAccion, eliminarActividadAccion, duplicarSemanaAccion, crearResponsableAccion, actualizarActividadAccion, asignarTareaAccion } from './acciones'
+import { SelectLote } from '../_componentes/select-lote'
 
 const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
 
@@ -36,12 +37,12 @@ export default async function ProgramarPage({
   const semana = sp.semana && Number.isInteger(semanaRaw) ? semanaRaw : hoy.semana
   const pasada = esSemanaPasada(anio, semana, hoy)
 
-  const [responsables, fincas, maquinas, actividades, porAsignar] = await Promise.all([
+  const [responsables, maquinas, actividades, porAsignar, lotes] = await Promise.all([
     listarResponsablesPorArea(areaId),
-    listarFincas(),
     listarMaquinas(),
     listarActividades(areaId, anio, semana),
     tareasPorAsignar(areaId, anio, semana),
+    listarLotes(),
   ])
 
   const fechas = fechasDeSemana(anio, semana)
@@ -132,11 +133,7 @@ export default async function ProgramarPage({
                         <option key={d} value={i + 1}>{d}</option>
                       ))}
                     </select>
-                    <select name="fincaId" required defaultValue={t.fincaId ?? ''} className="rounded border p-1 text-sm">
-                      {fincas.map((f) => (
-                        <option key={f.id} value={f.id}>{f.nombre}</option>
-                      ))}
-                    </select>
+                    <SelectLote lotes={lotes} name="loteId" required defaultValue={t.loteId ?? ''} />
                     <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">Asignar →</button>
                   </form>
                 </li>
@@ -236,12 +233,8 @@ export default async function ProgramarPage({
             </label>
 
             <label className="flex flex-col text-sm">
-              Finca
-              <select name="fincaId" required className="rounded border p-2">
-                {fincas.map((f) => (
-                  <option key={f.id} value={f.id}>{f.nombre}</option>
-                ))}
-              </select>
+              Lote
+              <SelectLote lotes={lotes} name="loteId" required />
             </label>
 
             <label className="col-span-2 flex flex-col text-sm md:col-span-2">

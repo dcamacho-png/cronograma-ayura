@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { crearActividad, eliminarActividad, duplicarSemana, crearResponsable, actualizarActividad, asignarTarea } from '@/datos/repositorio'
+import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearResponsable, actualizarActividad, asignarTarea } from '@/datos/repositorio'
 import { semanaAnterior, esSemanaPasada, semanaActual } from '@/dominio/semana'
 
 function texto(form: FormData, clave: string): string {
@@ -24,21 +24,25 @@ export async function crearActividadAccion(form: FormData) {
   const anio = Number(texto(form, 'anio'))
   const semana = Number(texto(form, 'semana'))
   if (esSemanaPasada(anio, semana, semanaActual())) return
-  await crearActividad({
-    areaId,
-    anio,
-    semana,
-    dia: Number(texto(form, 'dia')),
-    fincaId: texto(form, 'fincaId'),
-    responsableId: texto(form, 'responsableId'),
-    descripcion: texto(form, 'descripcion'),
-    turno: texto(form, 'turno'),
-    maquinaId: textoOpcional(form, 'maquinaId'),
-    areaTareaId: textoOpcional(form, 'areaTareaId'),
-    horas: numeroOpcional(form, 'horas'),
-    hectareas: numeroOpcional(form, 'hectareas'),
-    planB: textoOpcional(form, 'planB'),
-  })
+  const loteId = texto(form, 'loteId')
+  if (!areaId || !loteId) return
+  await crearActividadDesdeLotes(
+    {
+      areaId,
+      anio,
+      semana,
+      dia: Number(texto(form, 'dia')),
+      responsableId: texto(form, 'responsableId'),
+      descripcion: texto(form, 'descripcion'),
+      turno: texto(form, 'turno'),
+      maquinaId: textoOpcional(form, 'maquinaId'),
+      areaTareaId: textoOpcional(form, 'areaTareaId'),
+      horas: numeroOpcional(form, 'horas'),
+      hectareas: numeroOpcional(form, 'hectareas'),
+      planB: textoOpcional(form, 'planB'),
+    },
+    [loteId],
+  )
   revalidatePath('/programar')
 }
 
@@ -78,8 +82,8 @@ export async function asignarTareaAccion(form: FormData) {
   const tareaId = texto(form, 'tareaId')
   const responsableId = texto(form, 'responsableId')
   const dia = Number(texto(form, 'dia'))
-  const fincaId = texto(form, 'fincaId')
-  if (!tareaId || !responsableId || !fincaId || !Number.isInteger(dia)) return
-  await asignarTarea(tareaId, responsableId, dia, fincaId)
+  const loteId = texto(form, 'loteId')
+  if (!tareaId || !responsableId || !loteId || !Number.isInteger(dia)) return
+  await asignarTarea(tareaId, responsableId, dia, loteId)
   revalidatePath('/programar')
 }
