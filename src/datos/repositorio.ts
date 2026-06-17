@@ -213,3 +213,21 @@ export async function asignarTarea(
     return actividad
   })
 }
+
+// ---- Actividades estipuladas (catálogo de maquinaria) ----
+
+export function listarActividadesEstipuladas() {
+  return prisma.actividadEstipulada.findMany({ orderBy: { nombre: 'asc' } })
+}
+
+export function crearActividadEstipulada(nombre: string) {
+  return prisma.actividadEstipulada.create({ data: { nombre } })
+}
+
+export function eliminarActividadEstipulada(id: string) {
+  return prisma.actividadEstipulada.delete({ where: { id } })
+}
+
+export function renombrarActividadEstipulada(id: string, nombre: string) {
+  return prisma.actividadEstipulada.update({ where: { id }, data: { nombre } })
+}

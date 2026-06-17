@@ -38,6 +38,17 @@ const RESPONSABLES: Record<string, string[]> = {
   Nelore: [],
 }
 
+const ACTIVIDADES_ESTIPULADAS = [
+  'ENCALADORA', 'RENOVADOR', 'FERTILIZACION GRANULADA', 'FERTILIZACION POLLINAZA',
+  'REGAR COMPOST', 'FUMIGACION CONTROL MALEZAS', 'FUMIGACION CONTROL PLAGAS',
+  'RASTRA SIEMBRA', 'CINCEL SIEMBRA', 'PULIDOR SIEMBRA', 'PULIDOR SIEMBRA NEWMAN',
+  'SIEMBRA PASTOS', 'ESTERCOLERO', 'MOVIMIENTOS MATERIALES Y INSUMOS', 'MOVIVIMIENTOS RIEGO',
+  'MOVIMIENTO CARRETE', 'ROTOSPEED', 'COSECHAR PASTOS', 'COSECHA SILO', 'ROLO',
+  'ESPARCIDOR', 'TAIPA', 'DESBROZADORA', 'PALA', 'SEMBRAR CON VOLEADORA', 'SIEMBRA MAIZ',
+  'ZANJADORA', 'ALQUILER MAQUINAS CEBA ENTREMONTES', 'ALQUILER MAQUINAS MAIZ', 'GRANEL',
+  'COSECHAR MAIZ', 'RIEL', 'BOLA', 'CADENA',
+]
+
 // Máquinas del Excel (placa/identificador + operario oficial).
 const MAQUINAS: { nombre: string; operario: string | null }[] = [
   { nombre: '5403', operario: 'Duván' },
@@ -80,15 +91,20 @@ async function main() {
     }
   }
 
-  const [areas, fincas, motivos, responsables, maquinas] = await Promise.all([
+  for (const nombre of ACTIVIDADES_ESTIPULADAS) {
+    await prisma.actividadEstipulada.upsert({ where: { nombre }, update: {}, create: { nombre } })
+  }
+
+  const [areas, fincas, motivos, responsables, maquinas, estipuladas] = await Promise.all([
     prisma.area.count(),
     prisma.finca.count(),
     prisma.motivo.count(),
     prisma.responsable.count(),
     prisma.maquina.count(),
+    prisma.actividadEstipulada.count(),
   ])
   console.log(
-    `Seed listo: ${areas} áreas, ${fincas} fincas, ${motivos} motivos, ${responsables} responsables, ${maquinas} máquinas.`,
+    `Seed listo: ${areas} áreas, ${fincas} fincas, ${motivos} motivos, ${responsables} responsables, ${maquinas} máquinas, ${estipuladas} actividades estipuladas.`,
   )
 }
 
