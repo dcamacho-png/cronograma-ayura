@@ -1,6 +1,7 @@
 import { prisma } from './prisma'
 import { duplicarActividades, datosReprogramacion } from '@/dominio/programacion'
 import { turnoPorDia } from '@/dominio/turno'
+import { siguienteSemana } from '@/dominio/semana'
 import type { BorradorActividad } from '@/dominio/programacion'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
 
@@ -263,6 +264,44 @@ export function crearLote(nombre: string, fincaId: string, hectareas: number | n
 
 export function eliminarLote(id: string) {
   return prisma.lote.delete({ where: { id } })
+}
+
+// Registra el cumplimiento de una actividad PENDIENTE (la bloquea). Si es PARCIAL o
+// REPROGRAMADA, además crea la copia de continuación en la semana siguiente con la
+// observación de lo faltante.
+export async function registrarCumplimiento(
+  id: string,
+  estado: string,
+  motivoId: string | null,
+  nota: string | null,
+) {
+  const act = await prisma.actividad.findUnique({ where: { id }, include: { lotes: true } })
+  if (!act || act.estado !== 'PENDIENTE') return null // ya registrada / bloqueada
+  await prisma.actividad.update({ where: { id }, data: { estado, motivoId, nota } })
+  if (estado === 'PARCIAL' || estado === 'REPROGRAMADA') {
+    const yaExiste = await prisma.actividad.findFirst({ where: { origenId: id } })
+    if (!yaExiste) {
+      const prox = siguienteSemana(act.anio, act.semana)
+      await prisma.actividad.create({
+        data: {
+          anio: prox.anio,
+          semana: prox.semana,
+          dia: act.dia,
+          descripcion: act.descripcion,
+          turno: act.turno,
+          estado: 'REPROGRAMADA',
+          nota: nota ? `Faltante: ${nota}` : null,
+          vecesReprogramada: act.vecesReprogramada + 1,
+          origenId: act.id,
+          areaId: act.areaId,
+          fincaId: act.fincaId,
+          responsableId: act.responsableId,
+          lotes: { connect: act.lotes.map((l) => ({ id: l.id })) },
+        },
+      })
+    }
+  }
+  return true
 }
 
 // Crea una actividad enlazada a uno o varios lotes; la finca se deduce del primer lote.
