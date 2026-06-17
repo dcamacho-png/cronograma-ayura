@@ -77,8 +77,8 @@ export function AsignarTareaForm({
       ) : (
         <label className="flex flex-col text-xs">
           Lote
-          <select name="loteId" required className="rounded border p-1 text-sm">
-            <option value="">— elegir —</option>
+          <select name="loteId" className="rounded border p-1 text-sm">
+            <option value="">— sin lote —</option>
             {[...grupos.entries()].map(([finca, ls]) => (
               <optgroup key={finca} label={finca}>
                 {ls.map((l) => (

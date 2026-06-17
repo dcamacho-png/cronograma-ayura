@@ -208,9 +208,12 @@ export async function asignarTarea(
   const semana = tarea.semanaSel
   const loteIds =
     tarea.lotes.length > 0 ? tarea.lotes.map((l) => l.id) : loteIdFallback ? [loteIdFallback] : []
-  if (loteIds.length === 0) return null
-  const primer = await prisma.lote.findUnique({ where: { id: loteIds[0] } })
-  if (!primer) return null
+  let fincaId: string | null = null
+  if (loteIds.length > 0) {
+    const primer = await prisma.lote.findUnique({ where: { id: loteIds[0] } })
+    if (!primer) return null
+    fincaId = primer.fincaId
+  }
   return prisma.$transaction(async (tx) => {
     const actividad = await tx.actividad.create({
       data: {
@@ -220,7 +223,7 @@ export async function asignarTarea(
         descripcion: tarea.descripcion,
         turno: turno.trim() || turnoPorDia(dia),
         areaId: tarea.areaId,
-        fincaId: primer.fincaId,
+        fincaId,
         responsableId,
         tareaId: tarea.id,
         lotes: { connect: loteIds.map((id) => ({ id })) },
