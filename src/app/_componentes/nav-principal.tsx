@@ -9,6 +9,7 @@ export function NavPrincipal() {
           <Link href="/programar" className="hover:underline">Programar</Link>
           <Link href="/cumplimiento" className="hover:underline">Cumplimiento</Link>
           <Link href="/resumen" className="hover:underline">Resumen</Link>
+          <Link href="/configuracion" className="hover:underline">Configuración</Link>
         </nav>
       </div>
     </header>

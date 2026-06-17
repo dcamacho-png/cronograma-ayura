@@ -83,3 +83,23 @@ export async function reprogramarActividad(
   const datos = datosReprogramacion(origen as unknown as ActividadDominio, anioDestino, semanaDestino)
   return prisma.actividad.create({ data: datos })
 }
+
+export function crearArea(nombre: string) {
+  return prisma.area.create({ data: { nombre } })
+}
+
+export function crearFinca(nombre: string) {
+  return prisma.finca.create({ data: { nombre } })
+}
+
+export function crearMotivo(nombre: string) {
+  return prisma.motivo.create({ data: { nombre } })
+}
+
+export function crearMaquina(nombre: string, operario: string | null) {
+  return prisma.maquina.create({ data: { nombre, operario } })
+}
+
+export function listarResponsablesTodos() {
+  return prisma.responsable.findMany({ include: { area: true }, orderBy: { nombre: 'asc' } })
+}
