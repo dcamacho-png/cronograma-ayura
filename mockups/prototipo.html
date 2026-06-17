@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cronograma Ayurá — Prototipo</title>
+<style>
+  :root{
+    --verde:#2e9e5b; --verde-bg:#e6f6ec;
+    --amarillo:#e8b400; --amarillo-bg:#fbf3d5;
+    --naranja:#e8771a; --naranja-bg:#fce8d8;
+    --rojo:#d63b3b; --rojo-bg:#fbe3e3;
+    --azul:#2563eb; --tinta:#1f2937; --gris:#6b7280; --linea:#e5e7eb;
+    --fondo:#f4f6f9; --tarjeta:#fff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--fondo);color:var(--tinta);}
+  header{background:#11603a;color:#fff;padding:14px 22px;display:flex;align-items:center;gap:12px;}
+  header h1{font-size:18px;font-weight:700}
+  header .logo{width:34px;height:34px;border-radius:8px;background:#1d8a55;display:flex;align-items:center;justify-content:center;font-size:18px}
+  header .sub{margin-left:auto;font-size:13px;opacity:.85}
+  nav{display:flex;gap:4px;background:#fff;padding:0 16px;border-bottom:1px solid var(--linea);overflow-x:auto}
+  nav button{border:0;background:none;padding:14px 16px;font-size:14px;cursor:pointer;color:var(--gris);border-bottom:3px solid transparent;white-space:nowrap}
+  nav button.activo{color:#11603a;border-bottom-color:#11603a;font-weight:600}
+  main{padding:22px;max-width:1080px;margin:0 auto}
+  .panel{display:none}
+  .panel.activo{display:block}
+  .fila-top{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+  .fila-top h2{font-size:20px}
+  .pill{background:#eef2f7;border-radius:999px;padding:5px 12px;font-size:13px;color:#374151}
+  select,.boton{font-size:14px;padding:7px 12px;border-radius:8px;border:1px solid var(--linea);background:#fff}
+  .boton.primario{background:#11603a;color:#fff;border-color:#11603a;cursor:pointer}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px}
+  .card{background:var(--tarjeta);border:1px solid var(--linea);border-radius:14px;padding:18px}
+  .card .lab{font-size:13px;color:var(--gris);margin-bottom:6px}
+  .card .big{font-size:38px;font-weight:800;line-height:1}
+  .card .big small{font-size:16px;font-weight:600;color:var(--gris)}
+  .sem{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  .v{background:var(--verde)}.a{background:var(--amarillo)}.n{background:var(--naranja)}.r{background:var(--rojo)}
+  table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--linea);border-radius:14px;overflow:hidden}
+  th,td{padding:11px 12px;text-align:left;font-size:13.5px;border-bottom:1px solid var(--linea)}
+  th{background:#f8fafc;color:#475569;font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.03em}
+  tr:last-child td{border-bottom:0}
+  .estado{font-size:12.5px;font-weight:600;padding:3px 9px;border-radius:999px;display:inline-block}
+  .e-cum{background:var(--verde-bg);color:var(--verde)}
+  .e-par{background:var(--amarillo-bg);color:#9a7900}
+  .e-no{background:var(--rojo-bg);color:var(--rojo)}
+  .e-rep{background:#e7eefc;color:var(--azul)}
+  .e-pen{background:#eef0f3;color:var(--gris)}
+  .seccion-tit{font-size:15px;font-weight:700;margin:26px 0 10px;display:flex;align-items:center;gap:8px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr}}
+  .barra-area{display:flex;align-items:center;gap:12px;margin:12px 0}
+  .barra-area .nom{width:140px;font-size:13.5px;font-weight:600}
+  .barra-bg{flex:1;height:22px;background:#eef0f3;border-radius:6px;overflow:hidden}
+  .barra-fill{height:100%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;color:#fff;font-size:12px;font-weight:700}
+  .estrellas{color:#f5b50a;letter-spacing:2px}
+  .rank{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--linea)}
+  .rank:last-child{border-bottom:0}
+  .rank .pos{width:26px;height:26px;border-radius:50%;background:#11603a;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+  .rank .pos.bajo{background:#d63b3b}
+  .rank .nm{flex:1;font-size:14px;font-weight:600}
+  .rank .pct{font-size:14px;font-weight:700}
+  .nota{font-size:12.5px;color:var(--gris);margin-top:4px}
+  .veces{font-weight:700;font-size:13px}
+  .linea-svg{background:#fff;border:1px solid var(--linea);border-radius:14px;padding:16px}
+  .badge-aviso{background:#fff8e1;border:1px solid #f3e2a8;color:#7a5c00;padding:10px 14px;border-radius:10px;font-size:13px;margin-bottom:18px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🌱</div>
+  <h1>Cronograma Ayurá</h1>
+  <div class="sub">Coordinación · Semana 25 · 2026</div>
+</header>
+<nav>
+  <button class="activo" onclick="ir(this,'programar')">📋 Programar semana</button>
+  <button onclick="ir(this,'cumplimiento')">✅ Registrar cumplimiento</button>
+  <button onclick="ir(this,'semanal')">📅 Resumen semanal</button>
+  <button onclick="ir(this,'mensual')">📊 Tablero mensual</button>
+</nav>
+<main>
+
+  <div class="badge-aviso">🔎 Esto es una <b>maqueta</b> para ver el aspecto. Los datos son de ejemplo (tomados de tu Excel) y los botones aún no funcionan.</div>
+
+  <!-- PROGRAMAR -->
+  <section class="panel activo" id="programar">
+    <div class="fila-top">
+      <h2>Programar semana</h2>
+      <span class="pill">Área: Ganadería ceba</span>
+      <select><option>Semana 25 · 2026</option><option>Semana 24 · 2026</option></select>
+      <button class="boton">⧉ Duplicar semana anterior</button>
+      <button class="boton primario">+ Nueva actividad</button>
+    </div>
+    <table>
+      <thead><tr><th>Responsable</th><th>Día</th><th>Turno</th><th>Finca</th><th>Actividad</th></tr></thead>
+      <tbody>
+        <tr><td>David Zuleta</td><td>Martes</td><td>7am–4pm</td><td>Entremontes</td><td>Siembra de pasto</td></tr>
+        <tr><td>David Zuleta</td><td>Jueves</td><td>7am–4pm</td><td>Entremontes</td><td>Repartida de sal general</td></tr>
+        <tr><td>Duván Peña</td><td>Martes</td><td>7am–4pm</td><td>Entremontes</td><td>Apoyo corral, despacho y trabajada de ganado</td></tr>
+        <tr><td>Raúl Piñeros</td><td>Miércoles</td><td>7am–4pm</td><td>Acajure</td><td>Fumigación espartillo La Tira</td></tr>
+        <tr><td>Guillermo Bravo</td><td>Viernes</td><td>7am–3pm</td><td>Acajure</td><td>Guadaña lote Casa Vieja</td></tr>
+      </tbody>
+    </table>
+    <p class="nota">La grilla real permitirá agregar/editar cada celda y ver la semana completa de lunes a domingo.</p>
+  </section>
+
+  <!-- CUMPLIMIENTO -->
+  <section class="panel" id="cumplimiento">
+    <div class="fila-top">
+      <h2>Registrar cumplimiento</h2>
+      <span class="pill">Área: Ganadería ceba</span>
+      <select><option>Semana 25 · 2026</option></select>
+    </div>
+    <table>
+      <thead><tr><th>Responsable</th><th>Actividad</th><th>Estado</th><th>Motivo</th><th>Reprog.</th></tr></thead>
+      <tbody>
+        <tr><td>David Zuleta</td><td>Siembra de pasto</td><td><span class="estado e-cum">✅ Cumplida</span></td><td>—</td><td>—</td></tr>
+        <tr><td>David Zuleta</td><td>Repartida de sal general</td><td><span class="estado e-par">🟡 Parcial</span></td><td>Falta de personal</td><td><span class="sem v"></span>1ª</td></tr>
+        <tr><td>Duván Peña</td><td>Apoyo corral y despacho</td><td><span class="estado e-no">🔴 No cumplida</span></td><td>Daño de máquina</td><td><span class="sem a"></span>2ª</td></tr>
+        <tr><td>Raúl Piñeros</td><td>Fumigación espartillo La Tira</td><td><span class="estado e-rep">🔄 Reprogramada</span></td><td>Clima</td><td><span class="sem n"></span>3ª</td></tr>
+        <tr><td>Guillermo Bravo</td><td>Guadaña lote Casa Vieja</td><td><span class="estado e-pen">Pendiente</span></td><td>—</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <div class="badge-aviso" style="margin-top:18px;background:#eef6ff;border-color:#cfe0fb;color:#1e40af">
+      💬 Al marcar <b>🔴 No cumplida</b> o <b>🟡 Parcial</b>, la app preguntará el <b>motivo</b> y luego:
+      <b>"¿Deseas reprogramarla para la próxima semana?"</b> → si dices que sí, se copia sola a la semana siguiente como 🔄 Reprogramada.
+    </div>
+  </section>
+
+  <!-- RESUMEN SEMANAL -->
+  <section class="panel" id="semanal">
+    <div class="fila-top"><h2>Resumen semanal</h2><span class="pill">Semana 25 · Ganadería ceba</span></div>
+    <div class="cards">
+      <div class="card"><div class="lab">Cumplimiento del área</div><div class="big" style="color:var(--verde)">82<small>%</small></div><div class="nota"><span class="sem v"></span>En verde</div></div>
+      <div class="card"><div class="lab">Actividades cumplidas</div><div class="big">14<small>/18</small></div></div>
+      <div class="card"><div class="lab">Reprogramadas</div><div class="big" style="color:var(--naranja)">17<small>%</small></div><div class="nota">3 de 18 actividades</div></div>
+      <div class="card"><div class="lab">Cambios de la semana</div><div class="big">4</div></div>
+    </div>
+
+    <div class="grid2">
+      <div>
+        <div class="seccion-tit">⭐ Ranking de responsables</div>
+        <div class="card">
+          <div class="nota" style="margin-bottom:8px;font-weight:600;color:var(--verde)">TOP 3</div>
+          <div class="rank"><div class="pos">1</div><div class="nm">David Zuleta</div><div class="estrellas">★★★★★</div><div class="pct">100%</div></div>
+          <div class="rank"><div class="pos">2</div><div class="nm">Guillermo Bravo</div><div class="estrellas">★★★★☆</div><div class="pct">92%</div></div>
+          <div class="rank"><div class="pos">3</div><div class="nm">Jhones Andrés</div><div class="estrellas">★★★★☆</div><div class="pct">88%</div></div>
+          <div class="nota" style="margin:14px 0 8px;font-weight:600;color:var(--rojo)">3 MÁS BAJOS</div>
+          <div class="rank"><div class="pos bajo">8</div><div class="nm">Duván Peña</div><div class="estrellas">★★☆☆☆</div><div class="pct">55%</div></div>
+          <div class="rank"><div class="pos bajo">9</div><div class="nm">Alirio Bravo</div><div class="estrellas">★★☆☆☆</div><div class="pct">50%</div></div>
+          <div class="rank"><div class="pos bajo">10</div><div class="nm">Raúl Piñeros</div><div class="estrellas">★☆☆☆☆</div><div class="pct">40%</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="seccion-tit">🔄 Actividades reprogramadas / cambiadas</div>
+        <table>
+          <thead><tr><th>Actividad</th><th>Motivo</th><th>Veces</th></tr></thead>
+          <tbody>
+            <tr><td>Repartida de sal general</td><td>Falta de personal</td><td><span class="sem v"></span><span class="veces">1ª</span></td></tr>
+            <tr><td>Apoyo corral y despacho</td><td>Daño de máquina</td><td><span class="sem a"></span><span class="veces">2ª</span></td></tr>
+            <tr><td>Fumigación espartillo La Tira</td><td>Clima</td><td><span class="sem n"></span><span class="veces">3ª</span></td></tr>
+            <tr><td>Recogida de manguera</td><td>Cambio de prioridad</td><td><span class="sem r"></span><span class="veces">4ª</span></td></tr>
+          </tbody>
+        </table>
+        <p class="nota">El color avisa cuántas veces se ha movido: 🟢1 · 🟡2 · 🟠3 · 🔴4+. La de manguera ya está en rojo: hay que decidir qué hacer con ella.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TABLERO MENSUAL -->
+  <section class="panel" id="mensual">
+    <div class="fila-top"><h2>Tablero mensual</h2><select><option>Junio · 2026</option></select></div>
+    <div class="cards">
+      <div class="card"><div class="lab">Cumplimiento general</div><div class="big" style="color:var(--amarillo)">76<small>%</small></div><div class="nota"><span class="sem a"></span>Atención</div></div>
+      <div class="card"><div class="lab">Mejor área</div><div class="big" style="font-size:22px;padding-top:8px">Maíz<br><small style="color:var(--verde)">91%</small></div></div>
+      <div class="card"><div class="lab">Reprogramadas del mes</div><div class="big" style="color:var(--naranja)">21<small>%</small></div></div>
+    </div>
+
+    <div class="seccion-tit">📊 Cumplimiento por área</div>
+    <div class="card">
+      <div class="barra-area"><div class="nom">Maíz</div><div class="barra-bg"><div class="barra-fill" style="width:91%;background:var(--verde)">91%</div></div></div>
+      <div class="barra-area"><div class="nom">Riego</div><div class="barra-bg"><div class="barra-fill" style="width:84%;background:var(--verde)">84%</div></div></div>
+      <div class="barra-area"><div class="nom">Ganadería ceba</div><div class="barra-bg"><div class="barra-fill" style="width:78%;background:var(--amarillo)">78%</div></div></div>
+      <div class="barra-area"><div class="nom">Nelore</div><div class="barra-bg"><div class="barra-fill" style="width:72%;background:var(--amarillo)">72%</div></div></div>
+      <div class="barra-area"><div class="nom">Maquinaria</div><div class="barra-bg"><div class="barra-fill" style="width:63%;background:var(--naranja)">63%</div></div></div>
+    </div>
+
+    <div class="grid2" style="margin-top:18px">
+      <div>
+        <div class="seccion-tit">📈 Tendencia semana a semana</div>
+        <div class="linea-svg">
+          <svg viewBox="0 0 320 160" width="100%" height="160">
+            <line x1="30" y1="10" x2="30" y2="130" stroke="#e5e7eb"/>
+            <line x1="30" y1="130" x2="310" y2="130" stroke="#e5e7eb"/>
+            <text x="2" y="20" font-size="9" fill="#9ca3af">100</text>
+            <text x="6" y="75" font-size="9" fill="#9ca3af">50</text>
+            <text x="10" y="130" font-size="9" fill="#9ca3af">0</text>
+            <polyline fill="none" stroke="#11603a" stroke-width="3" points="55,55 120,38 185,62 250,30"/>
+            <circle cx="55" cy="55" r="4" fill="#11603a"/><circle cx="120" cy="38" r="4" fill="#11603a"/>
+            <circle cx="185" cy="62" r="4" fill="#11603a"/><circle cx="250" cy="30" r="4" fill="#11603a"/>
+            <text x="44" y="148" font-size="9" fill="#6b7280">S22</text><text x="109" y="148" font-size="9" fill="#6b7280">S23</text>
+            <text x="174" y="148" font-size="9" fill="#6b7280">S24</text><text x="239" y="148" font-size="9" fill="#6b7280">S25</text>
+          </svg>
+          <p class="nota">El cumplimiento del mes viene subiendo: 71% → 84% → 68% → 88%.</p>
+        </div>
+      </div>
+      <div>
+        <div class="seccion-tit">⚠️ Motivos más frecuentes</div>
+        <div class="card">
+          <div class="barra-area"><div class="nom" style="width:120px">Clima</div><div class="barra-bg"><div class="barra-fill" style="width:80%;background:#94a3b8">32%</div></div></div>
+          <div class="barra-area"><div class="nom" style="width:120px">Daño de máquina</div><div class="barra-bg"><div class="barra-fill" style="width:60%;background:#94a3b8">24%</div></div></div>
+          <div class="barra-area"><div class="nom" style="width:120px">Falta personal</div><div class="barra-bg"><div class="barra-fill" style="width:45%;background:#94a3b8">18%</div></div></div>
+          <div class="barra-area"><div class="nom" style="width:120px">Falta insumos</div><div class="barra-bg"><div class="barra-fill" style="width:38%;background:#94a3b8">15%</div></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+<script>
+  function ir(btn, id){
+    document.querySelectorAll('nav button').forEach(b=>b.classList.remove('activo'));
+    btn.classList.add('activo');
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('activo'));
+    document.getElementById(id).classList.add('activo');
+    window.scrollTo(0,0);
+  }
+</script>
+</body>
+</html>
