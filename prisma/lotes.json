@@ -1,0 +1,1562 @@
+[
+{
+"nombre": "ARGENTINA1",
+"finca": "Entremontes",
+"hectareas": 5.1,
+"tipoPasto": "MOMBAZA"
+},
+{
+"nombre": "ARGENTINA2",
+"finca": "Entremontes",
+"hectareas": 9.1,
+"tipoPasto": "MOMBAZA"
+},
+{
+"nombre": "ARGENTINA3",
+"finca": "Entremontes",
+"hectareas": 4.8,
+"tipoPasto": "MOMBAZA"
+},
+{
+"nombre": "ARGENTINA4",
+"finca": "Entremontes",
+"hectareas": 4.85,
+"tipoPasto": "MOMBAZA"
+},
+{
+"nombre": "ARGENTINA5",
+"finca": "Entremontes",
+"hectareas": 9.9,
+"tipoPasto": "MOMBAZA"
+},
+{
+"nombre": "ARGENTINA6",
+"finca": "Entremontes",
+"hectareas": 7.1,
+"tipoPasto": "MOMBAZA"
+},
+{
+"nombre": "ARGENTINA7",
+"finca": "Entremontes",
+"hectareas": 5.9,
+"tipoPasto": "MOMBAZA"
+},
+{
+"nombre": "ARGENTINA8",
+"finca": "Entremontes",
+"hectareas": 4.28,
+"tipoPasto": "MOMBAZA"
+},
+{
+"nombre": "PISTAZURI1",
+"finca": "Entremontes",
+"hectareas": 2.6,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "PISTAZURI2",
+"finca": "Entremontes",
+"hectareas": 2.6,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "PISTAZURI3",
+"finca": "Entremontes",
+"hectareas": 2.6,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "CHILE1",
+"finca": "Entremontes",
+"hectareas": 30.0,
+"tipoPasto": "MOMBAZA"
+},
+{
+"nombre": "CHILE2",
+"finca": "Entremontes",
+"hectareas": 27.0,
+"tipoPasto": "MOMBAZA"
+},
+{
+"nombre": "ARIZONA1",
+"finca": "Entremontes",
+"hectareas": 11.6,
+"tipoPasto": "MOMBAZA"
+},
+{
+"nombre": "ARIZONA2",
+"finca": "Entremontes",
+"hectareas": 8.5,
+"tipoPasto": "MOMBAZA"
+},
+{
+"nombre": "ARIZONA3",
+"finca": "Entremontes",
+"hectareas": 8.3,
+"tipoPasto": "DECUMBENS"
+},
+{
+"nombre": "CONEJO1",
+"finca": "Entremontes",
+"hectareas": 18.47,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "CONEJO2",
+"finca": "Entremontes",
+"hectareas": 22.41,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "CONEJO3",
+"finca": "Entremontes",
+"hectareas": 25.46,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "CONEJO4",
+"finca": "Entremontes",
+"hectareas": 22.84,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "COLONO1",
+"finca": "Entremontes",
+"hectareas": 12.48,
+"tipoPasto": "DECUMBENS"
+},
+{
+"nombre": "COLONO2",
+"finca": "Entremontes",
+"hectareas": 11.36,
+"tipoPasto": "DECUMBENS"
+},
+{
+"nombre": "COLONO3",
+"finca": "Entremontes",
+"hectareas": 11.92,
+"tipoPasto": "DECUMBENS"
+},
+{
+"nombre": "COLONO4",
+"finca": "Entremontes",
+"hectareas": 12.14,
+"tipoPasto": "DECUMBENS"
+},
+{
+"nombre": "CORINTO2",
+"finca": "Entremontes",
+"hectareas": 13.9,
+"tipoPasto": "TANZANIA"
+},
+{
+"nombre": "CORINTO1",
+"finca": "Entremontes",
+"hectareas": 13.94,
+"tipoPasto": "DECUMBENS"
+},
+{
+"nombre": "MORICHERA2",
+"finca": "Entremontes",
+"hectareas": 12.11,
+"tipoPasto": "DECUMBENS"
+},
+{
+"nombre": "MORICHERA",
+"finca": "Entremontes",
+"hectareas": 8.0,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "EUCALIPTO1",
+"finca": "Entremontes",
+"hectareas": 6.76,
+"tipoPasto": "MOMBAZA"
+},
+{
+"nombre": "EUCALIPTO2",
+"finca": "Entremontes",
+"hectareas": 6.27,
+"tipoPasto": "MOMBAZA"
+},
+{
+"nombre": "LA96-1CUERDA",
+"finca": "Entremontes",
+"hectareas": 10.4,
+"tipoPasto": "MOMBAZA"
+},
+{
+"nombre": "LA96-4CUERDA",
+"finca": "Entremontes",
+"hectareas": 10.4,
+"tipoPasto": "MOMBAZA"
+},
+{
+"nombre": "LA96-3CUERDA",
+"finca": "Entremontes",
+"hectareas": 6.9,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "GUADUAL1-2",
+"finca": "Entremontes",
+"hectareas": 1.3,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL3-4",
+"finca": "Entremontes",
+"hectareas": 1.3,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL5-6",
+"finca": "Entremontes",
+"hectareas": 1.3,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL7-8",
+"finca": "Entremontes",
+"hectareas": 1.2,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL9-10",
+"finca": "Entremontes",
+"hectareas": 1.3,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL11-12",
+"finca": "Entremontes",
+"hectareas": 1.3,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL13-14",
+"finca": "Entremontes",
+"hectareas": 1.3,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL15-16",
+"finca": "Entremontes",
+"hectareas": 1.2,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "SILENCIO1",
+"finca": "Entremontes",
+"hectareas": 11.0,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "SILENCIO2",
+"finca": "Entremontes",
+"hectareas": 10.2,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "SILENCIO3",
+"finca": "Entremontes",
+"hectareas": 10.04,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "SILENCIO4",
+"finca": "Entremontes",
+"hectareas": 11.0,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "ESCONDIDO1",
+"finca": "Entremontes",
+"hectareas": 13.35,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "ESCONDIDO2",
+"finca": "Entremontes",
+"hectareas": 13.0,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "PISTACUERDA1",
+"finca": "Entremontes",
+"hectareas": 8.7,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "PISTACUERDA2",
+"finca": "Entremontes",
+"hectareas": 7.7,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "PISTASILO",
+"finca": "Entremontes",
+"hectareas": 12.16,
+"tipoPasto": "MAIZ"
+},
+{
+"nombre": "SOCA1",
+"finca": "Entremontes",
+"hectareas": 5.7,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "SOCA2",
+"finca": "Entremontes",
+"hectareas": 5.7,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "SOCA3",
+"finca": "Entremontes",
+"hectareas": 5.7,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "SOCA4",
+"finca": "Entremontes",
+"hectareas": 5.6,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "SOCA5",
+"finca": "Entremontes",
+"hectareas": 5.3,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "SOCA6",
+"finca": "Entremontes",
+"hectareas": 5.3,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "SOCA7",
+"finca": "Entremontes",
+"hectareas": 4.2,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "SOCA8",
+"finca": "Entremontes",
+"hectareas": 5.3,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "SOCA9",
+"finca": "Entremontes",
+"hectareas": 5.7,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "MANGON1",
+"finca": "Entremontes",
+"hectareas": 1.42,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "MANGON2",
+"finca": "Entremontes",
+"hectareas": 0.38,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "MANGON3",
+"finca": "Entremontes",
+"hectareas": 2.85,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "ESMERALDA1",
+"finca": "Entremontes",
+"hectareas": 4.63,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "BUENOSAIRES1",
+"finca": "Entremontes",
+"hectareas": 11.83,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "BUENOSAIRES2",
+"finca": "Entremontes",
+"hectareas": 10.53,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "BUENOSAIRES3",
+"finca": "Entremontes",
+"hectareas": 7.93,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "BUENOSAIRES4",
+"finca": "Entremontes",
+"hectareas": 4.79,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "PELOZUDA1",
+"finca": "Entremontes",
+"hectareas": 13.9,
+"tipoPasto": "PIATA"
+},
+{
+"nombre": "PELOZUDA2",
+"finca": "Entremontes",
+"hectareas": 13.48,
+"tipoPasto": "PIATA"
+},
+{
+"nombre": "PELOZUDA3",
+"finca": "Entremontes",
+"hectareas": 13.63,
+"tipoPasto": "PIATA"
+},
+{
+"nombre": "LILIANA1",
+"finca": "Entremontes",
+"hectareas": 8.4,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "LILIANA2",
+"finca": "Entremontes",
+"hectareas": 9.3,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "LILIANA3",
+"finca": "Entremontes",
+"hectareas": 18.7,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "LILIANA4",
+"finca": "Entremontes",
+"hectareas": 12.7,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "LILIANA5",
+"finca": "Entremontes",
+"hectareas": 5.0,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "LILIANA6",
+"finca": "Entremontes",
+"hectareas": 10.39,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "LILIANA7",
+"finca": "Entremontes",
+"hectareas": 8.2,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "MORICHES1",
+"finca": "Entremontes",
+"hectareas": 9.64,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "MORICHES2",
+"finca": "Entremontes",
+"hectareas": 9.64,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "MORICHES3",
+"finca": "Entremontes",
+"hectareas": 9.64,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "MORICHES4",
+"finca": "Entremontes",
+"hectareas": 9.64,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "MATICAS1",
+"finca": "Entremontes",
+"hectareas": 7.28,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "MATICAS2",
+"finca": "Entremontes",
+"hectareas": 7.28,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "MATICAS3",
+"finca": "Entremontes",
+"hectareas": 6.92,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "GUDUALMANGA",
+"finca": "Entremontes",
+"hectareas": 0.67,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "ESMERALDA 4",
+"finca": "Entremontes",
+"hectareas": 6.49,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "BAMBU 1",
+"finca": "Entremontes",
+"hectareas": 6.5,
+"tipoPasto": "MASSAI"
+},
+{
+"nombre": "OROSOL1",
+"finca": "Entremontes",
+"hectareas": 6.4,
+"tipoPasto": "BRACHIARIA"
+},
+{
+"nombre": "OROSOL2",
+"finca": "Entremontes",
+"hectareas": 9.13,
+"tipoPasto": "BRACHIARIA"
+},
+{
+"nombre": "OROSOL3",
+"finca": "Entremontes",
+"hectareas": 10.11,
+"tipoPasto": "BRACHIARIA"
+},
+{
+"nombre": "OROSOL4",
+"finca": "Entremontes",
+"hectareas": 7.01,
+"tipoPasto": "BRACHIARIA"
+},
+{
+"nombre": "OROSOL5",
+"finca": "Entremontes",
+"hectareas": 11.41,
+"tipoPasto": "BRACHIARIA"
+},
+{
+"nombre": "OROSOL6",
+"finca": "Entremontes",
+"hectareas": 5.05,
+"tipoPasto": "BRACHIARIA"
+},
+{
+"nombre": "OROSOL7",
+"finca": "Entremontes",
+"hectareas": 7.5,
+"tipoPasto": "BRACHIARIA"
+},
+{
+"nombre": "OROSOL8",
+"finca": "Entremontes",
+"hectareas": 8.4,
+"tipoPasto": "BRACHIARIA"
+},
+{
+"nombre": "OROSOL9",
+"finca": "Entremontes",
+"hectareas": 4.16,
+"tipoPasto": "BRACHIARIA"
+},
+{
+"nombre": "OROSOL10",
+"finca": "Entremontes",
+"hectareas": 4.9,
+"tipoPasto": "BRACHIARIA"
+},
+{
+"nombre": "OROSOL11",
+"finca": "Entremontes",
+"hectareas": 4.4,
+"tipoPasto": "BRACHIARIA"
+},
+{
+"nombre": "OROSOL12",
+"finca": "Entremontes",
+"hectareas": 2.5,
+"tipoPasto": "BRACHIARIA"
+},
+{
+"nombre": "ARIZONA4",
+"finca": "Entremontes",
+"hectareas": 13.0,
+"tipoPasto": "DECUMBENS"
+},
+{
+"nombre": "MORICHERA1",
+"finca": "Entremontes",
+"hectareas": 12.11,
+"tipoPasto": "MAIZ"
+},
+{
+"nombre": "MORICHERA4",
+"finca": "Entremontes",
+"hectareas": 9.56,
+"tipoPasto": null
+},
+{
+"nombre": "CLINICA1",
+"finca": "Entremontes",
+"hectareas": 12.74,
+"tipoPasto": "MAIZ"
+},
+{
+"nombre": "CLINICA2",
+"finca": "Entremontes",
+"hectareas": 12.74,
+"tipoPasto": "MAIZ"
+},
+{
+"nombre": "CAÑOCOLORADO1",
+"finca": "Entremontes",
+"hectareas": 12.99,
+"tipoPasto": "MAIZ"
+},
+{
+"nombre": "CAÑOCOLORADO2",
+"finca": "Entremontes",
+"hectareas": 11.36,
+"tipoPasto": "MAIZ"
+},
+{
+"nombre": "ARBOLEDA1",
+"finca": "Entremontes",
+"hectareas": 8.0,
+"tipoPasto": "BRACHIARIA"
+},
+{
+"nombre": "ARBOLEDA2",
+"finca": "Entremontes",
+"hectareas": 13.73,
+"tipoPasto": "MAIZ"
+},
+{
+"nombre": "GUADUAL2",
+"finca": "Entremontes",
+"hectareas": 10.0,
+"tipoPasto": "MAIZ"
+},
+{
+"nombre": "GUADUAL3",
+"finca": "Entremontes",
+"hectareas": 9.52,
+"tipoPasto": "BRACHIARIA"
+},
+{
+"nombre": "GUADUAL 0",
+"finca": "Entremontes",
+"hectareas": 0.5,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "LAGUNA1",
+"finca": "Entremontes",
+"hectareas": 18.92,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "LAGUNA2",
+"finca": "Entremontes",
+"hectareas": 20.02,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "LAGUNA3",
+"finca": "Entremontes",
+"hectareas": 18.36,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "LAGUNA4",
+"finca": "Entremontes",
+"hectareas": 17.99,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "L.SECA1",
+"finca": "Entremontes",
+"hectareas": 15.68,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "L.SECA2",
+"finca": "Entremontes",
+"hectareas": 6.85,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "GUYACANA1",
+"finca": "Entremontes",
+"hectareas": 14.1,
+"tipoPasto": "MAIZ"
+},
+{
+"nombre": "GUYACANA2",
+"finca": "Entremontes",
+"hectareas": 5.3,
+"tipoPasto": "MAIZ"
+},
+{
+"nombre": "BELLAVISTA1",
+"finca": "Entremontes",
+"hectareas": 16.37,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "BELLAVISTA2",
+"finca": "Entremontes",
+"hectareas": 9.24,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "BELLAVISTA3",
+"finca": "Entremontes",
+"hectareas": 10.33,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "BELLAVISTA4",
+"finca": "Entremontes",
+"hectareas": 14.68,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "BELLAVISTA5",
+"finca": "Entremontes",
+"hectareas": 12.41,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "MATEPOPOCHO1",
+"finca": "Entremontes",
+"hectareas": 18.37,
+"tipoPasto": "DECUMBENS"
+},
+{
+"nombre": "MATEPOPOCHO2",
+"finca": "Entremontes",
+"hectareas": 13.71,
+"tipoPasto": "DECUMBENS"
+},
+{
+"nombre": "MARACOS1",
+"finca": "Entremontes",
+"hectareas": 18.6,
+"tipoPasto": "DECUMBENS"
+},
+{
+"nombre": "MARACOS2",
+"finca": "Entremontes",
+"hectareas": 15.23,
+"tipoPasto": "DECUMBENS"
+},
+{
+"nombre": "VENADO",
+"finca": "Entremontes",
+"hectareas": 24.19,
+"tipoPasto": "DECUMBENS"
+},
+{
+"nombre": "CAÑOFISTOL",
+"finca": "Entremontes",
+"hectareas": 21.03,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "PORTADA1",
+"finca": "Entremontes",
+"hectareas": 14.58,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "PORTADA2",
+"finca": "Entremontes",
+"hectareas": 14.72,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "COROCORAMANGA1",
+"finca": "Entremontes",
+"hectareas": 2.68,
+"tipoPasto": "MAIZ"
+},
+{
+"nombre": "COROCORAMANGA2",
+"finca": "Entremontes",
+"hectareas": 0.61,
+"tipoPasto": "MAIZ"
+},
+{
+"nombre": "LAVEGA1",
+"finca": "Entremontes",
+"hectareas": 13.75,
+"tipoPasto": "LLANERO"
+},
+{
+"nombre": "LAVEGA2",
+"finca": "Entremontes",
+"hectareas": 17.79,
+"tipoPasto": "LLANERO"
+},
+{
+"nombre": "BOCATOMA",
+"finca": "Entremontes",
+"hectareas": 10.86,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "TROMPILLO1",
+"finca": "Entremontes",
+"hectareas": 9.86,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "TROMPILLO2",
+"finca": "Entremontes",
+"hectareas": 9.86,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "LA96ZURI-1",
+"finca": "Entremontes",
+"hectareas": 14.24,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "ESMERALDA2",
+"finca": "Entremontes",
+"hectareas": 6.8,
+"tipoPasto": "LLANERO"
+},
+{
+"nombre": "LA96ZURI-3",
+"finca": "Entremontes",
+"hectareas": 13.6,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "LA96ZURI-4",
+"finca": "Entremontes",
+"hectareas": 13.6,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "LA96ZURI-5",
+"finca": "Entremontes",
+"hectareas": 13.6,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "LA96-2CUERDA",
+"finca": "Entremontes",
+"hectareas": 6.9,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "GUADUAL ZURI",
+"finca": "Entremontes",
+"hectareas": 2.3,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "FALTANTES",
+"finca": "Entremontes",
+"hectareas": 1.0,
+"tipoPasto": "BRACHIARIA"
+},
+{
+"nombre": "TROMPILLO3",
+"finca": "Entremontes",
+"hectareas": 9.86,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "MATICAS4",
+"finca": "Entremontes",
+"hectareas": 6.92,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "LA96ZURI-2",
+"finca": "Entremontes",
+"hectareas": 14.24,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "ESMERALDA3",
+"finca": "Entremontes",
+"hectareas": 6.0,
+"tipoPasto": "BRACHIARIA"
+},
+{
+"nombre": "MATAPALO1",
+"finca": "Acajure",
+"hectareas": 6.07,
+"tipoPasto": "MASSAI"
+},
+{
+"nombre": "MATAPALO2",
+"finca": "Acajure",
+"hectareas": 5.84,
+"tipoPasto": "MASSAI"
+},
+{
+"nombre": "MATAPALO3",
+"finca": "Acajure",
+"hectareas": 4.83,
+"tipoPasto": "MASSAI"
+},
+{
+"nombre": "MATAPALO4",
+"finca": "Acajure",
+"hectareas": 3.29,
+"tipoPasto": "MASSAI"
+},
+{
+"nombre": "MATAPALO5",
+"finca": "Acajure",
+"hectareas": 2.89,
+"tipoPasto": "MASSAI"
+},
+{
+"nombre": "ESPANTO1",
+"finca": "Acajure",
+"hectareas": 7.1,
+"tipoPasto": "MASSAI"
+},
+{
+"nombre": "ESPANTO2",
+"finca": "Acajure",
+"hectareas": 5.84,
+"tipoPasto": "GUINEA"
+},
+{
+"nombre": "ESPANTO3",
+"finca": "Acajure",
+"hectareas": 4.5,
+"tipoPasto": "GUINEA"
+},
+{
+"nombre": "ESPANTO4",
+"finca": "Acajure",
+"hectareas": 4.98,
+"tipoPasto": "GUINEA"
+},
+{
+"nombre": "ESPANTO5",
+"finca": "Acajure",
+"hectareas": 4.08,
+"tipoPasto": "GUINEA"
+},
+{
+"nombre": "ESPANTO6",
+"finca": "Acajure",
+"hectareas": 4.69,
+"tipoPasto": "GUINEA"
+},
+{
+"nombre": "ESPANTO7",
+"finca": "Acajure",
+"hectareas": 4.88,
+"tipoPasto": "GUINEA"
+},
+{
+"nombre": "MIRADOR1",
+"finca": "Acajure",
+"hectareas": 5.27,
+"tipoPasto": null
+},
+{
+"nombre": "MIRADOR2",
+"finca": "Acajure",
+"hectareas": 4.93,
+"tipoPasto": null
+},
+{
+"nombre": "MIRADOR3",
+"finca": "Acajure",
+"hectareas": 6.47,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "ARMADILLO",
+"finca": "Acajure",
+"hectareas": 7.58,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "ESCONDIDO",
+"finca": "Acajure",
+"hectareas": 4.55,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "SANCOCHO1",
+"finca": "Acajure",
+"hectareas": 4.43,
+"tipoPasto": null
+},
+{
+"nombre": "SANCOCHO2",
+"finca": "Acajure",
+"hectareas": 5.88,
+"tipoPasto": null
+},
+{
+"nombre": "SANCOCHO3",
+"finca": "Acajure",
+"hectareas": 3.64,
+"tipoPasto": null
+},
+{
+"nombre": "GUIO1",
+"finca": "Acajure",
+"hectareas": 5.99,
+"tipoPasto": "GUINEA"
+},
+{
+"nombre": "GUIO2",
+"finca": "Acajure",
+"hectareas": 5.22,
+"tipoPasto": "GUINEA"
+},
+{
+"nombre": "GUIO3",
+"finca": "Acajure",
+"hectareas": 4.14,
+"tipoPasto": "GUINEA"
+},
+{
+"nombre": "GUIO4",
+"finca": "Acajure",
+"hectareas": 5.21,
+"tipoPasto": "GUINEA"
+},
+{
+"nombre": "ÑAPA1",
+"finca": "Acajure",
+"hectareas": 3.4,
+"tipoPasto": null
+},
+{
+"nombre": "ÑAPA2",
+"finca": "Acajure",
+"hectareas": 2.96,
+"tipoPasto": null
+},
+{
+"nombre": "ÑAPA3",
+"finca": "Acajure",
+"hectareas": 2.79,
+"tipoPasto": null
+},
+{
+"nombre": "LA TIRA",
+"finca": "Acajure",
+"hectareas": 4.71,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "BOVEDA1",
+"finca": "Acajure",
+"hectareas": 5.79,
+"tipoPasto": null
+},
+{
+"nombre": "BOVEDA2",
+"finca": "Acajure",
+"hectareas": 4.38,
+"tipoPasto": null
+},
+{
+"nombre": "BOVEDA3",
+"finca": "Acajure",
+"hectareas": 3.73,
+"tipoPasto": null
+},
+{
+"nombre": "BOVEDA4",
+"finca": "Acajure",
+"hectareas": 5.24,
+"tipoPasto": null
+},
+{
+"nombre": "BOVEDA5",
+"finca": "Acajure",
+"hectareas": 3.15,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "CASAVIEJA",
+"finca": "Acajure",
+"hectareas": 3.5,
+"tipoPasto": null
+},
+{
+"nombre": "CORRAL",
+"finca": "Acajure",
+"hectareas": 3.23,
+"tipoPasto": null
+},
+{
+"nombre": "SAMAN1",
+"finca": "Acajure",
+"hectareas": 5.2,
+"tipoPasto": null
+},
+{
+"nombre": "SAMAN2",
+"finca": "Acajure",
+"hectareas": 3.96,
+"tipoPasto": null
+},
+{
+"nombre": "SAMAN3",
+"finca": "Acajure",
+"hectareas": 4.77,
+"tipoPasto": null
+},
+{
+"nombre": "SAMAN4",
+"finca": "Acajure",
+"hectareas": 5.42,
+"tipoPasto": null
+},
+{
+"nombre": "PASOONDO1",
+"finca": "Acajure",
+"hectareas": 5.08,
+"tipoPasto": null
+},
+{
+"nombre": "PASOONDO2",
+"finca": "Acajure",
+"hectareas": 4.43,
+"tipoPasto": null
+},
+{
+"nombre": "PASOONDO3",
+"finca": "Acajure",
+"hectareas": 4.55,
+"tipoPasto": null
+},
+{
+"nombre": "PASOONDO4",
+"finca": "Acajure",
+"hectareas": 4.93,
+"tipoPasto": null
+},
+{
+"nombre": "R.OSO1",
+"finca": "Acajure",
+"hectareas": 4.53,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "R.OSO2",
+"finca": "Acajure",
+"hectareas": 3.78,
+"tipoPasto": null
+},
+{
+"nombre": "R.OSO3",
+"finca": "Acajure",
+"hectareas": 4.32,
+"tipoPasto": null
+},
+{
+"nombre": "R.OSO4",
+"finca": "Acajure",
+"hectareas": 3.37,
+"tipoPasto": null
+},
+{
+"nombre": "R.OSO5",
+"finca": "Acajure",
+"hectareas": 3.76,
+"tipoPasto": null
+},
+{
+"nombre": "NISPERO1",
+"finca": "Acajure",
+"hectareas": 5.77,
+"tipoPasto": null
+},
+{
+"nombre": "NISPERO2",
+"finca": "Acajure",
+"hectareas": 4.91,
+"tipoPasto": "DECUMBENS"
+},
+{
+"nombre": "NISPERO3",
+"finca": "Acajure",
+"hectareas": 5.68,
+"tipoPasto": "BRACHIARIA"
+},
+{
+"nombre": "NISPERO4",
+"finca": "Acajure",
+"hectareas": 5.51,
+"tipoPasto": null
+},
+{
+"nombre": "NISPERO5",
+"finca": "Acajure",
+"hectareas": 6.05,
+"tipoPasto": "BRACHIARIA"
+},
+{
+"nombre": "NISPERO6",
+"finca": "Acajure",
+"hectareas": 4.2,
+"tipoPasto": "BRACHIARIA"
+},
+{
+"nombre": "NISPERO7",
+"finca": "Acajure",
+"hectareas": 5.23,
+"tipoPasto": "BRACHIARIA"
+},
+{
+"nombre": "NISPERO8",
+"finca": "Acajure",
+"hectareas": 4.68,
+"tipoPasto": "BRACHIARIA"
+},
+{
+"nombre": "NISPERO9",
+"finca": "Acajure",
+"hectareas": 3.53,
+"tipoPasto": "BRACHIARIA"
+},
+{
+"nombre": "MORICHE",
+"finca": "Acajure",
+"hectareas": 4.45,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "MORICHERA3",
+"finca": "Acajure",
+"hectareas": 7.24,
+"tipoPasto": null
+},
+{
+"nombre": "MORICHERA5",
+"finca": "Acajure",
+"hectareas": 5.39,
+"tipoPasto": null
+},
+{
+"nombre": "LAISLA",
+"finca": "Acajure",
+"hectareas": 77.2,
+"tipoPasto": null
+},
+{
+"nombre": "VIVERO",
+"finca": "Acajure",
+"hectareas": 5.85,
+"tipoPasto": null
+},
+{
+"nombre": "F.A 1",
+"finca": "Acajure",
+"hectareas": 6.2,
+"tipoPasto": "HUMIDICOLA"
+},
+{
+"nombre": "F.A 2",
+"finca": "Acajure",
+"hectareas": 4.08,
+"tipoPasto": "MAIZ"
+},
+{
+"nombre": "F.A 3",
+"finca": "Acajure",
+"hectareas": 3.97,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "F.A 4",
+"finca": "Acajure",
+"hectareas": 3.93,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "F.A 5",
+"finca": "Acajure",
+"hectareas": 3.77,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "F.A 6",
+"finca": "Acajure",
+"hectareas": 3.65,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "F.A 7",
+"finca": "Acajure",
+"hectareas": 3.62,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "F.A 8",
+"finca": "Acajure",
+"hectareas": 3.41,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "F.A 9",
+"finca": "Acajure",
+"hectareas": 2.81,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "FLORAMARILLO10",
+"finca": "Acajure",
+"hectareas": 0.96,
+"tipoPasto": "ZURI"
+},
+{
+"nombre": "BURRO",
+"finca": "Acajure",
+"hectareas": 4.0,
+"tipoPasto": "BRACHIARIA"
+},
+{
+"nombre": "BAMBU 2",
+"finca": "Entremontes",
+"hectareas": 6.5,
+"tipoPasto": "MASSAI"
+},
+{
+"nombre": "BAMBU 3",
+"finca": "Entremontes",
+"hectareas": 6.5,
+"tipoPasto": "MASSAI"
+},
+{
+"nombre": "BAMBU 4",
+"finca": "Entremontes",
+"hectareas": 6.5,
+"tipoPasto": "MASSAI"
+},
+{
+"nombre": "GUADUAL1-1",
+"finca": "Entremontes",
+"hectareas": 0.59,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL1-3",
+"finca": "Entremontes",
+"hectareas": 0.59,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL1-4",
+"finca": "Entremontes",
+"hectareas": 0.59,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL1-5",
+"finca": "Entremontes",
+"hectareas": 0.59,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL1-6",
+"finca": "Entremontes",
+"hectareas": 0.59,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL1-7",
+"finca": "Entremontes",
+"hectareas": 0.59,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL1-8",
+"finca": "Entremontes",
+"hectareas": 0.59,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL1-9",
+"finca": "Entremontes",
+"hectareas": 0.59,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL1-10",
+"finca": "Entremontes",
+"hectareas": 0.59,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL1-11",
+"finca": "Entremontes",
+"hectareas": 0.59,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL2-1",
+"finca": "Entremontes",
+"hectareas": 0.59,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL2-2",
+"finca": "Entremontes",
+"hectareas": 0.59,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL2-3",
+"finca": "Entremontes",
+"hectareas": 0.59,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL2-4",
+"finca": "Entremontes",
+"hectareas": 0.59,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL2-5",
+"finca": "Entremontes",
+"hectareas": 0.59,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL2-6",
+"finca": "Entremontes",
+"hectareas": 0.59,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL2-7",
+"finca": "Entremontes",
+"hectareas": 0.59,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL2-8",
+"finca": "Entremontes",
+"hectareas": 0.59,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL2-9",
+"finca": "Entremontes",
+"hectareas": 0.59,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL2-10",
+"finca": "Entremontes",
+"hectareas": 0.59,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "GUADUAL2-11",
+"finca": "Entremontes",
+"hectareas": 0.59,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "MODULO 1",
+"finca": "Entremontes",
+"hectareas": 1.0,
+"tipoPasto": "SUPLEMENTACION"
+},
+{
+"nombre": "MODULO 2",
+"finca": "Entremontes",
+"hectareas": 1.0,
+"tipoPasto": "SUPLEMENTACION"
+},
+{
+"nombre": "MODULO 3",
+"finca": "Entremontes",
+"hectareas": 0.5,
+"tipoPasto": "SUPLEMENTACION"
+},
+{
+"nombre": "MODULO 4",
+"finca": "Entremontes",
+"hectareas": 1.0,
+"tipoPasto": "SUPLEMENTACION"
+},
+{
+"nombre": "COROCORA 1",
+"finca": "Entremontes",
+"hectareas": 9.12,
+"tipoPasto": "MOMBAZA"
+},
+{
+"nombre": "COROCORA 2",
+"finca": "Entremontes",
+"hectareas": 10.0,
+"tipoPasto": "MOMBAZA"
+},
+{
+"nombre": "LAVEGA3",
+"finca": "Entremontes",
+"hectareas": 1.0,
+"tipoPasto": "BRIZANTHA MARANDU"
+},
+{
+"nombre": "LAVEGA4",
+"finca": "Entremontes",
+"hectareas": 1.0,
+"tipoPasto": "BRIZANTHA MARANDU"
+},
+{
+"nombre": "EUCALIPTO 3",
+"finca": "Entremontes",
+"hectareas": 6.12,
+"tipoPasto": "MOMBAZA"
+},
+{
+"nombre": "EUCALIPTO 4",
+"finca": "Entremontes",
+"hectareas": 5.25,
+"tipoPasto": "MOMBAZA"
+},
+{
+"nombre": "GUADUAL 0-1",
+"finca": "Entremontes",
+"hectareas": 0.5,
+"tipoPasto": "MIYAGUI"
+},
+{
+"nombre": "CORRAL 1",
+"finca": "Entremontes",
+"hectareas": 0.2,
+"tipoPasto": "NA"
+}
+]
