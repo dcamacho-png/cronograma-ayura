@@ -97,7 +97,8 @@ model Tarea {
   fincaId     String?
   finca       Finca?      @relation(fields: [fincaId], references: [id])
   loteId      String?
-  lote        Lote?       @relation(fields: [loteId], references: [id])
+  lote        Lote?       @relation("TareaLoteUnico", fields: [loteId], references: [id])
+  lotes       Lote[]      @relation("TareaLotesMulti")
 
   actividades Actividad[]
 
@@ -117,7 +118,8 @@ model Lote {
   fincaId     String
   finca       Finca       @relation(fields: [fincaId], references: [id])
   actividades Actividad[]
-  tareas      Tarea[]
+  tareas      Tarea[]     @relation("TareaLoteUnico")
+  tareasMulti Tarea[]     @relation("TareaLotesMulti")
 
   @@index([fincaId])
 }
