@@ -30,3 +30,25 @@ describe('semanaAnterior', () => {
     expect(semanaAnterior(2027, 1)).toEqual({ anio: 2026, semana: 53 })
   })
 })
+
+import { semanasDelMes } from './semana'
+
+describe('semanasDelMes', () => {
+  it('junio 2026 = semanas ISO 23 a 26', () => {
+    expect(semanasDelMes(2026, 6)).toEqual([
+      { anio: 2026, semana: 23 },
+      { anio: 2026, semana: 24 },
+      { anio: 2026, semana: 25 },
+      { anio: 2026, semana: 26 },
+    ])
+  })
+  it('enero 2026 = semanas ISO 1 a 5', () => {
+    expect(semanasDelMes(2026, 1)).toEqual([
+      { anio: 2026, semana: 1 },
+      { anio: 2026, semana: 2 },
+      { anio: 2026, semana: 3 },
+      { anio: 2026, semana: 4 },
+      { anio: 2026, semana: 5 },
+    ])
+  })
+})

@@ -48,3 +48,32 @@ export function semanaAnterior(anio: number, semana: number): Semana {
 export function semanaActual(): Semana {
   return isoSemanaDeFecha(new Date())
 }
+
+// Semanas ISO cuyo jueves cae en el mes calendario dado (mes: 1-12), en orden.
+export function semanasDelMes(anio: number, mes: number): Semana[] {
+  const resultado: Semana[] = []
+  const vistas = new Set<string>()
+  const ultimoDia = new Date(Date.UTC(anio, mes, 0)).getUTCDate()
+  for (let dia = 1; dia <= ultimoDia; dia++) {
+    const fecha = new Date(Date.UTC(anio, mes - 1, dia))
+    // Jueves de la semana de esta fecha.
+    const diaLunes0 = (fecha.getUTCDay() + 6) % 7
+    const jueves = new Date(fecha)
+    jueves.setUTCDate(fecha.getUTCDate() - diaLunes0 + 3)
+    if (jueves.getUTCFullYear() === anio && jueves.getUTCMonth() === mes - 1) {
+      const s = isoSemanaDeFecha(fecha)
+      const clave = `${s.anio}-${s.semana}`
+      if (!vistas.has(clave)) {
+        vistas.add(clave)
+        resultado.push(s)
+      }
+    }
+  }
+  return resultado
+}
+
+// Mes calendario actual (usa la fecha del sistema; no determinista, por eso no se prueba).
+export function mesActual(): { anio: number; mes: number } {
+  const d = new Date()
+  return { anio: d.getUTCFullYear(), mes: d.getUTCMonth() + 1 }
+}
