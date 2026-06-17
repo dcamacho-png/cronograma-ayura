@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { listarAreas, listarFincas, listarTareasPendientes, listarActividadesEstipuladas } from '@/datos/repositorio'
+import { listarAreas, listarLotes, listarTareasPendientes, listarActividadesEstipuladas } from '@/datos/repositorio'
+import { SelectLote } from '../_componentes/select-lote'
 import { siguienteSemana, semanaAnterior, semanaActual, esSemanaPasada } from '@/dominio/semana'
 import {
   crearTareaAccion,
@@ -33,10 +34,10 @@ export default async function TareasPage({
   const semana = sp.semana && Number.isInteger(semanaRaw) ? semanaRaw : hoy.semana
   const pasada = esSemanaPasada(anio, semana, hoy)
 
-  const [fincas, tareas, estipuladas] = await Promise.all([
-    listarFincas(),
+  const [tareas, estipuladas, lotes] = await Promise.all([
     listarTareasPendientes(areaId),
     listarActividadesEstipuladas(),
+    listarLotes(),
   ])
 
   const previa = semanaAnterior(anio, semana)
@@ -141,13 +142,8 @@ export default async function TareasPage({
           </label>
         )}
         <label className="flex flex-col text-sm">
-          Finca (opcional)
-          <select name="fincaId" className="rounded border p-2">
-            <option value="">—</option>
-            {fincas.map((f) => (
-              <option key={f.id} value={f.id}>{f.nombre}</option>
-            ))}
-          </select>
+          Lote (opcional)
+          <SelectLote lotes={lotes} name="loteId" />
         </label>
         <button className="rounded bg-[#11603a] px-4 py-2 text-sm font-semibold text-white">+ Agregar al banco</button>
       </form>

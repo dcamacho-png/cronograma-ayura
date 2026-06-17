@@ -23,7 +23,7 @@ export async function crearTareaAccion(form: FormData) {
   const descripcion =
     textoOpcional(form, 'otra') ?? textoOpcional(form, 'estipulada') ?? texto(form, 'descripcion')
   if (!areaId || !descripcion) return
-  await crearTarea(areaId, descripcion, textoOpcional(form, 'fincaId'))
+  await crearTarea(areaId, descripcion, textoOpcional(form, 'loteId'))
   revalidatePath('/tareas')
 }
 
