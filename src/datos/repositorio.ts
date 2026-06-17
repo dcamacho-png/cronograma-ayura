@@ -26,7 +26,14 @@ export function listarResponsablesPorArea(areaId: string) {
 export function listarActividades(areaId: string, anio: number, semana: number) {
   return prisma.actividad.findMany({
     where: { areaId, anio, semana },
-    include: { responsable: true, finca: true, motivo: true, maquina: true, areaTarea: true },
+    include: {
+      responsable: true,
+      finca: true,
+      motivo: true,
+      maquina: true,
+      areaTarea: true,
+      _count: { select: { derivadas: true } },
+    },
     orderBy: [{ dia: 'asc' }],
   })
 }

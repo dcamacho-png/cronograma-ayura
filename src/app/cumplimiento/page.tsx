@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { listarAreas, listarMotivos, listarActividades } from '@/datos/repositorio'
-import { siguienteSemana, semanaAnterior, semanaActual } from '@/dominio/semana'
+import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana } from '@/dominio/semana'
 import { porcentajeCumplimiento, porcentajeReprogramadas, colorSemaforo } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
 import { marcarEstadoAccion, reprogramarAccion } from './acciones'
@@ -56,6 +56,9 @@ export default async function CumplimientoPage({
 
   const previa = semanaAnterior(anio, semana)
   const proxima = siguienteSemana(anio, semana)
+  const fechas = fechasDeSemana(anio, semana)
+  const fmtFecha = (f: Date) =>
+    new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(f)
   const url = (a: string, an: number, se: number) => `/cumplimiento?area=${a}&anio=${an}&semana=${se}`
 
   return (
@@ -101,7 +104,7 @@ export default async function CumplimientoPage({
           {actividades.map((a) => (
             <li key={a.id} className="rounded-lg border p-3">
               <div className="mb-2 flex items-center gap-2 text-sm">
-                <span className="font-semibold">{DIAS[a.dia] ?? ''}</span>
+                <span className="font-semibold">{DIAS[a.dia] ?? ''} {fechas[a.dia - 1] ? fmtFecha(fechas[a.dia - 1]) : ''}</span>
                 <span>·</span>
                 <span>{a.responsable.nombre}</span>
                 {a.vecesReprogramada > 0 && (
@@ -143,14 +146,18 @@ export default async function CumplimientoPage({
                 </button>
               </form>
 
-              <form action={reprogramarAccion} className="mt-2">
-                <input type="hidden" name="id" value={a.id} />
-                <input type="hidden" name="anio" value={anio} />
-                <input type="hidden" name="semana" value={semana} />
-                <button className="text-sm text-blue-700 hover:underline">
-                  🔄 Reprogramar a la semana {proxima.semana}
-                </button>
-              </form>
+              {a._count.derivadas > 0 ? (
+                <p className="mt-2 text-sm text-gray-500">🔄 Ya reprogramada a la semana siguiente</p>
+              ) : (
+                <form action={reprogramarAccion} className="mt-2">
+                  <input type="hidden" name="id" value={a.id} />
+                  <input type="hidden" name="anio" value={anio} />
+                  <input type="hidden" name="semana" value={semana} />
+                  <button className="text-sm text-blue-700 hover:underline">
+                    🔄 Reprogramar a la semana {proxima.semana}
+                  </button>
+                </form>
+              )}
             </li>
           ))}
         </ul>
