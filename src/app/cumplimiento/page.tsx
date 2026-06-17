@@ -4,6 +4,7 @@ import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana } from '@
 import { porcentajeCumplimiento, porcentajeReprogramadas, colorSemaforo } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
 import { marcarEstadoAccion, reprogramarAccion } from './acciones'
+import { InfoLotes } from '../_componentes/info-lotes'
 
 const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
@@ -117,9 +118,7 @@ export default async function CumplimientoPage({
                 )}
               </div>
               <div className="mb-2 font-medium">{a.descripcion}</div>
-              {a.lotes.length > 0 && (
-                <div className="mb-2 text-xs text-gray-500">Lote: {a.lotes.map((l) => l.nombre).join(', ')}</div>
-              )}
+              <InfoLotes lotes={a.lotes} className="mb-2" />
 
               <form action={marcarEstadoAccion} className="flex flex-wrap items-end gap-2">
                 <input type="hidden" name="id" value={a.id} />

@@ -10,6 +10,7 @@ import {
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, esSemanaPasada } from '@/dominio/semana'
 import { crearActividadAccion, eliminarActividadAccion, duplicarSemanaAccion, crearResponsableAccion, actualizarActividadAccion, asignarTareaAccion } from './acciones'
 import { SelectLote } from '../_componentes/select-lote'
+import { InfoLotes } from '../_componentes/info-lotes'
 
 const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
 
@@ -193,6 +194,7 @@ export default async function ProgramarPage({
                                 </form>
                               </>
                             )}
+                            <InfoLotes lotes={a.lotes} className="mt-1" />
                           </div>
                         ))}
                       </td>
