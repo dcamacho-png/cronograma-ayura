@@ -7,7 +7,7 @@ import {
   listarLotes,
 } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, esSemanaPasada } from '@/dominio/semana'
-import { duplicarSemanaAccion, crearResponsableAccion, asignarTareaAccion } from './acciones'
+import { duplicarSemanaAccion, asignarTareaAccion } from './acciones'
 import { InfoLotes } from '../_componentes/info-lotes'
 import { AsignarTareaForm } from './asignar-tarea-form'
 
@@ -29,7 +29,6 @@ export default async function ProgramarPage({
   }
 
   const areaId = sp.area && areas.some((a) => a.id === sp.area) ? sp.area : areas[0].id
-  const areaActual = areas.find((a) => a.id === areaId)!
   const hoy = semanaActual()
   const anioRaw = Number(sp.anio)
   const semanaRaw = Number(sp.semana)
@@ -93,19 +92,6 @@ export default async function ProgramarPage({
         <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
           🔒 Semana cerrada — solo lectura. No se puede modificar la programación de una semana pasada.
         </div>
-      )}
-
-      {!pasada && (
-        <form action={crearResponsableAccion} className="mb-5 flex flex-wrap items-end gap-2">
-          <input type="hidden" name="areaId" value={areaId} />
-          <label className="flex flex-col text-xs">
-            Agregar responsable a {areaActual.nombre}
-            <input name="nombre" required className="rounded border p-2 text-sm" placeholder="Nombre del responsable" />
-          </label>
-          <button className="rounded bg-[#11603a] px-3 py-2 text-sm font-semibold text-white">
-            + Responsable
-          </button>
-        </form>
       )}
 
       {!pasada && porAsignar.length > 0 && (
