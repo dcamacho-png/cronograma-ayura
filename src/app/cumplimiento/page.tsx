@@ -5,6 +5,7 @@ import { porcentajeCumplimiento, porcentajeReprogramadas, colorSemaforo } from '
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
 import { registrarAccion } from './acciones'
 import { InfoLotes } from '../_componentes/info-lotes'
+import { FormRegistrar } from './form-registrar'
 
 const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
@@ -40,6 +41,8 @@ export default async function CumplimientoPage({
   }
 
   const areaId = sp.area && areas.some((a) => a.id === sp.area) ? sp.area : areas[0].id
+  const areaActual = areas.find((a) => a.id === areaId)!
+  const esMaquinaria = areaActual.nombre.toLowerCase().includes('maquinaria')
   const hoy = semanaActual()
   const anioRaw = Number(sp.anio)
   const semanaRaw = Number(sp.semana)
@@ -138,33 +141,12 @@ export default async function CumplimientoPage({
               <InfoLotes lotes={a.lotes} className="mb-2" />
 
               {a.estado === 'PENDIENTE' ? (
-                <form action={registrarAccion} className="flex flex-wrap items-end gap-2">
-                  <input type="hidden" name="id" value={a.id} />
-                  <label className="flex flex-col text-xs">
-                    Estado
-                    <select name="estado" required defaultValue="" className="rounded border p-1 text-sm">
-                      <option value="">— marcar —</option>
-                      <option value="CUMPLIDA">✅ Cumplida</option>
-                      <option value="NO_CUMPLIDA">🔴 No cumplida</option>
-                      <option value="PARCIAL">🟡 Parcial</option>
-                      <option value="REPROGRAMADA">🔄 Reprogramada</option>
-                    </select>
-                  </label>
-                  <label className="flex flex-col text-xs">
-                    Motivo
-                    <select name="motivoId" defaultValue="" className="rounded border p-1 text-sm">
-                      <option value="">—</option>
-                      {motivos.map((m) => (
-                        <option key={m.id} value={m.id}>{m.nombre}</option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="flex flex-1 flex-col text-xs">
-                    Observación / lo que faltó
-                    <input name="nota" placeholder="(para parcial o reprogramada)" className="rounded border p-1 text-sm" />
-                  </label>
-                  <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">Registrar</button>
-                </form>
+                <FormRegistrar
+                  actividadId={a.id}
+                  esMaquinaria={esMaquinaria}
+                  motivos={motivos}
+                  accion={registrarAccion}
+                />
               ) : (
                 <div className="flex flex-wrap items-center gap-2 text-sm">
                   <span className="font-semibold">{ESTADOS.find((e) => e.valor === a.estado)?.etiqueta ?? a.estado}</span>
