@@ -13,12 +13,14 @@ model Area {
   actividades   Actividad[]   @relation("AreaDeActividad")
   tareasMaquina Actividad[]   @relation("AreaDeTarea")
   responsables  Responsable[]
+  tareas        Tarea[]
 }
 
 model Finca {
   id          String      @id @default(cuid())
   nombre      String      @unique
   actividades Actividad[]
+  tareas      Tarea[]
 }
 
 model Responsable {
@@ -70,6 +72,8 @@ model Actividad {
   // Campos de maquinaria (opcionales).
   maquinaId  String?
   maquina    Maquina? @relation(fields: [maquinaId], references: [id])
+  tareaId    String?
+  tarea      Tarea?   @relation(fields: [tareaId], references: [id])
   areaTareaId String?
   areaTarea   Area?   @relation("AreaDeTarea", fields: [areaTareaId], references: [id])
   horas      Float?
@@ -77,4 +81,21 @@ model Actividad {
   planB      String?
 
   @@index([anio, semana, areaId])
+}
+
+model Tarea {
+  id          String      @id @default(cuid())
+  descripcion String
+  estado      String      @default("PENDIENTE")
+  anioSel     Int?
+  semanaSel   Int?
+
+  areaId      String
+  area        Area        @relation(fields: [areaId], references: [id])
+  fincaId     String?
+  finca       Finca?      @relation(fields: [fincaId], references: [id])
+
+  actividades Actividad[]
+
+  @@index([areaId, estado])
 }
