@@ -49,3 +49,43 @@ describe('porcentajeCumplimiento', () => {
     expect(porcentajeCumplimiento([])).toBeNull()
   })
 })
+
+import { estrellas, rankingResponsables } from './metricas'
+
+describe('estrellas', () => {
+  it('traduce el % a escala de 1 a 5', () => {
+    expect(estrellas(100)).toBe(5)
+    expect(estrellas(90)).toBe(5)
+    expect(estrellas(80)).toBe(4)
+    expect(estrellas(60)).toBe(3)
+    expect(estrellas(45)).toBe(2)
+    expect(estrellas(10)).toBe(1)
+  })
+})
+
+describe('rankingResponsables', () => {
+  it('agrupa por responsable, ordena y separa top 3 y 3 más bajos', () => {
+    const acts: Actividad[] = [
+      act({ responsableId: 'A', estado: 'CUMPLIDA' }),   // A = 100
+      act({ responsableId: 'B', estado: 'CUMPLIDA' }),
+      act({ responsableId: 'B', estado: 'NO_CUMPLIDA' }), // B = 50
+      act({ responsableId: 'C', estado: 'NO_CUMPLIDA' }), // C = 0
+      act({ responsableId: 'D', estado: 'PARCIAL' }),     // D = 50
+    ]
+    const { top, bajos } = rankingResponsables(acts)
+    expect(top.map((f) => f.responsableId)).toEqual(['A', 'B', 'D'])
+    expect(top[0]).toEqual({ responsableId: 'A', porcentaje: 100, estrellas: 5 })
+    // los 3 más bajos en orden de mayor a menor %
+    expect(bajos.map((f) => f.responsableId)).toEqual(['B', 'D', 'C'])
+    expect(bajos[2]).toEqual({ responsableId: 'C', porcentaje: 0, estrellas: 1 })
+  })
+
+  it('ignora responsables sin actividades evaluadas', () => {
+    const acts: Actividad[] = [
+      act({ responsableId: 'A', estado: 'CUMPLIDA' }),
+      act({ responsableId: 'Z', estado: 'PENDIENTE' }),
+    ]
+    const { top } = rankingResponsables(acts)
+    expect(top.map((f) => f.responsableId)).toEqual(['A'])
+  })
+})

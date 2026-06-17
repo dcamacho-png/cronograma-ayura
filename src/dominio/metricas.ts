@@ -21,3 +21,44 @@ export function porcentajeCumplimiento(actividades: Actividad[]): number | null 
   const suma = pesos.reduce((acc, p) => acc + p, 0)
   return Math.round((suma / pesos.length) * 100)
 }
+
+// Traduce un % (0..100) a estrellas (1..5).
+export function estrellas(porcentaje: number): number {
+  if (porcentaje >= 90) return 5
+  if (porcentaje >= 75) return 4
+  if (porcentaje >= 60) return 3
+  if (porcentaje >= 40) return 2
+  return 1
+}
+
+export interface FilaRanking {
+  responsableId: string
+  porcentaje: number
+  estrellas: number
+}
+
+// Ranking de responsables por % de cumplimiento.
+// Devuelve los 3 mejores y los 3 más bajos (mayor a menor % en cada grupo).
+export function rankingResponsables(
+  actividades: Actividad[],
+): { top: FilaRanking[]; bajos: FilaRanking[] } {
+  const porResp = new Map<string, Actividad[]>()
+  for (const a of actividades) {
+    const lista = porResp.get(a.responsableId) ?? []
+    lista.push(a)
+    porResp.set(a.responsableId, lista)
+  }
+
+  const filas: FilaRanking[] = []
+  for (const [responsableId, acts] of porResp) {
+    const pct = porcentajeCumplimiento(acts)
+    if (pct === null) continue
+    filas.push({ responsableId, porcentaje: pct, estrellas: estrellas(pct) })
+  }
+
+  filas.sort((a, b) => b.porcentaje - a.porcentaje)
+  return {
+    top: filas.slice(0, 3),
+    bajos: filas.slice(-3),
+  }
+}
