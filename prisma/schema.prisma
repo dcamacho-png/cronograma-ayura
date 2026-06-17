@@ -79,6 +79,7 @@ model Actividad {
   areaTarea   Area?   @relation("AreaDeTarea", fields: [areaTareaId], references: [id])
   horas      Float?
   hectareas  Float?
+  haFaltante Float?
   planB      String?
   lotes      Lote[]
 
