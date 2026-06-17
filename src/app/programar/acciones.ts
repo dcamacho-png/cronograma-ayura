@@ -82,8 +82,8 @@ export async function asignarTareaAccion(form: FormData) {
   const tareaId = texto(form, 'tareaId')
   const responsableId = texto(form, 'responsableId')
   const dia = Number(texto(form, 'dia'))
-  const loteId = texto(form, 'loteId')
-  if (!tareaId || !responsableId || !loteId || !Number.isInteger(dia)) return
+  const loteId = textoOpcional(form, 'loteId')
+  if (!tareaId || !responsableId || !Number.isInteger(dia)) return
   await asignarTarea(tareaId, responsableId, dia, loteId)
   revalidatePath('/programar')
 }

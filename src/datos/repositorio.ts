@@ -156,18 +156,20 @@ export function eliminarResponsable(id: string) {
 export function listarTareasPendientes(areaId: string) {
   return prisma.tarea.findMany({
     where: { areaId, estado: 'PENDIENTE' },
-    include: { finca: true },
+    include: { finca: true, lotes: { include: { finca: true } } },
     orderBy: { descripcion: 'asc' },
   })
 }
 
-export async function crearTarea(areaId: string, descripcion: string, loteId: string | null) {
+export async function crearTarea(areaId: string, descripcion: string, loteIds: string[]) {
   let fincaId: string | null = null
-  if (loteId) {
-    const lote = await prisma.lote.findUnique({ where: { id: loteId } })
-    fincaId = lote?.fincaId ?? null
+  if (loteIds.length > 0) {
+    const primer = await prisma.lote.findUnique({ where: { id: loteIds[0] } })
+    fincaId = primer?.fincaId ?? null
   }
-  return prisma.tarea.create({ data: { areaId, descripcion, fincaId, loteId } })
+  return prisma.tarea.create({
+    data: { areaId, descripcion, fincaId, lotes: { connect: loteIds.map((id) => ({ id })) } },
+  })
 }
 
 export function eliminarTarea(id: string) {
@@ -185,7 +187,7 @@ export function quitarSeleccionTarea(id: string) {
 export function tareasPorAsignar(areaId: string, anio: number, semana: number) {
   return prisma.tarea.findMany({
     where: { areaId, estado: 'PENDIENTE', anioSel: anio, semanaSel: semana },
-    include: { finca: true },
+    include: { finca: true, lotes: { include: { finca: true } } },
     orderBy: { descripcion: 'asc' },
   })
 }
@@ -195,14 +197,17 @@ export async function asignarTarea(
   tareaId: string,
   responsableId: string,
   dia: number,
-  loteId: string,
+  loteIdFallback: string | null,
 ) {
-  const tarea = await prisma.tarea.findUnique({ where: { id: tareaId } })
+  const tarea = await prisma.tarea.findUnique({ where: { id: tareaId }, include: { lotes: true } })
   if (!tarea || tarea.anioSel === null || tarea.semanaSel === null) return null
-  const lote = await prisma.lote.findUnique({ where: { id: loteId } })
-  if (!lote) return null
   const anio = tarea.anioSel
   const semana = tarea.semanaSel
+  const loteIds =
+    tarea.lotes.length > 0 ? tarea.lotes.map((l) => l.id) : loteIdFallback ? [loteIdFallback] : []
+  if (loteIds.length === 0) return null
+  const primer = await prisma.lote.findUnique({ where: { id: loteIds[0] } })
+  if (!primer) return null
   return prisma.$transaction(async (tx) => {
     const actividad = await tx.actividad.create({
       data: {
@@ -212,10 +217,10 @@ export async function asignarTarea(
         descripcion: tarea.descripcion,
         turno: '',
         areaId: tarea.areaId,
-        fincaId: lote.fincaId,
+        fincaId: primer.fincaId,
         responsableId,
         tareaId: tarea.id,
-        lotes: { connect: { id: lote.id } },
+        lotes: { connect: loteIds.map((id) => ({ id })) },
       },
     })
     await tx.tarea.update({ where: { id: tarea.id }, data: { estado: 'PROGRAMADA' } })
