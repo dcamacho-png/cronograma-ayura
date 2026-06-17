@@ -52,3 +52,15 @@ describe('semanasDelMes', () => {
     ])
   })
 })
+
+import { fechasDeSemana } from './semana'
+
+describe('fechasDeSemana', () => {
+  it('devuelve lunes a domingo de la semana ISO', () => {
+    const f = fechasDeSemana(2026, 25)
+    expect(f).toHaveLength(7)
+    // Lunes 15 jun 2026 .. Domingo 21 jun 2026
+    expect(f[0].toISOString().slice(0, 10)).toBe('2026-06-15')
+    expect(f[6].toISOString().slice(0, 10)).toBe('2026-06-21')
+  })
+})

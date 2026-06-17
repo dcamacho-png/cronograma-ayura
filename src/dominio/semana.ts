@@ -77,3 +77,13 @@ export function mesActual(): { anio: number; mes: number } {
   const d = new Date()
   return { anio: d.getUTCFullYear(), mes: d.getUTCMonth() + 1 }
 }
+
+// Las 7 fechas (UTC) de una semana ISO: lunes a domingo.
+export function fechasDeSemana(anio: number, semana: number): Date[] {
+  const lunes = lunesDeIsoSemana(anio, semana)
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(lunes)
+    d.setUTCDate(lunes.getUTCDate() + i)
+    return d
+  })
+}
