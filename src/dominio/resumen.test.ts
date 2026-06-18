@@ -45,3 +45,47 @@ describe('actividadesConCambio', () => {
     expect(acts).toEqual(copia)
   })
 })
+
+import { extremosFinalizadas, conteoPorEstado, hectareasTrabajadasYFaltantes } from './resumen'
+
+describe('extremosFinalizadas', () => {
+  it('devuelve quien más y quien menos finalizó (CUMPLIDA)', () => {
+    const acts = [
+      act({ responsableId: 'A', estado: 'CUMPLIDA' }),
+      act({ responsableId: 'A', estado: 'CUMPLIDA' }),
+      act({ responsableId: 'B', estado: 'CUMPLIDA' }),
+      act({ responsableId: 'B', estado: 'PARCIAL' }),
+      act({ responsableId: 'C', estado: 'NO_CUMPLIDA' }),
+    ]
+    const { mas, menos } = extremosFinalizadas(acts)
+    expect(mas).toEqual({ responsableId: 'A', finalizadas: 2 })
+    expect(menos).toEqual({ responsableId: 'C', finalizadas: 0 })
+  })
+  it('devuelve null si no hay actividades', () => {
+    expect(extremosFinalizadas([])).toEqual({ mas: null, menos: null })
+  })
+})
+
+describe('conteoPorEstado', () => {
+  it('cuenta por estado', () => {
+    const acts = [
+      act({ estado: 'CUMPLIDA' }),
+      act({ estado: 'CUMPLIDA' }),
+      act({ estado: 'PARCIAL' }),
+      act({ estado: 'PENDIENTE' }),
+    ]
+    expect(conteoPorEstado(acts)).toEqual({ PENDIENTE: 1, CUMPLIDA: 2, PARCIAL: 1, NO_CUMPLIDA: 0, REPROGRAMADA: 0 })
+  })
+})
+
+describe('hectareasTrabajadasYFaltantes', () => {
+  it('suma trabajadas y faltantes, ignorando PENDIENTE', () => {
+    const filas = [
+      { estado: 'CUMPLIDA', haProgramada: 10, haFaltante: 0 },
+      { estado: 'PARCIAL', haProgramada: 8, haFaltante: 3 },
+      { estado: 'PENDIENTE', haProgramada: 5, haFaltante: 0 },
+    ]
+    // trabajadas = 10 + (8-3) = 15 ; faltantes = 3
+    expect(hectareasTrabajadasYFaltantes(filas)).toEqual({ trabajadas: 15, faltantes: 3 })
+  })
+})

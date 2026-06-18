@@ -19,3 +19,62 @@ export function actividadesConCambio(actividades: Actividad[]): Actividad[] {
     .filter((a) => ESTADOS_CON_CAMBIO.includes(a.estado))
     .sort((a, b) => b.vecesReprogramada - a.vecesReprogramada || a.dia - b.dia)
 }
+
+export interface FilaFinalizadas {
+  responsableId: string
+  finalizadas: number
+}
+
+// Entre los responsables con actividades, el que más finalizó (CUMPLIDA) y el que menos.
+export function extremosFinalizadas(
+  actividades: Actividad[],
+): { mas: FilaFinalizadas | null; menos: FilaFinalizadas | null } {
+  const conteo = new Map<string, number>()
+  for (const a of actividades) {
+    const prev = conteo.get(a.responsableId) ?? 0
+    conteo.set(a.responsableId, prev + (a.estado === 'CUMPLIDA' ? 1 : 0))
+  }
+  const filas: FilaFinalizadas[] = [...conteo.entries()].map(([responsableId, finalizadas]) => ({
+    responsableId,
+    finalizadas,
+  }))
+  if (filas.length === 0) return { mas: null, menos: null }
+  filas.sort((a, b) => b.finalizadas - a.finalizadas)
+  return { mas: filas[0], menos: filas[filas.length - 1] }
+}
+
+export function conteoPorEstado(actividades: Actividad[]): Record<string, number> {
+  const r: Record<string, number> = {
+    PENDIENTE: 0,
+    CUMPLIDA: 0,
+    PARCIAL: 0,
+    NO_CUMPLIDA: 0,
+    REPROGRAMADA: 0,
+  }
+  for (const a of actividades) {
+    if (a.estado in r) r[a.estado] += 1
+  }
+  return r
+}
+
+export interface FilaHa {
+  estado: string
+  haProgramada: number
+  haFaltante: number
+}
+
+const r1 = (n: number) => Math.round(n * 10) / 10
+
+// Hectáreas trabajadas vs faltantes (ignora PENDIENTE).
+export function hectareasTrabajadasYFaltantes(
+  filas: FilaHa[],
+): { trabajadas: number; faltantes: number } {
+  let trabajadas = 0
+  let faltantes = 0
+  for (const f of filas) {
+    if (f.estado === 'PENDIENTE') continue
+    faltantes += f.haFaltante
+    trabajadas += Math.max(0, f.haProgramada - f.haFaltante)
+  }
+  return { trabajadas: r1(trabajadas), faltantes: r1(faltantes) }
+}
