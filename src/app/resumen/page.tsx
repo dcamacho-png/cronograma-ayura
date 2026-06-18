@@ -76,10 +76,6 @@ export default async function ResumenPage({
     actividades.map((a) => ({ estado: a.estado, haProgramada: haActividad(a), haFaltante: a.haFaltante ?? 0 })),
   )
 
-  const loteMap = new Map<string, number>()
-  for (const a of actividades) for (const l of a.lotes) loteMap.set(l.nombre, (loteMap.get(l.nombre) ?? 0) + 1)
-  const porLote = [...loteMap.entries()].sort((a, b) => b[1] - a[1])
-
   const haPorActividad = new Map<string, number>()
   for (const a of actividades) {
     if (a.estado === 'PENDIENTE') continue
@@ -210,22 +206,6 @@ export default async function ResumenPage({
           )}
         </div>
 
-        {/* Por lote */}
-        <div className="rounded-xl border p-4">
-          <h2 className="mb-3 text-lg font-semibold">📍 Por lote</h2>
-          {porLote.length === 0 ? (
-            <p className="text-sm text-gray-500">Sin lotes esta semana.</p>
-          ) : (
-            <ul className="max-h-48 space-y-1 overflow-y-auto text-sm">
-              {porLote.map(([nombre, n]) => (
-                <li key={nombre} className="flex justify-between">
-                  <span>{nombre}</span>
-                  <span className="text-gray-600">{n} act.</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
       </div>
 
       {esMaquinaria && haActividadLista.length > 0 && (
