@@ -15,6 +15,17 @@ model Area {
   responsables  Responsable[]
   tareas      Tarea[] @relation("TareaArea")
   solicitudes Tarea[] @relation("TareaSolicitante")
+  usuarios    Usuario[]
+}
+
+model Usuario {
+  id      String  @id @default(cuid())
+  usuario String  @unique
+  nombre  String
+  hash    String
+  rol     String  @default("AREA")
+  areaId  String?
+  area    Area?   @relation(fields: [areaId], references: [id])
 }
 
 model Finca {

@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import { PrismaClient } from '@prisma/client'
 import { readFileSync } from 'node:fs'
+import { hashPassword } from '../src/auth/password'
 const lotes: { nombre: string; finca: string | null; hectareas: number | null; tipoPasto: string | null }[] =
   JSON.parse(readFileSync(new URL('./lotes.json', import.meta.url), 'utf-8'))
 
@@ -110,6 +111,25 @@ async function main() {
     await prisma.actividadEstipulada.upsert({ where: { nombre }, update: {}, create: { nombre } })
   }
 
+  // Usuarios: un admin + uno por área (idempotente por 'usuario'). Contraseña por defecto: clave123
+  const USUARIOS: { usuario: string; nombre: string; rol: string; area: string | null }[] = [
+    { usuario: 'admin', nombre: 'Coordinación general', rol: 'ADMIN', area: null },
+    { usuario: 'ganaderia', nombre: 'Ganadería ceba', rol: 'AREA', area: 'Ganadería ceba' },
+    { usuario: 'maquinaria', nombre: 'Maquinaria', rol: 'AREA', area: 'Maquinaria' },
+    { usuario: 'maiz', nombre: 'Maíz', rol: 'AREA', area: 'Maíz' },
+    { usuario: 'riego', nombre: 'Riego', rol: 'AREA', area: 'Riego' },
+    { usuario: 'nelore', nombre: 'Nelore', rol: 'AREA', area: 'Nelore' },
+  ]
+  for (const u of USUARIOS) {
+    const areaId = u.area ? (await prisma.area.findUnique({ where: { nombre: u.area } }))?.id ?? null : null
+    await prisma.usuario.upsert({
+      where: { usuario: u.usuario },
+      update: {},
+      create: { usuario: u.usuario, nombre: u.nombre, rol: u.rol, areaId, hash: hashPassword('clave123') },
+    })
+  }
+  const totalUsuarios = await prisma.usuario.count()
+
   const [areas, fincas, motivos, responsables, maquinas, estipuladas] = await Promise.all([
     prisma.area.count(),
     prisma.finca.count(),
@@ -120,7 +140,7 @@ async function main() {
   ])
   const totalLotes = await prisma.lote.count()
   console.log(
-    `Seed listo: ${areas} áreas, ${fincas} fincas, ${motivos} motivos, ${responsables} responsables, ${maquinas} máquinas, ${estipuladas} actividades estipuladas, ${totalLotes} lotes.`,
+    `Seed listo: ${areas} áreas, ${fincas} fincas, ${motivos} motivos, ${responsables} responsables, ${maquinas} máquinas, ${estipuladas} actividades estipuladas, ${totalLotes} lotes, ${totalUsuarios} usuarios.`,
   )
 }
 

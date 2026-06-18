@@ -252,6 +252,10 @@ export function renombrarActividadEstipulada(id: string, nombre: string) {
   return prisma.actividadEstipulada.update({ where: { id }, data: { nombre } })
 }
 
+export function obtenerUsuarioPorLogin(usuario: string) {
+  return prisma.usuario.findUnique({ where: { usuario } })
+}
+
 // ---- Lotes / potreros ----
 
 export function listarLotes() {
