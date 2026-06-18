@@ -158,7 +158,7 @@ export function eliminarResponsable(id: string) {
 export function listarTareasPendientes(areaId: string) {
   return prisma.tarea.findMany({
     where: { areaId, estado: 'PENDIENTE' },
-    include: { finca: true, lotes: { include: { finca: true } } },
+    include: { finca: true, lotes: { include: { finca: true } }, solicitadaPorArea: true },
     orderBy: { descripcion: 'asc' },
   })
 }
@@ -189,7 +189,7 @@ export function quitarSeleccionTarea(id: string) {
 export function tareasPorAsignar(areaId: string, anio: number, semana: number) {
   return prisma.tarea.findMany({
     where: { areaId, estado: 'PENDIENTE', anioSel: anio, semanaSel: semana },
-    include: { finca: true, lotes: { include: { finca: true } } },
+    include: { finca: true, lotes: { include: { finca: true } }, solicitadaPorArea: true },
     orderBy: { descripcion: 'asc' },
   })
 }
@@ -306,6 +306,26 @@ export async function registrarCumplimiento(
     }
   }
   return true
+}
+
+// Crea una solicitud: una tarea que ejecuta `areaEjecutoraId`, pedida por `solicitadaPorAreaId`.
+export function crearSolicitud(
+  areaEjecutoraId: string,
+  descripcion: string,
+  solicitadaPorAreaId: string,
+) {
+  return prisma.tarea.create({
+    data: { areaId: areaEjecutoraId, descripcion, solicitadaPorAreaId },
+  })
+}
+
+// Tareas que un área solicitó a otras (para seguimiento), con el área ejecutora incluida.
+export function listarSolicitudesDeArea(areaId: string) {
+  return prisma.tarea.findMany({
+    where: { solicitadaPorAreaId: areaId },
+    include: { area: true },
+    orderBy: { descripcion: 'asc' },
+  })
 }
 
 // Crea una actividad enlazada a uno o varios lotes; la finca se deduce del primer lote.

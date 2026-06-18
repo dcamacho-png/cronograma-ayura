@@ -6,6 +6,7 @@ import {
   eliminarTarea,
   seleccionarTarea,
   quitarSeleccionTarea,
+  crearSolicitud,
 } from '@/datos/repositorio'
 import { esSemanaPasada, semanaActual } from '@/dominio/semana'
 
@@ -48,5 +49,14 @@ export async function seleccionarTareaAccion(form: FormData) {
 export async function quitarSeleccionTareaAccion(form: FormData) {
   const id = texto(form, 'id')
   if (id) await quitarSeleccionTarea(id)
+  revalidatePath('/tareas')
+}
+
+export async function crearSolicitudAccion(form: FormData) {
+  const solicitanteAreaId = texto(form, 'solicitanteAreaId')
+  const areaEjecutoraId = texto(form, 'areaEjecutoraId')
+  const descripcion = texto(form, 'descripcion')
+  if (!solicitanteAreaId || !areaEjecutoraId || !descripcion || areaEjecutoraId === solicitanteAreaId) return
+  await crearSolicitud(areaEjecutoraId, descripcion, solicitanteAreaId)
   revalidatePath('/tareas')
 }
