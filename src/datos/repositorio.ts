@@ -313,9 +313,15 @@ export function crearSolicitud(
   areaEjecutoraId: string,
   descripcion: string,
   solicitadaPorAreaId: string,
+  loteIds: string[],
 ) {
   return prisma.tarea.create({
-    data: { areaId: areaEjecutoraId, descripcion, solicitadaPorAreaId },
+    data: {
+      areaId: areaEjecutoraId,
+      descripcion,
+      solicitadaPorAreaId,
+      lotes: { connect: loteIds.map((id) => ({ id })) },
+    },
   })
 }
 

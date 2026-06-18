@@ -55,8 +55,10 @@ export async function quitarSeleccionTareaAccion(form: FormData) {
 export async function crearSolicitudAccion(form: FormData) {
   const solicitanteAreaId = texto(form, 'solicitanteAreaId')
   const areaEjecutoraId = texto(form, 'areaEjecutoraId')
-  const descripcion = texto(form, 'descripcion')
+  const descripcion =
+    textoOpcional(form, 'otra') ?? textoOpcional(form, 'estipulada') ?? texto(form, 'descripcion')
   if (!solicitanteAreaId || !areaEjecutoraId || !descripcion || areaEjecutoraId === solicitanteAreaId) return
-  await crearSolicitud(areaEjecutoraId, descripcion, solicitanteAreaId)
+  const loteIds = form.getAll('loteId').map((v) => String(v).trim()).filter(Boolean)
+  await crearSolicitud(areaEjecutoraId, descripcion, solicitanteAreaId, loteIds)
   revalidatePath('/tareas')
 }
