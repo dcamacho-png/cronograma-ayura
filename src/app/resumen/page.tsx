@@ -11,6 +11,14 @@ import {
 } from '@/dominio/resumen'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
 
+const ESTADOS_ORDEN = [
+  { v: 'CUMPLIDA', etq: '✅ Cumplidas' },
+  { v: 'PARCIAL', etq: '🟡 Parciales' },
+  { v: 'NO_CUMPLIDA', etq: '🔴 No cumplidas' },
+  { v: 'REPROGRAMADA', etq: '🔄 Reprogramadas' },
+  { v: 'PENDIENTE', etq: '⏳ Pendientes' },
+]
+
 const COLOR_HEX: Record<string, string> = {
   gris: '#9ca3af',
   verde: '#2e9e5b',
@@ -68,19 +76,17 @@ export default async function ResumenPage({
     actividades.map((a) => ({ estado: a.estado, haProgramada: haActividad(a), haFaltante: a.haFaltante ?? 0 })),
   )
 
-  const fincaMap = new Map<string, { count: number; ha: number }>()
-  for (const a of actividades) {
-    const k = a.finca?.nombre ?? 'Sin finca'
-    const e = fincaMap.get(k) ?? { count: 0, ha: 0 }
-    e.count += 1
-    e.ha += haActividad(a)
-    fincaMap.set(k, e)
-  }
-  const porFinca = [...fincaMap.entries()]
-
   const loteMap = new Map<string, number>()
   for (const a of actividades) for (const l of a.lotes) loteMap.set(l.nombre, (loteMap.get(l.nombre) ?? 0) + 1)
   const porLote = [...loteMap.entries()].sort((a, b) => b[1] - a[1])
+
+  const haPorActividad = new Map<string, number>()
+  for (const a of actividades) {
+    if (a.estado === 'PENDIENTE') continue
+    const realizada = Math.max(0, haActividad(a) - (a.haFaltante ?? 0))
+    haPorActividad.set(a.descripcion, (haPorActividad.get(a.descripcion) ?? 0) + realizada)
+  }
+  const haActividadLista = [...haPorActividad.entries()].sort((a, b) => b[1] - a[1])
 
   const previa = semanaAnterior(anio, semana)
   const proxima = siguienteSemana(anio, semana)
@@ -145,6 +151,26 @@ export default async function ResumenPage({
         <span className="rounded-full bg-gray-100 px-3 py-1">⏳ Pendientes: <b>{conteo.PENDIENTE}</b></span>
       </div>
 
+      <div className="mb-8 space-y-3">
+        {ESTADOS_ORDEN.map(({ v, etq }) => {
+          const acts = actividades.filter((a) => a.estado === v)
+          if (acts.length === 0) return null
+          return (
+            <div key={v}>
+              <div className="text-sm font-semibold">{etq} ({acts.length})</div>
+              <ul className="ml-4 list-disc text-sm text-gray-600">
+                {acts.map((a) => (
+                  <li key={a.id}>
+                    {a.descripcion}
+                    {a.lotes.length > 0 ? ` · 📍 ${a.lotes.map((l) => l.nombre).join(', ')}` : ''}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        })}
+      </div>
+
       <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Ranking simple */}
         <div className="rounded-xl border p-4">
@@ -184,23 +210,6 @@ export default async function ResumenPage({
           )}
         </div>
 
-        {/* Por finca */}
-        <div className="rounded-xl border p-4">
-          <h2 className="mb-3 text-lg font-semibold">📍 Por finca</h2>
-          {porFinca.length === 0 ? (
-            <p className="text-sm text-gray-500">Sin datos.</p>
-          ) : (
-            <ul className="space-y-1 text-sm">
-              {porFinca.map(([finca, e]) => (
-                <li key={finca} className="flex justify-between">
-                  <span>{finca}</span>
-                  <span className="text-gray-600">{e.count} act.{e.ha > 0 ? ` · ${e.ha.toFixed(1)} ha` : ''}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
         {/* Por lote */}
         <div className="rounded-xl border p-4">
           <h2 className="mb-3 text-lg font-semibold">📍 Por lote</h2>
@@ -218,6 +227,20 @@ export default async function ResumenPage({
           )}
         </div>
       </div>
+
+      {esMaquinaria && haActividadLista.length > 0 && (
+        <div className="mb-8">
+          <h2 className="mb-2 text-lg font-semibold">🚜 Hectáreas realizadas por actividad</h2>
+          <ul className="space-y-1 text-sm">
+            {haActividadLista.map(([desc, ha]) => (
+              <li key={desc} className="flex justify-between rounded border px-3 py-1">
+                <span>{desc}</span>
+                <b>{(Math.round(ha * 10) / 10)} ha</b>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Cambios / reprogramadas */}
       <h2 className="mb-2 text-lg font-semibold">🔄 Actividades cambiadas o reprogramadas</h2>
