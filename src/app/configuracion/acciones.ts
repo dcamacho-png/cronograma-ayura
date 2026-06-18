@@ -1,11 +1,16 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, crearLote, eliminarLote } from '@/datos/repositorio'
+import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, crearLote, eliminarLote, crearUsuario, cambiarContrasena, eliminarUsuario } from '@/datos/repositorio'
 
 function texto(form: FormData, clave: string): string {
   const v = form.get(clave)
   return typeof v === 'string' ? v.trim() : ''
+}
+
+function textoOpcional(form: FormData, clave: string): string | null {
+  const v = texto(form, clave)
+  return v === '' ? null : v
 }
 
 // Ejecuta la creación ignorando errores (p. ej. nombre duplicado en catálogos únicos).
@@ -111,5 +116,30 @@ export async function crearLoteAccion(form: FormData) {
 export async function eliminarLoteAccion(form: FormData) {
   const id = texto(form, 'id')
   if (id) await intentar(() => eliminarLote(id))
+  revalidatePath('/configuracion')
+}
+
+export async function crearUsuarioAccion(form: FormData) {
+  const usuario = texto(form, 'usuario')
+  const nombre = texto(form, 'nombre')
+  const password = texto(form, 'password')
+  const rol = texto(form, 'rol')
+  const areaId = textoOpcional(form, 'areaId')
+  if (usuario && nombre && password && (rol === 'AREA' || rol === 'ADMIN')) {
+    await intentar(() => crearUsuario(usuario, nombre, password, rol, rol === 'AREA' ? areaId : null))
+  }
+  revalidatePath('/configuracion')
+}
+
+export async function cambiarContrasenaAccion(form: FormData) {
+  const id = texto(form, 'id')
+  const password = texto(form, 'password')
+  if (id && password) await intentar(() => cambiarContrasena(id, password))
+  revalidatePath('/configuracion')
+}
+
+export async function eliminarUsuarioAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (id) await intentar(() => eliminarUsuario(id))
   revalidatePath('/configuracion')
 }

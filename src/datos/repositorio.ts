@@ -1,4 +1,5 @@
 import { prisma } from './prisma'
+import { hashPassword } from '@/auth/password'
 import { duplicarActividades, datosReprogramacion } from '@/dominio/programacion'
 import { turnoPorDia } from '@/dominio/turno'
 import { siguienteSemana } from '@/dominio/semana'
@@ -254,6 +255,30 @@ export function renombrarActividadEstipulada(id: string, nombre: string) {
 
 export function obtenerUsuarioPorLogin(usuario: string) {
   return prisma.usuario.findUnique({ where: { usuario } })
+}
+
+export function listarUsuarios() {
+  return prisma.usuario.findMany({ include: { area: true }, orderBy: { usuario: 'asc' } })
+}
+
+export function crearUsuario(
+  usuario: string,
+  nombre: string,
+  password: string,
+  rol: string,
+  areaId: string | null,
+) {
+  return prisma.usuario.create({
+    data: { usuario, nombre, hash: hashPassword(password), rol, areaId: rol === 'AREA' ? areaId : null },
+  })
+}
+
+export function cambiarContrasena(id: string, password: string) {
+  return prisma.usuario.update({ where: { id }, data: { hash: hashPassword(password) } })
+}
+
+export function eliminarUsuario(id: string) {
+  return prisma.usuario.delete({ where: { id } })
 }
 
 // ---- Lotes / potreros ----

@@ -8,6 +8,7 @@ import {
   listarResponsablesTodos,
   listarActividadesEstipuladas,
   listarLotes,
+  listarUsuarios,
 } from '@/datos/repositorio'
 import {
   crearAreaAccion,
@@ -25,12 +26,15 @@ import {
   renombrarActividadEstipuladaAccion,
   crearLoteAccion,
   eliminarLoteAccion,
+  crearUsuarioAccion,
+  cambiarContrasenaAccion,
+  eliminarUsuarioAccion,
 } from './acciones'
 
 export default async function ConfiguracionPage() {
   const u = await usuarioActual()
   if (!u || u.rol !== 'ADMIN') redirect('/programar')
-  const [areas, fincas, motivos, maquinas, responsables, estipuladas, lotes] = await Promise.all([
+  const [areas, fincas, motivos, maquinas, responsables, estipuladas, lotes, usuarios] = await Promise.all([
     listarAreas(),
     listarFincas(),
     listarMotivos(),
@@ -38,6 +42,7 @@ export default async function ConfiguracionPage() {
     listarResponsablesTodos(),
     listarActividadesEstipuladas(),
     listarLotes(),
+    listarUsuarios(),
   ])
 
   return (
@@ -207,6 +212,45 @@ export default async function ConfiguracionPage() {
             <input name="hectareas" type="number" step="0.01" placeholder="ha" className="w-20 rounded border p-2 text-sm" />
             <input name="tipoPasto" placeholder="Tipo de pasto" className="rounded border p-2 text-sm" />
             <button className="rounded bg-[#11603a] px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
+          </form>
+        </section>
+
+        {/* Usuarios */}
+        <section className="rounded-xl border p-4 md:col-span-2">
+          <h2 className="mb-2 font-semibold">Usuarios</h2>
+          <ul className="mb-3 space-y-2 text-sm">
+            {usuarios.map((u) => (
+              <li key={u.id} className="flex flex-wrap items-center gap-2">
+                <span className="flex-1">
+                  <b>{u.usuario}</b> · {u.nombre} · {u.rol}{u.area ? ` · ${u.area.nombre}` : ''}
+                </span>
+                <form action={cambiarContrasenaAccion} className="flex items-center gap-1">
+                  <input type="hidden" name="id" value={u.id} />
+                  <input name="password" required placeholder="nueva contraseña" className="rounded border p-1 text-xs" />
+                  <button className="text-xs font-semibold text-[#11603a] hover:underline">cambiar</button>
+                </form>
+                <form action={eliminarUsuarioAccion}>
+                  <input type="hidden" name="id" value={u.id} />
+                  <button className="text-gray-400 hover:text-red-600" title="Eliminar" aria-label="Eliminar">✕</button>
+                </form>
+              </li>
+            ))}
+          </ul>
+          <form action={crearUsuarioAccion} className="flex flex-wrap items-end gap-2">
+            <input name="usuario" required placeholder="usuario (login)" className="rounded border p-2 text-sm" />
+            <input name="nombre" required placeholder="nombre" className="rounded border p-2 text-sm" />
+            <input name="password" required placeholder="contraseña" className="rounded border p-2 text-sm" />
+            <select name="rol" required className="rounded border p-2 text-sm">
+              <option value="AREA">Área</option>
+              <option value="ADMIN">Admin</option>
+            </select>
+            <select name="areaId" className="rounded border p-2 text-sm">
+              <option value="">(área, si es de área)</option>
+              {areas.map((a) => (
+                <option key={a.id} value={a.id}>{a.nombre}</option>
+              ))}
+            </select>
+            <button className="rounded bg-[#11603a] px-3 py-2 text-sm font-semibold text-white">+ Usuario</button>
           </form>
         </section>
       </div>
