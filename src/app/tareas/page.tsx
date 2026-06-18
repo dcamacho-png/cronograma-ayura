@@ -3,6 +3,7 @@ import { listarAreas, listarLotes, listarTareasPendientes, listarActividadesEsti
 import { SelectLote } from '../_componentes/select-lote'
 import { InfoLotes } from '../_componentes/info-lotes'
 import { FormNuevaTareaMaquinaria } from './form-nueva-tarea-maquinaria'
+import { FormSolicitar } from './form-solicitar'
 import { siguienteSemana, semanaAnterior, semanaActual, esSemanaPasada } from '@/dominio/semana'
 import {
   crearTareaAccion,
@@ -30,6 +31,8 @@ export default async function TareasPage({
   const areaId = sp.area && areas.some((a) => a.id === sp.area) ? sp.area : areas[0].id
   const areaActual = areas.find((a) => a.id === areaId)!
   const esMaquinaria = areaActual.nombre.toLowerCase().includes('maquinaria')
+  const maquinariaArea = areas.find((a) => a.nombre.toLowerCase().includes('maquinaria'))
+  const maquinariaAreaId = maquinariaArea?.id ?? ''
   const hoy = semanaActual()
   const anioRaw = Number(sp.anio)
   const semanaRaw = Number(sp.semana)
@@ -85,6 +88,36 @@ export default async function TareasPage({
       <p className="mb-3 text-xs text-gray-500">
         {seleccionadas.length} seleccionadas para esta semana · {enBanco.length} en el banco
       </p>
+
+      <div className="mb-6 grid gap-4 md:grid-cols-2">
+        <div className="rounded-xl border p-4">
+          <h2 className="mb-2 font-semibold">➕ Agregar al banco</h2>
+          {esMaquinaria ? (
+            <FormNuevaTareaMaquinaria areaId={areaId} estipuladas={estipuladas} lotes={lotes} accion={crearTareaAccion} />
+          ) : (
+            <form action={crearTareaAccion} className="flex flex-wrap items-end gap-2">
+              <input type="hidden" name="areaId" value={areaId} />
+              <label className="flex flex-1 flex-col text-sm">
+                Nueva tarea
+                <input name="descripcion" required placeholder="Ej: Arreglo de saladero" className="rounded border p-2" />
+              </label>
+              <label className="flex flex-col text-sm">
+                Lote (opcional)
+                <SelectLote lotes={lotes} name="loteId" />
+              </label>
+              <button className="rounded bg-[#11603a] px-4 py-2 text-sm font-semibold text-white">+ Agregar al banco</button>
+            </form>
+          )}
+        </div>
+        <FormSolicitar
+          solicitanteAreaId={areaId}
+          areas={areas}
+          maquinariaAreaId={maquinariaAreaId}
+          estipuladas={estipuladas}
+          lotes={lotes}
+          accion={crearSolicitudAccion}
+        />
+      </div>
 
       <div className="mb-4 rounded-xl border p-4">
         <h2 className="mb-3 font-semibold text-[#11603a]">📌 Seleccionadas para la semana {semana}</h2>
@@ -162,25 +195,6 @@ export default async function TareasPage({
         )}
       </div>
 
-      <form action={crearSolicitudAccion} className="mb-4 flex flex-wrap items-end gap-2 rounded-xl border border-purple-200 bg-purple-50 p-4">
-        <input type="hidden" name="solicitanteAreaId" value={areaId} />
-        <h2 className="w-full font-semibold text-purple-900">📨 Solicitar a otra área</h2>
-        <label className="flex flex-col text-sm">
-          Área que la ejecuta
-          <select name="areaEjecutoraId" required className="rounded border p-2 text-sm">
-            <option value="">— elegir área —</option>
-            {areas.filter((a) => a.id !== areaId).map((a) => (
-              <option key={a.id} value={a.id}>{a.nombre}</option>
-            ))}
-          </select>
-        </label>
-        <label className="flex flex-1 flex-col text-sm">
-          Descripción
-          <input name="descripcion" required placeholder="Ej: pasar renovador en lote X" className="rounded border p-2 text-sm" />
-        </label>
-        <button className="rounded bg-purple-700 px-4 py-2 text-sm font-semibold text-white">📨 Solicitar</button>
-      </form>
-
       <div className="mb-4 rounded-xl border p-4">
         <h2 className="mb-3 font-semibold">📨 Mis solicitudes a otras áreas</h2>
         {solicitudes.length === 0 ? (
@@ -200,28 +214,6 @@ export default async function TareasPage({
           </ul>
         )}
       </div>
-
-      {esMaquinaria ? (
-        <FormNuevaTareaMaquinaria
-          areaId={areaId}
-          estipuladas={estipuladas}
-          lotes={lotes}
-          accion={crearTareaAccion}
-        />
-      ) : (
-        <form action={crearTareaAccion} className="flex flex-wrap items-end gap-2 rounded-xl border p-4">
-          <input type="hidden" name="areaId" value={areaId} />
-          <label className="flex flex-1 flex-col text-sm">
-            Nueva tarea
-            <input name="descripcion" required placeholder="Ej: Arreglo de saladero" className="rounded border p-2" />
-          </label>
-          <label className="flex flex-col text-sm">
-            Lote (opcional)
-            <SelectLote lotes={lotes} name="loteId" />
-          </label>
-          <button className="rounded bg-[#11603a] px-4 py-2 text-sm font-semibold text-white">+ Agregar al banco</button>
-        </form>
-      )}
     </main>
   )
 }
