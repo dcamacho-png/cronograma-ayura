@@ -13,7 +13,8 @@ model Area {
   actividades   Actividad[]   @relation("AreaDeActividad")
   tareasMaquina Actividad[]   @relation("AreaDeTarea")
   responsables  Responsable[]
-  tareas        Tarea[]
+  tareas      Tarea[] @relation("TareaArea")
+  solicitudes Tarea[] @relation("TareaSolicitante")
 }
 
 model Finca {
@@ -94,8 +95,10 @@ model Tarea {
   anioSel     Int?
   semanaSel   Int?
 
-  areaId      String
-  area        Area        @relation(fields: [areaId], references: [id])
+  areaId              String
+  area                Area        @relation("TareaArea", fields: [areaId], references: [id])
+  solicitadaPorAreaId String?
+  solicitadaPorArea   Area?       @relation("TareaSolicitante", fields: [solicitadaPorAreaId], references: [id])
   fincaId     String?
   finca       Finca?      @relation(fields: [fincaId], references: [id])
   loteId      String?
