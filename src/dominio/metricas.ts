@@ -34,15 +34,16 @@ export function pesoEstado(estado: Estado): number | null {
   }
 }
 
-// % de cumplimiento (0..100) sobre las actividades evaluadas.
-// Devuelve null si no hay ninguna actividad evaluada.
+// % de cumplimiento sobre el TOTAL de actividades: Cumplida=1, Parcial=0.5,
+// No cumplida / Pendiente / Reprogramada = 0. Devuelve null solo si no hay actividades.
 export function porcentajeCumplimiento(actividades: Actividad[]): number | null {
-  const pesos = actividades
-    .map((a) => pesoEstado(a.estado))
-    .filter((p): p is number => p !== null)
-  if (pesos.length === 0) return null
-  const suma = pesos.reduce((acc, p) => acc + p, 0)
-  return Math.round((suma / pesos.length) * 100)
+  if (actividades.length === 0) return null
+  const suma = actividades.reduce((acc, a) => {
+    if (a.estado === 'CUMPLIDA') return acc + 1
+    if (a.estado === 'PARCIAL') return acc + 0.5
+    return acc
+  }, 0)
+  return Math.round((suma / actividades.length) * 100)
 }
 
 // Traduce un % (0..100) a estrellas (1..5).

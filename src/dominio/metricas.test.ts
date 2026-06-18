@@ -35,17 +35,17 @@ describe('porcentajeCumplimiento', () => {
     // (1 + 0.5 + 0) / 3 = 0.5 -> 50
     expect(porcentajeCumplimiento(acts)).toBe(50)
   })
-  it('excluye PENDIENTE y REPROGRAMADA del cálculo', () => {
+  it('PENDIENTE y REPROGRAMADA cuentan como 0 sobre el total', () => {
     const acts = [
       act({ estado: 'CUMPLIDA' }),
       act({ estado: 'PENDIENTE' }),
       act({ estado: 'REPROGRAMADA' }),
     ]
-    // solo cuenta la CUMPLIDA -> 100
-    expect(porcentajeCumplimiento(acts)).toBe(100)
+    // (1 + 0 + 0) / 3 = 0.333 -> 33
+    expect(porcentajeCumplimiento(acts)).toBe(33)
   })
-  it('devuelve null cuando no hay actividades evaluadas', () => {
-    expect(porcentajeCumplimiento([act({ estado: 'PENDIENTE' })])).toBeNull()
+  it('devuelve null solo con lista vacía; una pendiente sola devuelve 0', () => {
+    expect(porcentajeCumplimiento([act({ estado: 'PENDIENTE' })])).toBe(0)
     expect(porcentajeCumplimiento([])).toBeNull()
   })
 })
@@ -80,13 +80,15 @@ describe('rankingResponsables', () => {
     expect(bajos[0]).toEqual({ responsableId: 'C', porcentaje: 0, estrellas: 1 })
   })
 
-  it('ignora responsables sin actividades evaluadas', () => {
+  it('responsables con solo PENDIENTE aparecen con porcentaje 0', () => {
     const acts: Actividad[] = [
       act({ responsableId: 'A', estado: 'CUMPLIDA' }),
       act({ responsableId: 'Z', estado: 'PENDIENTE' }),
     ]
     const { top } = rankingResponsables(acts)
-    expect(top.map((f) => f.responsableId)).toEqual(['A'])
+    // Z tiene 0% (1 pendiente sobre total), ya no se excluye
+    expect(top.map((f) => f.responsableId)).toEqual(['A', 'Z'])
+    expect(top[1]).toEqual({ responsableId: 'Z', porcentaje: 0, estrellas: 1 })
   })
 })
 
@@ -173,10 +175,10 @@ describe('estrellas (borde inferior)', () => {
 })
 
 describe('cumplimientoPorArea (porcentaje null)', () => {
-  it('incluye áreas con porcentaje null cuando no hay actividades evaluadas', () => {
+  it('áreas con solo PENDIENTE devuelven porcentaje 0 (no null)', () => {
     const acts = [act({ areaId: 'admin', estado: 'PENDIENTE' })]
     const filas = cumplimientoPorArea(acts)
-    expect(filas).toContainEqual({ areaId: 'admin', porcentaje: null })
+    expect(filas).toContainEqual({ areaId: 'admin', porcentaje: 0 })
   })
 })
 
