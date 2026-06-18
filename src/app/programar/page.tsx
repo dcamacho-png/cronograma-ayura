@@ -7,7 +7,7 @@ import {
   listarLotes,
 } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, esSemanaPasada } from '@/dominio/semana'
-import { duplicarSemanaAccion, asignarTareaAccion } from './acciones'
+import { asignarTareaAccion } from './acciones'
 import { InfoLotes } from '../_componentes/info-lotes'
 import { AsignarTareaForm } from './asignar-tarea-form'
 
@@ -76,16 +76,6 @@ export default async function ProgramarPage({
         <Link href={url(areaId, proxima.anio, proxima.semana)} className="rounded border px-3 py-1 text-sm">
           Semana {proxima.semana} →
         </Link>
-        {!pasada && (
-          <form action={duplicarSemanaAccion} className="ml-auto">
-            <input type="hidden" name="areaId" value={areaId} />
-            <input type="hidden" name="anio" value={anio} />
-            <input type="hidden" name="semana" value={semana} />
-            <button className="rounded bg-gray-100 px-3 py-1 text-sm hover:bg-gray-200">
-              ⧉ Duplicar semana anterior
-            </button>
-          </form>
-        )}
       </div>
 
       {pasada && (
