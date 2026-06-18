@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { listarAreas, listarLotes, listarTareasPendientes, listarActividadesEstipuladas } from '@/datos/repositorio'
+import { listarAreas, listarLotes, listarTareasPendientes, listarActividadesEstipuladas, listarSolicitudesDeArea } from '@/datos/repositorio'
 import { SelectLote } from '../_componentes/select-lote'
 import { InfoLotes } from '../_componentes/info-lotes'
 import { FormNuevaTareaMaquinaria } from './form-nueva-tarea-maquinaria'
@@ -9,6 +9,7 @@ import {
   eliminarTareaAccion,
   seleccionarTareaAccion,
   quitarSeleccionTareaAccion,
+  crearSolicitudAccion,
 } from './acciones'
 
 export default async function TareasPage({
@@ -36,10 +37,11 @@ export default async function TareasPage({
   const semana = sp.semana && Number.isInteger(semanaRaw) ? semanaRaw : hoy.semana
   const pasada = esSemanaPasada(anio, semana, hoy)
 
-  const [tareas, estipuladas, lotes] = await Promise.all([
+  const [tareas, estipuladas, lotes, solicitudes] = await Promise.all([
     listarTareasPendientes(areaId),
     listarActividadesEstipuladas(),
     listarLotes(),
+    listarSolicitudesDeArea(areaId),
   ])
 
   const seleccionadas = tareas.filter((t) => t.anioSel === anio && t.semanaSel === semana)
@@ -93,7 +95,14 @@ export default async function TareasPage({
             {seleccionadas.map((t) => (
               <li key={t.id} className="flex flex-wrap items-center gap-3 py-3">
                 <div className="flex-1">
-                  <div className="font-medium">{t.descripcion}</div>
+                  <div className="font-medium">
+                    {t.descripcion}
+                    {t.solicitadaPorArea && (
+                      <span className="ml-2 rounded-full bg-purple-100 px-2 py-0.5 text-xs font-semibold text-purple-700">
+                        📨 {t.solicitadaPorArea.nombre}
+                      </span>
+                    )}
+                  </div>
                   <InfoLotes lotes={t.lotes} />
                 </div>
                 <span className="rounded-full bg-[#1d8a55] px-3 py-1 text-xs font-bold text-white">➡️ Semana {semana}</span>
@@ -122,7 +131,14 @@ export default async function TareasPage({
             {enBanco.map((t) => (
               <li key={t.id} className="flex flex-wrap items-center gap-3 py-3">
                 <div className="flex-1">
-                  <div className="font-medium">{t.descripcion}</div>
+                  <div className="font-medium">
+                    {t.descripcion}
+                    {t.solicitadaPorArea && (
+                      <span className="ml-2 rounded-full bg-purple-100 px-2 py-0.5 text-xs font-semibold text-purple-700">
+                        📨 {t.solicitadaPorArea.nombre}
+                      </span>
+                    )}
+                  </div>
                   <InfoLotes lotes={t.lotes} />
                 </div>
                 {t.semanaSel !== null && (
@@ -140,6 +156,45 @@ export default async function TareasPage({
                   <input type="hidden" name="id" value={t.id} />
                   <button className="text-sm text-red-600 hover:underline">eliminar</button>
                 </form>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <form action={crearSolicitudAccion} className="mb-4 flex flex-wrap items-end gap-2 rounded-xl border border-purple-200 bg-purple-50 p-4">
+        <input type="hidden" name="solicitanteAreaId" value={areaId} />
+        <h2 className="w-full font-semibold text-purple-900">📨 Solicitar a otra área</h2>
+        <label className="flex flex-col text-sm">
+          Área que la ejecuta
+          <select name="areaEjecutoraId" required className="rounded border p-2 text-sm">
+            <option value="">— elegir área —</option>
+            {areas.filter((a) => a.id !== areaId).map((a) => (
+              <option key={a.id} value={a.id}>{a.nombre}</option>
+            ))}
+          </select>
+        </label>
+        <label className="flex flex-1 flex-col text-sm">
+          Descripción
+          <input name="descripcion" required placeholder="Ej: pasar renovador en lote X" className="rounded border p-2 text-sm" />
+        </label>
+        <button className="rounded bg-purple-700 px-4 py-2 text-sm font-semibold text-white">📨 Solicitar</button>
+      </form>
+
+      <div className="mb-4 rounded-xl border p-4">
+        <h2 className="mb-3 font-semibold">📨 Mis solicitudes a otras áreas</h2>
+        {solicitudes.length === 0 ? (
+          <p className="text-sm text-gray-500">No has solicitado tareas a otras áreas.</p>
+        ) : (
+          <ul className="divide-y text-sm">
+            {solicitudes.map((s) => (
+              <li key={s.id} className="flex items-center justify-between py-2">
+                <span>
+                  {s.descripcion} <span className="text-gray-500">· para {s.area.nombre}</span>
+                </span>
+                <span className={s.estado === 'PROGRAMADA' ? 'text-[#2e9e5b]' : 'text-gray-500'}>
+                  {s.estado === 'PROGRAMADA' ? '✅ Programada' : '🕓 En banco'}
+                </span>
               </li>
             ))}
           </ul>
