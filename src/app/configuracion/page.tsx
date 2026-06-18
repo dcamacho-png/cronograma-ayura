@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation'
+import { usuarioActual } from '@/auth/sesion'
 import {
   listarAreas,
   listarFincas,
@@ -26,6 +28,8 @@ import {
 } from './acciones'
 
 export default async function ConfiguracionPage() {
+  const u = await usuarioActual()
+  if (!u || u.rol !== 'ADMIN') redirect('/programar')
   const [areas, fincas, motivos, maquinas, responsables, estipuladas, lotes] = await Promise.all([
     listarAreas(),
     listarFincas(),

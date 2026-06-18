@@ -1,4 +1,6 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
+import { usuarioActual } from '@/auth/sesion'
 import { listarAreas, listarMotivos, listarActividadesDeSemanas } from '@/datos/repositorio'
 import { semanasDelMes, mesActual } from '@/dominio/semana'
 import {
@@ -29,6 +31,8 @@ export default async function TableroPage({
 }: {
   searchParams: Promise<{ anio?: string; mes?: string }>
 }) {
+  const u = await usuarioActual()
+  if (!u || u.rol !== 'ADMIN') redirect('/programar')
   const sp = await searchParams
   const hoy = mesActual()
   const anioRaw = Number(sp.anio)

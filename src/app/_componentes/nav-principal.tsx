@@ -15,13 +15,17 @@ const ENLACES = [
 
 export function NavPrincipal({ usuario }: { usuario: { nombre: string; rol: string } | null }) {
   const ruta = usePathname()
+  const enlaces =
+    usuario?.rol === 'ADMIN'
+      ? ENLACES
+      : ENLACES.filter((e) => e.href !== '/tablero' && e.href !== '/configuracion')
   return (
     <header className="bg-[#11603a] text-white">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-6 py-3">
         <span className="font-bold">🌱 Cronograma Ayurá</span>
         {usuario && (
           <nav className="flex flex-wrap gap-3 text-sm">
-            {ENLACES.map((e) => {
+            {enlaces.map((e) => {
               const activo = ruta === e.href
               return (
                 <Link

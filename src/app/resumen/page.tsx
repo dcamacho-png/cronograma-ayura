@@ -1,4 +1,6 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
+import { usuarioActual } from '@/auth/sesion'
 import { listarAreas, listarResponsablesPorArea, listarMotivos, listarActividades } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual } from '@/dominio/semana'
 import { porcentajeCumplimiento, porcentajeReprogramadas, motivosFrecuentes, colorSemaforo } from '@/dominio/metricas'
@@ -43,7 +45,13 @@ export default async function ResumenPage({
     )
   }
 
-  const areaId = sp.area && areas.some((a) => a.id === sp.area) ? sp.area : areas[0].id
+  const u = await usuarioActual()
+  if (!u) redirect('/login')
+  const esAdmin = u.rol === 'ADMIN'
+
+  const areaId = esAdmin
+    ? (sp.area && areas.some((a) => a.id === sp.area) ? sp.area : areas[0].id)
+    : (u.areaId && areas.some((a) => a.id === u.areaId) ? u.areaId : areas[0].id)
   const areaActual = areas.find((a) => a.id === areaId)!
   const esMaquinaria = areaActual.nombre.toLowerCase().includes('maquinaria')
   const hoy = semanaActual()
@@ -92,17 +100,21 @@ export default async function ResumenPage({
     <main className="mx-auto max-w-6xl p-6">
       <h1 className="mb-4 text-2xl font-bold text-[#11603a]">Resumen semanal</h1>
 
-      <div className="mb-3 flex flex-wrap gap-2">
-        {areas.map((a) => (
-          <Link
-            key={a.id}
-            href={url(a.id, anio, semana)}
-            className={`rounded-full px-3 py-1 text-sm ${a.id === areaId ? 'bg-[#11603a] text-white' : 'bg-gray-100 text-gray-700'}`}
-          >
-            {a.nombre}
-          </Link>
-        ))}
-      </div>
+      {esAdmin ? (
+        <div className="mb-3 flex flex-wrap gap-2">
+          {areas.map((a) => (
+            <Link
+              key={a.id}
+              href={url(a.id, anio, semana)}
+              className={`rounded-full px-3 py-1 text-sm ${a.id === areaId ? 'bg-[#11603a] text-white' : 'bg-gray-100 text-gray-700'}`}
+            >
+              {a.nombre}
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <div className="mb-3 text-sm text-gray-500">Área: <b className="text-gray-800">{areaActual.nombre}</b></div>
+      )}
 
       <div className="mb-6 flex items-center gap-3">
         <Link href={url(areaId, previa.anio, previa.semana)} className="rounded border px-3 py-1 text-sm">← Semana {previa.semana}</Link>

@@ -1,4 +1,6 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
+import { usuarioActual } from '@/auth/sesion'
 import {
   listarAreas,
   listarResponsablesPorArea,
@@ -28,7 +30,14 @@ export default async function ProgramarPage({
     )
   }
 
-  const areaId = sp.area && areas.some((a) => a.id === sp.area) ? sp.area : areas[0].id
+  const u = await usuarioActual()
+  if (!u) redirect('/login')
+  const esAdmin = u.rol === 'ADMIN'
+
+  const areaId = esAdmin
+    ? (sp.area && areas.some((a) => a.id === sp.area) ? sp.area : areas[0].id)
+    : (u.areaId && areas.some((a) => a.id === u.areaId) ? u.areaId : areas[0].id)
+  const areaActual = areas.find((a) => a.id === areaId)!
   const hoy = semanaActual()
   const anioRaw = Number(sp.anio)
   const semanaRaw = Number(sp.semana)
@@ -54,19 +63,21 @@ export default async function ProgramarPage({
     <main className="mx-auto max-w-6xl p-6">
       <h1 className="mb-4 text-2xl font-bold text-[#11603a]">Programar semana</h1>
 
-      <div className="mb-3 flex flex-wrap gap-2">
-        {areas.map((a) => (
-          <Link
-            key={a.id}
-            href={url(a.id, anio, semana)}
-            className={`rounded-full px-3 py-1 text-sm ${
-              a.id === areaId ? 'bg-[#11603a] text-white' : 'bg-gray-100 text-gray-700'
-            }`}
-          >
-            {a.nombre}
-          </Link>
-        ))}
-      </div>
+      {esAdmin ? (
+        <div className="mb-3 flex flex-wrap gap-2">
+          {areas.map((a) => (
+            <Link
+              key={a.id}
+              href={url(a.id, anio, semana)}
+              className={`rounded-full px-3 py-1 text-sm ${a.id === areaId ? 'bg-[#11603a] text-white' : 'bg-gray-100 text-gray-700'}`}
+            >
+              {a.nombre}
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <div className="mb-3 text-sm text-gray-500">Área: <b className="text-gray-800">{areaActual.nombre}</b></div>
+      )}
 
       <div className="mb-5 flex items-center gap-3">
         <Link href={url(areaId, previa.anio, previa.semana)} className="rounded border px-3 py-1 text-sm">
