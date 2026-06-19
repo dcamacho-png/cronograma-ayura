@@ -2,7 +2,6 @@ import { prisma } from './prisma'
 import { hashPassword } from '@/auth/password'
 import { duplicarActividades, datosReprogramacion } from '@/dominio/programacion'
 import { turnoPorDia } from '@/dominio/turno'
-import { siguienteSemana } from '@/dominio/semana'
 import type { BorradorActividad } from '@/dominio/programacion'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
 
@@ -158,7 +157,7 @@ export function eliminarResponsable(id: string) {
 
 export function listarTareasPendientes(areaId: string) {
   return prisma.tarea.findMany({
-    where: { areaId, estado: 'PENDIENTE' },
+    where: { areaId, estado: 'PENDIENTE', anioSel: null },
     include: { finca: true, lotes: { include: { finca: true } }, solicitadaPorArea: true },
     orderBy: { descripcion: 'asc' },
   })
@@ -223,6 +222,7 @@ export async function asignarTarea(
         dia,
         descripcion: tarea.descripcion,
         turno: turno.trim() || turnoPorDia(dia),
+        vecesReprogramada: tarea.vecesReprogramada,
         areaId: tarea.areaId,
         fincaId,
         responsableId,
@@ -298,9 +298,8 @@ export function eliminarLote(id: string) {
   return prisma.lote.delete({ where: { id } })
 }
 
-// Registra el cumplimiento de una actividad PENDIENTE (la bloquea). Si es PARCIAL o
-// REPROGRAMADA, además crea la copia de continuación en la semana siguiente con la
-// observación de lo faltante.
+// Registra el cumplimiento de una actividad PENDIENTE (la bloquea). Si no es CUMPLIDA,
+// devuelve la tarea de origen al banco (sin semana) para reprogramarla, conservando el contador.
 export async function registrarCumplimiento(
   id: string,
   estado: string,
@@ -311,28 +310,18 @@ export async function registrarCumplimiento(
   const act = await prisma.actividad.findUnique({ where: { id }, include: { lotes: true } })
   if (!act || act.estado !== 'PENDIENTE') return null // ya registrada / bloqueada
   await prisma.actividad.update({ where: { id }, data: { estado, motivoId, nota, haFaltante } })
-  if (estado === 'PARCIAL' || estado === 'REPROGRAMADA') {
-    const yaExiste = await prisma.actividad.findFirst({ where: { origenId: id } })
-    if (!yaExiste) {
-      const prox = siguienteSemana(act.anio, act.semana)
-      await prisma.actividad.create({
-        data: {
-          anio: prox.anio,
-          semana: prox.semana,
-          dia: act.dia,
-          descripcion: act.descripcion,
-          turno: act.turno,
-          estado: 'REPROGRAMADA',
-          nota: nota ? `Faltante: ${nota}${haFaltante ? ` (${haFaltante} ha)` : ''}` : null,
-          vecesReprogramada: act.vecesReprogramada + 1,
-          origenId: act.id,
-          areaId: act.areaId,
-          fincaId: act.fincaId,
-          responsableId: act.responsableId,
-          lotes: { connect: act.lotes.map((l) => ({ id: l.id })) },
-        },
-      })
-    }
+  // Novedad (todo lo que no es 100% cumplido): la tarea vuelve al banco sin semana,
+  // conservando el contador de reprogramaciones. El registro de esta semana queda en el historial.
+  if (estado !== 'CUMPLIDA' && act.tareaId) {
+    await prisma.tarea.update({
+      where: { id: act.tareaId },
+      data: {
+        estado: 'PENDIENTE',
+        anioSel: null,
+        semanaSel: null,
+        vecesReprogramada: act.vecesReprogramada + 1,
+      },
+    })
   }
   return true
 }
