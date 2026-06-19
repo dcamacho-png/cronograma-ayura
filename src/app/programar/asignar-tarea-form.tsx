@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { turnoPorDia } from '@/dominio/turno'
+import { turnoEfectivo } from '@/dominio/programacion'
 import { SelectFincaLote } from '../_componentes/select-finca-lote'
 
 const DIAS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
@@ -29,7 +30,7 @@ export function AsignarTareaForm({
   lotes: Lote[]
   esMaquinaria: boolean
   maquinas: { id: string; nombre: string }[]
-  ocupacion: { dia: number; turno: string; maquinaId: string }[]
+  ocupacion: { dia: number; turno: string; maquinaId: string | null; responsableId: string }[]
   areaId: string
   anio: number
   semana: number
@@ -37,10 +38,23 @@ export function AsignarTareaForm({
 }) {
   const [turno, setTurno] = useState(turnoPorDia(1))
   const [dias, setDias] = useState<number[]>([])
+  const [responsableId, setResponsableId] = useState(responsables[0]?.id ?? '')
   const tieneLotes = lotesTarea.length > 0
 
   const toggleDia = (d: number) =>
     setDias((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]))
+
+  // Aviso en vivo: días en que el responsable elegido ya tiene tarea ese turno.
+  const diasOcupadosResp = [...dias]
+    .sort((a, b) => a - b)
+    .filter((d) =>
+      ocupacion.some(
+        (o) =>
+          o.dia === d &&
+          o.turno === turnoEfectivo(turno, d) &&
+          o.responsableId === responsableId,
+      ),
+    )
 
   return (
     <form action={accion} className="flex flex-wrap items-end gap-2">
@@ -51,7 +65,13 @@ export function AsignarTareaForm({
       <span className="min-w-[160px] flex-1 font-medium">{descripcion}</span>
       <label className="flex flex-col text-xs">
         Responsable
-        <select name="responsableId" required className="rounded border p-1 text-sm">
+        <select
+          name="responsableId"
+          required
+          value={responsableId}
+          onChange={(e) => setResponsableId(e.target.value)}
+          className="rounded border p-1 text-sm"
+        >
           {responsables.map((r) => (
             <option key={r.id} value={r.id}>{r.nombre}</option>
           ))}
@@ -91,10 +111,10 @@ export function AsignarTareaForm({
         <div className="flex w-full flex-col gap-1 text-xs">
           <span className="text-gray-500">Máquina por día (solo disponibles · opcional)</span>
           {[...dias].sort((a, b) => a - b).map((d) => {
-            const turnoEfectivo = turno.trim() || turnoPorDia(d)
+            const turnoEf = turnoEfectivo(turno, d)
             const ocupadas = new Set(
               ocupacion
-                .filter((o) => o.dia === d && o.turno === turnoEfectivo)
+                .filter((o) => o.dia === d && o.turno === turnoEf)
                 .map((o) => o.maquinaId),
             )
             const disponibles = maquinas.filter((m) => !ocupadas.has(m.id))
@@ -114,6 +134,11 @@ export function AsignarTareaForm({
             )
           })}
         </div>
+      )}
+      {diasOcupadosResp.length > 0 && (
+        <p className="w-full text-xs font-medium text-red-700">
+          ⚠️ {responsables.find((r) => r.id === responsableId)?.nombre ?? 'El responsable'} ya tiene tarea en ese turno: {diasOcupadosResp.map((d) => DIAS[d - 1]).join(', ')}
+        </p>
       )}
       {tieneLotes ? (
         <span className="text-xs text-gray-600">Lote(s): {lotesTarea.map((l) => l.nombre).join(', ')}</span>

@@ -54,10 +54,13 @@ export default async function ProgramarPage({
     listarMaquinas(),
   ])
   const esMaquinaria = areaActual.nombre.toLowerCase().includes('maquinaria')
-  // Ocupación de máquinas en la semana: qué máquina está usada en cada día+turno.
-  const ocupacion = actividades
-    .filter((a) => a.maquinaId)
-    .map((a) => ({ dia: a.dia, turno: a.turno, maquinaId: a.maquinaId as string }))
+  // Ocupación en la semana: máquina y responsable usados en cada día+turno.
+  const ocupacion = actividades.map((a) => ({
+    dia: a.dia,
+    turno: a.turno,
+    maquinaId: a.maquinaId,
+    responsableId: a.responsableId,
+  }))
 
   const fechas = fechasDeSemana(anio, semana)
   const fmtFecha = (f: Date) =>
