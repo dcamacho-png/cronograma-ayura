@@ -54,6 +54,10 @@ export default async function ProgramarPage({
     listarMaquinas(),
   ])
   const esMaquinaria = areaActual.nombre.toLowerCase().includes('maquinaria')
+  // Ocupación de máquinas en la semana: qué máquina está usada en cada día+turno.
+  const ocupacion = actividades
+    .filter((a) => a.maquinaId)
+    .map((a) => ({ dia: a.dia, turno: a.turno, maquinaId: a.maquinaId as string }))
 
   const fechas = fechasDeSemana(anio, semana)
   const fmtFecha = (f: Date) =>
@@ -115,6 +119,7 @@ export default async function ProgramarPage({
                     lotes={lotes}
                     esMaquinaria={esMaquinaria}
                     maquinas={maquinas}
+                    ocupacion={ocupacion}
                     accion={asignarTareaAccion}
                   />
                   <form action={devolverAlBancoAccion} className="mt-1">

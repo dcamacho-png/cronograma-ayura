@@ -16,6 +16,7 @@ export function AsignarTareaForm({
   lotes,
   esMaquinaria,
   maquinas,
+  ocupacion,
   accion,
 }: {
   tareaId: string
@@ -25,6 +26,7 @@ export function AsignarTareaForm({
   lotes: Lote[]
   esMaquinaria: boolean
   maquinas: { id: string; nombre: string }[]
+  ocupacion: { dia: number; turno: string; maquinaId: string }[]
   accion: (formData: FormData) => void | Promise<void>
 }) {
   const [turno, setTurno] = useState(turnoPorDia(1))
@@ -78,18 +80,30 @@ export function AsignarTareaForm({
       </label>
       {esMaquinaria && dias.length > 0 && (
         <div className="flex w-full flex-col gap-1 text-xs">
-          <span className="text-gray-500">Máquina por día (opcional)</span>
-          {[...dias].sort((a, b) => a - b).map((d) => (
-            <label key={d} className="flex items-center gap-1">
-              <span className="w-8">{DIAS[d - 1]}</span>
-              <select name={`maquina_${d}`} className="rounded border p-1 text-sm">
-                <option value="">— sin máquina —</option>
-                {maquinas.map((m) => (
-                  <option key={m.id} value={m.id}>{m.nombre}</option>
-                ))}
-              </select>
-            </label>
-          ))}
+          <span className="text-gray-500">Máquina por día (solo disponibles · opcional)</span>
+          {[...dias].sort((a, b) => a - b).map((d) => {
+            const turnoEfectivo = turno.trim() || turnoPorDia(d)
+            const ocupadas = new Set(
+              ocupacion
+                .filter((o) => o.dia === d && o.turno === turnoEfectivo)
+                .map((o) => o.maquinaId),
+            )
+            const disponibles = maquinas.filter((m) => !ocupadas.has(m.id))
+            return (
+              <label key={d} className="flex items-center gap-1">
+                <span className="w-8">{DIAS[d - 1]}</span>
+                <select name={`maquina_${d}`} className="rounded border p-1 text-sm">
+                  <option value="">— sin máquina —</option>
+                  {disponibles.map((m) => (
+                    <option key={m.id} value={m.id}>{m.nombre}</option>
+                  ))}
+                </select>
+                {disponibles.length === 0 && (
+                  <span className="text-amber-600">sin máquinas libres este turno</span>
+                )}
+              </label>
+            )
+          })}
         </div>
       )}
       {tieneLotes ? (
