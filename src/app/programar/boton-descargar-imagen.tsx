@@ -15,8 +15,10 @@ export function BotonDescargarImagen({
       const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#ffffff' })
       const enlace = document.createElement('a')
       enlace.href = canvas.toDataURL('image/png')
-      enlace.download = nombreArchivo
+      enlace.download = nombreArchivo.replace(/\s+/g, '-')
+      document.body.appendChild(enlace)
       enlace.click()
+      enlace.remove()
     } catch {
       alert('No se pudo generar la imagen.')
     }
