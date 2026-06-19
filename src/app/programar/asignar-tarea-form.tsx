@@ -148,7 +148,12 @@ export function AsignarTareaForm({
           <SelectFincaLote lotes={lotes} name="loteId" />
         </label>
       )}
-      <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">Asignar →</button>
+      <button
+        disabled={diasOcupadosResp.length > 0}
+        className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
+      >
+        Asignar →
+      </button>
     </form>
   )
 }
