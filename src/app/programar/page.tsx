@@ -9,7 +9,7 @@ import {
   listarLotes,
 } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, esSemanaPasada } from '@/dominio/semana'
-import { asignarTareaAccion } from './acciones'
+import { asignarTareaAccion, devolverAlBancoAccion } from './acciones'
 import { InfoLotes } from '../_componentes/info-lotes'
 import { AsignarTareaForm } from './asignar-tarea-form'
 
@@ -112,6 +112,10 @@ export default async function ProgramarPage({
                     lotes={lotes}
                     accion={asignarTareaAccion}
                   />
+                  <form action={devolverAlBancoAccion} className="mt-1">
+                    <input type="hidden" name="tareaId" value={t.id} />
+                    <button className="text-xs text-gray-500 hover:underline">↩️ Devolver al banco</button>
+                  </form>
                 </li>
               ))}
             </ul>

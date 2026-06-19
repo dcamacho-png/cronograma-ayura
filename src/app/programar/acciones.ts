@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearResponsable, actualizarActividad, asignarTarea } from '@/datos/repositorio'
+import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearResponsable, actualizarActividad, asignarTarea, quitarSeleccionTarea } from '@/datos/repositorio'
 import { semanaAnterior, esSemanaPasada, semanaActual } from '@/dominio/semana'
 
 function texto(form: FormData, clave: string): string {
@@ -86,5 +86,11 @@ export async function asignarTareaAccion(form: FormData) {
   const turno = texto(form, 'turno')
   if (!tareaId || !responsableId || !Number.isInteger(dia)) return
   await asignarTarea(tareaId, responsableId, dia, loteId, turno)
+  revalidatePath('/programar')
+}
+
+export async function devolverAlBancoAccion(form: FormData) {
+  const tareaId = texto(form, 'tareaId')
+  if (tareaId) await quitarSeleccionTarea(tareaId)
   revalidatePath('/programar')
 }

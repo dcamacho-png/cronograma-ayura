@@ -136,7 +136,7 @@ export default async function TareasPage({
                     <label className="flex flex-col text-xs">
                       Programar para
                       <select name="anioSemana" defaultValue={actual} className="rounded border p-1 text-sm">
-                        <option value="">— sin programar —</option>
+                        <option value="">Elegir semana…</option>
                         {opciones.map((s) => (
                           <option key={`${s.anio}-${s.semana}`} value={`${s.anio}-${s.semana}`}>
                             Semana {s.semana}{s.anio === semanas[0].anio && s.semana === semanas[0].semana ? ' (esta)' : ''} · {s.anio}
