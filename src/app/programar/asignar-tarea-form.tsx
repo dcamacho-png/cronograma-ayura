@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { turnoPorDia } from '@/dominio/turno'
+import { SelectFincaLote } from '../_componentes/select-finca-lote'
 
 const DIAS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
@@ -24,13 +25,6 @@ export function AsignarTareaForm({
 }) {
   const [turno, setTurno] = useState(turnoPorDia(1))
   const tieneLotes = lotesTarea.length > 0
-
-  const grupos = new Map<string, Lote[]>()
-  for (const l of lotes) {
-    const arr = grupos.get(l.finca.nombre) ?? []
-    arr.push(l)
-    grupos.set(l.finca.nombre, arr)
-  }
 
   return (
     <form action={accion} className="flex flex-wrap items-end gap-2">
@@ -71,17 +65,8 @@ export function AsignarTareaForm({
         <span className="text-xs text-gray-600">Lote(s): {lotesTarea.map((l) => l.nombre).join(', ')}</span>
       ) : (
         <label className="flex flex-col text-xs">
-          Lote
-          <select name="loteId" className="rounded border p-1 text-sm">
-            <option value="">— sin lote —</option>
-            {[...grupos.entries()].map(([finca, ls]) => (
-              <optgroup key={finca} label={finca}>
-                {ls.map((l) => (
-                  <option key={l.id} value={l.id}>{l.nombre}</option>
-                ))}
-              </optgroup>
-            ))}
-          </select>
+          Finca y lote
+          <SelectFincaLote lotes={lotes} name="loteId" />
         </label>
       )}
       <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">Asignar →</button>

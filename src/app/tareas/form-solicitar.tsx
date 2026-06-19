@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { SelectFincaLote } from '../_componentes/select-finca-lote'
 
 type Lote = { id: string; nombre: string; finca: { nombre: string } }
 type Estipulada = { id: string; nombre: string }
@@ -25,13 +26,6 @@ export function FormSolicitar({
   const [estipulada, setEstipulada] = useState('')
   const esMaquinaria = areaEjecutoraId !== '' && areaEjecutoraId === maquinariaAreaId
   const esFert = estipulada.toUpperCase().includes('FERTILIZA')
-
-  const grupos = new Map<string, Lote[]>()
-  for (const l of lotes) {
-    const arr = grupos.get(l.finca.nombre) ?? []
-    arr.push(l)
-    grupos.set(l.finca.nombre, arr)
-  }
 
   return (
     <form action={accion} className="flex flex-col gap-2 rounded-xl border border-purple-200 bg-purple-50 p-4">
@@ -68,17 +62,8 @@ export function FormSolicitar({
             <input name="otra" placeholder="Escribe otra si no está en la lista" className="rounded border p-2 text-sm" />
           </label>
           <label className="flex flex-col text-sm">
-            {esFert ? 'Lotes (fertilización — varios, mantén Ctrl/⌘)' : 'Lote'}
-            <select name="loteId" multiple={esFert} size={esFert ? 6 : undefined} className="rounded border p-2 text-sm">
-              {!esFert && <option value="">— elegir lote —</option>}
-              {[...grupos.entries()].map(([finca, ls]) => (
-                <optgroup key={finca} label={finca}>
-                  {ls.map((l) => (
-                    <option key={l.id} value={l.id}>{l.nombre}</option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
+            {esFert ? 'Finca y lotes (fertilización — varios, mantén Ctrl/⌘)' : 'Finca y lote'}
+            <SelectFincaLote lotes={lotes} name="loteId" multiple={esFert} />
           </label>
         </>
       ) : (

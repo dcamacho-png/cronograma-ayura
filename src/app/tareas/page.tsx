@@ -10,7 +10,7 @@ import {
 import { semanaActual, siguienteSemana } from '@/dominio/semana'
 import { usuarioActual } from '@/auth/sesion'
 import { InfoLotes } from '../_componentes/info-lotes'
-import { SelectLote } from '../_componentes/select-lote'
+import { SelectFincaLote } from '../_componentes/select-finca-lote'
 import { FormNuevaTareaMaquinaria } from './form-nueva-tarea-maquinaria'
 import { FormSolicitar } from './form-solicitar'
 import { crearTareaAccion, eliminarTareaAccion, programarTareaAccion, crearSolicitudAccion } from './acciones'
@@ -89,8 +89,8 @@ export default async function TareasPage({
                 <input name="descripcion" required placeholder="Ej: Arreglo de saladero" className="rounded border p-2" />
               </label>
               <label className="flex flex-col text-sm">
-                Lote (opcional)
-                <SelectLote lotes={lotes} name="loteId" />
+                Finca y lote (opcional)
+                <SelectFincaLote lotes={lotes} name="loteId" />
               </label>
               <button className="rounded bg-[#11603a] px-4 py-2 text-sm font-semibold text-white">+ Agregar al banco</button>
             </form>
