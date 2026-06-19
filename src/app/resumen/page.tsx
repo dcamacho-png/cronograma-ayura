@@ -163,15 +163,28 @@ export default async function ResumenPage({
         {ESTADOS_ORDEN.map(({ v, etq }) => {
           const acts = actividades.filter((a) => a.estado === v)
           if (acts.length === 0) return null
+          // Agrupar actividades repetidas en la semana (misma descripción + mismos lotes)
+          // para mostrarlas una sola vez; ·×N indica en cuántos días aparece.
+          const grupos = new Map<string, { descripcion: string; lotes: string[]; maquinas: Set<string>; conteo: number }>()
+          for (const a of acts) {
+            const lotesNombres = a.lotes.map((l) => l.nombre).sort()
+            const clave = `${a.descripcion}|${lotesNombres.join(',')}`
+            const g = grupos.get(clave) ?? { descripcion: a.descripcion, lotes: lotesNombres, maquinas: new Set<string>(), conteo: 0 }
+            g.conteo += 1
+            if (a.maquina) g.maquinas.add(a.maquina.nombre)
+            grupos.set(clave, g)
+          }
+          const items = [...grupos.values()]
           return (
             <div key={v}>
-              <div className="text-sm font-semibold">{etq} ({acts.length})</div>
+              <div className="text-sm font-semibold">{etq} ({items.length})</div>
               <ul className="ml-4 list-disc text-sm text-gray-600">
-                {acts.map((a) => (
-                  <li key={a.id}>
-                    {a.descripcion}
-                    {a.maquina ? ` · 🚜 ${a.maquina.nombre}` : ''}
-                    {a.lotes.length > 0 ? ` · 📍 ${a.lotes.map((l) => l.nombre).join(', ')}` : ''}
+                {items.map((g, i) => (
+                  <li key={i}>
+                    {g.descripcion}
+                    {g.conteo > 1 ? ` ·×${g.conteo}` : ''}
+                    {g.maquinas.size > 0 ? ` · 🚜 ${[...g.maquinas].join(', ')}` : ''}
+                    {g.lotes.length > 0 ? ` · 📍 ${g.lotes.join(', ')}` : ''}
                   </li>
                 ))}
               </ul>
