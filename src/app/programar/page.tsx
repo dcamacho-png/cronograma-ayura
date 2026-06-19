@@ -11,10 +11,8 @@ import {
 } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, esSemanaPasada } from '@/dominio/semana'
 import { asignarTareaAccion, devolverAlBancoAccion } from './acciones'
-import { InfoLotes } from '../_componentes/info-lotes'
 import { AsignarTareaForm } from './asignar-tarea-form'
-
-const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+import { GrillaSemana } from './grilla-semana'
 
 export default async function ProgramarPage({
   searchParams,
@@ -63,8 +61,6 @@ export default async function ProgramarPage({
   }))
 
   const fechas = fechasDeSemana(anio, semana)
-  const fmtFecha = (f: Date) =>
-    new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(f)
 
   const previa = semanaAnterior(anio, semana)
   const proxima = siguienteSemana(anio, semana)
@@ -145,48 +141,15 @@ export default async function ProgramarPage({
         </div>
       )}
 
-      {responsables.length === 0 ? (
-        <p className="mb-6 text-sm text-gray-500">Esta área no tiene responsables. Las actividades se listan abajo.</p>
-      ) : (
-        <div className="mb-6 overflow-x-auto">
-          <table className="w-full border-collapse text-sm">
-            <thead>
-              <tr>
-                <th className="border bg-gray-50 p-2 text-left">Responsable</th>
-                {DIAS.map((d, i) => (
-                  <th key={d} className="border bg-gray-50 p-2 text-left">
-                    {d}
-                    <div className="text-xs font-normal text-gray-400">{fmtFecha(fechas[i])}</div>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {responsables.map((r) => (
-                <tr key={r.id}>
-                  <td className="border p-2 font-medium">{r.nombre}</td>
-                  {DIAS.map((_, i) => {
-                    const dia = i + 1
-                    const celdas = actividades.filter((a) => a.responsableId === r.id && a.dia === dia)
-                    return (
-                      <td key={dia} className="border p-2 align-top">
-                        {celdas.map((a) => (
-                          <div key={a.id} className="mb-1 rounded bg-green-50 p-1">
-                            <div>{a.descripcion}</div>
-                            {a.turno && <div className="text-xs text-gray-500">{a.turno}</div>}
-                            {a.maquina && <div className="text-xs text-gray-500">🚜 {a.maquina.nombre}</div>}
-                            <InfoLotes lotes={a.lotes} className="mt-1" />
-                          </div>
-                        ))}
-                      </td>
-                    )
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <div className="mb-6">
+        <GrillaSemana
+          areaNombre={areaActual.nombre}
+          semana={semana}
+          fechas={fechas}
+          responsables={responsables}
+          actividades={actividades}
+        />
+      </div>
 
     </main>
   )
