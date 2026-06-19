@@ -17,6 +17,9 @@ export function AsignarTareaForm({
   esMaquinaria,
   maquinas,
   ocupacion,
+  areaId,
+  anio,
+  semana,
   accion,
 }: {
   tareaId: string
@@ -27,6 +30,9 @@ export function AsignarTareaForm({
   esMaquinaria: boolean
   maquinas: { id: string; nombre: string }[]
   ocupacion: { dia: number; turno: string; maquinaId: string }[]
+  areaId: string
+  anio: number
+  semana: number
   accion: (formData: FormData) => void | Promise<void>
 }) {
   const [turno, setTurno] = useState(turnoPorDia(1))
@@ -39,6 +45,9 @@ export function AsignarTareaForm({
   return (
     <form action={accion} className="flex flex-wrap items-end gap-2">
       <input type="hidden" name="tareaId" value={tareaId} />
+      <input type="hidden" name="areaId" value={areaId} />
+      <input type="hidden" name="anio" value={anio} />
+      <input type="hidden" name="semana" value={semana} />
       <span className="min-w-[160px] flex-1 font-medium">{descripcion}</span>
       <label className="flex flex-col text-xs">
         Responsable

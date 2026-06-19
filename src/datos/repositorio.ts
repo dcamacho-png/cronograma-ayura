@@ -1,8 +1,8 @@
 import { prisma } from './prisma'
 import { hashPassword } from '@/auth/password'
-import { duplicarActividades, datosReprogramacion } from '@/dominio/programacion'
+import { duplicarActividades, datosReprogramacion, detectarConflictosAsignacion } from '@/dominio/programacion'
 import { turnoPorDia } from '@/dominio/turno'
-import type { BorradorActividad } from '@/dominio/programacion'
+import type { BorradorActividad, Conflicto } from '@/dominio/programacion'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
 
 export function listarAreas() {
@@ -204,11 +204,15 @@ export async function asignarTarea(
   loteIdFallback: string | null,
   turno: string,
   maquinaPorDia: Record<number, string | null> = {},
-) {
+): Promise<
+  | { ok: false; motivo: 'tarea' }
+  | { ok: false; motivo: 'conflicto'; conflictos: Conflicto[] }
+  | { ok: true; creadas: number }
+> {
   const tarea = await prisma.tarea.findUnique({ where: { id: tareaId }, include: { lotes: true } })
-  if (!tarea || tarea.anioSel === null || tarea.semanaSel === null) return null
+  if (!tarea || tarea.anioSel === null || tarea.semanaSel === null) return { ok: false, motivo: 'tarea' }
   const diasUnicos = [...new Set(dias)].filter((d) => Number.isInteger(d) && d >= 1 && d <= 7)
-  if (diasUnicos.length === 0) return null
+  if (diasUnicos.length === 0) return { ok: false, motivo: 'tarea' }
   const anio = tarea.anioSel
   const semana = tarea.semanaSel
   const loteIds =
@@ -216,33 +220,47 @@ export async function asignarTarea(
   let fincaId: string | null = null
   if (loteIds.length > 0) {
     const primer = await prisma.lote.findUnique({ where: { id: loteIds[0] } })
-    if (!primer) return null
+    if (!primer) return { ok: false, motivo: 'tarea' }
     fincaId = primer.fincaId
   }
   return prisma.$transaction(async (tx) => {
-    const creadas = []
+    // Guardia contra choques (a prueba de carreras: dentro de la transacción).
+    const existentes = await tx.actividad.findMany({
+      where: { anio, semana, dia: { in: diasUnicos } },
+      select: { dia: true, turno: true, maquinaId: true, responsableId: true },
+    })
+    const conflictos = detectarConflictosAsignacion(
+      existentes,
+      diasUnicos,
+      responsableId,
+      maquinaPorDia,
+      turno,
+    )
+    if (conflictos.length > 0) {
+      return { ok: false as const, motivo: 'conflicto' as const, conflictos }
+    }
+    let creadas = 0
     for (const dia of diasUnicos) {
-      creadas.push(
-        await tx.actividad.create({
-          data: {
-            anio,
-            semana,
-            dia,
-            descripcion: tarea.descripcion,
-            turno: turno.trim() || turnoPorDia(dia),
-            vecesReprogramada: tarea.vecesReprogramada,
-            areaId: tarea.areaId,
-            fincaId,
-            responsableId,
-            maquinaId: maquinaPorDia[dia] ?? null,
-            tareaId: tarea.id,
-            lotes: { connect: loteIds.map((id) => ({ id })) },
-          },
-        }),
-      )
+      await tx.actividad.create({
+        data: {
+          anio,
+          semana,
+          dia,
+          descripcion: tarea.descripcion,
+          turno: turno.trim() || turnoPorDia(dia),
+          vecesReprogramada: tarea.vecesReprogramada,
+          areaId: tarea.areaId,
+          fincaId,
+          responsableId,
+          maquinaId: maquinaPorDia[dia] ?? null,
+          tareaId: tarea.id,
+          lotes: { connect: loteIds.map((id) => ({ id })) },
+        },
+      })
+      creadas += 1
     }
     await tx.tarea.update({ where: { id: tarea.id }, data: { estado: 'PROGRAMADA' } })
-    return creadas
+    return { ok: true as const, creadas }
   })
 }
 

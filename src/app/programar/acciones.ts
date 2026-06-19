@@ -1,8 +1,11 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearResponsable, actualizarActividad, asignarTarea, quitarSeleccionTarea } from '@/datos/repositorio'
 import { semanaAnterior, esSemanaPasada, semanaActual } from '@/dominio/semana'
+
+const DIAS_CORTOS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
 function texto(form: FormData, clave: string): string {
   const v = form.get(clave)
@@ -93,7 +96,19 @@ export async function asignarTareaAccion(form: FormData) {
     maquinaPorDia[dia] = m || null
   }
   if (!tareaId || !responsableId || dias.length === 0) return
-  await asignarTarea(tareaId, responsableId, dias, loteId, turno, maquinaPorDia)
+  const res = await asignarTarea(tareaId, responsableId, dias, loteId, turno, maquinaPorDia)
+  if (res.ok === false && res.motivo === 'conflicto') {
+    const partes = res.conflictos.map((c) =>
+      c.tipo === 'responsable'
+        ? `${DIAS_CORTOS[c.dia]}: el responsable ya tiene una tarea en ese turno`
+        : `${DIAS_CORTOS[c.dia]}: la máquina ya está ocupada en ese turno`,
+    )
+    const msg = `No se asignó. ${partes.join(' · ')}`
+    const areaId = texto(form, 'areaId')
+    const anio = texto(form, 'anio')
+    const semana = texto(form, 'semana')
+    redirect(`/programar?area=${areaId}&anio=${anio}&semana=${semana}&error=${encodeURIComponent(msg)}`)
+  }
   revalidatePath('/programar')
 }
 

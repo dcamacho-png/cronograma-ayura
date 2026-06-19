@@ -1,4 +1,50 @@
 import type { Actividad } from './tipos'
+import { turnoPorDia } from './turno'
+
+// El turno que realmente queda en una actividad: el escrito a mano o, si está
+// vacío, el turno por defecto del día.
+export function turnoEfectivo(turno: string, dia: number): string {
+  return turno.trim() || turnoPorDia(dia)
+}
+
+// Una actividad ya existente en la semana, vista como "casilla ocupada".
+export interface CasillaOcupada {
+  dia: number
+  turno: string
+  maquinaId: string | null
+  responsableId: string
+}
+
+export type TipoConflicto = 'maquina' | 'responsable'
+export interface Conflicto {
+  dia: number
+  tipo: TipoConflicto
+}
+
+// Detecta choques al asignar: una máquina no puede repetirse en el mismo
+// día+turno, y un responsable no puede tener dos tareas en el mismo día+turno.
+// `existentes` son las actividades ya guardadas en la semana destino.
+export function detectarConflictosAsignacion(
+  existentes: CasillaOcupada[],
+  dias: number[],
+  responsableId: string,
+  maquinaPorDia: Record<number, string | null>,
+  turno: string,
+): Conflicto[] {
+  const conflictos: Conflicto[] = []
+  for (const dia of dias) {
+    const turno_ = turnoEfectivo(turno, dia)
+    const enCasilla = existentes.filter((e) => e.dia === dia && e.turno === turno_)
+    if (enCasilla.some((e) => e.responsableId === responsableId)) {
+      conflictos.push({ dia, tipo: 'responsable' })
+    }
+    const maqId = maquinaPorDia[dia] ?? null
+    if (maqId && enCasilla.some((e) => e.maquinaId === maqId)) {
+      conflictos.push({ dia, tipo: 'maquina' })
+    }
+  }
+  return conflictos
+}
 
 // Datos necesarios para crear una actividad nueva (sin seguimiento ni id).
 export interface BorradorActividad {

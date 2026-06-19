@@ -19,7 +19,7 @@ const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', '
 export default async function ProgramarPage({
   searchParams,
 }: {
-  searchParams: Promise<{ area?: string; anio?: string; semana?: string }>
+  searchParams: Promise<{ area?: string; anio?: string; semana?: string; error?: string }>
 }) {
   const sp = await searchParams
   const areas = await listarAreas()
@@ -69,6 +69,12 @@ export default async function ProgramarPage({
   return (
     <main className="mx-auto max-w-6xl p-6">
       <h1 className="mb-4 text-2xl font-bold text-[#11603a]">Programar semana</h1>
+
+      {sp.error && (
+        <div className="mb-4 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-800">
+          ⚠️ {sp.error}
+        </div>
+      )}
 
       {esAdmin ? (
         <div className="mb-3 flex flex-wrap gap-2">
@@ -120,6 +126,9 @@ export default async function ProgramarPage({
                     esMaquinaria={esMaquinaria}
                     maquinas={maquinas}
                     ocupacion={ocupacion}
+                    areaId={areaId}
+                    anio={anio}
+                    semana={semana}
                     accion={asignarTareaAccion}
                   />
                   <form action={devolverAlBancoAccion} className="mt-1">
