@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { usuarioActual } from '@/auth/sesion'
 import { listarAreas, listarMotivos, listarActividades } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana } from '@/dominio/semana'
-import { porcentajeCumplimiento, porcentajeReprogramadas, colorSemaforo } from '@/dominio/metricas'
+import { porcentajeCumplimiento, colorSemaforo } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
 import { registrarAccion } from './acciones'
 import { InfoLotes } from '../_componentes/info-lotes'
@@ -66,7 +66,12 @@ export default async function CumplimientoPage({
 
   const dominio = actividades as unknown as ActividadDominio[]
   const pct = porcentajeCumplimiento(dominio)
-  const pctRep = porcentajeReprogramadas(dominio)
+  const conteoEstado = {
+    CUMPLIDA: actividades.filter((a) => a.estado === 'CUMPLIDA').length,
+    PARCIAL: actividades.filter((a) => a.estado === 'PARCIAL').length,
+    NO_CUMPLIDA: actividades.filter((a) => a.estado === 'NO_CUMPLIDA').length,
+    REPROGRAMADA: actividades.filter((a) => a.estado === 'REPROGRAMADA').length,
+  }
 
   const previa = semanaAnterior(anio, semana)
   const proxima = siguienteSemana(anio, semana)
@@ -116,7 +121,8 @@ export default async function CumplimientoPage({
           Cumplido: <b>{pct === null ? '—' : `${pct}%`}</b>
         </span>
         <span className="rounded bg-gray-100 px-3 py-1 text-sm">
-          Reprogramadas: <b>{pctRep}%</b>
+          ✅ <b>{conteoEstado.CUMPLIDA}</b> · 🟡 <b>{conteoEstado.PARCIAL}</b> · 🔴 <b>{conteoEstado.NO_CUMPLIDA}</b> · 🔄 <b>{conteoEstado.REPROGRAMADA}</b>{' '}
+          <span className="text-gray-400">de {actividades.length}</span>
         </span>
       </div>
 
