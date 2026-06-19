@@ -31,7 +31,7 @@ export function GrillaSemana({
 }) {
   const rango = fechas.length === 7 ? `${fmtFecha(fechas[0])} – ${fmtFecha(fechas[6])}` : ''
   return (
-    <div className="rounded-xl border bg-white">
+    <div className="rounded-xl border bg-white text-gray-900">
       <div className="border-b p-3">
         <div className="text-lg font-bold text-[#11603a]">{areaNombre}</div>
         <div className="text-sm text-gray-500">Semana {semana}{rango ? ` · ${rango}` : ''}</div>

@@ -171,7 +171,6 @@ export default async function ProgramarPage({
           actividades={actividades}
         />
       </div>
-
     </main>
   )
 }
