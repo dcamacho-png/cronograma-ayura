@@ -14,6 +14,8 @@ export function AsignarTareaForm({
   lotesTarea,
   responsables,
   lotes,
+  esMaquinaria,
+  maquinas,
   accion,
 }: {
   tareaId: string
@@ -21,10 +23,16 @@ export function AsignarTareaForm({
   lotesTarea: { nombre: string }[]
   responsables: { id: string; nombre: string }[]
   lotes: Lote[]
+  esMaquinaria: boolean
+  maquinas: { id: string; nombre: string }[]
   accion: (formData: FormData) => void | Promise<void>
 }) {
   const [turno, setTurno] = useState(turnoPorDia(1))
+  const [dias, setDias] = useState<number[]>([])
   const tieneLotes = lotesTarea.length > 0
+
+  const toggleDia = (d: number) =>
+    setDias((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]))
 
   return (
     <form action={accion} className="flex flex-wrap items-end gap-2">
@@ -47,7 +55,14 @@ export function AsignarTareaForm({
               className="flex cursor-pointer flex-col items-center rounded border px-1.5 py-0.5 has-[:checked]:border-[#11603a] has-[:checked]:bg-green-50"
             >
               <span>{d}</span>
-              <input type="checkbox" name="dia" value={i + 1} className="accent-[#11603a]" />
+              <input
+                type="checkbox"
+                name="dia"
+                value={i + 1}
+                checked={dias.includes(i + 1)}
+                onChange={() => toggleDia(i + 1)}
+                className="accent-[#11603a]"
+              />
             </label>
           ))}
         </div>
@@ -61,6 +76,22 @@ export function AsignarTareaForm({
           className="w-28 rounded border p-1 text-sm"
         />
       </label>
+      {esMaquinaria && dias.length > 0 && (
+        <div className="flex w-full flex-col gap-1 text-xs">
+          <span className="text-gray-500">Máquina por día (opcional)</span>
+          {[...dias].sort((a, b) => a - b).map((d) => (
+            <label key={d} className="flex items-center gap-1">
+              <span className="w-8">{DIAS[d - 1]}</span>
+              <select name={`maquina_${d}`} className="rounded border p-1 text-sm">
+                <option value="">— sin máquina —</option>
+                {maquinas.map((m) => (
+                  <option key={m.id} value={m.id}>{m.nombre}</option>
+                ))}
+              </select>
+            </label>
+          ))}
+        </div>
+      )}
       {tieneLotes ? (
         <span className="text-xs text-gray-600">Lote(s): {lotesTarea.map((l) => l.nombre).join(', ')}</span>
       ) : (

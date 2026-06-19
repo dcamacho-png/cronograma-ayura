@@ -7,6 +7,7 @@ import {
   listarActividades,
   tareasPorAsignar,
   listarLotes,
+  listarMaquinas,
 } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, esSemanaPasada } from '@/dominio/semana'
 import { asignarTareaAccion, devolverAlBancoAccion } from './acciones'
@@ -45,12 +46,14 @@ export default async function ProgramarPage({
   const semana = sp.semana && Number.isInteger(semanaRaw) ? semanaRaw : hoy.semana
   const pasada = esSemanaPasada(anio, semana, hoy)
 
-  const [responsables, actividades, porAsignar, lotes] = await Promise.all([
+  const [responsables, actividades, porAsignar, lotes, maquinas] = await Promise.all([
     listarResponsablesPorArea(areaId),
     listarActividades(areaId, anio, semana),
     tareasPorAsignar(areaId, anio, semana),
     listarLotes(),
+    listarMaquinas(),
   ])
+  const esMaquinaria = areaActual.nombre.toLowerCase().includes('maquinaria')
 
   const fechas = fechasDeSemana(anio, semana)
   const fmtFecha = (f: Date) =>
@@ -110,6 +113,8 @@ export default async function ProgramarPage({
                     lotesTarea={t.lotes}
                     responsables={responsables}
                     lotes={lotes}
+                    esMaquinaria={esMaquinaria}
+                    maquinas={maquinas}
                     accion={asignarTareaAccion}
                   />
                   <form action={devolverAlBancoAccion} className="mt-1">
@@ -152,6 +157,7 @@ export default async function ProgramarPage({
                           <div key={a.id} className="mb-1 rounded bg-green-50 p-1">
                             <div>{a.descripcion}</div>
                             {a.turno && <div className="text-xs text-gray-500">{a.turno}</div>}
+                            {a.maquina && <div className="text-xs text-gray-500">🚜 {a.maquina.nombre}</div>}
                             <InfoLotes lotes={a.lotes} className="mt-1" />
                           </div>
                         ))}
