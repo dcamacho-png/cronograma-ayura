@@ -1,0 +1,34 @@
+'use client'
+
+export function BotonDescargarImagen({
+  targetId,
+  nombreArchivo,
+}: {
+  targetId: string
+  nombreArchivo: string
+}) {
+  async function descargar() {
+    const el = document.getElementById(targetId)
+    if (!el) return
+    try {
+      const { default: html2canvas } = await import('html2canvas-pro')
+      const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#ffffff' })
+      const enlace = document.createElement('a')
+      enlace.href = canvas.toDataURL('image/png')
+      enlace.download = nombreArchivo
+      enlace.click()
+    } catch {
+      alert('No se pudo generar la imagen.')
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={descargar}
+      className="rounded border border-[#11603a] px-3 py-1 text-sm font-semibold text-[#11603a] hover:bg-green-50"
+    >
+      📷 Descargar imagen
+    </button>
+  )
+}

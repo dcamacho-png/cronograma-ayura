@@ -13,6 +13,7 @@ import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, esSemana
 import { asignarTareaAccion, devolverAlBancoAccion } from './acciones'
 import { AsignarTareaForm } from './asignar-tarea-form'
 import { GrillaSemana } from './grilla-semana'
+import { BotonDescargarImagen } from './boton-descargar-imagen'
 
 export default async function ProgramarPage({
   searchParams,
@@ -141,7 +142,15 @@ export default async function ProgramarPage({
         </div>
       )}
 
-      <div className="mb-6">
+      {responsables.length > 0 && (
+        <div className="mb-2 flex flex-wrap items-center gap-2">
+          <BotonDescargarImagen
+            targetId="grilla-export"
+            nombreArchivo={`cronograma-${areaActual.nombre}-S${semana}-${anio}.png`}
+          />
+        </div>
+      )}
+      <div id="grilla-export" className="mb-6">
         <GrillaSemana
           areaNombre={areaActual.nombre}
           semana={semana}
