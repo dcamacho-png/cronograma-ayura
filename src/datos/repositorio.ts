@@ -195,15 +195,19 @@ export function tareasPorAsignar(areaId: string, anio: number, semana: number) {
 }
 
 // Asigna una tarea: crea la actividad (vinculada) y marca la tarea como PROGRAMADA.
+// Asigna una tarea a uno o varios días de su semana: crea una actividad por día
+// (mismo responsable, lote y turno) y marca la tarea como PROGRAMADA.
 export async function asignarTarea(
   tareaId: string,
   responsableId: string,
-  dia: number,
+  dias: number[],
   loteIdFallback: string | null,
   turno: string,
 ) {
   const tarea = await prisma.tarea.findUnique({ where: { id: tareaId }, include: { lotes: true } })
   if (!tarea || tarea.anioSel === null || tarea.semanaSel === null) return null
+  const diasUnicos = [...new Set(dias)].filter((d) => Number.isInteger(d) && d >= 1 && d <= 7)
+  if (diasUnicos.length === 0) return null
   const anio = tarea.anioSel
   const semana = tarea.semanaSel
   const loteIds =
@@ -215,23 +219,28 @@ export async function asignarTarea(
     fincaId = primer.fincaId
   }
   return prisma.$transaction(async (tx) => {
-    const actividad = await tx.actividad.create({
-      data: {
-        anio,
-        semana,
-        dia,
-        descripcion: tarea.descripcion,
-        turno: turno.trim() || turnoPorDia(dia),
-        vecesReprogramada: tarea.vecesReprogramada,
-        areaId: tarea.areaId,
-        fincaId,
-        responsableId,
-        tareaId: tarea.id,
-        lotes: { connect: loteIds.map((id) => ({ id })) },
-      },
-    })
+    const creadas = []
+    for (const dia of diasUnicos) {
+      creadas.push(
+        await tx.actividad.create({
+          data: {
+            anio,
+            semana,
+            dia,
+            descripcion: tarea.descripcion,
+            turno: turno.trim() || turnoPorDia(dia),
+            vecesReprogramada: tarea.vecesReprogramada,
+            areaId: tarea.areaId,
+            fincaId,
+            responsableId,
+            tareaId: tarea.id,
+            lotes: { connect: loteIds.map((id) => ({ id })) },
+          },
+        }),
+      )
+    }
     await tx.tarea.update({ where: { id: tarea.id }, data: { estado: 'PROGRAMADA' } })
-    return actividad
+    return creadas
   })
 }
 
@@ -312,16 +321,23 @@ export async function registrarCumplimiento(
   await prisma.actividad.update({ where: { id }, data: { estado, motivoId, nota, haFaltante } })
   // Novedad (todo lo que no es 100% cumplido): la tarea vuelve al banco sin semana,
   // conservando el contador de reprogramaciones. El registro de esta semana queda en el historial.
+  // Solo aplica a tareas de UN día (única actividad en su semana). Si la tarea se programó en
+  // varios días, cada día es independiente y no se devuelve al banco automáticamente.
   if (estado !== 'CUMPLIDA' && act.tareaId) {
-    await prisma.tarea.update({
-      where: { id: act.tareaId },
-      data: {
-        estado: 'PENDIENTE',
-        anioSel: null,
-        semanaSel: null,
-        vecesReprogramada: act.vecesReprogramada + 1,
-      },
+    const enLaSemana = await prisma.actividad.count({
+      where: { tareaId: act.tareaId, anio: act.anio, semana: act.semana },
     })
+    if (enLaSemana === 1) {
+      await prisma.tarea.update({
+        where: { id: act.tareaId },
+        data: {
+          estado: 'PENDIENTE',
+          anioSel: null,
+          semanaSel: null,
+          vecesReprogramada: act.vecesReprogramada + 1,
+        },
+      })
+    }
   }
   return true
 }

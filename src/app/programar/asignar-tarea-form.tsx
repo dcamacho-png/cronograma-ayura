@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { turnoPorDia } from '@/dominio/turno'
 
-const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+const DIAS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
 type Lote = { id: string; nombre: string; finca: { nombre: string } }
 
@@ -22,7 +22,6 @@ export function AsignarTareaForm({
   lotes: Lote[]
   accion: (formData: FormData) => void | Promise<void>
 }) {
-  const [dia, setDia] = useState(1)
   const [turno, setTurno] = useState(turnoPorDia(1))
   const tieneLotes = lotesTarea.length > 0
 
@@ -45,24 +44,20 @@ export function AsignarTareaForm({
           ))}
         </select>
       </label>
-      <label className="flex flex-col text-xs">
-        Día
-        <select
-          name="dia"
-          required
-          value={dia}
-          onChange={(e) => {
-            const d = Number(e.target.value)
-            setDia(d)
-            setTurno(turnoPorDia(d))
-          }}
-          className="rounded border p-1 text-sm"
-        >
+      <div className="flex flex-col text-xs">
+        Días
+        <div className="flex gap-1">
           {DIAS.map((d, i) => (
-            <option key={d} value={i + 1}>{d}</option>
+            <label
+              key={d}
+              className="flex cursor-pointer flex-col items-center rounded border px-1.5 py-0.5 has-[:checked]:border-[#11603a] has-[:checked]:bg-green-50"
+            >
+              <span>{d}</span>
+              <input type="checkbox" name="dia" value={i + 1} className="accent-[#11603a]" />
+            </label>
           ))}
-        </select>
-      </label>
+        </div>
+      </div>
       <label className="flex flex-col text-xs">
         Turno
         <input

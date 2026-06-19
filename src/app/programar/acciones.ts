@@ -81,11 +81,14 @@ export async function actualizarActividadAccion(form: FormData) {
 export async function asignarTareaAccion(form: FormData) {
   const tareaId = texto(form, 'tareaId')
   const responsableId = texto(form, 'responsableId')
-  const dia = Number(texto(form, 'dia'))
+  const dias = form
+    .getAll('dia')
+    .map((v) => Number(String(v)))
+    .filter((d) => Number.isInteger(d) && d >= 1 && d <= 7)
   const loteId = textoOpcional(form, 'loteId')
   const turno = texto(form, 'turno')
-  if (!tareaId || !responsableId || !Number.isInteger(dia)) return
-  await asignarTarea(tareaId, responsableId, dia, loteId, turno)
+  if (!tareaId || !responsableId || dias.length === 0) return
+  await asignarTarea(tareaId, responsableId, dias, loteId, turno)
   revalidatePath('/programar')
 }
 
