@@ -170,6 +170,7 @@ export default async function ResumenPage({
                 {acts.map((a) => (
                   <li key={a.id}>
                     {a.descripcion}
+                    {a.maquina ? ` · 🚜 ${a.maquina.nombre}` : ''}
                     {a.lotes.length > 0 ? ` · 📍 ${a.lotes.map((l) => l.nombre).join(', ')}` : ''}
                   </li>
                 ))}
