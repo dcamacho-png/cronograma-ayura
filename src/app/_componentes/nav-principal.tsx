@@ -20,7 +20,7 @@ export function NavPrincipal({ usuario }: { usuario: { nombre: string; rol: stri
       ? ENLACES
       : ENLACES.filter((e) => e.href !== '/tablero' && e.href !== '/configuracion')
   return (
-    <header className="bg-[#11603a] text-white">
+    <header className="bg-[#11603a] text-white print:hidden">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-6 py-3">
         <span className="font-bold">🌱 Cronograma Ayurá</span>
         {usuario && (

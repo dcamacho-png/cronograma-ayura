@@ -142,12 +142,24 @@ export default async function ProgramarPage({
         </div>
       )}
 
-      {responsables.length > 0 && (
+      {(responsables.length > 0 || esAdmin) && (
         <div className="mb-2 flex flex-wrap items-center gap-2">
-          <BotonDescargarImagen
-            targetId="grilla-export"
-            nombreArchivo={`cronograma-${areaActual.nombre}-S${semana}-${anio}.png`}
-          />
+          {responsables.length > 0 && (
+            <BotonDescargarImagen
+              targetId="grilla-export"
+              nombreArchivo={`cronograma-${areaActual.nombre}-S${semana}-${anio}.png`}
+            />
+          )}
+          {esAdmin && (
+            <a
+              href={`/programar/exportar?anio=${anio}&semana=${semana}`}
+              target="_blank"
+              rel="noopener"
+              className="rounded border border-purple-700 px-3 py-1 text-sm font-semibold text-purple-700 hover:bg-purple-50"
+            >
+              🖨️ Exportar PDF (todas las áreas)
+            </a>
+          )}
         </div>
       )}
       <div id="grilla-export" className="mb-6">
