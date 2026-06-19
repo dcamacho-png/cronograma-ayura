@@ -62,3 +62,18 @@ export async function crearSolicitudAccion(form: FormData) {
   await crearSolicitud(areaEjecutoraId, descripcion, solicitanteAreaId, loteIds)
   revalidatePath('/tareas')
 }
+
+export async function programarTareaAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (!id) return
+  const v = texto(form, 'anioSemana')
+  if (!v) {
+    await quitarSeleccionTarea(id)
+  } else {
+    const [anioStr, semanaStr] = v.split('-')
+    const anio = Number(anioStr)
+    const semana = Number(semanaStr)
+    if (Number.isInteger(anio) && Number.isInteger(semana)) await seleccionarTarea(id, anio, semana)
+  }
+  revalidatePath('/tareas')
+}

@@ -1,24 +1,24 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import {
+  listarAreas,
+  listarTareasPendientes,
+  listarActividadesEstipuladas,
+  listarLotes,
+  listarSolicitudesDeArea,
+} from '@/datos/repositorio'
+import { semanaActual, siguienteSemana } from '@/dominio/semana'
 import { usuarioActual } from '@/auth/sesion'
-import { listarAreas, listarLotes, listarTareasPendientes, listarActividadesEstipuladas, listarSolicitudesDeArea } from '@/datos/repositorio'
-import { SelectLote } from '../_componentes/select-lote'
 import { InfoLotes } from '../_componentes/info-lotes'
+import { SelectLote } from '../_componentes/select-lote'
 import { FormNuevaTareaMaquinaria } from './form-nueva-tarea-maquinaria'
 import { FormSolicitar } from './form-solicitar'
-import { siguienteSemana, semanaAnterior, semanaActual, esSemanaPasada } from '@/dominio/semana'
-import {
-  crearTareaAccion,
-  eliminarTareaAccion,
-  seleccionarTareaAccion,
-  quitarSeleccionTareaAccion,
-  crearSolicitudAccion,
-} from './acciones'
+import { crearTareaAccion, eliminarTareaAccion, programarTareaAccion, crearSolicitudAccion } from './acciones'
 
 export default async function TareasPage({
   searchParams,
 }: {
-  searchParams: Promise<{ area?: string; anio?: string; semana?: string }>
+  searchParams: Promise<{ area?: string }>
 }) {
   const sp = await searchParams
   const areas = await listarAreas()
@@ -29,11 +29,9 @@ export default async function TareasPage({
       </main>
     )
   }
-
   const u = await usuarioActual()
   if (!u) redirect('/login')
   const esAdmin = u.rol === 'ADMIN'
-
   const areaId = esAdmin
     ? (sp.area && areas.some((a) => a.id === sp.area) ? sp.area : areas[0].id)
     : (u.areaId && areas.some((a) => a.id === u.areaId) ? u.areaId : areas[0].id)
@@ -41,12 +39,6 @@ export default async function TareasPage({
   const esMaquinaria = areaActual.nombre.toLowerCase().includes('maquinaria')
   const maquinariaArea = areas.find((a) => a.nombre.toLowerCase().includes('maquinaria'))
   const maquinariaAreaId = maquinariaArea?.id ?? ''
-  const hoy = semanaActual()
-  const anioRaw = Number(sp.anio)
-  const semanaRaw = Number(sp.semana)
-  const anio = sp.anio && Number.isInteger(anioRaw) ? anioRaw : hoy.anio
-  const semana = sp.semana && Number.isInteger(semanaRaw) ? semanaRaw : hoy.semana
-  const pasada = esSemanaPasada(anio, semana, hoy)
 
   const [tareas, estipuladas, lotes, solicitudes] = await Promise.all([
     listarTareasPendientes(areaId),
@@ -55,23 +47,25 @@ export default async function TareasPage({
     listarSolicitudesDeArea(areaId),
   ])
 
-  const seleccionadas = tareas.filter((t) => t.anioSel === anio && t.semanaSel === semana)
-  const enBanco = tareas.filter((t) => !(t.anioSel === anio && t.semanaSel === semana))
+  const semanas: { anio: number; semana: number }[] = []
+  let w = semanaActual()
+  for (let i = 0; i < 9; i++) {
+    semanas.push(w)
+    w = siguienteSemana(w.anio, w.semana)
+  }
 
-  const previa = semanaAnterior(anio, semana)
-  const proxima = siguienteSemana(anio, semana)
-  const url = (a: string, an: number, se: number) => `/tareas?area=${a}&anio=${an}&semana=${se}`
+  const url = (a: string) => `/tareas?area=${a}`
 
   return (
     <main className="mx-auto max-w-5xl p-6">
       <h1 className="mb-4 text-2xl font-bold text-[#11603a]">🗂️ Banco de tareas</h1>
 
       {esAdmin ? (
-        <div className="mb-3 flex flex-wrap gap-2">
+        <div className="mb-4 flex flex-wrap gap-2">
           {areas.map((a) => (
             <Link
               key={a.id}
-              href={url(a.id, anio, semana)}
+              href={url(a.id)}
               className={`rounded-full px-3 py-1 text-sm ${a.id === areaId ? 'bg-[#11603a] text-white' : 'bg-gray-100 text-gray-700'}`}
             >
               {a.nombre}
@@ -79,25 +73,8 @@ export default async function TareasPage({
           ))}
         </div>
       ) : (
-        <div className="mb-3 text-sm text-gray-500">Área: <b className="text-gray-800">{areaActual.nombre}</b></div>
+        <div className="mb-4 text-sm text-gray-500">Área: <b className="text-gray-800">{areaActual.nombre}</b></div>
       )}
-
-      <div className="mb-5 flex flex-wrap items-center gap-3 text-sm">
-        <Link href={url(areaId, previa.anio, previa.semana)} className="rounded border px-3 py-1">← Semana {previa.semana}</Link>
-        <span className="font-semibold">Semana {semana} · {anio}</span>
-        <Link href={url(areaId, proxima.anio, proxima.semana)} className="rounded border px-3 py-1">Semana {proxima.semana} →</Link>
-        <span className="text-gray-500">(eliges para qué semana seleccionar)</span>
-      </div>
-
-      {pasada && (
-        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
-          🔒 Semana cerrada — no puedes seleccionar tareas para una semana pasada. (Sí puedes administrar el banco.)
-        </div>
-      )}
-
-      <p className="mb-3 text-xs text-gray-500">
-        {seleccionadas.length} seleccionadas para esta semana · {enBanco.length} en el banco
-      </p>
 
       <div className="mb-6 grid gap-4 md:grid-cols-2">
         <div className="rounded-xl border p-4">
@@ -129,78 +106,53 @@ export default async function TareasPage({
         />
       </div>
 
-      <div className="mb-4 rounded-xl border p-4">
-        <h2 className="mb-3 font-semibold text-[#11603a]">📌 Seleccionadas para la semana {semana}</h2>
-        {seleccionadas.length === 0 ? (
-          <p className="text-sm text-gray-500">Ninguna seleccionada todavía. Elige del banco de abajo.</p>
+      <div className="mb-6 rounded-xl border p-4">
+        <h2 className="mb-3 font-semibold">Tareas pendientes ({tareas.length})</h2>
+        {tareas.length === 0 ? (
+          <p className="text-sm text-gray-500">No hay tareas pendientes. Agrega una arriba.</p>
         ) : (
           <ul className="divide-y">
-            {seleccionadas.map((t) => (
-              <li key={t.id} className="flex flex-wrap items-center gap-3 py-3">
-                <div className="flex-1">
-                  <div className="font-medium">
-                    {t.descripcion}
-                    {t.solicitadaPorArea && (
-                      <span className="ml-2 rounded-full bg-purple-100 px-2 py-0.5 text-xs font-semibold text-purple-700">
-                        📨 {t.solicitadaPorArea.nombre}
-                      </span>
-                    )}
+            {tareas.map((t) => {
+              const actual = t.anioSel && t.semanaSel ? `${t.anioSel}-${t.semanaSel}` : ''
+              const opciones = [...semanas]
+              if (t.anioSel && t.semanaSel && !semanas.some((s) => s.anio === t.anioSel && s.semana === t.semanaSel)) {
+                opciones.unshift({ anio: t.anioSel, semana: t.semanaSel })
+              }
+              return (
+                <li key={t.id} className="flex flex-wrap items-center gap-3 py-3">
+                  <div className="flex-1">
+                    <div className="font-medium">
+                      {t.descripcion}
+                      {t.solicitadaPorArea && (
+                        <span className="ml-2 rounded-full bg-purple-100 px-2 py-0.5 text-xs font-semibold text-purple-700">
+                          📨 {t.solicitadaPorArea.nombre}
+                        </span>
+                      )}
+                    </div>
+                    <InfoLotes lotes={t.lotes} />
                   </div>
-                  <InfoLotes lotes={t.lotes} />
-                </div>
-                <span className="rounded-full bg-[#1d8a55] px-3 py-1 text-xs font-bold text-white">➡️ Semana {semana}</span>
-                {!pasada && (
-                  <form action={quitarSeleccionTareaAccion}>
+                  <form action={programarTareaAccion} className="flex items-end gap-1">
                     <input type="hidden" name="id" value={t.id} />
-                    <button className="rounded bg-gray-100 px-3 py-1 text-sm">Quitar</button>
+                    <label className="flex flex-col text-xs">
+                      Programar para
+                      <select name="anioSemana" defaultValue={actual} className="rounded border p-1 text-sm">
+                        <option value="">— sin programar —</option>
+                        {opciones.map((s) => (
+                          <option key={`${s.anio}-${s.semana}`} value={`${s.anio}-${s.semana}`}>
+                            Semana {s.semana}{s.anio === semanas[0].anio && s.semana === semanas[0].semana ? ' (esta)' : ''} · {s.anio}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">Guardar</button>
                   </form>
-                )}
-                <form action={eliminarTareaAccion}>
-                  <input type="hidden" name="id" value={t.id} />
-                  <button className="text-sm text-red-600 hover:underline">eliminar</button>
-                </form>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <div className="mb-4 rounded-xl border p-4">
-        <h2 className="mb-3 font-semibold">📋 Banco (sin programar / otras semanas)</h2>
-        {enBanco.length === 0 ? (
-          <p className="text-sm text-gray-500">El banco está vacío.</p>
-        ) : (
-          <ul className="divide-y">
-            {enBanco.map((t) => (
-              <li key={t.id} className="flex flex-wrap items-center gap-3 py-3">
-                <div className="flex-1">
-                  <div className="font-medium">
-                    {t.descripcion}
-                    {t.solicitadaPorArea && (
-                      <span className="ml-2 rounded-full bg-purple-100 px-2 py-0.5 text-xs font-semibold text-purple-700">
-                        📨 {t.solicitadaPorArea.nombre}
-                      </span>
-                    )}
-                  </div>
-                  <InfoLotes lotes={t.lotes} />
-                </div>
-                {t.semanaSel !== null && (
-                  <span className="rounded-full bg-gray-200 px-3 py-1 text-xs font-semibold text-gray-600">➡️ S{t.semanaSel}</span>
-                )}
-                {!pasada && (
-                  <form action={seleccionarTareaAccion}>
+                  <form action={eliminarTareaAccion}>
                     <input type="hidden" name="id" value={t.id} />
-                    <input type="hidden" name="anio" value={anio} />
-                    <input type="hidden" name="semana" value={semana} />
-                    <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">Seleccionar para semana {semana}</button>
+                    <button className="text-sm text-red-600 hover:underline">eliminar</button>
                   </form>
-                )}
-                <form action={eliminarTareaAccion}>
-                  <input type="hidden" name="id" value={t.id} />
-                  <button className="text-sm text-red-600 hover:underline">eliminar</button>
-                </form>
-              </li>
-            ))}
+                </li>
+              )
+            })}
           </ul>
         )}
       </div>
