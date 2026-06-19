@@ -1,6 +1,6 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, crearLote, eliminarLote, crearUsuario, cambiarContrasena, eliminarUsuario } from '@/datos/repositorio'
 
 function texto(form: FormData, clave: string): string {
@@ -13,109 +13,124 @@ function textoOpcional(form: FormData, clave: string): string | null {
   return v === '' ? null : v
 }
 
-// Ejecuta la creación ignorando errores (p. ej. nombre duplicado en catálogos únicos).
-async function intentar(fn: () => Promise<unknown>) {
+// Traduce errores de Prisma a un mensaje claro para el usuario.
+function mensajeError(e: unknown): string {
+  const code = (e as { code?: string })?.code
+  if (code === 'P2002') return 'Ya existe un registro con ese nombre.'
+  if (code === 'P2003' || code === 'P2014') return 'No se puede eliminar: está en uso.'
+  return 'Ocurrió un error. Intenta de nuevo.'
+}
+
+// Ejecuta la operación y redirige a /configuracion con un aviso de éxito o error.
+async function correr(fn: () => Promise<unknown>, okMsg: string): Promise<never> {
+  let url: string
   try {
     await fn()
-  } catch {
-    // se ignora (nombre repetido u otra restricción)
+    url = `/configuracion?ok=${encodeURIComponent(okMsg)}`
+  } catch (e) {
+    url = `/configuracion?error=${encodeURIComponent(mensajeError(e))}`
   }
+  redirect(url)
+}
+
+function faltanDatos(): never {
+  redirect(`/configuracion?error=${encodeURIComponent('Faltan datos requeridos.')}`)
 }
 
 export async function crearAreaAccion(form: FormData) {
   const nombre = texto(form, 'nombre')
-  if (nombre) await intentar(() => crearArea(nombre))
-  revalidatePath('/configuracion')
+  if (!nombre) faltanDatos()
+  await correr(() => crearArea(nombre), 'Área agregada.')
 }
 
 export async function crearFincaAccion(form: FormData) {
   const nombre = texto(form, 'nombre')
-  if (nombre) await intentar(() => crearFinca(nombre))
-  revalidatePath('/configuracion')
+  if (!nombre) faltanDatos()
+  await correr(() => crearFinca(nombre), 'Finca agregada.')
 }
 
 export async function crearMotivoAccion(form: FormData) {
   const nombre = texto(form, 'nombre')
-  if (nombre) await intentar(() => crearMotivo(nombre))
-  revalidatePath('/configuracion')
+  if (!nombre) faltanDatos()
+  await correr(() => crearMotivo(nombre), 'Motivo agregado.')
 }
 
 export async function crearMaquinaAccion(form: FormData) {
   const nombre = texto(form, 'nombre')
-  if (nombre) await intentar(() => crearMaquina(nombre))
-  revalidatePath('/configuracion')
+  if (!nombre) faltanDatos()
+  await correr(() => crearMaquina(nombre), 'Máquina agregada.')
 }
 
 export async function crearResponsableAccion(form: FormData) {
   const nombre = texto(form, 'nombre')
   const areaId = texto(form, 'areaId')
-  if (nombre && areaId) await intentar(() => crearResponsable(nombre, areaId))
-  revalidatePath('/configuracion')
+  if (!nombre || !areaId) faltanDatos()
+  await correr(() => crearResponsable(nombre, areaId), 'Responsable agregado.')
 }
 
 export async function eliminarAreaAccion(form: FormData) {
   const id = texto(form, 'id')
-  if (id) await intentar(() => eliminarArea(id))
-  revalidatePath('/configuracion')
+  if (!id) faltanDatos()
+  await correr(() => eliminarArea(id), 'Área eliminada.')
 }
 
 export async function eliminarFincaAccion(form: FormData) {
   const id = texto(form, 'id')
-  if (id) await intentar(() => eliminarFinca(id))
-  revalidatePath('/configuracion')
+  if (!id) faltanDatos()
+  await correr(() => eliminarFinca(id), 'Finca eliminada.')
 }
 
 export async function eliminarMotivoAccion(form: FormData) {
   const id = texto(form, 'id')
-  if (id) await intentar(() => eliminarMotivo(id))
-  revalidatePath('/configuracion')
+  if (!id) faltanDatos()
+  await correr(() => eliminarMotivo(id), 'Motivo eliminado.')
 }
 
 export async function eliminarMaquinaAccion(form: FormData) {
   const id = texto(form, 'id')
-  if (id) await intentar(() => eliminarMaquina(id))
-  revalidatePath('/configuracion')
+  if (!id) faltanDatos()
+  await correr(() => eliminarMaquina(id), 'Máquina eliminada.')
 }
 
 export async function eliminarResponsableAccion(form: FormData) {
   const id = texto(form, 'id')
-  if (id) await intentar(() => eliminarResponsable(id))
-  revalidatePath('/configuracion')
+  if (!id) faltanDatos()
+  await correr(() => eliminarResponsable(id), 'Responsable eliminado.')
 }
 
 export async function crearActividadEstipuladaAccion(form: FormData) {
   const nombre = texto(form, 'nombre')
-  if (nombre) await intentar(() => crearActividadEstipulada(nombre))
-  revalidatePath('/configuracion')
+  if (!nombre) faltanDatos()
+  await correr(() => crearActividadEstipulada(nombre), 'Actividad agregada.')
 }
 
 export async function eliminarActividadEstipuladaAccion(form: FormData) {
   const id = texto(form, 'id')
-  if (id) await intentar(() => eliminarActividadEstipulada(id))
-  revalidatePath('/configuracion')
+  if (!id) faltanDatos()
+  await correr(() => eliminarActividadEstipulada(id), 'Actividad eliminada.')
 }
 
 export async function renombrarActividadEstipuladaAccion(form: FormData) {
   const id = texto(form, 'id')
   const nombre = texto(form, 'nombre')
-  if (id && nombre) await intentar(() => renombrarActividadEstipulada(id, nombre))
-  revalidatePath('/configuracion')
+  if (!id || !nombre) faltanDatos()
+  await correr(() => renombrarActividadEstipulada(id, nombre), 'Actividad actualizada.')
 }
 
 export async function crearLoteAccion(form: FormData) {
   const nombre = texto(form, 'nombre')
   const fincaId = texto(form, 'fincaId')
+  if (!nombre || !fincaId) faltanDatos()
   const haTxt = texto(form, 'hectareas')
   const hectareas = haTxt && Number.isFinite(Number(haTxt)) ? Number(haTxt) : null
   const tipoPasto = texto(form, 'tipoPasto') || null
-  if (nombre && fincaId) await intentar(() => crearLote(nombre, fincaId, hectareas, tipoPasto))
-  revalidatePath('/configuracion')
+  await correr(() => crearLote(nombre, fincaId, hectareas, tipoPasto), 'Lote agregado.')
 }
 
 export async function eliminarLoteAccion(form: FormData) {
   const id = texto(form, 'id')
-  if (id) await intentar(() => eliminarLote(id))
-  revalidatePath('/configuracion')
+  if (!id) faltanDatos()
+  await correr(() => eliminarLote(id), 'Lote eliminado.')
 }
 
 export async function crearUsuarioAccion(form: FormData) {
@@ -124,21 +139,22 @@ export async function crearUsuarioAccion(form: FormData) {
   const password = texto(form, 'password')
   const rol = texto(form, 'rol')
   const areaId = textoOpcional(form, 'areaId')
-  if (usuario && nombre && password && (rol === 'AREA' || rol === 'ADMIN')) {
-    await intentar(() => crearUsuario(usuario, nombre, password, rol, rol === 'AREA' ? areaId : null))
-  }
-  revalidatePath('/configuracion')
+  if (!usuario || !nombre || !password || (rol !== 'AREA' && rol !== 'ADMIN')) faltanDatos()
+  await correr(
+    () => crearUsuario(usuario, nombre, password, rol as 'AREA' | 'ADMIN', rol === 'AREA' ? areaId : null),
+    'Usuario creado.',
+  )
 }
 
 export async function cambiarContrasenaAccion(form: FormData) {
   const id = texto(form, 'id')
   const password = texto(form, 'password')
-  if (id && password) await intentar(() => cambiarContrasena(id, password))
-  revalidatePath('/configuracion')
+  if (!id || !password) faltanDatos()
+  await correr(() => cambiarContrasena(id, password), 'Contraseña actualizada.')
 }
 
 export async function eliminarUsuarioAccion(form: FormData) {
   const id = texto(form, 'id')
-  if (id) await intentar(() => eliminarUsuario(id))
-  revalidatePath('/configuracion')
+  if (!id) faltanDatos()
+  await correr(() => eliminarUsuario(id), 'Usuario eliminado.')
 }
