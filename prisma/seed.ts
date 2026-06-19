@@ -53,17 +53,10 @@ const ACTIVIDADES_ESTIPULADAS = [
   'COSECHAR MAIZ', 'RIEL', 'BOLA', 'CADENA',
 ]
 
-// Máquinas del Excel (placa/identificador + operario oficial).
-const MAQUINAS: { nombre: string; operario: string | null }[] = [
-  { nombre: '5403', operario: 'Duván' },
-  { nombre: '4299', operario: 'Jairo' },
-  { nombre: '5075 E', operario: 'Daveis Ramírez' },
-  { nombre: '5090 E', operario: null },
-  { nombre: '6603', operario: 'Carlos Botiva' },
-  { nombre: 'SAME 55', operario: 'Luis Olaya' },
-  { nombre: '8030', operario: 'Santos' },
-  { nombre: '108', operario: 'Duván' },
-  { nombre: 'ZETOR', operario: 'Diego' },
+// Tractores de la hoja "I. MAQUINAS" (col C) — sin operario (el operario puede cambiar de máquina).
+const MAQUINAS: string[] = [
+  '6603', '5090E', '5090E PALA', '5075E', '5403',
+  '8030', '4299', '365', 'SAME 55', 'KUBOTA 108s', 'ZETOR 5711',
 ]
 
 async function main() {
@@ -102,8 +95,8 @@ async function main() {
 
   const totalMaquinas = await prisma.maquina.count()
   if (totalMaquinas === 0) {
-    for (const m of MAQUINAS) {
-      await prisma.maquina.create({ data: { nombre: m.nombre, operario: m.operario } })
+    for (const nombre of MAQUINAS) {
+      await prisma.maquina.create({ data: { nombre } })
     }
   }
 

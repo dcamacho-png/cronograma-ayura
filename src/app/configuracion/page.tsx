@@ -119,7 +119,7 @@ export default async function ConfiguracionPage() {
           <ul className="mb-3 space-y-1 text-sm">
             {maquinas.map((m) => (
               <li key={m.id} className="flex items-center gap-1 rounded bg-gray-100 px-2 py-1">
-                <span>{m.nombre}{m.operario ? ` · ${m.operario}` : ''}</span>
+                <span>{m.nombre}</span>
                 <form action={eliminarMaquinaAccion}>
                   <input type="hidden" name="id" value={m.id} />
                   <button className="text-gray-400 hover:text-red-600" title="Eliminar" aria-label="Eliminar">✕</button>
@@ -129,7 +129,6 @@ export default async function ConfiguracionPage() {
           </ul>
           <form action={crearMaquinaAccion} className="flex flex-wrap gap-2">
             <input name="nombre" required placeholder="Máquina (placa/nombre)" className="flex-1 rounded border p-2 text-sm" />
-            <input name="operario" placeholder="Operario (opcional)" className="flex-1 rounded border p-2 text-sm" />
             <button className="rounded bg-[#11603a] px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
           </form>
         </section>

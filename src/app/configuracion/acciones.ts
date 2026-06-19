@@ -42,8 +42,7 @@ export async function crearMotivoAccion(form: FormData) {
 
 export async function crearMaquinaAccion(form: FormData) {
   const nombre = texto(form, 'nombre')
-  const operario = texto(form, 'operario')
-  if (nombre) await intentar(() => crearMaquina(nombre, operario || null))
+  if (nombre) await intentar(() => crearMaquina(nombre))
   revalidatePath('/configuracion')
 }
 

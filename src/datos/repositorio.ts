@@ -109,8 +109,8 @@ export function crearMotivo(nombre: string) {
   return prisma.motivo.create({ data: { nombre } })
 }
 
-export function crearMaquina(nombre: string, operario: string | null) {
-  return prisma.maquina.create({ data: { nombre, operario } })
+export function crearMaquina(nombre: string) {
+  return prisma.maquina.create({ data: { nombre } })
 }
 
 export function listarResponsablesTodos() {
