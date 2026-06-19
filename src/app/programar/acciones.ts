@@ -87,8 +87,13 @@ export async function asignarTareaAccion(form: FormData) {
     .filter((d) => Number.isInteger(d) && d >= 1 && d <= 7)
   const loteId = textoOpcional(form, 'loteId')
   const turno = texto(form, 'turno')
+  const maquinaPorDia: Record<number, string | null> = {}
+  for (const dia of dias) {
+    const m = textoOpcional(form, `maquina_${dia}`)
+    maquinaPorDia[dia] = m || null
+  }
   if (!tareaId || !responsableId || dias.length === 0) return
-  await asignarTarea(tareaId, responsableId, dias, loteId, turno)
+  await asignarTarea(tareaId, responsableId, dias, loteId, turno, maquinaPorDia)
   revalidatePath('/programar')
 }
 

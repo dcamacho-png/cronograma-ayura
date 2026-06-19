@@ -203,6 +203,7 @@ export async function asignarTarea(
   dias: number[],
   loteIdFallback: string | null,
   turno: string,
+  maquinaPorDia: Record<number, string | null> = {},
 ) {
   const tarea = await prisma.tarea.findUnique({ where: { id: tareaId }, include: { lotes: true } })
   if (!tarea || tarea.anioSel === null || tarea.semanaSel === null) return null
@@ -233,6 +234,7 @@ export async function asignarTarea(
             areaId: tarea.areaId,
             fincaId,
             responsableId,
+            maquinaId: maquinaPorDia[dia] ?? null,
             tareaId: tarea.id,
             lotes: { connect: loteIds.map((id) => ({ id })) },
           },
