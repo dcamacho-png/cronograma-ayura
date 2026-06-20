@@ -21,6 +21,7 @@ import {
   eliminarMotivoAccion,
   eliminarMaquinaAccion,
   eliminarResponsableAccion,
+  cambiarEstadoResponsableAccion,
   crearActividadEstipuladaAccion,
   eliminarActividadEstipuladaAccion,
   renombrarActividadEstipuladaAccion,
@@ -184,9 +185,21 @@ export default async function ConfiguracionPage({
           <h3 className="mb-2 font-semibold">Responsables ({responsables.length})</h3>
           <ul className="mb-3 flex flex-wrap gap-2">
             {responsables.map((r) => (
-              <li key={r.id} className="flex items-center gap-1 rounded bg-gray-100 px-2 py-1 text-sm">
-                <span>{r.nombre} <span className="text-gray-500">· {r.area.nombre}</span></span>
-                <FormEliminar accion={eliminarResponsableAccion} id={r.id} etiqueta={r.nombre} />
+              <li key={r.id} className="flex items-center gap-2 rounded bg-gray-100 px-2 py-1 text-sm">
+                <span className={r.activo ? '' : 'text-gray-400'}>
+                  {r.nombre} <span className="text-gray-500">· {r.area.nombre}</span>
+                  {!r.activo && <span className="text-gray-400"> · (inactivo)</span>}
+                </span>
+                <form action={cambiarEstadoResponsableAccion}>
+                  <input type="hidden" name="id" value={r.id} />
+                  <input type="hidden" name="activo" value={r.activo ? '0' : '1'} />
+                  <button className="text-xs font-semibold text-[#11603a] hover:underline">
+                    {r.activo ? 'Dar de baja' : 'Reactivar'}
+                  </button>
+                </form>
+                {r._count.actividades === 0 && (
+                  <FormEliminar accion={eliminarResponsableAccion} id={r.id} etiqueta={r.nombre} />
+                )}
               </li>
             ))}
           </ul>

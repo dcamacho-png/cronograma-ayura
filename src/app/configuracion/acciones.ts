@@ -1,7 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, crearLote, eliminarLote, crearUsuario, cambiarContrasena, eliminarUsuario, BloqueoError } from '@/datos/repositorio'
+import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, setResponsableActivo, crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, crearLote, eliminarLote, crearUsuario, cambiarContrasena, eliminarUsuario, BloqueoError } from '@/datos/repositorio'
 
 function texto(form: FormData, clave: string): string {
   const v = form.get(clave)
@@ -97,6 +97,16 @@ export async function eliminarResponsableAccion(form: FormData) {
   const id = texto(form, 'id')
   if (!id) faltanDatos()
   await correr(() => eliminarResponsable(id), 'Responsable eliminado.')
+}
+
+export async function cambiarEstadoResponsableAccion(form: FormData) {
+  const id = texto(form, 'id')
+  const activo = texto(form, 'activo') === '1'
+  if (!id) faltanDatos()
+  await correr(
+    () => setResponsableActivo(id, activo),
+    activo ? 'Responsable reactivado.' : 'Responsable dado de baja.',
+  )
 }
 
 export async function crearActividadEstipuladaAccion(form: FormData) {
