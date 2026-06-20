@@ -70,13 +70,12 @@ export function FormRegistrar({
       </label>
       {esMaquinaria && (
         <label className="flex flex-col text-xs">
-          Hectáreas realizadas *
+          Hectáreas realizadas (opcional)
           <input
             name="haRealizada"
             type="number"
             step="0.1"
             min="0"
-            required
             defaultValue={haProgramada}
             className="w-28 rounded border p-1 text-sm"
           />
