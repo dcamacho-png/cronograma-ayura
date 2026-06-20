@@ -57,12 +57,6 @@ export function conteoPorEstado(actividades: Actividad[]): Record<string, number
   return r
 }
 
-export interface FilaHa {
-  estado: string
-  haProgramada: number
-  haFaltante: number
-}
-
 const r1 = (n: number) => Math.round(n * 10) / 10
 
 export function hectareasRealizadas(
@@ -74,18 +68,4 @@ export function hectareasRealizadas(
     total += f.haRealizada ?? (f.estado === 'CUMPLIDA' ? f.haProgramada : 0)
   }
   return r1(total)
-}
-
-// Hectáreas trabajadas vs faltantes (ignora PENDIENTE).
-export function hectareasTrabajadasYFaltantes(
-  filas: FilaHa[],
-): { trabajadas: number; faltantes: number } {
-  let trabajadas = 0
-  let faltantes = 0
-  for (const f of filas) {
-    if (f.estado === 'PENDIENTE') continue
-    faltantes += f.haFaltante
-    trabajadas += Math.max(0, f.haProgramada - f.haFaltante)
-  }
-  return { trabajadas: r1(trabajadas), faltantes: r1(faltantes) }
 }

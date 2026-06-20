@@ -4,7 +4,7 @@ import {
   actividadesConCambio,
   extremosFinalizadas,
   conteoPorEstado,
-  hectareasTrabajadasYFaltantes,
+  hectareasRealizadas,
 } from '@/dominio/resumen'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
 
@@ -30,7 +30,8 @@ type ActividadResumen = {
   estado: string
   descripcion: string
   vecesReprogramada: number
-  haFaltante: number | null
+  haRealizada: number | null
+  nota: string | null
   lotes: { nombre: string; hectareas: number | null }[]
   maquina: { nombre: string } | null
   responsable: { nombre: string }
@@ -67,14 +68,14 @@ export function ResumenArea({
   const nombreMotivo = new Map(motivos.map((m) => [m.id, m.nombre]))
 
   const haActividad = (a: ActividadResumen) => a.lotes.reduce((s, l) => s + (l.hectareas ?? 0), 0)
-  const ha = hectareasTrabajadasYFaltantes(
-    actividades.map((a) => ({ estado: a.estado, haProgramada: haActividad(a), haFaltante: a.haFaltante ?? 0 })),
+  const realizadas = hectareasRealizadas(
+    actividades.map((a) => ({ estado: a.estado, haProgramada: haActividad(a), haRealizada: a.haRealizada ?? null })),
   )
 
   const haPorActividad = new Map<string, number>()
   for (const a of actividades) {
     if (a.estado === 'PENDIENTE') continue
-    const realizada = Math.max(0, haActividad(a) - (a.haFaltante ?? 0))
+    const realizada = a.haRealizada ?? (a.estado === 'CUMPLIDA' ? haActividad(a) : 0)
     haPorActividad.set(a.descripcion, (haPorActividad.get(a.descripcion) ?? 0) + realizada)
   }
   const haActividadLista = [...haPorActividad.entries()].sort((a, b) => b[1] - a[1])
@@ -107,8 +108,7 @@ export function ResumenArea({
         {esMaquinaria && (
           <div className="rounded-2xl border p-5">
             <div className="mb-1 text-sm text-gray-500">Hectáreas</div>
-            <div className="text-2xl font-extrabold text-[#2e9e5b]">{ha.trabajadas} ha <span className="text-sm font-medium text-gray-500">trabajadas</span></div>
-            <div className="text-2xl font-extrabold text-[#e8771a]">{ha.faltantes} ha <span className="text-sm font-medium text-gray-500">faltantes</span></div>
+            <div className="text-2xl font-extrabold text-[#2e9e5b]">{realizadas} ha <span className="text-sm font-medium text-gray-500">realizadas</span></div>
           </div>
         )}
       </div>
@@ -221,6 +221,7 @@ export function ResumenArea({
                 {a.descripcion}
                 <span className="text-gray-500"> · {a.responsable.nombre}</span>
                 {a.motivo && <span className="text-gray-500"> · {a.motivo.nombre}</span>}
+                {a.nota && <span className="text-xs text-gray-500">· {a.nota}</span>}
               </span>
               {a.vecesReprogramada > 0 && (
                 <span className="rounded px-2 py-0.5 text-xs font-semibold text-white" style={{ backgroundColor: COLOR_HEX[colorSemaforo(a.vecesReprogramada)] }}>
