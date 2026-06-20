@@ -7,7 +7,7 @@ const lotes: { nombre: string; finca: string | null; hectareas: number | null; t
 
 const prisma = new PrismaClient()
 
-const AREAS = ['Maíz', 'Riego', 'Maquinaria', 'Ganadería ceba', 'Nelore']
+const AREAS = ['Maiz-Riego', 'Maquinaria', 'Ganadería ceba', 'Nelore']
 const FINCAS = ['Entremontes', 'Acajure', 'Normandia']
 const MOTIVOS = [
   'Clima',
@@ -20,26 +20,29 @@ const MOTIVOS = [
 
 // Responsables por nombre de área (del Excel).
 const RESPONSABLES: Record<string, string[]> = {
-  'Ganadería ceba': [
-    'David Zuleta',
-    'Duván Peña',
-    'Raúl Piñeros',
-    'Guillermo Bravo',
-    'Alirio Bravo',
-    'Jhones Andrés',
-  ],
+  'Maiz-Riego': ['Alexander', 'Alexis Rojas', 'Dairon Rojas', 'Diego Gomez'],
   Maquinaria: [
     'Andrés Mosquera',
-    'José Losada',
     'Carlos Botiva',
     'Daveis Ramírez',
+    'Jaime Nevado',
     'Jairo Leal',
+    'José Losada',
     'Luis Olaya',
     'Santos Bastos',
   ],
-  'Maíz': ['Diego (Zetor)'],
-  Riego: [],
-  Nelore: [],
+  'Ganadería ceba': [
+    'Alirio Bravo',
+    'David Zuleta',
+    'Duván Peña',
+    'Guillermo Bravo',
+    'Jhones Andrés',
+    'Julieth Camacho',
+    'Raúl Piñeros',
+    'Vaqueros Acajure',
+    'Vaqueros Entremontes',
+  ],
+  Nelore: ['Antonio Medina', 'Daniela', 'J Moreno - Contratista', 'Oscar Carrillo', 'Rodolfo Ducuara'],
 }
 
 const ACTIVIDADES_ESTIPULADAS = [
@@ -109,9 +112,8 @@ async function main() {
     { usuario: 'admin', nombre: 'Coordinación general', rol: 'ADMIN', area: null },
     { usuario: 'ganaderia', nombre: 'Ganadería ceba', rol: 'AREA', area: 'Ganadería ceba' },
     { usuario: 'maquinaria', nombre: 'Maquinaria', rol: 'AREA', area: 'Maquinaria' },
-    { usuario: 'maiz', nombre: 'Maíz', rol: 'AREA', area: 'Maíz' },
-    { usuario: 'riego', nombre: 'Riego', rol: 'AREA', area: 'Riego' },
     { usuario: 'nelore', nombre: 'Nelore', rol: 'AREA', area: 'Nelore' },
+    { usuario: 'maizriego', nombre: 'Maíz y Riego', rol: 'AREA', area: 'Maiz-Riego' },
   ]
   for (const u of USUARIOS) {
     const areaId = u.area ? (await prisma.area.findUnique({ where: { nombre: u.area } }))?.id ?? null : null
