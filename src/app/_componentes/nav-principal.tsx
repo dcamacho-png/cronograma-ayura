@@ -1,53 +1,82 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cerrarSesionAccion } from '@/app/login/acciones'
-
-const ENLACES = [
-  { href: '/tareas', texto: 'Tareas' },
-  { href: '/programar', texto: 'Programar' },
-  { href: '/cumplimiento', texto: 'Cumplimiento' },
-  { href: '/resumen', texto: 'Resumen' },
-  { href: '/tablero', texto: 'Tablero' },
-  { href: '/configuracion', texto: 'Configuración' },
-]
+import { seccionesVisibles } from './secciones'
 
 export function NavPrincipal({ usuario }: { usuario: { nombre: string; rol: string } | null }) {
   const ruta = usePathname()
-  const enlaces =
-    usuario?.rol === 'ADMIN'
-      ? ENLACES
-      : ENLACES.filter((e) => e.href !== '/tablero' && e.href !== '/configuracion')
+  const [abierto, setAbierto] = useState(false)
+
+  const enlaces = usuario
+    ? [{ href: '/', texto: 'Inicio', icono: '🏠' }, ...seccionesVisibles(usuario.rol)]
+    : []
+
+  const claseEnlace = (href: string) =>
+    ruta === href ? 'font-semibold underline underline-offset-4' : 'opacity-90 hover:underline'
+
   return (
     <header className="bg-[#11603a] text-white print:hidden">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-6 py-3">
-        <span className="font-bold">🌱 Cronograma Ayurá</span>
+      <div className="mx-auto flex max-w-6xl items-center gap-x-4 gap-y-2 px-6 py-3">
+        <Link href="/" className="font-bold">🌱 Cronograma Ayurá</Link>
+
         {usuario && (
-          <nav className="flex flex-wrap gap-3 text-sm">
-            {enlaces.map((e) => {
-              const activo = ruta === e.href
-              return (
-                <Link
-                  key={e.href}
-                  href={e.href}
-                  className={activo ? 'font-semibold underline underline-offset-4' : 'opacity-90 hover:underline'}
-                >
-                  {e.texto}
+          <>
+            {/* Escritorio: enlaces en fila */}
+            <nav className="ml-2 hidden flex-wrap gap-3 text-sm md:flex">
+              {enlaces.map((e) => (
+                <Link key={e.href} href={e.href} className={`inline-flex items-center gap-1 ${claseEnlace(e.href)}`}>
+                  <span>{e.icono}</span>{e.texto}
                 </Link>
-              )
-            })}
-          </nav>
+              ))}
+            </nav>
+
+            {/* Escritorio: usuario a la derecha */}
+            <div className="ml-auto hidden items-center gap-3 text-sm md:flex">
+              <span className="opacity-90">{usuario.nombre}</span>
+              <form action={cerrarSesionAccion}>
+                <button className="rounded bg-white/15 px-2 py-1 hover:bg-white/25">Cerrar sesión</button>
+              </form>
+            </div>
+
+            {/* Celular: botón ☰ */}
+            <button
+              type="button"
+              onClick={() => setAbierto((v) => !v)}
+              aria-label="Menú"
+              className="ml-auto rounded bg-white/15 px-3 py-1 text-lg leading-none hover:bg-white/25 md:hidden"
+            >
+              {abierto ? '✕' : '☰'}
+            </button>
+          </>
         )}
-        {usuario && (
-          <div className="ml-auto flex items-center gap-3 text-sm">
-            <span className="opacity-90">{usuario.nombre}</span>
+      </div>
+
+      {/* Celular: panel desplegable */}
+      {usuario && abierto && (
+        <div className="border-t border-white/20 px-4 pb-3 md:hidden">
+          <nav className="flex flex-col">
+            {enlaces.map((e) => (
+              <Link
+                key={e.href}
+                href={e.href}
+                onClick={() => setAbierto(false)}
+                className={`flex items-center gap-2 rounded px-3 py-2.5 text-[15px] hover:bg-white/10 ${ruta === e.href ? 'bg-white/15 font-semibold' : ''}`}
+              >
+                <span>{e.icono}</span>{e.texto}
+              </Link>
+            ))}
+          </nav>
+          <div className="mt-2 flex items-center gap-3 border-t border-white/20 px-3 pt-3 text-sm">
+            <span className="flex-1 opacity-90">👤 {usuario.nombre}</span>
             <form action={cerrarSesionAccion}>
               <button className="rounded bg-white/15 px-2 py-1 hover:bg-white/25">Cerrar sesión</button>
             </form>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </header>
   )
 }
