@@ -448,6 +448,39 @@ export function listarSolicitudesDeArea(areaId: string) {
   })
 }
 
+// Crea una actividad no programada registrada como CUMPLIDA en Cumplimiento.
+export async function crearActividadRealizada(datos: {
+  areaId: string
+  anio: number
+  semana: number
+  dia: number
+  responsableId: string
+  descripcion: string
+  loteId: string | null
+  maquinaId: string | null
+}) {
+  let fincaId: string | null = null
+  if (datos.loteId) {
+    const lote = await prisma.lote.findUnique({ where: { id: datos.loteId } })
+    fincaId = lote?.fincaId ?? null
+  }
+  return prisma.actividad.create({
+    data: {
+      anio: datos.anio,
+      semana: datos.semana,
+      dia: datos.dia,
+      descripcion: datos.descripcion,
+      estado: 'CUMPLIDA',
+      noProgramada: true,
+      areaId: datos.areaId,
+      fincaId,
+      responsableId: datos.responsableId,
+      maquinaId: datos.maquinaId,
+      lotes: datos.loteId ? { connect: [{ id: datos.loteId }] } : undefined,
+    },
+  })
+}
+
 // Crea una actividad enlazada a uno o varios lotes; la finca se deduce del primer lote.
 export async function crearActividadDesdeLotes(
   base: {

@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { marcarEstado, reprogramarActividad, registrarCumplimiento } from '@/datos/repositorio'
+import { marcarEstado, reprogramarActividad, registrarCumplimiento, crearActividadRealizada } from '@/datos/repositorio'
 import { siguienteSemana } from '@/dominio/semana'
 
 const ESTADOS_VALIDOS = ['PENDIENTE', 'CUMPLIDA', 'PARCIAL', 'NO_CUMPLIDA', 'REPROGRAMADA']
@@ -36,6 +36,27 @@ export async function reprogramarAccion(form: FormData) {
   if (!id || !anio || !semana || !Number.isInteger(anio) || !Number.isInteger(semana)) return
   const prox = siguienteSemana(anio, semana)
   await reprogramarActividad(id, prox.anio, prox.semana)
+  revalidatePath('/cumplimiento')
+}
+
+export async function agregarActividadRealizadaAccion(form: FormData) {
+  const areaId = texto(form, 'areaId')
+  const anio = Number(texto(form, 'anio'))
+  const semana = Number(texto(form, 'semana'))
+  const dia = Number(texto(form, 'dia'))
+  const responsableId = texto(form, 'responsableId')
+  const descripcion = texto(form, 'descripcion')
+  if (!areaId || !Number.isInteger(anio) || !Number.isInteger(semana) || !(dia >= 1 && dia <= 7) || !responsableId || !descripcion) return
+  await crearActividadRealizada({
+    areaId,
+    anio,
+    semana,
+    dia,
+    responsableId,
+    descripcion,
+    loteId: textoOpcional(form, 'loteId'),
+    maquinaId: textoOpcional(form, 'maquinaId'),
+  })
   revalidatePath('/cumplimiento')
 }
 

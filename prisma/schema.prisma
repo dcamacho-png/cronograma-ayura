@@ -92,9 +92,10 @@ model Actividad {
   horas      Float?
   hectareas  Float?
   haFaltante  Float?
-  haRealizada Float?
-  planB      String?
-  lotes      Lote[]
+  haRealizada  Float?
+  planB        String?
+  noProgramada Boolean @default(false)
+  lotes        Lote[]
 
   @@index([anio, semana, areaId])
 }
