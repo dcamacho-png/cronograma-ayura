@@ -53,6 +53,7 @@ export default async function ProgramarPage({
     listarMaquinas(),
   ])
   const esMaquinaria = areaActual.nombre.toLowerCase().includes('maquinaria')
+  const responsablesActivos = responsables.filter((r) => r.activo)
   // Ocupación en la semana: máquina y responsable usados en cada día+turno.
   const ocupacion = actividades.map((a) => ({
     dia: a.dia,
@@ -111,7 +112,7 @@ export default async function ProgramarPage({
       {!pasada && porAsignar.length > 0 && (
         <div className="mb-6 rounded-xl border border-blue-200 bg-blue-50 p-4">
           <h2 className="mb-3 font-semibold text-blue-900">📌 Tareas por asignar — semana {semana}</h2>
-          {responsables.length === 0 ? (
+          {responsablesActivos.length === 0 ? (
             <p className="text-sm text-blue-900">Primero agrega responsables a esta área para poder asignar.</p>
           ) : (
             <ul className="space-y-2">
@@ -121,7 +122,7 @@ export default async function ProgramarPage({
                     tareaId={t.id}
                     descripcion={t.descripcion}
                     lotesTarea={t.lotes}
-                    responsables={responsables}
+                    responsables={responsablesActivos}
                     lotes={lotes}
                     esMaquinaria={esMaquinaria}
                     maquinas={maquinas}
@@ -142,9 +143,9 @@ export default async function ProgramarPage({
         </div>
       )}
 
-      {(responsables.length > 0 || esAdmin) && (
+      {(responsablesActivos.length > 0 || esAdmin) && (
         <div className="mb-2 flex flex-wrap items-center gap-2">
-          {responsables.length > 0 && (
+          {responsablesActivos.length > 0 && (
             <BotonDescargarImagen
               targetId="grilla-export"
               nombreArchivo={`cronograma-${areaActual.nombre}-S${semana}-${anio}.png`}
@@ -167,7 +168,7 @@ export default async function ProgramarPage({
           areaNombre={areaActual.nombre}
           semana={semana}
           fechas={fechas}
-          responsables={responsables}
+          responsables={responsablesActivos}
           actividades={actividades}
         />
       </div>
