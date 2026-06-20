@@ -11,7 +11,13 @@ function firmar(id: string): string {
 
 export async function crearSesion(usuarioId: string) {
   const c = await cookies()
-  c.set(COOKIE, `${usuarioId}.${firmar(usuarioId)}`, { httpOnly: true, sameSite: 'lax', path: '/' })
+  c.set(COOKIE, `${usuarioId}.${firmar(usuarioId)}`, {
+    httpOnly: true,
+    sameSite: 'lax',
+    path: '/',
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 60 * 60 * 24 * 30,
+  })
 }
 
 export async function cerrarSesion() {
