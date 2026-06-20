@@ -1558,5 +1558,581 @@
 "finca": "Entremontes",
 "hectareas": 0.2,
 "tipoPasto": "NA"
+},
+{
+"nombre": "BAJO JIRAMENA 1",
+"finca": "Normandia",
+"hectareas": 3.617,
+"tipoPasto": null
+},
+{
+"nombre": "BAJO JIRAMENA 2",
+"finca": "Normandia",
+"hectareas": 8.14,
+"tipoPasto": null
+},
+{
+"nombre": "BAJO JIRAMENA 3",
+"finca": "Normandia",
+"hectareas": 6.409,
+"tipoPasto": null
+},
+{
+"nombre": "DESMODIUM 1",
+"finca": "Normandia",
+"hectareas": 3.51,
+"tipoPasto": null
+},
+{
+"nombre": "DESMODIUM 2",
+"finca": "Normandia",
+"hectareas": 2.91,
+"tipoPasto": null
+},
+{
+"nombre": "DESMODIUM 3",
+"finca": "Normandia",
+"hectareas": 2.28,
+"tipoPasto": null
+},
+{
+"nombre": "DESMODIUM 4",
+"finca": "Normandia",
+"hectareas": 3.38,
+"tipoPasto": null
+},
+{
+"nombre": "DESMODIUM 5",
+"finca": "Normandia",
+"hectareas": 3.28,
+"tipoPasto": null
+},
+{
+"nombre": "DESMODIUM 6",
+"finca": "Normandia",
+"hectareas": 3.18,
+"tipoPasto": null
+},
+{
+"nombre": "DESMODIUM 7",
+"finca": "Normandia",
+"hectareas": 2.82,
+"tipoPasto": null
+},
+{
+"nombre": "DESMODIUM 8",
+"finca": "Normandia",
+"hectareas": 2.99,
+"tipoPasto": null
+},
+{
+"nombre": "LOS POZOS 1",
+"finca": "Normandia",
+"hectareas": 2.98,
+"tipoPasto": null
+},
+{
+"nombre": "LOS POZOS 2",
+"finca": "Normandia",
+"hectareas": 2.89,
+"tipoPasto": null
+},
+{
+"nombre": "LOS POZOS 3",
+"finca": "Normandia",
+"hectareas": 2.9,
+"tipoPasto": null
+},
+{
+"nombre": "LOS POZOS 4",
+"finca": "Normandia",
+"hectareas": 2.77,
+"tipoPasto": null
+},
+{
+"nombre": "LOS POZOS 5",
+"finca": "Normandia",
+"hectareas": 2.33,
+"tipoPasto": null
+},
+{
+"nombre": "LOS POZOS 6",
+"finca": "Normandia",
+"hectareas": 2.41,
+"tipoPasto": null
+},
+{
+"nombre": "CAÑO FISTOL 1",
+"finca": "Normandia",
+"hectareas": 2.7,
+"tipoPasto": null
+},
+{
+"nombre": "CAÑO FISTOL 2",
+"finca": "Normandia",
+"hectareas": 2.98,
+"tipoPasto": null
+},
+{
+"nombre": "CAÑO FISTOL 3",
+"finca": "Normandia",
+"hectareas": 3.43,
+"tipoPasto": null
+},
+{
+"nombre": "CAÑO FISTOL 4",
+"finca": "Normandia",
+"hectareas": 2.87,
+"tipoPasto": null
+},
+{
+"nombre": "CAÑO FISTOL 5",
+"finca": "Normandia",
+"hectareas": 2.66,
+"tipoPasto": null
+},
+{
+"nombre": "CAÑO FISTOL 6",
+"finca": "Normandia",
+"hectareas": 2.6,
+"tipoPasto": null
+},
+{
+"nombre": "PALO SECO 1",
+"finca": "Normandia",
+"hectareas": 3.3,
+"tipoPasto": null
+},
+{
+"nombre": "PALO SECO 2",
+"finca": "Normandia",
+"hectareas": 2.8,
+"tipoPasto": null
+},
+{
+"nombre": "PALO SECO 3",
+"finca": "Normandia",
+"hectareas": 4.7,
+"tipoPasto": null
+},
+{
+"nombre": "PALO SECO 4",
+"finca": "Normandia",
+"hectareas": 8.5,
+"tipoPasto": null
+},
+{
+"nombre": "CASA VERDE 1",
+"finca": "Normandia",
+"hectareas": 3.2,
+"tipoPasto": null
+},
+{
+"nombre": "CASA VERDE 2",
+"finca": "Normandia",
+"hectareas": 2.6,
+"tipoPasto": null
+},
+{
+"nombre": "CASA VERDE 3",
+"finca": "Normandia",
+"hectareas": 2.2,
+"tipoPasto": null
+},
+{
+"nombre": "CASA VERDE 4",
+"finca": "Normandia",
+"hectareas": 1.95,
+"tipoPasto": null
+},
+{
+"nombre": "CASA VERDE 5",
+"finca": "Normandia",
+"hectareas": 1.87,
+"tipoPasto": null
+},
+{
+"nombre": "CASA VERDE 6",
+"finca": "Normandia",
+"hectareas": 2.1,
+"tipoPasto": null
+},
+{
+"nombre": "CASA VERDE 7",
+"finca": "Normandia",
+"hectareas": 2.92,
+"tipoPasto": null
+},
+{
+"nombre": "CASA VERDE 8",
+"finca": "Normandia",
+"hectareas": 2.8,
+"tipoPasto": null
+},
+{
+"nombre": "MATAPALO 1",
+"finca": "Normandia",
+"hectareas": 0.58,
+"tipoPasto": null
+},
+{
+"nombre": "MATAPALO 2",
+"finca": "Normandia",
+"hectareas": 0.34,
+"tipoPasto": null
+},
+{
+"nombre": "MATAPALO 3",
+"finca": "Normandia",
+"hectareas": 0.09,
+"tipoPasto": null
+},
+{
+"nombre": "MATAPALO 4",
+"finca": "Normandia",
+"hectareas": 0.13,
+"tipoPasto": null
+},
+{
+"nombre": "TIRA MATA 1",
+"finca": "Normandia",
+"hectareas": 0.12,
+"tipoPasto": null
+},
+{
+"nombre": "TIRA MATA 2",
+"finca": "Normandia",
+"hectareas": 0.08,
+"tipoPasto": null
+},
+{
+"nombre": "TIRA MATA 3",
+"finca": "Normandia",
+"hectareas": 0.07,
+"tipoPasto": null
+},
+{
+"nombre": "TIRA MATA 4",
+"finca": "Normandia",
+"hectareas": 0.07,
+"tipoPasto": null
+},
+{
+"nombre": "ESTABLO 1",
+"finca": "Normandia",
+"hectareas": 0.07,
+"tipoPasto": null
+},
+{
+"nombre": "ESTABLO 2",
+"finca": "Normandia",
+"hectareas": 0.2,
+"tipoPasto": null
+},
+{
+"nombre": "ESTABLO 3",
+"finca": "Normandia",
+"hectareas": 0.13,
+"tipoPasto": null
+},
+{
+"nombre": "ESTABLO 4",
+"finca": "Normandia",
+"hectareas": 0.13,
+"tipoPasto": null
+},
+{
+"nombre": "ESTABLO 5",
+"finca": "Normandia",
+"hectareas": 0.1,
+"tipoPasto": null
+},
+{
+"nombre": "ESTABLO 6",
+"finca": "Normandia",
+"hectareas": 0.21,
+"tipoPasto": null
+},
+{
+"nombre": "ESTABLO 7",
+"finca": "Normandia",
+"hectareas": 0.24,
+"tipoPasto": null
+},
+{
+"nombre": "ESTABLO 8",
+"finca": "Normandia",
+"hectareas": 1.23,
+"tipoPasto": null
+},
+{
+"nombre": "ESTABLO 9",
+"finca": "Normandia",
+"hectareas": 6.7,
+"tipoPasto": null
+},
+{
+"nombre": "ESTABLO 10",
+"finca": "Normandia",
+"hectareas": 4.5,
+"tipoPasto": null
+},
+{
+"nombre": "ESTABLO 11",
+"finca": "Normandia",
+"hectareas": 4.2,
+"tipoPasto": null
+},
+{
+"nombre": "ESTABLO 12",
+"finca": "Normandia",
+"hectareas": 4.6,
+"tipoPasto": null
+},
+{
+"nombre": "GUAMERA 1",
+"finca": "Normandia",
+"hectareas": 1.99,
+"tipoPasto": null
+},
+{
+"nombre": "GUAMERA 2",
+"finca": "Normandia",
+"hectareas": 1.97,
+"tipoPasto": null
+},
+{
+"nombre": "GUAMERA 3",
+"finca": "Normandia",
+"hectareas": 1.8,
+"tipoPasto": null
+},
+{
+"nombre": "GUAMERA 4",
+"finca": "Normandia",
+"hectareas": 2.3,
+"tipoPasto": null
+},
+{
+"nombre": "GUAMERA 5",
+"finca": "Normandia",
+"hectareas": 2.4,
+"tipoPasto": null
+},
+{
+"nombre": "GUAMERA 6",
+"finca": "Normandia",
+"hectareas": 2.18,
+"tipoPasto": null
+},
+{
+"nombre": "GUAMERA 7",
+"finca": "Normandia",
+"hectareas": 1.78,
+"tipoPasto": null
+},
+{
+"nombre": "CUBARRO 1",
+"finca": "Normandia",
+"hectareas": 5.8,
+"tipoPasto": null
+},
+{
+"nombre": "CUBARRO 2",
+"finca": "Normandia",
+"hectareas": 4.9,
+"tipoPasto": null
+},
+{
+"nombre": "ALCARABAN 1",
+"finca": "Normandia",
+"hectareas": 3.3,
+"tipoPasto": null
+},
+{
+"nombre": "ALCARABAN 2",
+"finca": "Normandia",
+"hectareas": 2.75,
+"tipoPasto": null
+},
+{
+"nombre": "ALCARABAN 3",
+"finca": "Normandia",
+"hectareas": 2.33,
+"tipoPasto": null
+},
+{
+"nombre": "ALCARABAN 4",
+"finca": "Normandia",
+"hectareas": 2.66,
+"tipoPasto": null
+},
+{
+"nombre": "ALCARABAN 5",
+"finca": "Normandia",
+"hectareas": 2.0,
+"tipoPasto": null
+},
+{
+"nombre": "ALCARABAN 6",
+"finca": "Normandia",
+"hectareas": 1.87,
+"tipoPasto": null
+},
+{
+"nombre": "CACHIRRE 1",
+"finca": "Normandia",
+"hectareas": 2.2,
+"tipoPasto": null
+},
+{
+"nombre": "CACHIRRE 2",
+"finca": "Normandia",
+"hectareas": 2.1,
+"tipoPasto": null
+},
+{
+"nombre": "CACHIRRE 3",
+"finca": "Normandia",
+"hectareas": 2.1,
+"tipoPasto": null
+},
+{
+"nombre": "CACHIRRE 4",
+"finca": "Normandia",
+"hectareas": 2.53,
+"tipoPasto": null
+},
+{
+"nombre": "CACHIRRE 5",
+"finca": "Normandia",
+"hectareas": 3.2,
+"tipoPasto": null
+},
+{
+"nombre": "CACHIRRE 6",
+"finca": "Normandia",
+"hectareas": 3.45,
+"tipoPasto": null
+},
+{
+"nombre": "GOYO 1",
+"finca": "Normandia",
+"hectareas": 2.36,
+"tipoPasto": null
+},
+{
+"nombre": "GOYO 2",
+"finca": "Normandia",
+"hectareas": 3.14,
+"tipoPasto": null
+},
+{
+"nombre": "GOYO 3",
+"finca": "Normandia",
+"hectareas": 2.1,
+"tipoPasto": null
+},
+{
+"nombre": "GOYO 4",
+"finca": "Normandia",
+"hectareas": 2.7,
+"tipoPasto": null
+},
+{
+"nombre": "GOYO 5",
+"finca": "Normandia",
+"hectareas": 2.42,
+"tipoPasto": null
+},
+{
+"nombre": "GOYO 6",
+"finca": "Normandia",
+"hectareas": 2.72,
+"tipoPasto": null
+},
+{
+"nombre": "GOYO 7",
+"finca": "Normandia",
+"hectareas": 2.53,
+"tipoPasto": null
+},
+{
+"nombre": "GOYO 8",
+"finca": "Normandia",
+"hectareas": 2.11,
+"tipoPasto": null
+},
+{
+"nombre": "GOMEZ 1",
+"finca": "Normandia",
+"hectareas": 0.88,
+"tipoPasto": null
+},
+{
+"nombre": "GOMEZ 2",
+"finca": "Normandia",
+"hectareas": 0.88,
+"tipoPasto": null
+},
+{
+"nombre": "GOMEZ 3",
+"finca": "Normandia",
+"hectareas": 0.72,
+"tipoPasto": null
+},
+{
+"nombre": "GOMEZ 4",
+"finca": "Normandia",
+"hectareas": 0.63,
+"tipoPasto": null
+},
+{
+"nombre": "GOMEZ 5",
+"finca": "Normandia",
+"hectareas": 0.52,
+"tipoPasto": null
+},
+{
+"nombre": "GOMEZ 6",
+"finca": "Normandia",
+"hectareas": 0.51,
+"tipoPasto": null
+},
+{
+"nombre": "GOMEZ 7",
+"finca": "Normandia",
+"hectareas": 0.52,
+"tipoPasto": null
+},
+{
+"nombre": "GOMEZ 8",
+"finca": "Normandia",
+"hectareas": 0.59,
+"tipoPasto": null
+},
+{
+"nombre": "GOMEZ 9",
+"finca": "Normandia",
+"hectareas": 0.56,
+"tipoPasto": null
+},
+{
+"nombre": "GOMEZ 10",
+"finca": "Normandia",
+"hectareas": 0.54,
+"tipoPasto": null
+},
+{
+"nombre": "GOMEZ 11",
+"finca": "Normandia",
+"hectareas": 0.51,
+"tipoPasto": null
+},
+{
+"nombre": "GOMEZ 12",
+"finca": "Normandia",
+"hectareas": 0.51,
+"tipoPasto": null
 }
 ]
