@@ -1,7 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, crearLote, eliminarLote, crearUsuario, cambiarContrasena, eliminarUsuario } from '@/datos/repositorio'
+import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, crearLote, eliminarLote, crearUsuario, cambiarContrasena, eliminarUsuario, BloqueoError } from '@/datos/repositorio'
 
 function texto(form: FormData, clave: string): string {
   const v = form.get(clave)
@@ -15,6 +15,7 @@ function textoOpcional(form: FormData, clave: string): string | null {
 
 // Traduce errores de Prisma a un mensaje claro para el usuario.
 function mensajeError(e: unknown): string {
+  if (e instanceof BloqueoError) return e.message
   const code = (e as { code?: string })?.code
   if (code === 'P2002') return 'Ya existe un registro con ese nombre.'
   if (code === 'P2003' || code === 'P2014') return 'No se puede eliminar: está en uso.'

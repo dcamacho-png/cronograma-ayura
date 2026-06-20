@@ -137,7 +137,28 @@ export function actualizarActividad(id: string, descripcion: string, turno: stri
   })
 }
 
-export function eliminarArea(id: string) {
+// Error de bloqueo por integridad: lleva un mensaje claro para mostrar al usuario.
+export class BloqueoError extends Error {}
+
+export async function eliminarArea(id: string) {
+  const [usuarios, responsables, actividades, actividadesTarea, tareas, tareasSolic] = await Promise.all([
+    prisma.usuario.count({ where: { areaId: id } }),
+    prisma.responsable.count({ where: { areaId: id } }),
+    prisma.actividad.count({ where: { areaId: id } }),
+    prisma.actividad.count({ where: { areaTareaId: id } }),
+    prisma.tarea.count({ where: { areaId: id } }),
+    prisma.tarea.count({ where: { solicitadaPorAreaId: id } }),
+  ])
+  const partes: string[] = []
+  if (usuarios) partes.push(`${usuarios} usuario(s)`)
+  if (responsables) partes.push(`${responsables} responsable(s)`)
+  if (actividades + actividadesTarea) partes.push(`${actividades + actividadesTarea} actividad(es)`)
+  if (tareas + tareasSolic) partes.push(`${tareas + tareasSolic} tarea(s)`)
+  if (partes.length) {
+    throw new BloqueoError(
+      `No se puede eliminar el área: tiene ${partes.join(', ')}. Elimina o reasigna eso primero.`,
+    )
+  }
   return prisma.area.delete({ where: { id } })
 }
 export function eliminarFinca(id: string) {
@@ -149,7 +170,13 @@ export function eliminarMotivo(id: string) {
 export function eliminarMaquina(id: string) {
   return prisma.maquina.delete({ where: { id } })
 }
-export function eliminarResponsable(id: string) {
+export async function eliminarResponsable(id: string) {
+  const actividades = await prisma.actividad.count({ where: { responsableId: id } })
+  if (actividades) {
+    throw new BloqueoError(
+      `No se puede eliminar el responsable: tiene ${actividades} actividad(es) en el cronograma. Primero quita o reasigna esas actividades.`,
+    )
+  }
   return prisma.responsable.delete({ where: { id } })
 }
 
