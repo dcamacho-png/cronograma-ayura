@@ -28,7 +28,7 @@ export function FormRegistrar({
   const [estado, setEstado] = useState('')
   const [motivoId, setMotivoId] = useState('')
   const requiereMotivo = estado !== '' && estado !== 'CUMPLIDA'
-  const esCambio = motivoId !== '' && motivoId === motivoCambioId
+  const esCambio = estado !== '' && estado !== 'CUMPLIDA' && motivoId !== '' && motivoId === motivoCambioId
 
   return (
     <form action={accion} className="flex flex-wrap items-end gap-2">

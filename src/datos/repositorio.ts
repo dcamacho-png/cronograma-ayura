@@ -372,7 +372,10 @@ export async function registrarCumplimiento(
   const act = await prisma.actividad.findUnique({ where: { id }, include: { lotes: true } })
   if (!act || act.estado !== 'PENDIENTE') return null // ya registrada / bloqueada
   const notaFinal = reemplazo ? `Cambiada por: ${reemplazo.descripcion}` : nota
-  await prisma.actividad.update({ where: { id }, data: { estado, motivoId, nota: notaFinal, haRealizada } })
+  await prisma.actividad.update({
+    where: { id },
+    data: { estado, motivoId, nota: notaFinal, haRealizada: reemplazo ? null : haRealizada },
+  })
 
   // Novedad (todo lo que no es 100% cumplido): la tarea vuelve al banco sin semana,
   // conservando el contador. Solo aplica a tareas de UN día (única actividad en su semana).
