@@ -114,7 +114,14 @@ export function crearMaquina(nombre: string) {
 }
 
 export function listarResponsablesTodos() {
-  return prisma.responsable.findMany({ include: { area: true }, orderBy: { nombre: 'asc' } })
+  return prisma.responsable.findMany({
+    include: { area: true, _count: { select: { actividades: true } } },
+    orderBy: { nombre: 'asc' },
+  })
+}
+
+export function setResponsableActivo(id: string, activo: boolean) {
+  return prisma.responsable.update({ where: { id }, data: { activo } })
 }
 
 // Actividades de un conjunto de semanas (todas las áreas), para el tablero mensual.

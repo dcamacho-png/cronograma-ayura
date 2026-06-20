@@ -42,6 +42,7 @@ model Responsable {
   areaId      String
   area        Area        @relation(fields: [areaId], references: [id])
   actividades Actividad[]
+  activo      Boolean     @default(true)
 }
 
 model Maquina {
