@@ -13,7 +13,7 @@ export async function iniciarSesionAccion(form: FormData) {
     redirect('/login?error=1')
   }
   await crearSesion(u.id)
-  redirect('/programar')
+  redirect('/')
 }
 
 export async function cerrarSesionAccion() {
