@@ -2,11 +2,19 @@ import { cookies } from 'next/headers'
 import { createHmac } from 'crypto'
 import { prisma } from '@/datos/prisma'
 
-const SECRET = process.env.SESION_SECRET ?? 'cronograma-local-secret'
 const COOKIE = 'sesion'
 
+function obtenerSecreto(): string {
+  const s = process.env.SESION_SECRET
+  if (s) return s
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('SESION_SECRET no está configurado (requerido en producción)')
+  }
+  return 'cronograma-local-secret'
+}
+
 function firmar(id: string): string {
-  return createHmac('sha256', SECRET).update(id).digest('hex')
+  return createHmac('sha256', obtenerSecreto()).update(id).digest('hex')
 }
 
 export async function crearSesion(usuarioId: string) {
