@@ -1,23 +1,34 @@
 'use client'
 
 import { useState } from 'react'
+import { SelectFincaLote } from '../_componentes/select-finca-lote'
 
 type Motivo = { id: string; nombre: string }
+type Lote = { id: string; nombre: string; finca: { nombre: string } }
 
 export function FormRegistrar({
   actividadId,
   esMaquinaria,
   motivos,
+  motivoCambioId,
+  lotes,
+  maquinas,
+  haProgramada,
   accion,
 }: {
   actividadId: string
   esMaquinaria: boolean
   motivos: Motivo[]
+  motivoCambioId: string | null
+  lotes: Lote[]
+  maquinas: { id: string; nombre: string }[]
+  haProgramada: number
   accion: (formData: FormData) => void | Promise<void>
 }) {
   const [estado, setEstado] = useState('')
+  const [motivoId, setMotivoId] = useState('')
   const requiereMotivo = estado !== '' && estado !== 'CUMPLIDA'
-  const requiereHa = esMaquinaria && requiereMotivo
+  const esCambio = motivoId !== '' && motivoId === motivoCambioId
 
   return (
     <form action={accion} className="flex flex-wrap items-end gap-2">
@@ -40,7 +51,13 @@ export function FormRegistrar({
       </label>
       <label className="flex flex-col text-xs">
         Motivo{requiereMotivo ? ' *' : ''}
-        <select name="motivoId" required={requiereMotivo} className="rounded border p-1 text-sm">
+        <select
+          name="motivoId"
+          required={requiereMotivo}
+          value={motivoId}
+          onChange={(e) => setMotivoId(e.target.value)}
+          className="rounded border p-1 text-sm"
+        >
           <option value="">—</option>
           {motivos.map((m) => (
             <option key={m.id} value={m.id}>{m.nombre}</option>
@@ -53,16 +70,41 @@ export function FormRegistrar({
       </label>
       {esMaquinaria && (
         <label className="flex flex-col text-xs">
-          Ha faltantes{requiereHa ? ' *' : ''}
+          Hectáreas realizadas *
           <input
-            name="haFaltante"
+            name="haRealizada"
             type="number"
             step="0.1"
             min="0"
-            required={requiereHa}
-            className="w-24 rounded border p-1 text-sm"
+            required
+            defaultValue={haProgramada}
+            className="w-28 rounded border p-1 text-sm"
           />
         </label>
+      )}
+      {esCambio && (
+        <div className="flex w-full flex-wrap items-end gap-2 rounded border border-amber-200 bg-amber-50 p-2">
+          <span className="w-full text-xs font-semibold text-amber-800">Actividad que se hizo en su lugar</span>
+          <label className="flex flex-1 flex-col text-xs">
+            Descripción *
+            <input name="reemplazoDescripcion" required className="rounded border p-1 text-sm" />
+          </label>
+          <label className="flex flex-col text-xs">
+            Finca y lote
+            <SelectFincaLote lotes={lotes} name="reemplazoLoteId" />
+          </label>
+          {esMaquinaria && (
+            <label className="flex flex-col text-xs">
+              Máquina
+              <select name="reemplazoMaquinaId" className="rounded border p-1 text-sm">
+                <option value="">— sin máquina —</option>
+                {maquinas.map((m) => (
+                  <option key={m.id} value={m.id}>{m.nombre}</option>
+                ))}
+              </select>
+            </label>
+          )}
+        </div>
       )}
       <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">Registrar</button>
     </form>

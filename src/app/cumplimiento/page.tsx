@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { usuarioActual } from '@/auth/sesion'
-import { listarAreas, listarMotivos, listarActividades } from '@/datos/repositorio'
+import { listarAreas, listarMotivos, listarActividades, listarLotes, listarMaquinas } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana } from '@/dominio/semana'
 import { porcentajeCumplimiento, colorSemaforo } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
@@ -57,10 +57,13 @@ export default async function CumplimientoPage({
   const anio = sp.anio && Number.isInteger(anioRaw) ? anioRaw : hoy.anio
   const semana = sp.semana && Number.isInteger(semanaRaw) ? semanaRaw : hoy.semana
 
-  const [motivos, actividades] = await Promise.all([
+  const [motivos, actividades, lotes, maquinas] = await Promise.all([
     listarMotivos(),
     listarActividades(areaId, anio, semana),
+    listarLotes(),
+    listarMaquinas(),
   ])
+  const motivoCambioId = motivos.find((m) => m.nombre === 'Cambio de actividad')?.id ?? null
 
   const pendientes = actividades.filter((a) => a.estado === 'PENDIENTE').length
 
@@ -162,6 +165,10 @@ export default async function CumplimientoPage({
                   actividadId={a.id}
                   esMaquinaria={esMaquinaria}
                   motivos={motivos}
+                  motivoCambioId={motivoCambioId}
+                  lotes={lotes}
+                  maquinas={maquinas}
+                  haProgramada={a.lotes.reduce((s, l) => s + (l.hectareas ?? 0), 0)}
                   accion={registrarAccion}
                 />
               ) : (
