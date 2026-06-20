@@ -46,7 +46,7 @@ describe('actividadesConCambio', () => {
   })
 })
 
-import { extremosFinalizadas, conteoPorEstado, hectareasTrabajadasYFaltantes } from './resumen'
+import { extremosFinalizadas, conteoPorEstado, hectareasTrabajadasYFaltantes, hectareasRealizadas } from './resumen'
 
 describe('extremosFinalizadas', () => {
   it('devuelve quien más y quien menos finalizó (CUMPLIDA)', () => {
@@ -87,5 +87,20 @@ describe('hectareasTrabajadasYFaltantes', () => {
     ]
     // trabajadas = 10 + (8-3) = 15 ; faltantes = 3
     expect(hectareasTrabajadasYFaltantes(filas)).toEqual({ trabajadas: 15, faltantes: 3 })
+  })
+})
+
+describe('hectareasRealizadas', () => {
+  it('suma realizadas; cumplida sin valor = programada; pendiente se ignora; no cumplida sin valor = 0', () => {
+    const filas = [
+      { estado: 'CUMPLIDA', haProgramada: 10, haRealizada: null }, // 10 (cae a programada)
+      { estado: 'PARCIAL', haProgramada: 8, haRealizada: 5 }, // 5
+      { estado: 'NO_CUMPLIDA', haProgramada: 4, haRealizada: null }, // 0
+      { estado: 'PENDIENTE', haProgramada: 6, haRealizada: null }, // ignorado
+    ]
+    expect(hectareasRealizadas(filas)).toBe(15)
+  })
+  it('usa el valor realizado explícito aunque sea cumplida', () => {
+    expect(hectareasRealizadas([{ estado: 'CUMPLIDA', haProgramada: 10, haRealizada: 7 }])).toBe(7)
   })
 })

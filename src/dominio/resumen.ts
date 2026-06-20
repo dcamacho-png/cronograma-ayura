@@ -65,6 +65,17 @@ export interface FilaHa {
 
 const r1 = (n: number) => Math.round(n * 10) / 10
 
+export function hectareasRealizadas(
+  filas: { estado: string; haProgramada: number; haRealizada: number | null }[],
+): number {
+  let total = 0
+  for (const f of filas) {
+    if (f.estado === 'PENDIENTE') continue
+    total += f.haRealizada ?? (f.estado === 'CUMPLIDA' ? f.haProgramada : 0)
+  }
+  return r1(total)
+}
+
 // Hectáreas trabajadas vs faltantes (ignora PENDIENTE).
 export function hectareasTrabajadasYFaltantes(
   filas: FilaHa[],
