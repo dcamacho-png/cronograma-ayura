@@ -361,22 +361,21 @@ export function eliminarLote(id: string) {
   return prisma.lote.delete({ where: { id } })
 }
 
-// Registra el cumplimiento de una actividad PENDIENTE (la bloquea). Si no es CUMPLIDA,
-// devuelve la tarea de origen al banco (sin semana) para reprogramarla, conservando el contador.
 export async function registrarCumplimiento(
   id: string,
   estado: string,
   motivoId: string | null,
   nota: string | null,
-  haFaltante: number | null,
+  haRealizada: number | null,
+  reemplazo?: { descripcion: string; loteId: string | null; maquinaId: string | null } | null,
 ) {
   const act = await prisma.actividad.findUnique({ where: { id }, include: { lotes: true } })
   if (!act || act.estado !== 'PENDIENTE') return null // ya registrada / bloqueada
-  await prisma.actividad.update({ where: { id }, data: { estado, motivoId, nota, haFaltante } })
+  const notaFinal = reemplazo ? `Cambiada por: ${reemplazo.descripcion}` : nota
+  await prisma.actividad.update({ where: { id }, data: { estado, motivoId, nota: notaFinal, haRealizada } })
+
   // Novedad (todo lo que no es 100% cumplido): la tarea vuelve al banco sin semana,
-  // conservando el contador de reprogramaciones. El registro de esta semana queda en el historial.
-  // Solo aplica a tareas de UN día (única actividad en su semana). Si la tarea se programó en
-  // varios días, cada día es independiente y no se devuelve al banco automáticamente.
+  // conservando el contador. Solo aplica a tareas de UN día (única actividad en su semana).
   if (estado !== 'CUMPLIDA' && act.tareaId) {
     const enLaSemana = await prisma.actividad.count({
       where: { tareaId: act.tareaId, anio: act.anio, semana: act.semana },
@@ -384,15 +383,39 @@ export async function registrarCumplimiento(
     if (enLaSemana === 1) {
       await prisma.tarea.update({
         where: { id: act.tareaId },
-        data: {
-          estado: 'PENDIENTE',
-          anioSel: null,
-          semanaSel: null,
-          vecesReprogramada: act.vecesReprogramada + 1,
-        },
+        data: { estado: 'PENDIENTE', anioSel: null, semanaSel: null, vecesReprogramada: act.vecesReprogramada + 1 },
       })
     }
   }
+
+  // Cambio de actividad: crear la que SÍ se hizo, como cumplida, mismo día/responsable.
+  if (reemplazo && reemplazo.descripcion) {
+    let fincaId: string | null = null
+    let haReemplazo: number | null = null
+    if (reemplazo.loteId) {
+      const lote = await prisma.lote.findUnique({ where: { id: reemplazo.loteId } })
+      fincaId = lote?.fincaId ?? null
+      haReemplazo = lote?.hectareas ?? null
+    }
+    await prisma.actividad.create({
+      data: {
+        anio: act.anio,
+        semana: act.semana,
+        dia: act.dia,
+        descripcion: reemplazo.descripcion,
+        turno: act.turno,
+        estado: 'CUMPLIDA',
+        areaId: act.areaId,
+        fincaId,
+        responsableId: act.responsableId,
+        maquinaId: reemplazo.maquinaId,
+        haRealizada: haReemplazo,
+        nota: `En reemplazo de: ${act.descripcion}`,
+        lotes: reemplazo.loteId ? { connect: [{ id: reemplazo.loteId }] } : undefined,
+      },
+    })
+  }
+
   return true
 }
 

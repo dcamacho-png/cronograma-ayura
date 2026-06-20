@@ -44,10 +44,17 @@ export async function registrarAccion(form: FormData) {
   const estado = texto(form, 'estado')
   if (!id || !ESTADOS_VALIDOS.includes(estado) || estado === 'PENDIENTE') return
   const motivoId = textoOpcional(form, 'motivoId')
-  // motivo obligatorio cuando NO es cumplida
   if (estado !== 'CUMPLIDA' && !motivoId) return
   const nota = textoOpcional(form, 'nota')
-  const haFaltante = numeroOpcional(form, 'haFaltante')
-  await registrarCumplimiento(id, estado, motivoId, nota, haFaltante)
+  const haRealizada = numeroOpcional(form, 'haRealizada')
+  const reemplazoDescripcion = textoOpcional(form, 'reemplazoDescripcion')
+  const reemplazo = reemplazoDescripcion
+    ? {
+        descripcion: reemplazoDescripcion,
+        loteId: textoOpcional(form, 'reemplazoLoteId'),
+        maquinaId: textoOpcional(form, 'reemplazoMaquinaId'),
+      }
+    : null
+  await registrarCumplimiento(id, estado, motivoId, nota, haRealizada, reemplazo)
   revalidatePath('/cumplimiento')
 }

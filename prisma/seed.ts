@@ -15,6 +15,7 @@ const MOTIVOS = [
   'Falta de personal',
   'Falta de insumos',
   'Cambio de prioridad',
+  'Cambio de actividad',
   'Otro',
 ]
 
