@@ -25,7 +25,7 @@ export default async function ExportarPage({
   const datos = await Promise.all(
     areas.map(async (a) => ({
       area: a,
-      responsables: await listarResponsablesPorArea(a.id),
+      responsables: (await listarResponsablesPorArea(a.id)).filter((r) => r.activo),
       actividades: await listarActividades(a.id, anio, semana),
     })),
   )
