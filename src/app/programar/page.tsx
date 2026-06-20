@@ -54,8 +54,9 @@ export default async function ProgramarPage({
   ])
   const esMaquinaria = areaActual.nombre.toLowerCase().includes('maquinaria')
   const responsablesActivos = responsables.filter((r) => r.activo)
+  const actividadesCronograma = actividades.filter((a) => !a.noProgramada)
   // Ocupación en la semana: máquina y responsable usados en cada día+turno.
-  const ocupacion = actividades.map((a) => ({
+  const ocupacion = actividadesCronograma.map((a) => ({
     dia: a.dia,
     turno: a.turno,
     maquinaId: a.maquinaId,
@@ -169,7 +170,7 @@ export default async function ProgramarPage({
           semana={semana}
           fechas={fechas}
           responsables={responsablesActivos}
-          actividades={actividades}
+          actividades={actividadesCronograma}
         />
       </div>
     </main>

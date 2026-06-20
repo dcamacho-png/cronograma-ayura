@@ -26,7 +26,7 @@ export default async function ExportarPage({
     areas.map(async (a) => ({
       area: a,
       responsables: (await listarResponsablesPorArea(a.id)).filter((r) => r.activo),
-      actividades: await listarActividades(a.id, anio, semana),
+      actividades: (await listarActividades(a.id, anio, semana)).filter((act) => !act.noProgramada),
     })),
   )
 

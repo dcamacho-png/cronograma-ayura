@@ -36,6 +36,7 @@ type ActividadResumen = {
   maquina: { nombre: string } | null
   responsable: { nombre: string }
   motivo: { nombre: string } | null
+  noProgramada: boolean
 }
 
 export function ResumenArea({
@@ -62,6 +63,7 @@ export function ResumenArea({
   const { mas, menos } = extremosFinalizadas(dominio)
   const motivosTop = motivosFrecuentes(dominio)
   const cambios = actividadesConCambio(dominio) as unknown as ActividadResumen[]
+  const nuevas = actividades.filter((a) => a.noProgramada)
 
   const nombrePorId = new Map(responsables.map((r) => [r.id, r.nombre]))
   const nombreResp = (id: string) => nombrePorId.get(id) ?? 'Responsable'
@@ -203,6 +205,23 @@ export function ResumenArea({
               <li key={desc} className="flex justify-between rounded border px-3 py-1">
                 <span>{desc}</span>
                 <b>{(Math.round(haRealizada * 10) / 10)} ha</b>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {nuevas.length > 0 && (
+        <div className="mb-8">
+          <h2 className="mb-2 text-lg font-semibold">🆕 Actividades nuevas (no programadas) ({nuevas.length})</h2>
+          <ul className="space-y-1 text-sm">
+            {nuevas.map((a) => (
+              <li key={a.id} className="rounded border px-3 py-1">
+                {a.descripcion}
+                <span className="text-gray-500"> · {a.responsable.nombre}</span>
+                {a.lotes.length > 0 ? (
+                  <span className="text-gray-500"> · 📍 {a.lotes.map((l) => l.nombre).join(', ')}</span>
+                ) : null}
               </li>
             ))}
           </ul>
