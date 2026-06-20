@@ -69,6 +69,24 @@ export default async function ResumenPage({
         <Link href={url(areaId, previa.anio, previa.semana)} className="rounded border px-3 py-1 text-sm">← Semana {previa.semana}</Link>
         <span className="font-semibold">Semana {semana} · {anio}</span>
         <Link href={url(areaId, proxima.anio, proxima.semana)} className="rounded border px-3 py-1 text-sm">Semana {proxima.semana} →</Link>
+        <a
+          href={`/resumen/exportar?area=${areaId}&anio=${anio}&semana=${semana}`}
+          target="_blank"
+          rel="noopener"
+          className="rounded border border-purple-700 px-3 py-1 text-sm font-semibold text-purple-700 hover:bg-purple-50"
+        >
+          🖨️ Exportar PDF
+        </a>
+        {esAdmin && (
+          <a
+            href={`/resumen/exportar?todas=1&anio=${anio}&semana=${semana}`}
+            target="_blank"
+            rel="noopener"
+            className="rounded border border-purple-700 px-3 py-1 text-sm font-semibold text-purple-700 hover:bg-purple-50"
+          >
+            🖨️ Exportar PDF (todas las áreas)
+          </a>
+        )}
       </div>
 
       <ResumenArea

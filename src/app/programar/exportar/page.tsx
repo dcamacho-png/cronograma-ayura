@@ -3,7 +3,7 @@ import { usuarioActual } from '@/auth/sesion'
 import { listarAreas, listarResponsablesPorArea, listarActividades } from '@/datos/repositorio'
 import { semanaActual, fechasDeSemana } from '@/dominio/semana'
 import { GrillaSemana } from '../grilla-semana'
-import { AutoImprimir } from './auto-imprimir'
+import { AutoImprimir } from '../../_componentes/auto-imprimir'
 
 export default async function ExportarPage({
   searchParams,
