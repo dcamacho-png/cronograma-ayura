@@ -1,11 +1,12 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { usuarioActual } from '@/auth/sesion'
-import { listarAreas, listarMotivos, listarActividades, listarLotes, listarMaquinas } from '@/datos/repositorio'
+import { listarAreas, listarMotivos, listarActividades, listarLotes, listarMaquinas, listarResponsablesPorArea } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana } from '@/dominio/semana'
 import { porcentajeCumplimiento, colorSemaforo } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
-import { registrarAccion } from './acciones'
+import { registrarAccion, agregarActividadRealizadaAccion } from './acciones'
+import { FormActividadRealizada } from './form-actividad-realizada'
 import { InfoLotes } from '../_componentes/info-lotes'
 import { FormRegistrar } from './form-registrar'
 
@@ -57,12 +58,14 @@ export default async function CumplimientoPage({
   const anio = sp.anio && Number.isInteger(anioRaw) ? anioRaw : hoy.anio
   const semana = sp.semana && Number.isInteger(semanaRaw) ? semanaRaw : hoy.semana
 
-  const [motivos, actividades, lotes, maquinas] = await Promise.all([
+  const [motivos, actividades, lotes, maquinas, responsablesTodos] = await Promise.all([
     listarMotivos(),
     listarActividades(areaId, anio, semana),
     listarLotes(),
     listarMaquinas(),
+    listarResponsablesPorArea(areaId),
   ])
+  const responsables = responsablesTodos.filter((r) => r.activo)
   const motivoCambioId = motivos.find((m) => m.nombre === 'Cambio de actividad')?.id ?? null
 
   const pendientes = actividades.filter((a) => a.estado === 'PENDIENTE').length
@@ -133,6 +136,19 @@ export default async function CumplimientoPage({
         <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
           ⚠️ Faltan <b>{pendientes}</b> actividad(es) por registrar esta semana. Regístralas para pasar a la siguiente semana.
         </div>
+      )}
+
+      {responsables.length > 0 && (
+        <FormActividadRealizada
+          areaId={areaId}
+          anio={anio}
+          semana={semana}
+          esMaquinaria={esMaquinaria}
+          responsables={responsables}
+          lotes={lotes}
+          maquinas={maquinas}
+          accion={agregarActividadRealizadaAccion}
+        />
       )}
 
       {actividades.length === 0 ? (
