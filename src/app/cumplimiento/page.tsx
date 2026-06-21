@@ -4,6 +4,7 @@ import { usuarioActual } from '@/auth/sesion'
 import { listarAreas, listarMotivos, listarActividades, listarLotes, listarMaquinas, listarResponsablesPorArea, listarActividadesEstipuladas } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana } from '@/dominio/semana'
 import { unidadDe } from '@/dominio/unidad'
+import { textoLotesHechos } from '@/dominio/lotes-hechos'
 import { porcentajeCumplimiento, colorSemaforo } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
 import { registrarAccion, agregarActividadRealizadaAccion } from './acciones'
@@ -206,6 +207,7 @@ export default async function CumplimientoPage({
                   maquinas={maquinas}
                   estipuladas={estipuladas}
                   haProgramada={a.lotes.reduce((s, l) => s + (l.hectareas ?? 0), 0)}
+                  lotesActividad={a.lotes}
                   accion={registrarAccion}
                 />
               ) : (
@@ -214,6 +216,9 @@ export default async function CumplimientoPage({
                   {a.motivo && <span className="text-gray-500">· {a.motivo.nombre}</span>}
                   {a.nota && <span className="text-gray-500">· {a.nota}</span>}
                   {a.centroCosto && <span className="text-gray-500">· 🏷️ {a.centroCosto}</span>}
+                  {textoLotesHechos(a.lotes, a.lotesHechos as string[] | null) && (
+                    <span className="text-gray-500">· ✅ Realizados: {textoLotesHechos(a.lotes, a.lotesHechos as string[] | null)}</span>
+                  )}
                   <span className="text-xs text-gray-400">🔒 registrada</span>
                 </div>
               )}

@@ -76,6 +76,7 @@ export async function registrarAccion(form: FormData) {
   const haRealizada = numeroOpcional(form, 'haRealizada')
   const centroSelect = texto(form, 'centroCosto')
   const centroCosto = centroSelect === '__otra__' ? textoOpcional(form, 'centroCostoOtra') : (centroSelect || null)
+  const lotesHechos = form.getAll('loteHecho').map((v) => String(v))
   // La descripción del reemplazo (maquinaria) puede venir del catálogo o ser "__otra__" (texto libre).
   const reemplazoSelect = texto(form, 'reemplazoDescripcion')
   const reemplazoDescripcion = reemplazoSelect === '__otra__' ? textoOpcional(form, 'reemplazoDescripcionOtra') : (reemplazoSelect || null)
@@ -87,6 +88,6 @@ export async function registrarAccion(form: FormData) {
         medida: numeroOpcional(form, 'reemplazoMedida'),
       }
     : null
-  await registrarCumplimiento(id, estado, motivoId, nota, haRealizada, reemplazo, centroCosto)
+  await registrarCumplimiento(id, estado, motivoId, nota, haRealizada, reemplazo, centroCosto, lotesHechos)
   revalidatePath('/cumplimiento')
 }

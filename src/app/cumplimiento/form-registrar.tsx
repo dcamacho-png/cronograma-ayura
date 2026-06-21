@@ -19,6 +19,7 @@ export function FormRegistrar({
   maquinas,
   estipuladas,
   haProgramada,
+  lotesActividad,
   accion,
 }: {
   actividadId: string
@@ -30,6 +31,7 @@ export function FormRegistrar({
   maquinas: { id: string; nombre: string }[]
   estipuladas: Estipulada[]
   haProgramada: number
+  lotesActividad: { id: string; nombre: string }[]
   accion: (formData: FormData) => void | Promise<void>
 }) {
   const [estado, setEstado] = useState('')
@@ -37,6 +39,7 @@ export function FormRegistrar({
   const [reemplazoDesc, setReemplazoDesc] = useState('')
   const [centroCosto, setCentroCosto] = useState('')
   const requiereMotivo = estado !== '' && estado !== 'CUMPLIDA'
+  const requierePotreros = (estado === 'PARCIAL' || estado === 'REPROGRAMADA') && lotesActividad.length > 1
   const esCambio = estado !== '' && estado !== 'CUMPLIDA' && motivoId !== '' && motivoId === motivoCambioId
 
   // Unidad de la actividad de reemplazo elegida ("Otra"/vacío ⇒ ha).
@@ -117,6 +120,19 @@ export function FormRegistrar({
           Otras (texto libre)
           <input name="centroCostoOtra" className="w-40 rounded border p-1 text-sm" />
         </label>
+      )}
+      {requierePotreros && (
+        <div className="flex w-full flex-col gap-1 rounded border border-gray-200 bg-gray-50 p-2 text-xs">
+          <span className="font-semibold text-gray-700">¿En cuáles potreros se realizó? (opcional)</span>
+          <div className="flex flex-wrap gap-3">
+            {lotesActividad.map((l) => (
+              <label key={l.id} className="flex items-center gap-1">
+                <input type="checkbox" name="loteHecho" value={l.id} className="accent-[#11603a]" />
+                {l.nombre}
+              </label>
+            ))}
+          </div>
+        </div>
       )}
       {esCambio && (
         <div className="flex w-full flex-wrap items-end gap-2 rounded border border-amber-200 bg-amber-50 p-2">
