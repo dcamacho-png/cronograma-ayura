@@ -46,7 +46,7 @@ describe('actividadesConCambio', () => {
   })
 })
 
-import { extremosFinalizadas, conteoPorEstado, hectareasRealizadas } from './resumen'
+import { extremosFinalizadas, conteoPorEstado, hectareasRealizadas, medidasPorUnidad } from './resumen'
 
 describe('extremosFinalizadas', () => {
   it('devuelve quien más y quien menos finalizó (CUMPLIDA)', () => {
@@ -91,5 +91,20 @@ describe('hectareasRealizadas', () => {
   })
   it('usa el valor realizado explícito aunque sea cumplida', () => {
     expect(hectareasRealizadas([{ estado: 'CUMPLIDA', haProgramada: 10, haRealizada: 7 }])).toBe(7)
+  })
+})
+
+describe('medidasPorUnidad', () => {
+  it('totaliza por unidad, ignora PENDIENTE y solo deriva de ha programada en ha CUMPLIDA', () => {
+    const tot = medidasPorUnidad([
+      { estado: 'CUMPLIDA', haProgramada: 3, haRealizada: null, unidad: 'ha' },   // 3 ha (derivada)
+      { estado: 'CUMPLIDA', haProgramada: 3, haRealizada: 2, unidad: 'ha' },      // 2 ha (medida gana)
+      { estado: 'CUMPLIDA', haProgramada: 5, haRealizada: 6, unidad: 'hora' },    // 6 horas
+      { estado: 'CUMPLIDA', haProgramada: 5, haRealizada: null, unidad: 'hora' }, // 0 (no se deriva en hora)
+      { estado: 'CUMPLIDA', haProgramada: 0, haRealizada: 100, unidad: 'kg' },    // 100 kg
+      { estado: 'PENDIENTE', haProgramada: 9, haRealizada: 9, unidad: 'ha' },     // ignorada
+      { estado: 'PARCIAL', haProgramada: 4, haRealizada: 1, unidad: 'ha' },       // 1 ha
+    ])
+    expect(tot).toEqual({ ha: 6, hora: 6, kg: 100 })
   })
 })

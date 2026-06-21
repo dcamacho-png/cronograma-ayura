@@ -1,4 +1,5 @@
 import type { Actividad } from './tipos'
+import type { Unidad } from './unidad'
 
 export type ColorPorcentaje = 'gris' | 'verde' | 'amarillo' | 'rojo'
 
@@ -68,4 +69,19 @@ export function hectareasRealizadas(
     total += f.haRealizada ?? (f.estado === 'CUMPLIDA' ? f.haProgramada : 0)
   }
   return r1(total)
+}
+
+// Totaliza la medida realizada por unidad. La medida explícita (haRealizada)
+// gana; si no hay, solo se deriva de la ha programada cuando la unidad es 'ha'
+// y la actividad está CUMPLIDA. Las PENDIENTE se ignoran.
+export function medidasPorUnidad(
+  filas: { estado: string; haProgramada: number; haRealizada: number | null; unidad: Unidad }[],
+): Record<Unidad, number> {
+  const tot: Record<Unidad, number> = { ha: 0, hora: 0, kg: 0 }
+  for (const f of filas) {
+    if (f.estado === 'PENDIENTE') continue
+    const medida = f.haRealizada ?? (f.unidad === 'ha' && f.estado === 'CUMPLIDA' ? f.haProgramada : 0)
+    tot[f.unidad] += medida
+  }
+  return { ha: r1(tot.ha), hora: r1(tot.hora), kg: r1(tot.kg) }
 }
