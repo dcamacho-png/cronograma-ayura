@@ -109,7 +109,7 @@ export function FormActividadRealizada({
           </label>
           <label className="flex flex-col text-xs">
             {etiquetaMedida(unidadSel)} (opcional)
-            <input name="medida" type="number" step="0.1" min="0" className="w-28 rounded border p-1 text-sm" />
+            <input name="medida" type="number" step="any" min="0" className="w-28 rounded border p-1 text-sm" />
           </label>
           <label className="flex flex-col text-xs">
             Centro de costo
