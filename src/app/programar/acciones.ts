@@ -85,7 +85,7 @@ export async function actualizarActividadAccion(form: FormData) {
 
 export async function asignarTareaAccion(form: FormData) {
   const tareaId = texto(form, 'tareaId')
-  const responsableId = texto(form, 'responsableId')
+  const responsableIds = form.getAll('responsableId').map((v) => String(v)).filter(Boolean)
   const anioForm = Number(texto(form, 'anio'))
   const semanaForm = Number(texto(form, 'semana'))
   const hoy = { ...semanaActual(), dia: diaActual() }
@@ -101,8 +101,8 @@ export async function asignarTareaAccion(form: FormData) {
     const m = textoOpcional(form, `maquina_${dia}`)
     maquinaPorDia[dia] = m || null
   }
-  if (!tareaId || !responsableId || dias.length === 0) return
-  const res = await asignarTarea(tareaId, responsableId, dias, loteId, turno, maquinaPorDia)
+  if (!tareaId || responsableIds.length === 0 || dias.length === 0) return
+  const res = await asignarTarea(tareaId, responsableIds, dias, loteId, turno, maquinaPorDia)
   if (res.ok === false && res.motivo === 'conflicto') {
     const partes = res.conflictos.map((c) =>
       c.tipo === 'responsable'

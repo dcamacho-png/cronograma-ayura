@@ -247,7 +247,7 @@ export function tareasPorAsignar(areaId: string, anio: number, semana: number) {
 // (mismo responsable, lote y turno) y marca la tarea como PROGRAMADA.
 export async function asignarTarea(
   tareaId: string,
-  responsableId: string,
+  responsableIds: string[],
   dias: number[],
   loteIdFallback: string | null,
   turno: string,
@@ -277,36 +277,41 @@ export async function asignarTarea(
       where: { anio, semana, dia: { in: diasUnicos } },
       select: { dia: true, turno: true, maquinaId: true, responsableId: true },
     })
-    const conflictos = detectarConflictosAsignacion(
-      existentes,
-      diasUnicos,
-      responsableId,
-      maquinaPorDia,
-      turno,
+    const conflictosRaw = responsableIds.flatMap((rid) =>
+      detectarConflictosAsignacion(existentes, diasUnicos, rid, maquinaPorDia, turno),
     )
+    const vistos = new Set<string>()
+    const conflictos = conflictosRaw.filter((c) => {
+      const k = `${c.dia}-${c.tipo}`
+      if (vistos.has(k)) return false
+      vistos.add(k)
+      return true
+    })
     if (conflictos.length > 0) {
       return { ok: false as const, motivo: 'conflicto' as const, conflictos }
     }
     let creadas = 0
-    for (const dia of diasUnicos) {
-      await tx.actividad.create({
-        data: {
-          anio,
-          semana,
-          dia,
-          descripcion: tarea.descripcion,
-          turno: turno.trim() || turnoPorDia(dia),
-          vecesReprogramada: tarea.vecesReprogramada,
-          areaId: tarea.areaId,
-          fincaId,
-          responsableId,
-          maquinaId: maquinaPorDia[dia] ?? null,
-          tareaId: tarea.id,
-          lotes: { connect: loteIds.map((id) => ({ id })) },
-          ...(tarea.bultosPorLote != null ? { bultosPorLote: tarea.bultosPorLote as Prisma.InputJsonValue } : {}),
-        },
-      })
-      creadas += 1
+    for (const rid of responsableIds) {
+      for (const dia of diasUnicos) {
+        await tx.actividad.create({
+          data: {
+            anio,
+            semana,
+            dia,
+            descripcion: tarea.descripcion,
+            turno: turno.trim() || turnoPorDia(dia),
+            vecesReprogramada: tarea.vecesReprogramada,
+            areaId: tarea.areaId,
+            fincaId,
+            responsableId: rid,
+            maquinaId: maquinaPorDia[dia] ?? null,
+            tareaId: tarea.id,
+            lotes: { connect: loteIds.map((id) => ({ id })) },
+            ...(tarea.bultosPorLote != null ? { bultosPorLote: tarea.bultosPorLote as Prisma.InputJsonValue } : {}),
+          },
+        })
+        creadas += 1
+      }
     }
     await tx.tarea.update({ where: { id: tarea.id }, data: { estado: 'PROGRAMADA' } })
     return { ok: true as const, creadas }

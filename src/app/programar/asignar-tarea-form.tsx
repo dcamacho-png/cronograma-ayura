@@ -40,7 +40,9 @@ export function AsignarTareaForm({
 }) {
   const [turno, setTurno] = useState(turnoPorDia(1))
   const [dias, setDias] = useState<number[]>([])
-  const [responsableId, setResponsableId] = useState(responsables[0]?.id ?? '')
+  const [responsableIds, setResponsableIds] = useState<string[]>(responsables[0] ? [responsables[0].id] : [])
+  const toggleResp = (id: string) =>
+    setResponsableIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
   const tieneLotes = lotesTarea.length > 0
 
   const toggleDia = (d: number) => {
@@ -48,17 +50,16 @@ export function AsignarTareaForm({
     setDias((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]))
   }
 
-  // Aviso en vivo: días en que el responsable elegido ya tiene tarea ese turno.
-  const diasOcupadosResp = [...dias]
-    .sort((a, b) => a - b)
-    .filter((d) =>
-      ocupacion.some(
-        (o) =>
-          o.dia === d &&
-          o.turno === turnoEfectivo(turno, d) &&
-          o.responsableId === responsableId,
-      ),
-    )
+  const conflictosResp = responsableIds.flatMap((rid) =>
+    [...dias]
+      .sort((a, b) => a - b)
+      .filter((d) =>
+        ocupacion.some(
+          (o) => o.dia === d && o.turno === turnoEfectivo(turno, d) && o.responsableId === rid,
+        ),
+      )
+      .map((d) => ({ rid, dia: d })),
+  )
 
   return (
     <form action={accion} className="flex flex-wrap items-end gap-2">
@@ -67,20 +68,27 @@ export function AsignarTareaForm({
       <input type="hidden" name="anio" value={anio} />
       <input type="hidden" name="semana" value={semana} />
       <span className="min-w-[160px] flex-1 font-medium">{descripcion}</span>
-      <label className="flex flex-col text-xs">
-        Responsable
-        <select
-          name="responsableId"
-          required
-          value={responsableId}
-          onChange={(e) => setResponsableId(e.target.value)}
-          className="rounded border p-1 text-sm"
-        >
+      <div className="flex flex-col text-xs">
+        Responsables
+        <div className="flex flex-wrap gap-1">
           {responsables.map((r) => (
-            <option key={r.id} value={r.id}>{r.nombre}</option>
+            <label
+              key={r.id}
+              className="flex cursor-pointer items-center gap-1 rounded border px-1.5 py-0.5 has-[:checked]:border-[#11603a] has-[:checked]:bg-green-50"
+            >
+              <input
+                type="checkbox"
+                name="responsableId"
+                value={r.id}
+                checked={responsableIds.includes(r.id)}
+                onChange={() => toggleResp(r.id)}
+                className="accent-[#11603a]"
+              />
+              {r.nombre}
+            </label>
           ))}
-        </select>
-      </label>
+        </div>
+      </div>
       <div className="flex flex-col text-xs">
         Días
         <div className="flex gap-1">
@@ -146,9 +154,9 @@ export function AsignarTareaForm({
           })}
         </div>
       )}
-      {diasOcupadosResp.length > 0 && (
+      {conflictosResp.length > 0 && (
         <p className="w-full text-xs font-medium text-red-700">
-          ⚠️ {responsables.find((r) => r.id === responsableId)?.nombre ?? 'El responsable'} ya tiene tarea en ese turno: {diasOcupadosResp.map((d) => DIAS[d - 1]).join(', ')}
+          ⚠️ Conflicto de turno: {conflictosResp.map((c) => `${responsables.find((r) => r.id === c.rid)?.nombre ?? ''} (${DIAS[c.dia - 1]})`).join(', ')}
         </p>
       )}
       {tieneLotes ? (
@@ -160,7 +168,7 @@ export function AsignarTareaForm({
         </label>
       )}
       <button
-        disabled={diasOcupadosResp.length > 0}
+        disabled={responsableIds.length === 0 || conflictosResp.length > 0}
         className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
       >
         Asignar →
