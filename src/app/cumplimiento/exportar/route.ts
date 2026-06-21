@@ -4,6 +4,7 @@ import { usuarioActual } from '@/auth/sesion'
 import { listarAreas, listarActividades, listarActividadesEstipuladas } from '@/datos/repositorio'
 import { fechasDeSemana } from '@/dominio/semana'
 import { COLUMNAS_CUMPLIMIENTO, filaCumplimiento } from '@/dominio/cumplimiento-export'
+import type { BultosPorLote } from '@/dominio/bultos'
 
 // exceljs necesita runtime Node (no edge).
 export const runtime = 'nodejs'
@@ -43,7 +44,7 @@ export async function GET(req: NextRequest) {
   header.font = { bold: true }
   for (const a of actividades) {
     const fecha = fechas[a.dia - 1] ? fmtFecha(fechas[a.dia - 1]) : ''
-    ws.addRow(filaCumplimiento(a, fecha, unidadPorNombre))
+    ws.addRow(filaCumplimiento({ ...a, bultosPorLote: a.bultosPorLote as BultosPorLote | null }, fecha, unidadPorNombre))
   }
 
   const buffer = await wb.xlsx.writeBuffer()
