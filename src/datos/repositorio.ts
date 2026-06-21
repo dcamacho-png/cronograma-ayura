@@ -203,6 +203,7 @@ export async function crearTarea(
   descripcion: string,
   loteIds: string[],
   bultosPorLote: Record<string, number> | null = null,
+  detalle: string | null = null,
 ) {
   let fincaId: string | null = null
   if (loteIds.length > 0) {
@@ -214,6 +215,7 @@ export async function crearTarea(
       areaId,
       descripcion,
       fincaId,
+      detalle,
       lotes: { connect: loteIds.map((id) => ({ id })) },
       ...(bultosPorLote ? { bultosPorLote } : {}),
     },
@@ -449,12 +451,14 @@ export function crearSolicitud(
   solicitadaPorAreaId: string,
   loteIds: string[],
   bultosPorLote: Record<string, number> | null = null,
+  detalle: string | null = null,
 ) {
   return prisma.tarea.create({
     data: {
       areaId: areaEjecutoraId,
       descripcion,
       solicitadaPorAreaId,
+      detalle,
       lotes: { connect: loteIds.map((id) => ({ id })) },
       ...(bultosPorLote ? { bultosPorLote } : {}),
     },
@@ -465,7 +469,7 @@ export function crearSolicitud(
 export function listarSolicitudesDeArea(areaId: string) {
   return prisma.tarea.findMany({
     where: { solicitadaPorAreaId: areaId },
-    include: { area: true },
+    include: { area: true, lotes: true },
     orderBy: { descripcion: 'asc' },
   })
 }

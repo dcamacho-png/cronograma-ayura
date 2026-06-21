@@ -122,6 +122,7 @@ model Tarea {
   lote        Lote?       @relation("TareaLoteUnico", fields: [loteId], references: [id])
   lotes       Lote[]      @relation("TareaLotesMulti")
   bultosPorLote Json?
+  detalle String?
 
   actividades Actividad[]
 
