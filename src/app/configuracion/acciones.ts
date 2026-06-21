@@ -112,7 +112,9 @@ export async function cambiarEstadoResponsableAccion(form: FormData) {
 export async function crearActividadEstipuladaAccion(form: FormData) {
   const nombre = texto(form, 'nombre')
   if (!nombre) faltanDatos()
-  await correr(() => crearActividadEstipulada(nombre), 'Actividad agregada.')
+  const unidadRaw = texto(form, 'unidad')
+  const unidad = unidadRaw === 'hora' || unidadRaw === 'kg' ? unidadRaw : 'ha'
+  await correr(() => crearActividadEstipulada(nombre, unidad), 'Actividad agregada.')
 }
 
 export async function eliminarActividadEstipuladaAccion(form: FormData) {

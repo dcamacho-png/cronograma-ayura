@@ -167,12 +167,18 @@ export default async function ConfiguracionPage({
                   <input name="nombre" defaultValue={e.nombre} className="flex-1 rounded border p-1 text-sm" />
                   <button className="text-xs font-semibold text-[#11603a] hover:underline">guardar</button>
                 </form>
+                <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">{e.unidad}</span>
                 <FormEliminar accion={eliminarActividadEstipuladaAccion} id={e.id} etiqueta={e.nombre} />
               </li>
             ))}
           </ul>
-          <form action={crearActividadEstipuladaAccion} className="flex gap-2">
+          <form action={crearActividadEstipuladaAccion} className="flex flex-wrap gap-2">
             <input name="nombre" required placeholder="Nueva actividad de maquinaria" className="flex-1 rounded border p-2 text-sm" />
+            <select name="unidad" defaultValue="ha" className="rounded border p-2 text-sm">
+              <option value="ha">Ha</option>
+              <option value="hora">Hora</option>
+              <option value="kg">Kg</option>
+            </select>
             <button className="rounded bg-[#11603a] px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
           </form>
         </section>
