@@ -131,6 +131,10 @@ export function ResumenArea({
             <div className="text-2xl font-extrabold text-[#2e9e5b]">{totalUnidades || '—'}</div>
           </div>
         )}
+        <div className="rounded-2xl border p-5">
+          <div className="mb-1 text-sm text-gray-500">Nuevas (no programadas)</div>
+          <div className="text-4xl font-extrabold">{nuevas.length}</div>
+        </div>
       </div>
 
       {/* Detalle por estado */}
