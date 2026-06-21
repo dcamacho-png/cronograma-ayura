@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { SelectFincaLote } from '../_componentes/select-finca-lote'
 import { etiquetaMedida, normalizarUnidad, type Unidad } from '@/dominio/unidad'
+import { CENTROS_COSTO } from '@/dominio/centro-costo'
 
 type Motivo = { id: string; nombre: string }
 type Lote = { id: string; nombre: string; finca: { nombre: string } }
@@ -34,6 +35,7 @@ export function FormRegistrar({
   const [estado, setEstado] = useState('')
   const [motivoId, setMotivoId] = useState('')
   const [reemplazoDesc, setReemplazoDesc] = useState('')
+  const [centroCosto, setCentroCosto] = useState('')
   const requiereMotivo = estado !== '' && estado !== 'CUMPLIDA'
   const esCambio = estado !== '' && estado !== 'CUMPLIDA' && motivoId !== '' && motivoId === motivoCambioId
 
@@ -91,6 +93,29 @@ export function FormRegistrar({
             defaultValue={haProgramada}
             className="w-28 rounded border p-1 text-sm"
           />
+        </label>
+      )}
+      {esMaquinaria && (
+        <label className="flex flex-col text-xs">
+          Centro de costo
+          <select
+            name="centroCosto"
+            value={centroCosto}
+            onChange={(e) => setCentroCosto(e.target.value)}
+            className="rounded border p-1 text-sm"
+          >
+            <option value="">— sin centro —</option>
+            {CENTROS_COSTO.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+            <option value="__otra__">Otras…</option>
+          </select>
+        </label>
+      )}
+      {esMaquinaria && centroCosto === '__otra__' && (
+        <label className="flex flex-col text-xs">
+          Otras (texto libre)
+          <input name="centroCostoOtra" className="w-40 rounded border p-1 text-sm" />
         </label>
       )}
       {esCambio && (

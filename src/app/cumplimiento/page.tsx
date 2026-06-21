@@ -213,6 +213,7 @@ export default async function CumplimientoPage({
                   <span className="font-semibold">{ESTADOS.find((e) => e.valor === a.estado)?.etiqueta ?? a.estado}</span>
                   {a.motivo && <span className="text-gray-500">· {a.motivo.nombre}</span>}
                   {a.nota && <span className="text-gray-500">· {a.nota}</span>}
+                  {a.centroCosto && <span className="text-gray-500">· 🏷️ {a.centroCosto}</span>}
                   <span className="text-xs text-gray-400">🔒 registrada</span>
                 </div>
               )}
