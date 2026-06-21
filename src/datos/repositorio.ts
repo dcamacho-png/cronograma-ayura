@@ -304,8 +304,8 @@ export function listarActividadesEstipuladas() {
   return prisma.actividadEstipulada.findMany({ orderBy: { nombre: 'asc' } })
 }
 
-export function crearActividadEstipulada(nombre: string) {
-  return prisma.actividadEstipulada.create({ data: { nombre } })
+export function crearActividadEstipulada(nombre: string, unidad: string = 'ha') {
+  return prisma.actividadEstipulada.create({ data: { nombre, unidad } })
 }
 
 export function eliminarActividadEstipulada(id: string) {
@@ -458,6 +458,7 @@ export async function crearActividadRealizada(datos: {
   descripcion: string
   loteId: string | null
   maquinaId: string | null
+  medida: number | null
 }) {
   let fincaId: string | null = null
   if (datos.loteId) {
@@ -476,6 +477,7 @@ export async function crearActividadRealizada(datos: {
       fincaId,
       responsableId: datos.responsableId,
       maquinaId: datos.maquinaId,
+      haRealizada: datos.medida,
       lotes: datos.loteId ? { connect: [{ id: datos.loteId }] } : undefined,
     },
   })

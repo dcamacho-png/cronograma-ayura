@@ -46,15 +46,44 @@ const RESPONSABLES: Record<string, string[]> = {
   Nelore: ['Antonio Medina', 'Daniela', 'J Moreno - Contratista', 'Oscar Carrillo', 'Rodolfo Ducuara'],
 }
 
-const ACTIVIDADES_ESTIPULADAS = [
-  'ENCALADORA', 'RENOVADOR', 'FERTILIZACION GRANULADA', 'FERTILIZACION POLLINAZA',
-  'REGAR COMPOST', 'FUMIGACION CONTROL MALEZAS', 'FUMIGACION CONTROL PLAGAS',
-  'RASTRA SIEMBRA', 'CINCEL SIEMBRA', 'PULIDOR SIEMBRA', 'PULIDOR SIEMBRA NEWMAN',
-  'SIEMBRA PASTOS', 'ESTERCOLERO', 'MOVIMIENTOS MATERIALES Y INSUMOS', 'MOVIVIMIENTOS RIEGO',
-  'MOVIMIENTO CARRETE', 'ROTOSPEED', 'COSECHAR PASTOS', 'COSECHA SILO', 'ROLO',
-  'ESPARCIDOR', 'TAIPA', 'DESBROZADORA', 'PALA', 'SEMBRAR CON VOLEADORA', 'SIEMBRA MAIZ',
-  'ZANJADORA', 'ALQUILER MAQUINAS CEBA ENTREMONTES', 'ALQUILER MAQUINAS MAIZ', 'GRANEL',
-  'COSECHAR MAIZ', 'RIEL', 'BOLA', 'CADENA',
+const ACTIVIDADES_ESTIPULADAS: { nombre: string; unidad: 'ha' | 'hora' | 'kg' }[] = [
+  // ha (14)
+  { nombre: 'ENCALADORA', unidad: 'ha' },
+  { nombre: 'RENOVADOR', unidad: 'ha' },
+  { nombre: 'FERTILIZACION GRANULADA', unidad: 'ha' },
+  { nombre: 'FERTILIZACION POLLINAZA', unidad: 'ha' },
+  { nombre: 'FUMIGACION CONTROL MALEZAS', unidad: 'ha' },
+  { nombre: 'FUMIGACION CONTROL PLAGAS', unidad: 'ha' },
+  { nombre: 'RASTRA SIEMBRA', unidad: 'ha' },
+  { nombre: 'CINCEL SIEMBRA', unidad: 'ha' },
+  { nombre: 'PULIDOR SIEMBRA', unidad: 'ha' },
+  { nombre: 'PULIDOR SIEMBRA NEWMAN', unidad: 'ha' },
+  { nombre: 'SIEMBRA PASTOS', unidad: 'ha' },
+  { nombre: 'ROTOSPEED', unidad: 'ha' },
+  { nombre: 'COSECHAR PASTOS', unidad: 'ha' },
+  { nombre: 'COSECHA SILO', unidad: 'ha' },
+  // hora (18)
+  { nombre: 'REGAR COMPOST', unidad: 'hora' },
+  { nombre: 'ESTERCOLERO', unidad: 'hora' },
+  { nombre: 'MOVIMIENTOS MATERIALES Y INSUMOS', unidad: 'hora' },
+  { nombre: 'MOVIVIMIENTOS RIEGO', unidad: 'hora' },
+  { nombre: 'MOVIMIENTO CARRETE', unidad: 'hora' },
+  { nombre: 'ROLO', unidad: 'hora' },
+  { nombre: 'ESPARCIDOR', unidad: 'hora' },
+  { nombre: 'TAIPA', unidad: 'hora' },
+  { nombre: 'DESBROZADORA', unidad: 'hora' },
+  { nombre: 'PALA', unidad: 'hora' },
+  { nombre: 'SEMBRAR CON VOLEADORA', unidad: 'hora' },
+  { nombre: 'SIEMBRA MAIZ', unidad: 'hora' },
+  { nombre: 'ZANJADORA', unidad: 'hora' },
+  { nombre: 'ALQUILER MAQUINAS CEBA ENTREMONTES', unidad: 'hora' },
+  { nombre: 'ALQUILER MAQUINAS MAIZ', unidad: 'hora' },
+  { nombre: 'RIEL', unidad: 'hora' },
+  { nombre: 'BOLA', unidad: 'hora' },
+  { nombre: 'CADENA', unidad: 'hora' },
+  // kg (2)
+  { nombre: 'GRANEL', unidad: 'kg' },
+  { nombre: 'COSECHAR MAIZ', unidad: 'kg' },
 ]
 
 // Tractores de la hoja "I. MAQUINAS" (col C) — sin operario (el operario puede cambiar de máquina).
@@ -104,8 +133,12 @@ async function main() {
     }
   }
 
-  for (const nombre of ACTIVIDADES_ESTIPULADAS) {
-    await prisma.actividadEstipulada.upsert({ where: { nombre }, update: {}, create: { nombre } })
+  for (const a of ACTIVIDADES_ESTIPULADAS) {
+    await prisma.actividadEstipulada.upsert({
+      where: { nombre: a.nombre },
+      update: { unidad: a.unidad },
+      create: { nombre: a.nombre, unidad: a.unidad },
+    })
   }
 
   // Usuarios: un admin + uno por área (idempotente por 'usuario'). Contraseña por defecto: clave123

@@ -56,6 +56,7 @@ export async function agregarActividadRealizadaAccion(form: FormData) {
     descripcion,
     loteId: textoOpcional(form, 'loteId'),
     maquinaId: textoOpcional(form, 'maquinaId'),
+    medida: numeroOpcional(form, 'medida'),
   })
   revalidatePath('/cumplimiento')
 }

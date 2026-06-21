@@ -127,6 +127,7 @@ model Tarea {
 model ActividadEstipulada {
   id     String @id @default(cuid())
   nombre String @unique
+  unidad String @default("ha")
 }
 
 model Lote {
