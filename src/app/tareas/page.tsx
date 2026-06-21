@@ -130,6 +130,9 @@ export default async function TareasPage({
                       )}
                     </div>
                     <InfoLotes lotes={t.lotes} />
+                    {t.detalle && (
+                      <div className="mt-1 whitespace-pre-line text-xs text-gray-600">📝 {t.detalle}</div>
+                    )}
                   </div>
                   <form action={programarTareaAccion} className="flex items-end gap-1">
                     <input type="hidden" name="id" value={t.id} />
@@ -164,13 +167,19 @@ export default async function TareasPage({
         ) : (
           <ul className="divide-y text-sm">
             {solicitudes.map((s) => (
-              <li key={s.id} className="flex items-center justify-between py-2">
-                <span>
-                  {s.descripcion} <span className="text-gray-500">· para {s.area.nombre}</span>
-                </span>
-                <span className={s.estado === 'PROGRAMADA' ? 'text-[#2e9e5b]' : 'text-gray-500'}>
-                  {s.estado === 'PROGRAMADA' ? '✅ Programada' : '🕓 En banco'}
-                </span>
+              <li key={s.id} className="py-2">
+                <div className="flex items-center justify-between">
+                  <span>
+                    {s.descripcion} <span className="text-gray-500">· para {s.area.nombre}</span>
+                  </span>
+                  <span className={s.estado === 'PROGRAMADA' ? 'text-[#2e9e5b]' : 'text-gray-500'}>
+                    {s.estado === 'PROGRAMADA' ? '✅ Programada' : '🕓 En banco'}
+                  </span>
+                </div>
+                <InfoLotes lotes={s.lotes} />
+                {s.detalle && (
+                  <div className="mt-1 whitespace-pre-line text-xs text-gray-600">📝 {s.detalle}</div>
+                )}
               </li>
             ))}
           </ul>
