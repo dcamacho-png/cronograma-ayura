@@ -133,6 +133,9 @@ async function main() {
     }
   }
 
+  // OJO: `update: { unidad }` reescribe la unidad de las 34 actividades sembradas.
+  // Correr el seed una sola vez tras la migración para fijar las unidades; re-correrlo
+  // después revierte cualquier cambio de unidad hecho a mano en Configuración.
   for (const a of ACTIVIDADES_ESTIPULADAS) {
     await prisma.actividadEstipulada.upsert({
       where: { nombre: a.nombre },
