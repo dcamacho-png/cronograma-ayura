@@ -473,6 +473,7 @@ export async function crearActividadRealizada(datos: {
   loteId: string | null
   maquinaId: string | null
   medida: number | null
+  centroCosto: string | null
 }) {
   let fincaId: string | null = null
   if (datos.loteId) {
@@ -492,6 +493,7 @@ export async function crearActividadRealizada(datos: {
       responsableId: datos.responsableId,
       maquinaId: datos.maquinaId,
       haRealizada: datos.medida,
+      centroCosto: datos.centroCosto,
       lotes: datos.loteId ? { connect: [{ id: datos.loteId }] } : undefined,
     },
   })

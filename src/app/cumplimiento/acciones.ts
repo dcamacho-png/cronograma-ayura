@@ -49,6 +49,8 @@ export async function agregarActividadRealizadaAccion(form: FormData) {
   const descSelect = texto(form, 'descripcion')
   const descripcion = descSelect === '__otra__' ? texto(form, 'descripcionOtra') : descSelect
   if (!areaId || !Number.isInteger(anio) || !Number.isInteger(semana) || !(dia >= 1 && dia <= 7) || !responsableId || !descripcion) return
+  const centroSelect = texto(form, 'centroCosto')
+  const centroCosto = centroSelect === '__otra__' ? textoOpcional(form, 'centroCostoOtra') : (centroSelect || null)
   await crearActividadRealizada({
     areaId,
     anio,
@@ -59,6 +61,7 @@ export async function agregarActividadRealizadaAccion(form: FormData) {
     loteId: textoOpcional(form, 'loteId'),
     maquinaId: textoOpcional(form, 'maquinaId'),
     medida: numeroOpcional(form, 'medida'),
+    centroCosto,
   })
   revalidatePath('/cumplimiento')
 }

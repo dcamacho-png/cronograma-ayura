@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { SelectFincaLote } from '../_componentes/select-finca-lote'
 import { etiquetaMedida, normalizarUnidad, type Unidad } from '@/dominio/unidad'
+import { CENTROS_COSTO } from '@/dominio/centro-costo'
 
 const DIAS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
@@ -32,6 +33,7 @@ export function FormActividadRealizada({
 }) {
   // Para maquinaria, la descripción se elige del catálogo (o "Otra").
   const [desc, setDesc] = useState('')
+  const [centroCosto, setCentroCosto] = useState('')
   const unidadPorNombre = new Map(estipuladas.map((e) => [e.nombre, normalizarUnidad(e.unidad)]))
   const esOtra = desc === '__otra__'
   const unidadSel: Unidad = esOtra || desc === '' ? 'ha' : unidadPorNombre.get(desc) ?? 'ha'
@@ -109,6 +111,27 @@ export function FormActividadRealizada({
             {etiquetaMedida(unidadSel)} (opcional)
             <input name="medida" type="number" step="0.1" min="0" className="w-28 rounded border p-1 text-sm" />
           </label>
+          <label className="flex flex-col text-xs">
+            Centro de costo
+            <select
+              name="centroCosto"
+              value={centroCosto}
+              onChange={(e) => setCentroCosto(e.target.value)}
+              className="rounded border p-1 text-sm"
+            >
+              <option value="">— sin centro —</option>
+              {CENTROS_COSTO.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+              <option value="__otra__">Otras…</option>
+            </select>
+          </label>
+          {centroCosto === '__otra__' && (
+            <label className="flex flex-col text-xs">
+              Otras (texto libre)
+              <input name="centroCostoOtra" className="w-40 rounded border p-1 text-sm" />
+            </label>
+          )}
         </>
       )}
       <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">Agregar</button>
