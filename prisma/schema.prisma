@@ -95,6 +95,7 @@ model Actividad {
   haRealizada  Float?
   planB        String?
   noProgramada Boolean @default(false)
+  bultosPorLote Json?
   lotes        Lote[]
 
   @@index([anio, semana, areaId])
@@ -118,6 +119,7 @@ model Tarea {
   loteId      String?
   lote        Lote?       @relation("TareaLoteUnico", fields: [loteId], references: [id])
   lotes       Lote[]      @relation("TareaLotesMulti")
+  bultosPorLote Json?
 
   actividades Actividad[]
 

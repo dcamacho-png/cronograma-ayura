@@ -1,4 +1,5 @@
 import { prisma } from './prisma'
+import { Prisma } from '@prisma/client'
 import { hashPassword } from '@/auth/password'
 import { duplicarActividades, datosReprogramacion, detectarConflictosAsignacion } from '@/dominio/programacion'
 import { turnoPorDia } from '@/dominio/turno'
@@ -197,14 +198,25 @@ export function listarTareasPendientes(areaId: string) {
   })
 }
 
-export async function crearTarea(areaId: string, descripcion: string, loteIds: string[]) {
+export async function crearTarea(
+  areaId: string,
+  descripcion: string,
+  loteIds: string[],
+  bultosPorLote: Record<string, number> | null = null,
+) {
   let fincaId: string | null = null
   if (loteIds.length > 0) {
     const primer = await prisma.lote.findUnique({ where: { id: loteIds[0] } })
     fincaId = primer?.fincaId ?? null
   }
   return prisma.tarea.create({
-    data: { areaId, descripcion, fincaId, lotes: { connect: loteIds.map((id) => ({ id })) } },
+    data: {
+      areaId,
+      descripcion,
+      fincaId,
+      lotes: { connect: loteIds.map((id) => ({ id })) },
+      ...(bultosPorLote ? { bultosPorLote } : {}),
+    },
   })
 }
 
@@ -289,6 +301,7 @@ export async function asignarTarea(
           maquinaId: maquinaPorDia[dia] ?? null,
           tareaId: tarea.id,
           lotes: { connect: loteIds.map((id) => ({ id })) },
+          ...(tarea.bultosPorLote != null ? { bultosPorLote: tarea.bultosPorLote as Prisma.InputJsonValue } : {}),
         },
       })
       creadas += 1
