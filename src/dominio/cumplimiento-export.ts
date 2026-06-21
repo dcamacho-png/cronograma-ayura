@@ -1,8 +1,9 @@
 import { normalizarUnidad, unidadAbreviada, type Unidad } from './unidad'
 import { textoBultosPorLote, type BultosPorLote } from './bultos'
+import { textoLotesHechos } from './lotes-hechos'
 
 export const COLUMNAS_CUMPLIMIENTO = [
-  'Día', 'Fecha', 'Responsable', 'Actividad', 'Máquina', 'Lote(s)', 'Estado', 'Medida realizada', 'Unidad', 'Bultos por lote', 'Centro de costo',
+  'Día', 'Fecha', 'Responsable', 'Actividad', 'Máquina', 'Lote(s)', 'Estado', 'Medida realizada', 'Unidad', 'Bultos por lote', 'Centro de costo', 'Potreros realizados',
 ] as const
 
 const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
@@ -25,6 +26,7 @@ export type ActividadExport = {
   lotes: { id: string; nombre: string }[]
   bultosPorLote: BultosPorLote | null
   centroCosto: string | null
+  lotesHechos: string[] | null
 }
 
 // Fila del Excel para una actividad, en el orden de COLUMNAS_CUMPLIMIENTO.
@@ -48,5 +50,6 @@ export function filaCumplimiento(
     a.haRealizada == null ? '' : unidadAbreviada(unidad),
     textoBultosPorLote(a.lotes, a.bultosPorLote),
     a.centroCosto ?? '',
+    textoLotesHechos(a.lotes, a.lotesHechos),
   ]
 }
