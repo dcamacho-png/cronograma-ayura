@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { usuarioActual } from '@/auth/sesion'
-import { listarAreas, listarMotivos, listarActividades, listarLotes, listarMaquinas, listarResponsablesPorArea } from '@/datos/repositorio'
+import { listarAreas, listarMotivos, listarActividades, listarLotes, listarMaquinas, listarResponsablesPorArea, listarActividadesEstipuladas } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana } from '@/dominio/semana'
+import { unidadDe } from '@/dominio/unidad'
 import { porcentajeCumplimiento, colorSemaforo } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
 import { registrarAccion, agregarActividadRealizadaAccion } from './acciones'
@@ -58,15 +59,17 @@ export default async function CumplimientoPage({
   const anio = sp.anio && Number.isInteger(anioRaw) ? anioRaw : hoy.anio
   const semana = sp.semana && Number.isInteger(semanaRaw) ? semanaRaw : hoy.semana
 
-  const [motivos, actividades, lotes, maquinas, responsablesTodos] = await Promise.all([
+  const [motivos, actividades, lotes, maquinas, responsablesTodos, estipuladas] = await Promise.all([
     listarMotivos(),
     listarActividades(areaId, anio, semana),
     listarLotes(),
     listarMaquinas(),
     listarResponsablesPorArea(areaId),
+    listarActividadesEstipuladas(),
   ])
   const responsables = responsablesTodos.filter((r) => r.activo)
   const motivoCambioId = motivos.find((m) => m.nombre === 'Cambio de actividad')?.id ?? null
+  const unidadPorNombre = Object.fromEntries(estipuladas.map((e) => [e.nombre, e.unidad]))
 
   const pendientes = actividades.filter((a) => a.estado === 'PENDIENTE').length
 
@@ -147,6 +150,7 @@ export default async function CumplimientoPage({
           responsables={responsables}
           lotes={lotes}
           maquinas={maquinas}
+          estipuladas={estipuladas}
           accion={agregarActividadRealizadaAccion}
         />
       )}
@@ -180,6 +184,7 @@ export default async function CumplimientoPage({
                 <FormRegistrar
                   actividadId={a.id}
                   esMaquinaria={esMaquinaria}
+                  unidad={unidadDe(unidadPorNombre, a.descripcion)}
                   motivos={motivos}
                   motivoCambioId={motivoCambioId}
                   lotes={lotes}

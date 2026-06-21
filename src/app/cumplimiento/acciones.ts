@@ -45,7 +45,9 @@ export async function agregarActividadRealizadaAccion(form: FormData) {
   const semana = Number(texto(form, 'semana'))
   const dia = Number(texto(form, 'dia'))
   const responsableId = texto(form, 'responsableId')
-  const descripcion = texto(form, 'descripcion')
+  // Para maquinaria la descripción viene del catálogo; "__otra__" usa el texto libre.
+  const descSelect = texto(form, 'descripcion')
+  const descripcion = descSelect === '__otra__' ? texto(form, 'descripcionOtra') : descSelect
   if (!areaId || !Number.isInteger(anio) || !Number.isInteger(semana) || !(dia >= 1 && dia <= 7) || !responsableId || !descripcion) return
   await crearActividadRealizada({
     areaId,

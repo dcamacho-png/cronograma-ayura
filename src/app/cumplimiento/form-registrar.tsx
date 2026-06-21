@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { SelectFincaLote } from '../_componentes/select-finca-lote'
+import { etiquetaMedida, type Unidad } from '@/dominio/unidad'
 
 type Motivo = { id: string; nombre: string }
 type Lote = { id: string; nombre: string; finca: { nombre: string } }
@@ -9,6 +10,7 @@ type Lote = { id: string; nombre: string; finca: { nombre: string } }
 export function FormRegistrar({
   actividadId,
   esMaquinaria,
+  unidad,
   motivos,
   motivoCambioId,
   lotes,
@@ -18,6 +20,7 @@ export function FormRegistrar({
 }: {
   actividadId: string
   esMaquinaria: boolean
+  unidad: Unidad
   motivos: Motivo[]
   motivoCambioId: string | null
   lotes: Lote[]
@@ -70,7 +73,7 @@ export function FormRegistrar({
       </label>
       {esMaquinaria && (
         <label className="flex flex-col text-xs">
-          Hectáreas realizadas (opcional)
+          {etiquetaMedida(unidad)} (opcional)
           <input
             name="haRealizada"
             type="number"
