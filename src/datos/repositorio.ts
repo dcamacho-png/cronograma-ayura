@@ -367,7 +367,7 @@ export async function registrarCumplimiento(
   motivoId: string | null,
   nota: string | null,
   haRealizada: number | null,
-  reemplazo?: { descripcion: string; loteId: string | null; maquinaId: string | null } | null,
+  reemplazo?: { descripcion: string; loteId: string | null; maquinaId: string | null; medida: number | null } | null,
 ) {
   const act = await prisma.actividad.findUnique({ where: { id }, include: { lotes: true } })
   if (!act || act.estado !== 'PENDIENTE') return null // ya registrada / bloqueada
@@ -394,11 +394,9 @@ export async function registrarCumplimiento(
   // Cambio de actividad: crear la que SÍ se hizo, como cumplida, mismo día/responsable.
   if (reemplazo && reemplazo.descripcion) {
     let fincaId: string | null = null
-    let haReemplazo: number | null = null
     if (reemplazo.loteId) {
       const lote = await prisma.lote.findUnique({ where: { id: reemplazo.loteId } })
       fincaId = lote?.fincaId ?? null
-      haReemplazo = lote?.hectareas ?? null
     }
     await prisma.actividad.create({
       data: {
@@ -412,7 +410,7 @@ export async function registrarCumplimiento(
         fincaId,
         responsableId: act.responsableId,
         maquinaId: reemplazo.maquinaId,
-        haRealizada: haReemplazo,
+        haRealizada: reemplazo.medida,
         nota: `En reemplazo de: ${act.descripcion}`,
         lotes: reemplazo.loteId ? { connect: [{ id: reemplazo.loteId }] } : undefined,
       },

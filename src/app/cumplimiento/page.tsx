@@ -189,6 +189,7 @@ export default async function CumplimientoPage({
                   motivoCambioId={motivoCambioId}
                   lotes={lotes}
                   maquinas={maquinas}
+                  estipuladas={estipuladas}
                   haProgramada={a.lotes.reduce((s, l) => s + (l.hectareas ?? 0), 0)}
                   accion={registrarAccion}
                 />

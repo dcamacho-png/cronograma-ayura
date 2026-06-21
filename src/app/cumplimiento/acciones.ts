@@ -71,12 +71,15 @@ export async function registrarAccion(form: FormData) {
   if (estado !== 'CUMPLIDA' && !motivoId) return
   const nota = textoOpcional(form, 'nota')
   const haRealizada = numeroOpcional(form, 'haRealizada')
-  const reemplazoDescripcion = textoOpcional(form, 'reemplazoDescripcion')
+  // La descripción del reemplazo (maquinaria) puede venir del catálogo o ser "__otra__" (texto libre).
+  const reemplazoSelect = texto(form, 'reemplazoDescripcion')
+  const reemplazoDescripcion = reemplazoSelect === '__otra__' ? textoOpcional(form, 'reemplazoDescripcionOtra') : (reemplazoSelect || null)
   const reemplazo = reemplazoDescripcion
     ? {
         descripcion: reemplazoDescripcion,
         loteId: textoOpcional(form, 'reemplazoLoteId'),
         maquinaId: textoOpcional(form, 'reemplazoMaquinaId'),
+        medida: numeroOpcional(form, 'reemplazoMedida'),
       }
     : null
   await registrarCumplimiento(id, estado, motivoId, nota, haRealizada, reemplazo)
