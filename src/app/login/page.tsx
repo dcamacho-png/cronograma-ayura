@@ -24,9 +24,6 @@ export default async function LoginPage({
         </label>
         <button className="rounded bg-[#11603a] px-4 py-2 font-semibold text-white">Entrar</button>
       </form>
-      <p className="mt-4 text-xs text-gray-400">
-        Usuarios: admin, ganaderia, maquinaria, maiz, riego, nelore · contraseña por defecto: clave123
-      </p>
     </main>
   )
 }
