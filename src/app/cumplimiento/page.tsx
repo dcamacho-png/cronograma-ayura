@@ -126,6 +126,21 @@ export default async function CumplimientoPage({
             Semana {proxima.semana} →
           </Link>
         )}
+        {pendientes > 0 ? (
+          <span
+            className="cursor-not-allowed rounded border px-3 py-1 text-sm text-gray-300"
+            title="Registra todas las actividades para descargar el Excel"
+          >
+            📥 Descargar Excel
+          </span>
+        ) : (
+          <a
+            href={`/cumplimiento/exportar?area=${areaId}&anio=${anio}&semana=${semana}`}
+            className="rounded border border-[#11603a] px-3 py-1 text-sm font-semibold text-[#11603a] hover:bg-green-50"
+          >
+            📥 Descargar Excel
+          </a>
+        )}
         <span className="ml-auto rounded bg-gray-100 px-3 py-1 text-sm">
           Cumplido: <b>{pct === null ? '—' : `${pct}%`}</b>
         </span>
