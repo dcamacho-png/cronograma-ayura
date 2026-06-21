@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { usuarioActual } from '@/auth/sesion'
-import { listarAreas, listarResponsablesPorArea, listarMotivos, listarActividades } from '@/datos/repositorio'
+import { listarAreas, listarResponsablesPorArea, listarMotivos, listarActividades, listarActividadesEstipuladas } from '@/datos/repositorio'
 import { semanaActual } from '@/dominio/semana'
 import { ResumenArea } from '../resumen-area'
 import { AutoImprimir } from '../../_componentes/auto-imprimir'
@@ -21,6 +21,8 @@ export default async function ExportarResumenPage({
   const semana = sp.semana && Number.isInteger(semanaRaw) ? semanaRaw : hoy.semana
 
   const areas = await listarAreas()
+  const estipuladas = await listarActividadesEstipuladas()
+  const unidadPorNombre = Object.fromEntries(estipuladas.map((e) => [e.nombre, e.unidad]))
   const esMaquinaria = (nombre: string) => nombre.toLowerCase().includes('maquinaria')
 
   // Modo "todas las áreas": solo ADMIN.
@@ -46,6 +48,7 @@ export default async function ExportarResumenPage({
                 semana={semana}
                 anio={anio}
                 esMaquinaria={esMaquinaria(area.nombre)}
+                unidadPorNombre={unidadPorNombre}
                 actividades={actividades}
                 responsables={responsables}
                 motivos={motivos}
@@ -78,6 +81,7 @@ export default async function ExportarResumenPage({
         semana={semana}
         anio={anio}
         esMaquinaria={esMaquinaria(area.nombre)}
+        unidadPorNombre={unidadPorNombre}
         actividades={actividades}
         responsables={responsables}
         motivos={motivos}

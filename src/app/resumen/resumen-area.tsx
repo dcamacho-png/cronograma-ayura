@@ -4,9 +4,10 @@ import {
   actividadesConCambio,
   extremosFinalizadas,
   conteoPorEstado,
-  hectareasRealizadas,
+  medidasPorUnidad,
 } from '@/dominio/resumen'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
+import { unidadDe, unidadAbreviada, type Unidad } from '@/dominio/unidad'
 
 const ESTADOS_ORDEN = [
   { v: 'CUMPLIDA', etq: '✅ Cumplidas' },
@@ -44,6 +45,7 @@ export function ResumenArea({
   semana,
   anio,
   esMaquinaria,
+  unidadPorNombre,
   actividades,
   responsables,
   motivos,
@@ -52,6 +54,7 @@ export function ResumenArea({
   semana: number
   anio: number
   esMaquinaria: boolean
+  unidadPorNombre: Record<string, string>
   actividades: ActividadResumen[]
   responsables: { id: string; nombre: string }[]
   motivos: { id: string; nombre: string }[]
@@ -70,17 +73,32 @@ export function ResumenArea({
   const nombreMotivo = new Map(motivos.map((m) => [m.id, m.nombre]))
 
   const haActividad = (a: ActividadResumen) => a.lotes.reduce((s, l) => s + (l.hectareas ?? 0), 0)
-  const realizadas = hectareasRealizadas(
-    actividades.map((a) => ({ estado: a.estado, haProgramada: haActividad(a), haRealizada: a.haRealizada ?? null })),
+  const totales = medidasPorUnidad(
+    actividades.map((a) => ({
+      estado: a.estado,
+      haProgramada: haActividad(a),
+      haRealizada: a.haRealizada ?? null,
+      unidad: unidadDe(unidadPorNombre, a.descripcion),
+    })),
   )
+  const totalUnidades = (['ha', 'hora', 'kg'] as Unidad[])
+    .filter((u) => totales[u] > 0)
+    .map((u) => `${totales[u]} ${unidadAbreviada(u)}`)
+    .join(' · ')
 
-  const haPorActividad = new Map<string, number>()
+  // Lista "realizado por actividad": valor + unidad de cada descripción.
+  const medidaPorActividad = new Map<string, { valor: number; unidad: Unidad }>()
   for (const a of actividades) {
     if (a.estado === 'PENDIENTE') continue
-    const realizada = a.haRealizada ?? (a.estado === 'CUMPLIDA' ? haActividad(a) : 0)
-    haPorActividad.set(a.descripcion, (haPorActividad.get(a.descripcion) ?? 0) + realizada)
+    const unidad = unidadDe(unidadPorNombre, a.descripcion)
+    const realizada = a.haRealizada ?? (unidad === 'ha' && a.estado === 'CUMPLIDA' ? haActividad(a) : 0)
+    const prev = medidaPorActividad.get(a.descripcion)
+    medidaPorActividad.set(a.descripcion, {
+      valor: (prev?.valor ?? 0) + realizada,
+      unidad,
+    })
   }
-  const haActividadLista = [...haPorActividad.entries()].sort((a, b) => b[1] - a[1])
+  const medidaActividadLista = [...medidaPorActividad.entries()].sort((a, b) => b[1].valor - a[1].valor)
 
   return (
     <div className="text-gray-900">
@@ -109,8 +127,8 @@ export function ResumenArea({
         </div>
         {esMaquinaria && (
           <div className="rounded-2xl border p-5">
-            <div className="mb-1 text-sm text-gray-500">Hectáreas</div>
-            <div className="text-2xl font-extrabold text-[#2e9e5b]">{realizadas} ha <span className="text-sm font-medium text-gray-500">realizadas</span></div>
+            <div className="mb-1 text-sm text-gray-500">Realizado</div>
+            <div className="text-2xl font-extrabold text-[#2e9e5b]">{totalUnidades || '—'}</div>
           </div>
         )}
       </div>
@@ -197,14 +215,14 @@ export function ResumenArea({
         </div>
       </div>
 
-      {esMaquinaria && haActividadLista.length > 0 && (
+      {esMaquinaria && medidaActividadLista.length > 0 && (
         <div className="mb-8">
-          <h2 className="mb-2 text-lg font-semibold">🚜 Hectáreas realizadas por actividad</h2>
+          <h2 className="mb-2 text-lg font-semibold">🚜 Realizado por actividad</h2>
           <ul className="space-y-1 text-sm">
-            {haActividadLista.map(([desc, haRealizada]) => (
+            {medidaActividadLista.map(([desc, { valor, unidad }]) => (
               <li key={desc} className="flex justify-between rounded border px-3 py-1">
                 <span>{desc}</span>
-                <b>{(Math.round(haRealizada * 10) / 10)} ha</b>
+                <b>{Math.round(valor * 10) / 10} {unidadAbreviada(unidad)}</b>
               </li>
             ))}
           </ul>

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { usuarioActual } from '@/auth/sesion'
-import { listarAreas, listarResponsablesPorArea, listarMotivos, listarActividades } from '@/datos/repositorio'
+import { listarAreas, listarResponsablesPorArea, listarMotivos, listarActividades, listarActividadesEstipuladas } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual } from '@/dominio/semana'
 import { ResumenArea } from './resumen-area'
 
@@ -35,11 +35,13 @@ export default async function ResumenPage({
   const anio = sp.anio && Number.isInteger(anioRaw) ? anioRaw : hoy.anio
   const semana = sp.semana && Number.isInteger(semanaRaw) ? semanaRaw : hoy.semana
 
-  const [responsables, motivos, actividades] = await Promise.all([
+  const [responsables, motivos, actividades, estipuladas] = await Promise.all([
     listarResponsablesPorArea(areaId),
     listarMotivos(),
     listarActividades(areaId, anio, semana),
+    listarActividadesEstipuladas(),
   ])
+  const unidadPorNombre = Object.fromEntries(estipuladas.map((e) => [e.nombre, e.unidad]))
 
   const previa = semanaAnterior(anio, semana)
   const proxima = siguienteSemana(anio, semana)
@@ -94,6 +96,7 @@ export default async function ResumenPage({
         semana={semana}
         anio={anio}
         esMaquinaria={esMaquinaria}
+        unidadPorNombre={unidadPorNombre}
         actividades={actividades}
         responsables={responsables}
         motivos={motivos}
