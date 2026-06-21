@@ -18,6 +18,12 @@ function textoOpcional(form: FormData, clave: string): string | null {
   const v = texto(form, clave)
   return v === '' ? null : v
 }
+function numeroOpcional(form: FormData, clave: string): number | null {
+  const v = texto(form, clave)
+  if (v === '') return null
+  const n = Number(v)
+  return Number.isFinite(n) ? n : null
+}
 
 export async function crearTareaAccion(form: FormData) {
   const areaId = texto(form, 'areaId')
@@ -25,7 +31,12 @@ export async function crearTareaAccion(form: FormData) {
     textoOpcional(form, 'otra') ?? textoOpcional(form, 'estipulada') ?? texto(form, 'descripcion')
   if (!areaId || !descripcion) return
   const loteIds = form.getAll('loteId').map((v) => String(v).trim()).filter(Boolean)
-  await crearTarea(areaId, descripcion, loteIds)
+  const bultos: Record<string, number> = {}
+  for (const id of loteIds) {
+    const b = numeroOpcional(form, `bultos_${id}`)
+    if (b != null) bultos[id] = b
+  }
+  await crearTarea(areaId, descripcion, loteIds, Object.keys(bultos).length > 0 ? bultos : null)
   revalidatePath('/tareas')
 }
 

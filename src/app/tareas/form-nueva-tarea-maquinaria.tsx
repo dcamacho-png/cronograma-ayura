@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { SelectFincaLote } from '../_componentes/select-finca-lote'
+import { PickerLotesBultos } from './picker-lotes-bultos'
+import { usaBultos } from '@/dominio/bultos'
 
 type Lote = { id: string; nombre: string; finca: { nombre: string } }
 type Estipulada = { id: string; nombre: string }
@@ -18,7 +20,7 @@ export function FormNuevaTareaMaquinaria({
   accion: (formData: FormData) => void | Promise<void>
 }) {
   const [estipulada, setEstipulada] = useState('')
-  const esFertilizacion = estipulada.toUpperCase().includes('FERTILIZA')
+  const conBultos = usaBultos(estipulada)
 
   return (
     <form action={accion} className="flex flex-wrap items-end gap-2 rounded-xl border p-4">
@@ -42,8 +44,12 @@ export function FormNuevaTareaMaquinaria({
         <input name="otra" placeholder="Escribe otra si no está en la lista" className="rounded border p-2" />
       </label>
       <label className="flex flex-col text-sm">
-        {esFertilizacion ? 'Finca y lotes (fertilización — mantén Ctrl/⌘ para varios)' : 'Finca y lote'}
-        <SelectFincaLote lotes={lotes} name="loteId" multiple={esFertilizacion} />
+        {conBultos ? 'Lotes y bultos por lote' : 'Finca y lote'}
+        {conBultos ? (
+          <PickerLotesBultos lotes={lotes} />
+        ) : (
+          <SelectFincaLote lotes={lotes} name="loteId" />
+        )}
       </label>
       <button className="rounded bg-[#11603a] px-4 py-2 text-sm font-semibold text-white">+ Agregar al banco</button>
     </form>
