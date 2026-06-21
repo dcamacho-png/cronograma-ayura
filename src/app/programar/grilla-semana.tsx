@@ -9,7 +9,8 @@ type ActividadGrilla = {
   descripcion: string
   turno: string
   maquina: { nombre: string } | null
-  lotes: { nombre: string; hectareas: number | null }[]
+  lotes: { id: string; nombre: string; hectareas: number | null }[]
+  bultosPorLote?: unknown
 }
 
 function fmtFecha(f: Date) {
@@ -66,7 +67,7 @@ export function GrillaSemana({
                             <div>{a.descripcion}</div>
                             {a.turno && <div className="text-xs text-gray-500">{a.turno}</div>}
                             {a.maquina && <div className="text-xs text-gray-500">🚜 {a.maquina.nombre}</div>}
-                            <InfoLotes lotes={a.lotes} className="mt-1" />
+                            <InfoLotes lotes={a.lotes} bultosPorLote={a.bultosPorLote as Record<string, number> | null} className="mt-1" />
                           </div>
                         ))}
                       </td>

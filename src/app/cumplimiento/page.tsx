@@ -193,7 +193,7 @@ export default async function CumplimientoPage({
               </div>
               <div className="mb-2 font-medium">{a.descripcion}</div>
               {a.maquina && <div className="mb-2 text-sm text-gray-600">🚜 {a.maquina.nombre}</div>}
-              <InfoLotes lotes={a.lotes} className="mb-2" />
+              <InfoLotes lotes={a.lotes} bultosPorLote={a.bultosPorLote as Record<string, number> | null} className="mb-2" />
 
               {a.estado === 'PENDIENTE' ? (
                 <FormRegistrar

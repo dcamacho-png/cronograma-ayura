@@ -1,9 +1,23 @@
-type LoteInfo = { nombre: string; hectareas: number | null }
+import type { BultosPorLote } from '@/dominio/bultos'
 
-export function InfoLotes({ lotes, className = '' }: { lotes: LoteInfo[]; className?: string }) {
+type LoteInfo = { id: string; nombre: string; hectareas: number | null }
+
+export function InfoLotes({
+  lotes,
+  bultosPorLote,
+  className = '',
+}: {
+  lotes: LoteInfo[]
+  bultosPorLote?: BultosPorLote | null
+  className?: string
+}) {
   if (lotes.length === 0) return null
   const ha = lotes.reduce((s, l) => s + (l.hectareas ?? 0), 0)
-  const nombres = lotes.map((l) => l.nombre).join(', ')
+  const etiqueta = (l: LoteInfo) => {
+    const b = bultosPorLote?.[l.id]
+    return typeof b === 'number' ? `${l.nombre} (${b} bultos)` : l.nombre
+  }
+  const nombres = lotes.map(etiqueta).join(', ')
   return (
     <div className={`text-xs text-gray-500 ${className}`}>
       📍 {nombres}
