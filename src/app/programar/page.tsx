@@ -9,7 +9,7 @@ import {
   listarLotes,
   listarMaquinas,
 } from '@/datos/repositorio'
-import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, esSemanaPasada } from '@/dominio/semana'
+import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, esSemanaPasada, diaActual, esDiaPasado } from '@/dominio/semana'
 import { asignarTareaAccion, devolverAlBancoAccion } from './acciones'
 import { AsignarTareaForm } from './asignar-tarea-form'
 import { GrillaSemana } from './grilla-semana'
@@ -44,6 +44,10 @@ export default async function ProgramarPage({
   const anio = sp.anio && Number.isInteger(anioRaw) ? anioRaw : hoy.anio
   const semana = sp.semana && Number.isInteger(semanaRaw) ? semanaRaw : hoy.semana
   const pasada = esSemanaPasada(anio, semana, hoy)
+  // Días ya pasados de la semana mostrada (solo aplica a la semana actual; en
+  // futuras queda vacío y en pasadas el formulario no se muestra).
+  const hoyRef = { ...hoy, dia: diaActual() }
+  const diasPasados = [1, 2, 3, 4, 5, 6, 7].filter((d) => esDiaPasado(anio, semana, d, hoyRef))
 
   const [responsables, actividades, porAsignar, lotes, maquinas] = await Promise.all([
     listarResponsablesPorArea(areaId),
@@ -128,6 +132,7 @@ export default async function ProgramarPage({
                     esMaquinaria={esMaquinaria}
                     maquinas={maquinas}
                     ocupacion={ocupacion}
+                    diasPasados={diasPasados}
                     areaId={areaId}
                     anio={anio}
                     semana={semana}

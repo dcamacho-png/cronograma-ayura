@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearResponsable, actualizarActividad, asignarTarea, quitarSeleccionTarea } from '@/datos/repositorio'
-import { semanaAnterior, esSemanaPasada, semanaActual } from '@/dominio/semana'
+import { semanaAnterior, esSemanaPasada, semanaActual, diaActual, esDiaPasado } from '@/dominio/semana'
 
 const DIAS_CORTOS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
@@ -27,6 +27,8 @@ export async function crearActividadAccion(form: FormData) {
   const anio = Number(texto(form, 'anio'))
   const semana = Number(texto(form, 'semana'))
   if (esSemanaPasada(anio, semana, semanaActual())) return
+  const dia = Number(texto(form, 'dia'))
+  if (esDiaPasado(anio, semana, dia, { ...semanaActual(), dia: diaActual() })) return
   const loteId = texto(form, 'loteId')
   if (!areaId || !loteId) return
   await crearActividadDesdeLotes(
@@ -34,7 +36,7 @@ export async function crearActividadAccion(form: FormData) {
       areaId,
       anio,
       semana,
-      dia: Number(texto(form, 'dia')),
+      dia,
       responsableId: texto(form, 'responsableId'),
       descripcion: texto(form, 'descripcion'),
       turno: texto(form, 'turno'),
@@ -84,10 +86,14 @@ export async function actualizarActividadAccion(form: FormData) {
 export async function asignarTareaAccion(form: FormData) {
   const tareaId = texto(form, 'tareaId')
   const responsableId = texto(form, 'responsableId')
+  const anioForm = Number(texto(form, 'anio'))
+  const semanaForm = Number(texto(form, 'semana'))
+  const hoy = { ...semanaActual(), dia: diaActual() }
   const dias = form
     .getAll('dia')
     .map((v) => Number(String(v)))
     .filter((d) => Number.isInteger(d) && d >= 1 && d <= 7)
+    .filter((d) => !esDiaPasado(anioForm, semanaForm, d, hoy))
   const loteId = textoOpcional(form, 'loteId')
   const turno = texto(form, 'turno')
   const maquinaPorDia: Record<number, string | null> = {}

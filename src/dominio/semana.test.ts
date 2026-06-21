@@ -85,3 +85,38 @@ describe('esSemanaPasada', () => {
     expect(esSemanaPasada(2027, 1, ref)).toBe(false)
   })
 })
+
+import { diaIsoDeFecha, esDiaPasado } from './semana'
+
+describe('diaIsoDeFecha', () => {
+  it('da el día ISO (lunes=1 .. domingo=7) en UTC', () => {
+    // 2026-06-15 es lunes, 2026-06-21 es domingo.
+    expect(diaIsoDeFecha(new Date(Date.UTC(2026, 5, 15)))).toBe(1)
+    expect(diaIsoDeFecha(new Date(Date.UTC(2026, 5, 17)))).toBe(3) // miércoles
+    expect(diaIsoDeFecha(new Date(Date.UTC(2026, 5, 21)))).toBe(7) // domingo
+  })
+})
+
+describe('esDiaPasado', () => {
+  // Hoy: miércoles (día 3) de la semana 25 de 2026.
+  const hoy = { anio: 2026, semana: 25, dia: 3 }
+  it('un día anterior de la semana actual es pasado', () => {
+    expect(esDiaPasado(2026, 25, 1, hoy)).toBe(true) // lunes
+    expect(esDiaPasado(2026, 25, 2, hoy)).toBe(true) // martes
+  })
+  it('hoy no es pasado', () => {
+    expect(esDiaPasado(2026, 25, 3, hoy)).toBe(false)
+  })
+  it('un día futuro de la semana actual no es pasado', () => {
+    expect(esDiaPasado(2026, 25, 4, hoy)).toBe(false) // jueves
+    expect(esDiaPasado(2026, 25, 7, hoy)).toBe(false) // domingo
+  })
+  it('cualquier día de una semana anterior es pasado', () => {
+    expect(esDiaPasado(2026, 24, 7, hoy)).toBe(true)
+    expect(esDiaPasado(2025, 52, 7, hoy)).toBe(true)
+  })
+  it('cualquier día de una semana futura no es pasado', () => {
+    expect(esDiaPasado(2026, 26, 1, hoy)).toBe(false)
+    expect(esDiaPasado(2027, 1, 1, hoy)).toBe(false)
+  })
+})

@@ -18,6 +18,7 @@ export function AsignarTareaForm({
   esMaquinaria,
   maquinas,
   ocupacion,
+  diasPasados = [],
   areaId,
   anio,
   semana,
@@ -31,6 +32,7 @@ export function AsignarTareaForm({
   esMaquinaria: boolean
   maquinas: { id: string; nombre: string }[]
   ocupacion: { dia: number; turno: string; maquinaId: string | null; responsableId: string }[]
+  diasPasados?: number[]
   areaId: string
   anio: number
   semana: number
@@ -41,8 +43,10 @@ export function AsignarTareaForm({
   const [responsableId, setResponsableId] = useState(responsables[0]?.id ?? '')
   const tieneLotes = lotesTarea.length > 0
 
-  const toggleDia = (d: number) =>
+  const toggleDia = (d: number) => {
+    if (diasPasados.includes(d)) return
     setDias((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]))
+  }
 
   // Aviso en vivo: días en que el responsable elegido ya tiene tarea ese turno.
   const diasOcupadosResp = [...dias]
@@ -80,22 +84,29 @@ export function AsignarTareaForm({
       <div className="flex flex-col text-xs">
         Días
         <div className="flex gap-1">
-          {DIAS.map((d, i) => (
-            <label
-              key={d}
-              className="flex cursor-pointer flex-col items-center rounded border px-1.5 py-0.5 has-[:checked]:border-[#11603a] has-[:checked]:bg-green-50"
-            >
-              <span>{d}</span>
-              <input
-                type="checkbox"
-                name="dia"
-                value={i + 1}
-                checked={dias.includes(i + 1)}
-                onChange={() => toggleDia(i + 1)}
-                className="accent-[#11603a]"
-              />
-            </label>
-          ))}
+          {DIAS.map((d, i) => {
+            const pasado = diasPasados.includes(i + 1)
+            return (
+              <label
+                key={d}
+                title={pasado ? 'Día ya pasado de esta semana' : undefined}
+                className={`flex flex-col items-center rounded border px-1.5 py-0.5 has-[:checked]:border-[#11603a] has-[:checked]:bg-green-50 ${
+                  pasado ? 'cursor-not-allowed bg-gray-100 text-gray-300' : 'cursor-pointer'
+                }`}
+              >
+                <span>{d}</span>
+                <input
+                  type="checkbox"
+                  name="dia"
+                  value={i + 1}
+                  checked={dias.includes(i + 1)}
+                  disabled={pasado}
+                  onChange={() => toggleDia(i + 1)}
+                  className="accent-[#11603a]"
+                />
+              </label>
+            )
+          })}
         </div>
       </div>
       <label className="flex flex-col text-xs">

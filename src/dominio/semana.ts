@@ -92,3 +92,26 @@ export function fechasDeSemana(anio: number, semana: number): Date[] {
 export function esSemanaPasada(anio: number, semana: number, referencia: Semana): boolean {
   return anio < referencia.anio || (anio === referencia.anio && semana < referencia.semana)
 }
+
+// Día ISO de una fecha en UTC: lunes = 1 ... domingo = 7.
+export function diaIsoDeFecha(fecha: Date): number {
+  const d = new Date(Date.UTC(fecha.getUTCFullYear(), fecha.getUTCMonth(), fecha.getUTCDate()))
+  return ((d.getUTCDay() + 6) % 7) + 1
+}
+
+// Día ISO de hoy (lunes = 1 ... domingo = 7), en UTC (misma convención que semanaActual).
+export function diaActual(): number {
+  return diaIsoDeFecha(new Date())
+}
+
+// ¿El día (anio, semana, dia) ya pasó respecto a hoy? Considera año, semana y día.
+export function esDiaPasado(
+  anio: number,
+  semana: number,
+  dia: number,
+  hoy: { anio: number; semana: number; dia: number },
+): boolean {
+  if (anio !== hoy.anio) return anio < hoy.anio
+  if (semana !== hoy.semana) return semana < hoy.semana
+  return dia < hoy.dia
+}
