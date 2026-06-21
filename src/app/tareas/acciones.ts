@@ -27,8 +27,10 @@ function numeroOpcional(form: FormData, clave: string): number | null {
 
 export async function crearTareaAccion(form: FormData) {
   const areaId = texto(form, 'areaId')
-  const descripcion =
-    textoOpcional(form, 'otra') ?? textoOpcional(form, 'estipulada') ?? texto(form, 'descripcion')
+  const est = textoOpcional(form, 'estipulada')
+  const descripcion = est === '__otra__'
+    ? textoOpcional(form, 'otra')
+    : (est ?? textoOpcional(form, 'descripcion'))
   if (!areaId || !descripcion) return
   const loteIds = form.getAll('loteId').map((v) => String(v).trim()).filter(Boolean)
   const bultos: Record<string, number> = {}
@@ -36,7 +38,8 @@ export async function crearTareaAccion(form: FormData) {
     const b = numeroOpcional(form, `bultos_${id}`)
     if (b != null) bultos[id] = b
   }
-  await crearTarea(areaId, descripcion, loteIds, Object.keys(bultos).length > 0 ? bultos : null)
+  const detalle = textoOpcional(form, 'detalle')
+  await crearTarea(areaId, descripcion, loteIds, Object.keys(bultos).length > 0 ? bultos : null, detalle)
   revalidatePath('/tareas')
 }
 
@@ -66,8 +69,10 @@ export async function quitarSeleccionTareaAccion(form: FormData) {
 export async function crearSolicitudAccion(form: FormData) {
   const solicitanteAreaId = texto(form, 'solicitanteAreaId')
   const areaEjecutoraId = texto(form, 'areaEjecutoraId')
-  const descripcion =
-    textoOpcional(form, 'otra') ?? textoOpcional(form, 'estipulada') ?? texto(form, 'descripcion')
+  const est = textoOpcional(form, 'estipulada')
+  const descripcion = est === '__otra__'
+    ? textoOpcional(form, 'otra')
+    : (est ?? textoOpcional(form, 'descripcion'))
   if (!solicitanteAreaId || !areaEjecutoraId || !descripcion || areaEjecutoraId === solicitanteAreaId) return
   const loteIds = form.getAll('loteId').map((v) => String(v).trim()).filter(Boolean)
   const bultos: Record<string, number> = {}
@@ -75,7 +80,8 @@ export async function crearSolicitudAccion(form: FormData) {
     const b = numeroOpcional(form, `bultos_${id}`)
     if (b != null) bultos[id] = b
   }
-  await crearSolicitud(areaEjecutoraId, descripcion, solicitanteAreaId, loteIds, Object.keys(bultos).length > 0 ? bultos : null)
+  const detalle = textoOpcional(form, 'detalle')
+  await crearSolicitud(areaEjecutoraId, descripcion, solicitanteAreaId, loteIds, Object.keys(bultos).length > 0 ? bultos : null, detalle)
   revalidatePath('/tareas')
 }
 

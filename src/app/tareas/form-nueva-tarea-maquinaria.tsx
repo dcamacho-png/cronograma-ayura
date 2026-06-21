@@ -37,12 +37,15 @@ export function FormNuevaTareaMaquinaria({
           {estipuladas.map((e) => (
             <option key={e.id} value={e.nombre}>{e.nombre}</option>
           ))}
+          <option value="__otra__">Otra…</option>
         </select>
       </label>
-      <label className="flex flex-1 flex-col text-sm">
-        Otra (opcional)
-        <input name="otra" placeholder="Escribe otra si no está en la lista" className="rounded border p-2" />
-      </label>
+      {estipulada === '__otra__' && (
+        <label className="flex flex-1 flex-col text-sm">
+          Otra (escribe la actividad)
+          <input name="otra" placeholder="¿Qué actividad?" className="rounded border p-2" />
+        </label>
+      )}
       <label className="flex flex-col text-sm">
         {conBultos ? 'Lotes y bultos por lote' : 'Finca y lote'}
         {conBultos ? (
@@ -50,6 +53,10 @@ export function FormNuevaTareaMaquinaria({
         ) : (
           <SelectFincaLote lotes={lotes} name="loteId" />
         )}
+      </label>
+      <label className="flex w-full flex-col text-sm">
+        Detalle / instrucciones (opcional)
+        <textarea name="detalle" rows={2} placeholder="Ej: aplicar urea, 2 bultos/ha" className="rounded border p-2 text-sm" />
       </label>
       <button className="rounded bg-[#11603a] px-4 py-2 text-sm font-semibold text-white">+ Agregar al banco</button>
     </form>

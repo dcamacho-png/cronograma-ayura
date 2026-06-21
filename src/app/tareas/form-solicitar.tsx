@@ -57,12 +57,15 @@ export function FormSolicitar({
               {estipuladas.map((e) => (
                 <option key={e.id} value={e.nombre}>{e.nombre}</option>
               ))}
+              <option value="__otra__">Otra…</option>
             </select>
           </label>
-          <label className="flex flex-col text-sm">
-            Otra (opcional)
-            <input name="otra" placeholder="Escribe otra si no está en la lista" className="rounded border p-2 text-sm" />
-          </label>
+          {estipulada === '__otra__' && (
+            <label className="flex flex-col text-sm">
+              Otra (escribe la actividad)
+              <input name="otra" placeholder="¿Qué actividad?" className="rounded border p-2 text-sm" />
+            </label>
+          )}
           <label className="flex flex-col text-sm">
             {conBultos ? 'Lotes y bultos por lote' : 'Finca y lote'}
             {conBultos ? (
@@ -70,6 +73,10 @@ export function FormSolicitar({
             ) : (
               <SelectFincaLote lotes={lotes} name="loteId" />
             )}
+          </label>
+          <label className="flex flex-col text-sm">
+            Detalle / instrucciones (opcional)
+            <textarea name="detalle" rows={2} placeholder="Ej: aplicar urea, 2 bultos/ha" className="rounded border p-2 text-sm" />
           </label>
         </>
       ) : (
