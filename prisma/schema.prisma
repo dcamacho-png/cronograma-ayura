@@ -67,6 +67,7 @@ model Actividad {
   estado            String   @default("PENDIENTE")
   nota              String?
   vecesReprogramada Int      @default(0)
+  centroCosto       String?
 
   areaId        String
   area          Area    @relation("AreaDeActividad", fields: [areaId], references: [id])

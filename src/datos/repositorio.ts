@@ -381,13 +381,14 @@ export async function registrarCumplimiento(
   nota: string | null,
   haRealizada: number | null,
   reemplazo?: { descripcion: string; loteId: string | null; maquinaId: string | null; medida: number | null } | null,
+  centroCosto: string | null = null,
 ) {
   const act = await prisma.actividad.findUnique({ where: { id }, include: { lotes: true } })
   if (!act || act.estado !== 'PENDIENTE') return null // ya registrada / bloqueada
   const notaFinal = reemplazo ? `Cambiada por: ${reemplazo.descripcion}` : nota
   await prisma.actividad.update({
     where: { id },
-    data: { estado, motivoId, nota: notaFinal, haRealizada: reemplazo ? null : haRealizada },
+    data: { estado, motivoId, nota: notaFinal, haRealizada: reemplazo ? null : haRealizada, centroCosto },
   })
 
   // Novedad (todo lo que no es 100% cumplido): la tarea vuelve al banco sin semana,
