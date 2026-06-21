@@ -439,6 +439,7 @@ export function crearSolicitud(
   descripcion: string,
   solicitadaPorAreaId: string,
   loteIds: string[],
+  bultosPorLote: Record<string, number> | null = null,
 ) {
   return prisma.tarea.create({
     data: {
@@ -446,6 +447,7 @@ export function crearSolicitud(
       descripcion,
       solicitadaPorAreaId,
       lotes: { connect: loteIds.map((id) => ({ id })) },
+      ...(bultosPorLote ? { bultosPorLote } : {}),
     },
   })
 }

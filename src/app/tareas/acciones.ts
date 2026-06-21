@@ -70,7 +70,12 @@ export async function crearSolicitudAccion(form: FormData) {
     textoOpcional(form, 'otra') ?? textoOpcional(form, 'estipulada') ?? texto(form, 'descripcion')
   if (!solicitanteAreaId || !areaEjecutoraId || !descripcion || areaEjecutoraId === solicitanteAreaId) return
   const loteIds = form.getAll('loteId').map((v) => String(v).trim()).filter(Boolean)
-  await crearSolicitud(areaEjecutoraId, descripcion, solicitanteAreaId, loteIds)
+  const bultos: Record<string, number> = {}
+  for (const id of loteIds) {
+    const b = numeroOpcional(form, `bultos_${id}`)
+    if (b != null) bultos[id] = b
+  }
+  await crearSolicitud(areaEjecutoraId, descripcion, solicitanteAreaId, loteIds, Object.keys(bultos).length > 0 ? bultos : null)
   revalidatePath('/tareas')
 }
 

@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { SelectFincaLote } from '../_componentes/select-finca-lote'
+import { PickerLotesBultos } from './picker-lotes-bultos'
+import { usaBultos } from '@/dominio/bultos'
 
 type Lote = { id: string; nombre: string; finca: { nombre: string } }
 type Estipulada = { id: string; nombre: string }
@@ -25,7 +27,7 @@ export function FormSolicitar({
   const [areaEjecutoraId, setAreaEjecutoraId] = useState('')
   const [estipulada, setEstipulada] = useState('')
   const esMaquinaria = areaEjecutoraId !== '' && areaEjecutoraId === maquinariaAreaId
-  const esFert = estipulada.toUpperCase().includes('FERTILIZA')
+  const conBultos = usaBultos(estipulada)
 
   return (
     <form action={accion} className="flex flex-col gap-2 rounded-xl border border-purple-200 bg-purple-50 p-4">
@@ -62,8 +64,12 @@ export function FormSolicitar({
             <input name="otra" placeholder="Escribe otra si no está en la lista" className="rounded border p-2 text-sm" />
           </label>
           <label className="flex flex-col text-sm">
-            {esFert ? 'Finca y lotes (fertilización — varios, mantén Ctrl/⌘)' : 'Finca y lote'}
-            <SelectFincaLote lotes={lotes} name="loteId" multiple={esFert} />
+            {conBultos ? 'Lotes y bultos por lote' : 'Finca y lote'}
+            {conBultos ? (
+              <PickerLotesBultos lotes={lotes} />
+            ) : (
+              <SelectFincaLote lotes={lotes} name="loteId" />
+            )}
           </label>
         </>
       ) : (
