@@ -97,6 +97,7 @@ model Actividad {
   planB        String?
   noProgramada Boolean @default(false)
   bultosPorLote Json?
+  lotesHechos  Json?
   lotes        Lote[]
 
   @@index([anio, semana, areaId])
