@@ -41,8 +41,10 @@ export function AsignarTareaForm({
   const [turno, setTurno] = useState(turnoPorDia(1))
   const [dias, setDias] = useState<number[]>([])
   const [responsableIds, setResponsableIds] = useState<string[]>(responsables[0] ? [responsables[0].id] : [])
+  const [respAbierto, setRespAbierto] = useState(false)
   const toggleResp = (id: string) =>
     setResponsableIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
+  const nombresSel = responsables.filter((r) => responsableIds.includes(r.id)).map((r) => r.nombre)
   const tieneLotes = lotesTarea.length > 0
 
   const toggleDia = (d: number) => {
@@ -68,13 +70,23 @@ export function AsignarTareaForm({
       <input type="hidden" name="anio" value={anio} />
       <input type="hidden" name="semana" value={semana} />
       <span className="min-w-[160px] flex-1 font-medium">{descripcion}</span>
-      <div className="flex flex-col text-xs">
+      <div className="relative flex flex-col text-xs">
         Responsables
-        <div className="flex flex-wrap gap-1">
+        <button
+          type="button"
+          onClick={() => setRespAbierto((v) => !v)}
+          className="flex w-48 items-center justify-between rounded border p-1 text-sm"
+        >
+          <span className="truncate">{nombresSel.length > 0 ? nombresSel.join(', ') : '— elegir —'}</span>
+          <span className="ml-1 text-gray-500">▾</span>
+        </button>
+        <div
+          className={`absolute top-full left-0 z-10 mt-1 max-h-52 w-56 flex-col gap-1 overflow-auto rounded border bg-white p-2 shadow-lg ${respAbierto ? 'flex' : 'hidden'}`}
+        >
           {responsables.map((r) => (
             <label
               key={r.id}
-              className="flex cursor-pointer items-center gap-1 rounded border px-1.5 py-0.5 has-[:checked]:border-[#11603a] has-[:checked]:bg-green-50"
+              className="flex cursor-pointer items-center gap-1 rounded px-1 py-0.5 hover:bg-gray-50"
             >
               <input
                 type="checkbox"
