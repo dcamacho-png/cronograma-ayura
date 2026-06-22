@@ -152,6 +152,36 @@ describe('tendenciaSemanal', () => {
   })
 })
 
+describe('rankingResponsables (agrupamiento por actividad)', () => {
+  it('tarea multi-día cuenta como UNA actividad, no por días', () => {
+    // Responsable A: tarea T1 de 5 días todos CUMPLIDA + 1 suelta NO_CUMPLIDA
+    // Por actividad: (100% + 0%) / 2 = 50  (por día sería 5/6 = 83)
+    const acts: Actividad[] = [
+      ...[1, 2, 3, 4, 5].map((dia) =>
+        act({ id: `t${dia}`, tareaId: 'T1', dia, responsableId: 'A', estado: 'CUMPLIDA' })),
+      act({ id: 's1', tareaId: null, responsableId: 'A', estado: 'NO_CUMPLIDA' }),
+    ]
+    const { top } = rankingResponsables(acts)
+    const filaA = top.find((f) => f.responsableId === 'A')
+    expect(filaA?.porcentaje).toBe(50)
+  })
+})
+
+describe('tendenciaSemanal (agrupamiento por actividad)', () => {
+  it('tarea multi-día cuenta como UNA actividad en la semana', () => {
+    // Semana 30/2026: tarea TS de 3 días todos CUMPLIDA + 1 suelta NO_CUMPLIDA
+    // Por actividad: (100% + 0%) / 2 = 50  (por día sería 3/4 = 75)
+    const acts: Actividad[] = [
+      ...[1, 2, 3].map((dia) =>
+        act({ id: `s${dia}`, tareaId: 'TS', dia, anio: 2026, semana: 30, estado: 'CUMPLIDA' })),
+      act({ id: 'l1', tareaId: null, anio: 2026, semana: 30, estado: 'NO_CUMPLIDA' }),
+    ]
+    const puntos = tendenciaSemanal(acts)
+    const punto = puntos.find((p) => p.semana === 30 && p.anio === 2026)
+    expect(punto?.porcentaje).toBe(50)
+  })
+})
+
 describe('rankingResponsables (sin solapamiento)', () => {
   it('una misma persona no aparece en top y en bajos a la vez', () => {
     const acts: Actividad[] = [
@@ -172,6 +202,20 @@ describe('rankingResponsables (sin solapamiento)', () => {
 describe('estrellas (borde inferior)', () => {
   it('estrellas(0) es 1', () => {
     expect(estrellas(0)).toBe(1)
+  })
+})
+
+describe('cumplimientoPorArea (agrupamiento por actividad)', () => {
+  it('tarea multi-día cuenta como UNA actividad por área', () => {
+    // Área maiz: tarea TM de 4 días todos CUMPLIDA + 1 suelta NO_CUMPLIDA
+    // Por actividad: (100% + 0%) / 2 = 50  (por día sería 4/5 = 80)
+    const acts: Actividad[] = [
+      ...[1, 2, 3, 4].map((dia) =>
+        act({ id: `m${dia}`, tareaId: 'TM', dia, areaId: 'maiz', estado: 'CUMPLIDA' })),
+      act({ id: 'n1', tareaId: null, areaId: 'maiz', estado: 'NO_CUMPLIDA' }),
+    ]
+    const filas = cumplimientoPorArea(acts)
+    expect(filas).toContainEqual({ areaId: 'maiz', porcentaje: 50 })
   })
 })
 
