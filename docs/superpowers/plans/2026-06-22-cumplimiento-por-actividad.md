@@ -523,6 +523,52 @@ git commit -m "feat(cumplimiento): checkbox cumplido por día y novedad colapsab
 
 ---
 
+### Task 4: Desmarcar un día (revertir a Pendiente) en no-maquinaria
+
+La spec quiere un checkbox reversible. El botón "✓ Cumplido" (Task 3) es de un solo sentido; esta task agrega un control "↩ desmarcar" en el estado registrado para devolver el día a Pendiente. Acotado a **no-maquinaria**: ahí un día solo puede llevar motivo/nota, así que revertir no deja datos huérfanos (en maquinaria habría medida/centro de costo, por eso se deja de un solo sentido).
+
+**Files:**
+- Modify: `src/app/cumplimiento/page.tsx` (bloque de estado registrado dentro de la sub-fila del día)
+
+**Interfaces:**
+- Consumes: `marcarEstadoAccion` de `./acciones` (ya importada en Task 3). `marcarEstadoAccion` valida `estado` contra `ESTADOS_VALIDOS` (que incluye `PENDIENTE`) y aplica `marcarEstado(id, 'PENDIENTE', null, null)` → limpia motivoId/nota. No requiere acción ni función de repositorio nuevas.
+- Produces: nada nuevo; solo un botón de formulario.
+
+- [ ] **Step 1: Agregar el botón "↩ desmarcar" al estado registrado (solo no-maquinaria)**
+
+En `src/app/cumplimiento/page.tsx`, dentro del bloque `else` que muestra el estado registrado (`🔒 registrada`), agregar el botón al final del `<div>`, después del `<span>🔒 registrada</span>`:
+
+```tsx
+                          <span className="text-xs text-gray-400">🔒 registrada</span>
+                          {!esMaquinaria && (
+                            <form action={marcarEstadoAccion} className="ml-auto">
+                              <input type="hidden" name="id" value={a.id} />
+                              <input type="hidden" name="estado" value="PENDIENTE" />
+                              <button className="text-xs text-gray-500 underline hover:text-gray-700">↩ desmarcar</button>
+                            </form>
+                          )}
+```
+
+> `marcarEstadoAccion` ya está importada (Task 3) y revalida `/cumplimiento`, así que al desmarcar el día vuelve a aparecer con el botón "✓ Cumplido" / "registrar novedad". En maquinaria no se muestra el control (el día conserva su medida).
+
+- [ ] **Step 2: Verificar tipos y lint**
+
+Run: `npx tsc --noEmit && npm run lint`
+Expected: sin errores.
+
+- [ ] **Step 3: Verificación manual**
+
+Run: `npm run dev`. En un área **no** maquinaria, marcar un día como "✓ Cumplido" y luego "↩ desmarcar": el día vuelve a Pendiente y el % de la tarjeta baja. En maquinaria, el día registrado **no** muestra "↩ desmarcar".
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add src/app/cumplimiento/page.tsx
+git commit -m "feat(cumplimiento): desmarcar un día (volver a pendiente) en no-maquinaria"
+```
+
+---
+
 ## Self-Review
 
 **Spec coverage:**
