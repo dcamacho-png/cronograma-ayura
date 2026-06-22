@@ -9,7 +9,7 @@ import {
   listarLotes,
   listarMaquinas,
 } from '@/datos/repositorio'
-import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, esSemanaPasada, diaActual, esDiaPasado } from '@/dominio/semana'
+import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, esSemanaFutura, diaActual, esDiaPasado } from '@/dominio/semana'
 import { asignarTareaAccion, devolverAlBancoAccion } from './acciones'
 import { AsignarTareaForm } from './asignar-tarea-form'
 import { GrillaSemana } from './grilla-semana'
@@ -43,7 +43,7 @@ export default async function ProgramarPage({
   const semanaRaw = Number(sp.semana)
   const anio = sp.anio && Number.isInteger(anioRaw) ? anioRaw : hoy.anio
   const semana = sp.semana && Number.isInteger(semanaRaw) ? semanaRaw : hoy.semana
-  const pasada = esSemanaPasada(anio, semana, hoy)
+  const futura = esSemanaFutura(anio, semana, hoy)
   // Días ya pasados de la semana mostrada (solo aplica a la semana actual; en
   // futuras queda vacío y en pasadas el formulario no se muestra).
   const hoyRef = { ...hoy, dia: diaActual() }
@@ -108,13 +108,13 @@ export default async function ProgramarPage({
         </Link>
       </div>
 
-      {pasada && (
+      {!futura && (
         <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
-          🔒 Semana cerrada — solo lectura. No se puede modificar la programación de una semana pasada.
+          🔒 Esta semana ya empezó — solo lectura. La programación se hace antes del lunes de inicio de la semana.
         </div>
       )}
 
-      {!pasada && porAsignar.length > 0 && (
+      {futura && porAsignar.length > 0 && (
         <div className="mb-6 rounded-xl border border-blue-200 bg-blue-50 p-4">
           <h2 className="mb-3 font-semibold text-blue-900">📌 Tareas por asignar — semana {semana}</h2>
           {responsablesActivos.length === 0 ? (
@@ -176,6 +176,7 @@ export default async function ProgramarPage({
           fechas={fechas}
           responsables={responsablesActivos}
           actividades={actividadesCronograma}
+          turnoEditable={futura}
         />
       </div>
     </main>

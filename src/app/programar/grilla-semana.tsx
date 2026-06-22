@@ -1,4 +1,5 @@
 import { InfoLotes } from '../_componentes/info-lotes'
+import { actualizarActividadAccion } from './acciones'
 
 const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
 
@@ -23,12 +24,14 @@ export function GrillaSemana({
   fechas,
   responsables,
   actividades,
+  turnoEditable = false,
 }: {
   areaNombre: string
   semana: number
   fechas: Date[]
   responsables: { id: string; nombre: string }[]
   actividades: ActividadGrilla[]
+  turnoEditable?: boolean
 }) {
   const rango = fechas.length === 7 ? `${fmtFecha(fechas[0])} – ${fmtFecha(fechas[6])}` : ''
   return (
@@ -65,7 +68,16 @@ export function GrillaSemana({
                         {celdas.map((a) => (
                           <div key={a.id} className="mb-1 rounded bg-green-50 p-1">
                             <div>{a.descripcion}</div>
-                            {a.turno && <div className="text-xs text-gray-500">{a.turno}</div>}
+                            {turnoEditable ? (
+                              <form action={actualizarActividadAccion} className="mt-0.5 flex items-center gap-1">
+                                <input type="hidden" name="id" value={a.id} />
+                                <input type="hidden" name="descripcion" value={a.descripcion} />
+                                <input name="turno" defaultValue={a.turno} className="w-20 rounded border p-0.5 text-xs" />
+                                <button className="rounded bg-[#11603a] px-1.5 text-xs font-semibold text-white">✓</button>
+                              </form>
+                            ) : (
+                              a.turno && <div className="text-xs text-gray-500">{a.turno}</div>
+                            )}
                             {a.maquina && <div className="text-xs text-gray-500">🚜 {a.maquina.nombre}</div>}
                             <InfoLotes lotes={a.lotes} bultosPorLote={a.bultosPorLote as Record<string, number> | null} className="mt-1" />
                           </div>
