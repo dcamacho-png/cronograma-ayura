@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearResponsable, actualizarActividad, asignarTarea, quitarSeleccionTarea } from '@/datos/repositorio'
-import { semanaAnterior, esSemanaPasada, semanaActual, diaActual, esDiaPasado } from '@/dominio/semana'
+import { semanaAnterior, esSemanaPasada, semanaActual, diaActual, esDiaPasado, esSemanaFutura } from '@/dominio/semana'
 
 const DIAS_CORTOS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
@@ -78,7 +78,10 @@ export async function actualizarActividadAccion(form: FormData) {
   const id = texto(form, 'id')
   const descripcion = texto(form, 'descripcion')
   const turno = texto(form, 'turno')
+  const anio = Number(texto(form, 'anio'))
+  const semana = Number(texto(form, 'semana'))
   if (!id || !descripcion) return
+  if (!Number.isInteger(anio) || !Number.isInteger(semana) || !esSemanaFutura(anio, semana, semanaActual())) return
   await actualizarActividad(id, descripcion, turno)
   revalidatePath('/programar')
 }

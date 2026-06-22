@@ -172,6 +172,7 @@ export default async function ProgramarPage({
       <div id="grilla-export" className="mb-6">
         <GrillaSemana
           areaNombre={areaActual.nombre}
+          anio={anio}
           semana={semana}
           fechas={fechas}
           responsables={responsablesActivos}

@@ -20,6 +20,7 @@ function fmtFecha(f: Date) {
 
 export function GrillaSemana({
   areaNombre,
+  anio,
   semana,
   fechas,
   responsables,
@@ -27,6 +28,7 @@ export function GrillaSemana({
   turnoEditable = false,
 }: {
   areaNombre: string
+  anio: number
   semana: number
   fechas: Date[]
   responsables: { id: string; nombre: string }[]
@@ -72,8 +74,10 @@ export function GrillaSemana({
                               <form action={actualizarActividadAccion} className="mt-0.5 flex items-center gap-1">
                                 <input type="hidden" name="id" value={a.id} />
                                 <input type="hidden" name="descripcion" value={a.descripcion} />
-                                <input name="turno" defaultValue={a.turno} className="w-20 rounded border p-0.5 text-xs" />
-                                <button className="rounded bg-[#11603a] px-1.5 text-xs font-semibold text-white">✓</button>
+                                <input type="hidden" name="anio" value={anio} />
+                                <input type="hidden" name="semana" value={semana} />
+                                <input aria-label="Turno" name="turno" defaultValue={a.turno} className="w-20 rounded border p-0.5 text-xs" />
+                                <button type="submit" className="rounded bg-[#11603a] px-1.5 text-xs font-semibold text-white">✓</button>
                               </form>
                             ) : (
                               a.turno && <div className="text-xs text-gray-500">{a.turno}</div>

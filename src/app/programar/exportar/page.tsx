@@ -41,6 +41,7 @@ export default async function ExportarPage({
           <div key={area.id} style={i < datos.length - 1 ? { breakAfter: 'page' } : undefined}>
             <GrillaSemana
               areaNombre={area.nombre}
+              anio={anio}
               semana={semana}
               fechas={fechas}
               responsables={responsables}
