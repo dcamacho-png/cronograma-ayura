@@ -94,9 +94,36 @@ export async function devolverAAsignacionAccion(form: FormData) {
 
 Asignar una tarea (futura) → aparece en la grilla → si hubo error, "↩️ Devolver a asignar" borra sus actividades de esa semana y la tarea vuelve a "📌 Tareas por asignar" (misma semana) → se asigna de nuevo correctamente.
 
+### #5 — Sin turno en Ganadería, Nelore y Maíz-Riego
+
+El turno es concepto de Maquinaria. Para las demás áreas (no maquinaria) se oculta en la grilla y se quita del formulario de asignar; la actividad se guarda con turno vacío.
+
+`src/app/programar/asignar-tarea-form.tsx`:
+- Estado inicial del turno según área: `const [turno, setTurno] = useState(esMaquinaria ? turnoPorDia(1) : '')`.
+- Envolver el `<label>Turno …</label>` en `{esMaquinaria && (…)}` (no se muestra para otras áreas).
+- Agregar un hidden para que la acción sepa el área: `<input type="hidden" name="esMaquinaria" value={esMaquinaria ? '1' : ''} />`.
+- (La sección "Máquina por día" ya está bajo `{esMaquinaria && …}`. El aviso `conflictosResp` no cambia: con `turno=''` y actividades guardadas con `''`, en no-maquinaria simplemente no marca conflictos.)
+
+`src/app/programar/acciones.ts` (`asignarTareaAccion`):
+- `const esMaquinaria = texto(form, 'esMaquinaria') === '1'`.
+- Pasar `esMaquinaria` a `asignarTarea`.
+
+`src/datos/repositorio.ts` (`asignarTarea`):
+- Nuevo parámetro final `esMaquinaria: boolean`.
+- Al crear cada actividad: `turno: esMaquinaria ? (turno.trim() || turnoPorDia(dia)) : ''`.
+- (La detección de conflictos sigue igual; en no-maquinaria el `turno=''` hace que `turnoEfectivo('',dia)` no calce con los guardados `''`, así que NO se marcan conflictos de responsable en esas áreas — aceptado: una persona puede tener varias tareas el mismo día ahí.)
+
+`src/app/programar/grilla-semana.tsx`:
+- Nueva prop `esMaquinaria: boolean`.
+- El bloque del turno (form editable o texto) se muestra solo si `esMaquinaria` (envolver todo el `{turnoEditable ? <form> : a.turno && <div>}` en `{esMaquinaria && (…)}`).
+
+`src/app/programar/page.tsx` y `src/app/programar/exportar/page.tsx`:
+- Pasar `esMaquinaria={...}` a `GrillaSemana`. En el export (PDF, todas las áreas) se calcula por cada área: `esMaquinaria: a.nombre.toLowerCase().includes('maquinaria')`.
+
 ## Retrocompatibilidad y constraints
 
 - Sin migración (display + quitar un campo + un borrado/reset).
+- #5: en no-maquinaria el turno se guarda vacío y no se detectan conflictos de responsable por turno (se acepta multi-tarea por día). Maquinaria sin cambios.
 - #4 solo aplica a semanas futuras (mismo umbral `esSemanaFutura` que la edición de turno; con guard de servidor) y solo a actividades con `tareaId` (las "actividades realizadas" sueltas no lo muestran).
 - `devolverAAsignacion` no incrementa `vecesReprogramada` (es una corrección, no una reprogramación).
 - No se toca cumplimiento, resumen, ni el PDF (la grilla del PDF tiene `turnoEditable` por defecto false → no muestra los botones).
@@ -109,4 +136,7 @@ Asignar una tarea (futura) → aparece en la grilla → si hubo error, "↩️ D
 - `src/app/programar/page.tsx` — #2/#3 (quitar `lotes`, pasar `bultosPorLote`).
 - `src/datos/repositorio.ts` — #4 (`devolverAAsignacion`).
 - `src/app/programar/acciones.ts` — #4 (`devolverAAsignacionAccion`).
-- `src/app/programar/grilla-semana.tsx` — #4 (botón + `tareaId` en `ActividadGrilla`).
+- `src/app/programar/grilla-semana.tsx` — #4 (botón + `tareaId` en `ActividadGrilla`) y #5 (ocultar turno si no maquinaria).
+- `src/app/programar/exportar/page.tsx` — #5 (pasar `esMaquinaria` por área a `GrillaSemana`).
+
+(Resumen por archivo: tareas/page.tsx = #1; asignar-tarea-form.tsx = #2/#3/#5; programar/page.tsx = #2/#3/#5; repositorio.ts = #4/#5; programar/acciones.ts = #4/#5; grilla-semana.tsx = #4/#5; exportar/page.tsx = #5.)
