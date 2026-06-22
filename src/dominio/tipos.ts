@@ -22,6 +22,7 @@ export interface Actividad {
   nota: string | null
   vecesReprogramada: number   // 0 si nunca se ha arrastrado
   origenId: string | null     // id de la actividad de la que proviene (reprogramación)
+  tareaId: string | null      // tarea de origen; null si es una actividad suelta
 
   // Campos específicos de maquinaria (opcionales en otras áreas):
   maquinaId?: string | null

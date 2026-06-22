@@ -8,6 +8,7 @@ function act(parcial: Partial<Actividad>): Actividad {
     areaId: 'a', fincaId: 'f', responsableId: 'r',
     descripcion: '', turno: '', estado: 'PENDIENTE',
     motivoId: null, nota: null, vecesReprogramada: 0, origenId: null,
+    tareaId: null,
     maquinaId: null, areaTareaId: null, horas: null, hectareas: null, planB: null,
     ...parcial,
   }

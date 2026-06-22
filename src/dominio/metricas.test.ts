@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { pesoEstado, porcentajeCumplimiento } from './metricas'
+import { pesoEstado, porcentajeCumplimiento, agruparPorActividad } from './metricas'
 import type { Actividad } from './tipos'
 
 // Ayuda para crear actividades de prueba con valores por defecto.
@@ -9,6 +9,7 @@ function act(parcial: Partial<Actividad>): Actividad {
     areaId: 'a', fincaId: 'f', responsableId: 'r',
     descripcion: '', turno: '', estado: 'PENDIENTE',
     motivoId: null, nota: null, vecesReprogramada: 0, origenId: null,
+    tareaId: null,
     ...parcial,
   }
 }
@@ -199,5 +200,68 @@ describe('motivosFrecuentes', () => {
   })
   it('devuelve lista vacía si no hay motivos', () => {
     expect(motivosFrecuentes([act({ motivoId: null })])).toEqual([])
+  })
+})
+
+describe('porcentajeCumplimiento por actividad', () => {
+  it('cuenta cada actividad como una, no por días (agrupa por tareaId)', () => {
+    const acts: Actividad[] = [
+      ...[1, 2, 3, 4, 5].map((dia) =>
+        act({ id: `x${dia}`, tareaId: 'T1', dia, estado: 'CUMPLIDA' })),
+      act({ id: 'y1', tareaId: 'T2', dia: 1, estado: 'NO_CUMPLIDA' }),
+    ]
+    // Por actividad: (100% + 0%) / 2 = 50  (por día sería 5/6 = 83)
+    expect(porcentajeCumplimiento(acts)).toBe(50)
+  })
+
+  it('una actividad multi-día parcial da su fracción proporcional', () => {
+    const acts: Actividad[] = [1, 2, 3, 4, 5].map((dia) =>
+      act({ id: `x${dia}`, tareaId: 'T1', dia, estado: dia <= 3 ? 'CUMPLIDA' : 'NO_CUMPLIDA' }))
+    // 3 de 5 días = 60%; una sola actividad => 60
+    expect(porcentajeCumplimiento(acts)).toBe(60)
+  })
+
+  it('una novedad por día (NO_CUMPLIDA) baja el % de su actividad', () => {
+    const acts: Actividad[] = [
+      act({ id: 'a1', tareaId: 'T1', dia: 1, estado: 'CUMPLIDA' }),
+      act({ id: 'a2', tareaId: 'T1', dia: 2, estado: 'CUMPLIDA' }),
+      act({ id: 'a3', tareaId: 'T1', dia: 3, estado: 'NO_CUMPLIDA' }),
+    ]
+    // 2/3 = 0.667 -> 67
+    expect(porcentajeCumplimiento(acts)).toBe(67)
+  })
+
+  it('actividades sueltas (sin tareaId) cuentan una cada una', () => {
+    const acts: Actividad[] = [
+      act({ id: 's1', tareaId: null, estado: 'CUMPLIDA' }),
+      act({ id: 's2', tareaId: null, estado: 'NO_CUMPLIDA' }),
+    ]
+    // (100 + 0) / 2 = 50
+    expect(porcentajeCumplimiento(acts)).toBe(50)
+  })
+
+  it('mezcla: 1 actividad multi-día + 1 suelta', () => {
+    const acts: Actividad[] = [
+      ...[1, 2, 3, 4, 5].map((dia) =>
+        act({ id: `m${dia}`, tareaId: 'T1', dia, estado: 'CUMPLIDA' })),
+      act({ id: 's1', tareaId: null, estado: 'NO_CUMPLIDA' }),
+    ]
+    // (100 + 0) / 2 = 50  (por día sería 5/6 = 83)
+    expect(porcentajeCumplimiento(acts)).toBe(50)
+  })
+})
+
+describe('agruparPorActividad', () => {
+  it('une las filas con el mismo tareaId y separa las sueltas', () => {
+    const acts: Actividad[] = [
+      act({ id: 'a1', tareaId: 'T1', dia: 1 }),
+      act({ id: 'a2', tareaId: 'T1', dia: 2 }),
+      act({ id: 's1', tareaId: null }),
+      act({ id: 's2', tareaId: null }),
+    ]
+    const grupos = agruparPorActividad(acts)
+    expect(grupos.size).toBe(3)               // T1 (2 días) + 2 sueltas
+    expect(grupos.get('T1')?.length).toBe(2)
+    expect(grupos.get('solo:s1')?.length).toBe(1)
   })
 })

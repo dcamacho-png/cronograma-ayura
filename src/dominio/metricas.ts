@@ -34,16 +34,38 @@ export function pesoEstado(estado: Estado): number | null {
   }
 }
 
-// % de cumplimiento sobre el TOTAL de actividades: Cumplida=1, Parcial=0.5,
-// No cumplida / Pendiente / Reprogramada = 0. Devuelve null solo si no hay actividades.
+// Agrupa filas-día en actividades: misma tareaId = una actividad;
+// sin tareaId, cada fila es su propia actividad (clave `solo:${id}`).
+// Genérico para reutilizarse también sobre filas de Prisma en la UI.
+export function agruparPorActividad<T extends { id: string; tareaId?: string | null }>(
+  items: T[],
+): Map<string, T[]> {
+  const grupos = new Map<string, T[]>()
+  for (const a of items) {
+    const k = a.tareaId ?? `solo:${a.id}`
+    const lista = grupos.get(k) ?? []
+    lista.push(a)
+    grupos.set(k, lista)
+  }
+  return grupos
+}
+
+// Fracción de cumplimiento (0..1) de UNA actividad: promedio del peso de sus
+// días. Pendiente/Reprogramada cuentan 0; el denominador son todos los días.
+function fraccionActividad(dias: { estado: Estado }[]): number {
+  const suma = dias.reduce((acc, a) => acc + (pesoEstado(a.estado) ?? 0), 0)
+  return suma / dias.length
+}
+
+// % de cumplimiento contando cada actividad como UNA (no por días).
+// Agrupa por tareaId, calcula la fracción de cada actividad y las promedia.
+// Devuelve null solo si no hay actividades.
 export function porcentajeCumplimiento(actividades: Actividad[]): number | null {
   if (actividades.length === 0) return null
-  const suma = actividades.reduce((acc, a) => {
-    if (a.estado === 'CUMPLIDA') return acc + 1
-    if (a.estado === 'PARCIAL') return acc + 0.5
-    return acc
-  }, 0)
-  return Math.round((suma / actividades.length) * 100)
+  const grupos = agruparPorActividad(actividades)
+  let suma = 0
+  for (const dias of grupos.values()) suma += fraccionActividad(dias)
+  return Math.round((suma / grupos.size) * 100)
 }
 
 // Traduce un % (0..100) a estrellas (1..5).
