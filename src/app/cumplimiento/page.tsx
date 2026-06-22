@@ -254,6 +254,13 @@ export default async function CumplimientoPage({
                             <span className="text-gray-500">· ✅ Realizados: {textoLotesHechos(a.lotes, a.lotesHechos as string[] | null)}</span>
                           )}
                           <span className="text-xs text-gray-400">🔒 registrada</span>
+                          {!esMaquinaria && (
+                            <form action={marcarEstadoAccion} className="ml-auto">
+                              <input type="hidden" name="id" value={a.id} />
+                              <input type="hidden" name="estado" value="PENDIENTE" />
+                              <button className="text-xs text-gray-500 underline hover:text-gray-700">↩ desmarcar</button>
+                            </form>
+                          )}
                         </div>
                       )}
                     </li>
