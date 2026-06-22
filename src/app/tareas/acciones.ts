@@ -7,6 +7,8 @@ import {
   seleccionarTarea,
   quitarSeleccionTarea,
   crearSolicitud,
+  devolverAlSolicitante,
+  reenviarSolicitud,
 } from '@/datos/repositorio'
 import { esSemanaPasada, semanaActual } from '@/dominio/semana'
 
@@ -82,6 +84,18 @@ export async function crearSolicitudAccion(form: FormData) {
   }
   const detalle = textoOpcional(form, 'detalle')
   await crearSolicitud(areaEjecutoraId, descripcion, solicitanteAreaId, loteIds, Object.keys(bultos).length > 0 ? bultos : null, detalle)
+  revalidatePath('/tareas')
+}
+
+export async function devolverAlSolicitanteAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (id) await devolverAlSolicitante(id)
+  revalidatePath('/tareas')
+}
+
+export async function reenviarSolicitudAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (id) await reenviarSolicitud(id)
   revalidatePath('/tareas')
 }
 

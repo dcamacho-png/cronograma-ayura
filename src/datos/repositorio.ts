@@ -470,6 +470,22 @@ export function crearSolicitud(
   })
 }
 
+// Maquinaria devuelve una tarea solicitada al área que la pidió (no la elimina).
+export function devolverAlSolicitante(id: string) {
+  return prisma.tarea.update({
+    where: { id },
+    data: { estado: 'DEVUELTA', anioSel: null, semanaSel: null },
+  })
+}
+
+// El área solicitante vuelve a enviar al banco de la ejecutora una tarea devuelta.
+export function reenviarSolicitud(id: string) {
+  return prisma.tarea.update({
+    where: { id },
+    data: { estado: 'PENDIENTE', anioSel: null, semanaSel: null },
+  })
+}
+
 // Tareas que un área solicitó a otras (para seguimiento), con el área ejecutora incluida.
 export function listarSolicitudesDeArea(areaId: string) {
   return prisma.tarea.findMany({

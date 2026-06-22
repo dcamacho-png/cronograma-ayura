@@ -13,7 +13,7 @@ import { InfoLotes } from '../_componentes/info-lotes'
 import { SelectFincaLote } from '../_componentes/select-finca-lote'
 import { FormNuevaTareaMaquinaria } from './form-nueva-tarea-maquinaria'
 import { FormSolicitar } from './form-solicitar'
-import { crearTareaAccion, eliminarTareaAccion, programarTareaAccion, crearSolicitudAccion } from './acciones'
+import { crearTareaAccion, eliminarTareaAccion, programarTareaAccion, crearSolicitudAccion, devolverAlSolicitanteAccion, reenviarSolicitudAccion } from './acciones'
 
 export default async function TareasPage({
   searchParams,
@@ -149,10 +149,17 @@ export default async function TareasPage({
                     </label>
                     <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">Guardar</button>
                   </form>
-                  <form action={eliminarTareaAccion}>
-                    <input type="hidden" name="id" value={t.id} />
-                    <button className="text-sm text-red-600 hover:underline">eliminar</button>
-                  </form>
+                  {t.solicitadaPorArea ? (
+                    <form action={devolverAlSolicitanteAccion}>
+                      <input type="hidden" name="id" value={t.id} />
+                      <button className="text-sm text-amber-700 hover:underline">↩️ Devolver al solicitante</button>
+                    </form>
+                  ) : (
+                    <form action={eliminarTareaAccion}>
+                      <input type="hidden" name="id" value={t.id} />
+                      <button className="text-sm text-red-600 hover:underline">eliminar</button>
+                    </form>
+                  )}
                 </li>
               )
             })}
@@ -172,13 +179,19 @@ export default async function TareasPage({
                   <span>
                     {s.descripcion} <span className="text-gray-500">· para {s.area.nombre}</span>
                   </span>
-                  <span className={s.estado === 'PROGRAMADA' ? 'text-[#2e9e5b]' : 'text-gray-500'}>
-                    {s.estado === 'PROGRAMADA' ? '✅ Programada' : '🕓 En banco'}
+                  <span className={s.estado === 'PROGRAMADA' ? 'text-[#2e9e5b]' : s.estado === 'DEVUELTA' ? 'text-red-600' : 'text-gray-500'}>
+                    {s.estado === 'PROGRAMADA' ? '✅ Programada' : s.estado === 'DEVUELTA' ? '🔴 No realizada' : '🕓 En banco'}
                   </span>
                 </div>
                 <InfoLotes lotes={s.lotes} />
                 {s.detalle && (
                   <div className="mt-1 whitespace-pre-line text-xs text-gray-600">📝 {s.detalle}</div>
+                )}
+                {s.estado === 'DEVUELTA' && (
+                  <form action={reenviarSolicitudAccion} className="mt-1">
+                    <input type="hidden" name="id" value={s.id} />
+                    <button className="text-xs font-semibold text-purple-700 hover:underline">Reenviar</button>
+                  </form>
                 )}
               </li>
             ))}
