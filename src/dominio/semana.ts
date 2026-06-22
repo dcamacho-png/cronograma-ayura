@@ -44,9 +44,21 @@ export function semanaAnterior(anio: number, semana: number): Semana {
   return isoSemanaDeFecha(lunes)
 }
 
-// Semana ISO actual (usa la fecha del sistema; no es determinista, por eso no se prueba).
+// Colombia es UTC-5 todo el año (no usa horario de verano). El servidor (Vercel)
+// corre en UTC, así que para "hoy" hay que convertir a hora de Colombia; si no,
+// la semana/día avanzan ~5 horas antes (un domingo en la noche ya sería lunes en UTC).
+const OFFSET_COLOMBIA_MS = 5 * 60 * 60 * 1000
+
+// Devuelve un Date cuyos campos UTC representan la hora "de pared" en Colombia,
+// para reutilizar isoSemanaDeFecha/diaIsoDeFecha (que leen campos UTC).
+export function aHoraColombia(instante: Date): Date {
+  return new Date(instante.getTime() - OFFSET_COLOMBIA_MS)
+}
+
+// Semana ISO actual en hora de Colombia (no determinista; el caso de borde se
+// prueba vía aHoraColombia).
 export function semanaActual(): Semana {
-  return isoSemanaDeFecha(new Date())
+  return isoSemanaDeFecha(aHoraColombia(new Date()))
 }
 
 // Semanas ISO cuyo jueves cae en el mes calendario dado (mes: 1-12), en orden.
@@ -104,9 +116,9 @@ export function diaIsoDeFecha(fecha: Date): number {
   return ((d.getUTCDay() + 6) % 7) + 1
 }
 
-// Día ISO de hoy (lunes = 1 ... domingo = 7), en UTC (misma convención que semanaActual).
+// Día ISO de hoy (lunes = 1 ... domingo = 7), en hora de Colombia (igual que semanaActual).
 export function diaActual(): number {
-  return diaIsoDeFecha(new Date())
+  return diaIsoDeFecha(aHoraColombia(new Date()))
 }
 
 // ¿El día (anio, semana, dia) ya pasó respecto a hoy? Considera año, semana y día.

@@ -139,3 +139,21 @@ describe('esDiaPasado', () => {
     expect(esDiaPasado(2027, 1, 1, hoy)).toBe(false)
   })
 })
+
+import { aHoraColombia } from './semana'
+
+describe('aHoraColombia (UTC-5, sin horario de verano)', () => {
+  it('domingo 23:00 Colombia (= lunes 04:00 UTC) sigue siendo domingo de la semana 25', () => {
+    // 2026-06-22T04:00Z = 2026-06-21 23:00 en Colombia → domingo, semana 25.
+    const instante = new Date('2026-06-22T04:00:00Z')
+    expect(isoSemanaDeFecha(aHoraColombia(instante))).toEqual({ anio: 2026, semana: 25 })
+    expect(diaIsoDeFecha(aHoraColombia(instante))).toBe(7) // domingo
+    // Sin ajuste, en UTC ya sería lunes de la semana 26 (el bug):
+    expect(isoSemanaDeFecha(instante)).toEqual({ anio: 2026, semana: 26 })
+  })
+  it('lunes 00:00 Colombia (= lunes 05:00 UTC) ya es lunes de la semana 26', () => {
+    const instante = new Date('2026-06-22T05:00:00Z')
+    expect(isoSemanaDeFecha(aHoraColombia(instante))).toEqual({ anio: 2026, semana: 26 })
+    expect(diaIsoDeFecha(aHoraColombia(instante))).toBe(1) // lunes
+  })
+})
