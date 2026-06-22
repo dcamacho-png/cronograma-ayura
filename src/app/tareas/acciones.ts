@@ -10,7 +10,7 @@ import {
   devolverAlSolicitante,
   reenviarSolicitud,
 } from '@/datos/repositorio'
-import { esSemanaPasada, semanaActual } from '@/dominio/semana'
+import { esSemanaPasada, esSemanaFutura, semanaActual } from '@/dominio/semana'
 
 function texto(form: FormData, clave: string): string {
   const v = form.get(clave)
@@ -109,7 +109,10 @@ export async function programarTareaAccion(form: FormData) {
     const [anioStr, semanaStr] = v.split('-')
     const anio = Number(anioStr)
     const semana = Number(semanaStr)
-    if (Number.isInteger(anio) && Number.isInteger(semana)) await seleccionarTarea(id, anio, semana)
+    if (Number.isInteger(anio) && Number.isInteger(semana)) {
+      if (!esSemanaFutura(anio, semana, semanaActual())) return
+      await seleccionarTarea(id, anio, semana)
+    }
   }
   revalidatePath('/tareas')
 }

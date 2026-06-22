@@ -48,8 +48,8 @@ export default async function TareasPage({
   ])
 
   const semanas: { anio: number; semana: number }[] = []
-  let w = semanaActual()
-  for (let i = 0; i < 9; i++) {
+  let w = siguienteSemana(semanaActual().anio, semanaActual().semana)
+  for (let i = 0; i < 8; i++) {
     semanas.push(w)
     w = siguienteSemana(w.anio, w.semana)
   }
@@ -142,7 +142,7 @@ export default async function TareasPage({
                         <option value="">Elegir semana…</option>
                         {opciones.map((s) => (
                           <option key={`${s.anio}-${s.semana}`} value={`${s.anio}-${s.semana}`}>
-                            Semana {s.semana}{s.anio === semanas[0].anio && s.semana === semanas[0].semana ? ' (esta)' : ''} · {s.anio}
+                            Semana {s.semana} · {s.anio}
                           </option>
                         ))}
                       </select>
