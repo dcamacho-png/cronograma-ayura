@@ -471,6 +471,13 @@ export function crearSolicitud(
   })
 }
 
+// Deshace la asignación de una tarea en una semana: borra sus actividades de esa
+// semana y la deja PENDIENTE en la misma semana (reaparece en "Tareas por asignar").
+export async function devolverAAsignacion(tareaId: string, anio: number, semana: number) {
+  await prisma.actividad.deleteMany({ where: { tareaId, anio, semana } })
+  return prisma.tarea.update({ where: { id: tareaId }, data: { estado: 'PENDIENTE' } })
+}
+
 // Maquinaria devuelve una tarea solicitada al área que la pidió (no la elimina).
 export function devolverAlSolicitante(id: string) {
   return prisma.tarea.update({

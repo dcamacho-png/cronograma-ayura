@@ -176,6 +176,7 @@ export default async function ProgramarPage({
           responsables={responsablesActivos}
           actividades={actividadesCronograma}
           turnoEditable={futura}
+          esMaquinaria={esMaquinaria}
         />
       </div>
     </main>

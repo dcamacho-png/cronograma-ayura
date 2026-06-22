@@ -46,6 +46,7 @@ export default async function ExportarPage({
               fechas={fechas}
               responsables={responsables}
               actividades={actividades}
+              esMaquinaria={area.nombre.toLowerCase().includes('maquinaria')}
             />
           </div>
         ))}

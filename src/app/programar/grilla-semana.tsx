@@ -1,5 +1,5 @@
 import { InfoLotes } from '../_componentes/info-lotes'
-import { actualizarActividadAccion } from './acciones'
+import { actualizarActividadAccion, devolverAAsignacionAccion } from './acciones'
 
 const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
 
@@ -9,6 +9,7 @@ type ActividadGrilla = {
   dia: number
   descripcion: string
   turno: string
+  tareaId: string | null
   maquina: { nombre: string } | null
   lotes: { id: string; nombre: string; hectareas: number | null }[]
   bultosPorLote?: unknown
@@ -26,6 +27,7 @@ export function GrillaSemana({
   responsables,
   actividades,
   turnoEditable = false,
+  esMaquinaria,
 }: {
   areaNombre: string
   anio: number
@@ -34,6 +36,7 @@ export function GrillaSemana({
   responsables: { id: string; nombre: string }[]
   actividades: ActividadGrilla[]
   turnoEditable?: boolean
+  esMaquinaria: boolean
 }) {
   const rango = fechas.length === 7 ? `${fmtFecha(fechas[0])} – ${fmtFecha(fechas[6])}` : ''
   return (
@@ -70,7 +73,7 @@ export function GrillaSemana({
                         {celdas.map((a) => (
                           <div key={a.id} className="mb-1 rounded bg-green-50 p-1">
                             <div>{a.descripcion}</div>
-                            {turnoEditable ? (
+                            {esMaquinaria && (turnoEditable ? (
                               <form action={actualizarActividadAccion} className="mt-0.5 flex items-center gap-1">
                                 <input type="hidden" name="id" value={a.id} />
                                 <input type="hidden" name="descripcion" value={a.descripcion} />
@@ -81,9 +84,17 @@ export function GrillaSemana({
                               </form>
                             ) : (
                               a.turno && <div className="text-xs text-gray-500">{a.turno}</div>
-                            )}
+                            ))}
                             {a.maquina && <div className="text-xs text-gray-500">🚜 {a.maquina.nombre}</div>}
                             <InfoLotes lotes={a.lotes} bultosPorLote={a.bultosPorLote as Record<string, number> | null} className="mt-1" />
+                            {turnoEditable && a.tareaId && (
+                              <form action={devolverAAsignacionAccion} className="mt-0.5">
+                                <input type="hidden" name="tareaId" value={a.tareaId} />
+                                <input type="hidden" name="anio" value={anio} />
+                                <input type="hidden" name="semana" value={semana} />
+                                <button type="submit" className="text-xs text-amber-700 hover:underline">↩️ Devolver a asignar</button>
+                              </form>
+                            )}
                           </div>
                         ))}
                       </td>
