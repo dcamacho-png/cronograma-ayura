@@ -129,7 +129,7 @@ export default async function TareasPage({
                         </span>
                       )}
                     </div>
-                    <InfoLotes lotes={t.lotes} />
+                    <InfoLotes lotes={t.lotes} bultosPorLote={t.bultosPorLote as Record<string, number> | null} />
                     {t.detalle && (
                       <div className="mt-1 whitespace-pre-line text-xs text-gray-600">📝 {t.detalle}</div>
                     )}
@@ -183,7 +183,7 @@ export default async function TareasPage({
                     {s.estado === 'PROGRAMADA' ? '✅ Programada' : s.estado === 'DEVUELTA' ? '🔴 No realizada' : '🕓 En banco'}
                   </span>
                 </div>
-                <InfoLotes lotes={s.lotes} />
+                <InfoLotes lotes={s.lotes} bultosPorLote={s.bultosPorLote as Record<string, number> | null} />
                 {s.detalle && (
                   <div className="mt-1 whitespace-pre-line text-xs text-gray-600">📝 {s.detalle}</div>
                 )}
