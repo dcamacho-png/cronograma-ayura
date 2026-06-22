@@ -5,7 +5,7 @@ import { listarAreas, listarMotivos, listarActividades, listarLotes, listarMaqui
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana } from '@/dominio/semana'
 import { unidadDe } from '@/dominio/unidad'
 import { textoLotesHechos } from '@/dominio/lotes-hechos'
-import { porcentajeCumplimiento, colorSemaforo } from '@/dominio/metricas'
+import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
 import { registrarAccion, agregarActividadRealizadaAccion } from './acciones'
 import { FormActividadRealizada } from './form-actividad-realizada'
@@ -73,6 +73,12 @@ export default async function CumplimientoPage({
   const unidadPorNombre = Object.fromEntries(estipuladas.map((e) => [e.nombre, e.unidad]))
 
   const pendientes = actividades.filter((a) => a.estado === 'PENDIENTE').length
+
+  // Agrupar las filas-día en actividades (misma tarea = una tarjeta).
+  // Cada grupo se ordena por día; las tarjetas, por el primer día de la actividad.
+  const gruposActividad = [...agruparPorActividad(actividades).values()]
+    .map((dias) => [...dias].sort((a, b) => a.dia - b.dia))
+    .sort((g1, g2) => g1[0].dia - g2[0].dia)
 
   const dominio = actividades as unknown as ActividadDominio[]
   const pct = porcentajeCumplimiento(dominio)
@@ -176,54 +182,70 @@ export default async function CumplimientoPage({
           No hay actividades en esta semana. Prográmalas en la pestaña <b>Programar</b>.
         </p>
       ) : (
-        <ul className="space-y-3">
-          {actividades.map((a) => (
-            <li key={a.id} className="rounded-lg border p-3">
-              <div className="mb-2 flex items-center gap-2 text-sm">
-                <span className="font-semibold">{DIAS[a.dia] ?? ''} {fechas[a.dia - 1] ? fmtFecha(fechas[a.dia - 1]) : ''}</span>
-                <span>·</span>
-                <span>{a.responsable.nombre}</span>
-                {a.vecesReprogramada > 0 && (
-                  <span
-                    className="ml-auto rounded px-2 py-0.5 text-xs font-semibold text-white"
-                    style={{ backgroundColor: COLOR_HEX[colorSemaforo(a.vecesReprogramada)] }}
-                  >
-                    reprogramada {a.vecesReprogramada}×
-                  </span>
-                )}
-              </div>
-              <div className="mb-2 font-medium">{a.descripcion}</div>
-              {a.maquina && <div className="mb-2 text-sm text-gray-600">🚜 {a.maquina.nombre}</div>}
-              <InfoLotes lotes={a.lotes} bultosPorLote={a.bultosPorLote as Record<string, number> | null} className="mb-2" />
-
-              {a.estado === 'PENDIENTE' ? (
-                <FormRegistrar
-                  actividadId={a.id}
-                  esMaquinaria={esMaquinaria}
-                  unidad={unidadDe(unidadPorNombre, a.descripcion)}
-                  motivos={motivos}
-                  motivoCambioId={motivoCambioId}
-                  lotes={lotes}
-                  maquinas={maquinas}
-                  estipuladas={estipuladas}
-                  haProgramada={a.lotes.reduce((s, l) => s + (l.hectareas ?? 0), 0)}
-                  lotesActividad={a.lotes}
-                  accion={registrarAccion}
-                />
-              ) : (
-                <div className="flex flex-wrap items-center gap-2 text-sm">
-                  <span className="font-semibold">{ESTADOS.find((e) => e.valor === a.estado)?.etiqueta ?? a.estado}</span>
-                  {a.motivo && <span className="text-gray-500">· {a.motivo.nombre}</span>}
-                  {a.nota && <span className="text-gray-500">· {a.nota}</span>}
-                  {a.centroCosto && <span className="text-gray-500">· 🏷️ {a.centroCosto}</span>}
-                  {textoLotesHechos(a.lotes, a.lotesHechos as string[] | null) && (
-                    <span className="text-gray-500">· ✅ Realizados: {textoLotesHechos(a.lotes, a.lotesHechos as string[] | null)}</span>
+        <ul className="space-y-4">
+          {gruposActividad.map((dias) => {
+            const cab = dias[0]
+            const pctAct = porcentajeCumplimiento(dias as unknown as ActividadDominio[])
+            const esMultiDia = dias.length > 1
+            return (
+              <li key={cab.tareaId ?? cab.id} className="rounded-lg border p-3">
+                <div className="mb-2 flex items-center gap-2 text-sm">
+                  <span className="font-medium">{cab.descripcion}</span>
+                  <span>·</span>
+                  <span>{cab.responsable.nombre}</span>
+                  {cab.maquina && <span className="text-gray-600">· 🚜 {cab.maquina.nombre}</span>}
+                  {cab.vecesReprogramada > 0 && (
+                    <span
+                      className="rounded px-2 py-0.5 text-xs font-semibold text-white"
+                      style={{ backgroundColor: COLOR_HEX[colorSemaforo(cab.vecesReprogramada)] }}
+                    >
+                      reprogramada {cab.vecesReprogramada}×
+                    </span>
                   )}
-                  <span className="text-xs text-gray-400">🔒 registrada</span>
+                  <span className="ml-auto rounded bg-gray-100 px-2 py-0.5 text-xs">
+                    {esMultiDia ? `${dias.length} días · ` : ''}Cumplido: <b>{pctAct === null ? '—' : `${pctAct}%`}</b>
+                  </span>
                 </div>
-              )}
-            </li>
-          ))}
+                <InfoLotes lotes={cab.lotes} bultosPorLote={cab.bultosPorLote as Record<string, number> | null} className="mb-2" />
+
+                <ul className="space-y-2">
+                  {dias.map((a) => (
+                    <li key={a.id} className="rounded border border-gray-100 bg-gray-50/50 p-2">
+                      <div className="mb-1 text-xs font-semibold text-gray-600">
+                        {DIAS[a.dia] ?? ''} {fechas[a.dia - 1] ? fmtFecha(fechas[a.dia - 1]) : ''}
+                      </div>
+                      {a.estado === 'PENDIENTE' ? (
+                        <FormRegistrar
+                          actividadId={a.id}
+                          esMaquinaria={esMaquinaria}
+                          unidad={unidadDe(unidadPorNombre, a.descripcion)}
+                          motivos={motivos}
+                          motivoCambioId={motivoCambioId}
+                          lotes={lotes}
+                          maquinas={maquinas}
+                          estipuladas={estipuladas}
+                          haProgramada={a.lotes.reduce((s, l) => s + (l.hectareas ?? 0), 0)}
+                          lotesActividad={a.lotes}
+                          accion={registrarAccion}
+                        />
+                      ) : (
+                        <div className="flex flex-wrap items-center gap-2 text-sm">
+                          <span className="font-semibold">{ESTADOS.find((e) => e.valor === a.estado)?.etiqueta ?? a.estado}</span>
+                          {a.motivo && <span className="text-gray-500">· {a.motivo.nombre}</span>}
+                          {a.nota && <span className="text-gray-500">· {a.nota}</span>}
+                          {a.centroCosto && <span className="text-gray-500">· 🏷️ {a.centroCosto}</span>}
+                          {textoLotesHechos(a.lotes, a.lotesHechos as string[] | null) && (
+                            <span className="text-gray-500">· ✅ Realizados: {textoLotesHechos(a.lotes, a.lotesHechos as string[] | null)}</span>
+                          )}
+                          <span className="text-xs text-gray-400">🔒 registrada</span>
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            )
+          })}
         </ul>
       )}
     </main>
