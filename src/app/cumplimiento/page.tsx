@@ -7,10 +7,11 @@ import { unidadDe } from '@/dominio/unidad'
 import { textoLotesHechos } from '@/dominio/lotes-hechos'
 import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
-import { registrarAccion, agregarActividadRealizadaAccion } from './acciones'
+import { registrarAccion, agregarActividadRealizadaAccion, marcarEstadoAccion } from './acciones'
 import { FormActividadRealizada } from './form-actividad-realizada'
 import { InfoLotes } from '../_componentes/info-lotes'
 import { FormRegistrar } from './form-registrar'
+import { DiaNoMaquinaria } from './dia-no-maquinaria'
 
 const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
@@ -215,19 +216,34 @@ export default async function CumplimientoPage({
                         {DIAS[a.dia] ?? ''} {fechas[a.dia - 1] ? fmtFecha(fechas[a.dia - 1]) : ''}
                       </div>
                       {a.estado === 'PENDIENTE' ? (
-                        <FormRegistrar
-                          actividadId={a.id}
-                          esMaquinaria={esMaquinaria}
-                          unidad={unidadDe(unidadPorNombre, a.descripcion)}
-                          motivos={motivos}
-                          motivoCambioId={motivoCambioId}
-                          lotes={lotes}
-                          maquinas={maquinas}
-                          estipuladas={estipuladas}
-                          haProgramada={a.lotes.reduce((s, l) => s + (l.hectareas ?? 0), 0)}
-                          lotesActividad={a.lotes}
-                          accion={registrarAccion}
-                        />
+                        esMaquinaria ? (
+                          <FormRegistrar
+                            actividadId={a.id}
+                            esMaquinaria={esMaquinaria}
+                            unidad={unidadDe(unidadPorNombre, a.descripcion)}
+                            motivos={motivos}
+                            motivoCambioId={motivoCambioId}
+                            lotes={lotes}
+                            maquinas={maquinas}
+                            estipuladas={estipuladas}
+                            haProgramada={a.lotes.reduce((s, l) => s + (l.hectareas ?? 0), 0)}
+                            lotesActividad={a.lotes}
+                            accion={registrarAccion}
+                          />
+                        ) : (
+                          <DiaNoMaquinaria
+                            actividadId={a.id}
+                            motivos={motivos}
+                            motivoCambioId={motivoCambioId}
+                            lotes={lotes}
+                            maquinas={maquinas}
+                            estipuladas={estipuladas}
+                            lotesActividad={a.lotes}
+                            unidad={unidadDe(unidadPorNombre, a.descripcion)}
+                            marcarCumplido={marcarEstadoAccion}
+                            accionRegistrar={registrarAccion}
+                          />
+                        )
                       ) : (
                         <div className="flex flex-wrap items-center gap-2 text-sm">
                           <span className="font-semibold">{ESTADOS.find((e) => e.valor === a.estado)?.etiqueta ?? a.estado}</span>
