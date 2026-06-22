@@ -99,13 +99,14 @@ export async function asignarTareaAccion(form: FormData) {
     .filter((d) => !esDiaPasado(anioForm, semanaForm, d, hoy))
   const loteId = textoOpcional(form, 'loteId')
   const turno = texto(form, 'turno')
+  const esMaquinaria = texto(form, 'esMaquinaria') === '1'
   const maquinaPorDia: Record<number, string | null> = {}
   for (const dia of dias) {
     const m = textoOpcional(form, `maquina_${dia}`)
     maquinaPorDia[dia] = m || null
   }
   if (!tareaId || responsableIds.length === 0 || dias.length === 0) return
-  const res = await asignarTarea(tareaId, responsableIds, dias, loteId, turno, maquinaPorDia)
+  const res = await asignarTarea(tareaId, responsableIds, dias, loteId, turno, maquinaPorDia, esMaquinaria)
   if (res.ok === false && res.motivo === 'conflicto') {
     const partes = res.conflictos.map((c) =>
       c.tipo === 'responsable'

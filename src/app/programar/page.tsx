@@ -6,7 +6,6 @@ import {
   listarResponsablesPorArea,
   listarActividades,
   tareasPorAsignar,
-  listarLotes,
   listarMaquinas,
 } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, esSemanaFutura, diaActual, esDiaPasado } from '@/dominio/semana'
@@ -49,11 +48,10 @@ export default async function ProgramarPage({
   const hoyRef = { ...hoy, dia: diaActual() }
   const diasPasados = [1, 2, 3, 4, 5, 6, 7].filter((d) => esDiaPasado(anio, semana, d, hoyRef))
 
-  const [responsables, actividades, porAsignar, lotes, maquinas] = await Promise.all([
+  const [responsables, actividades, porAsignar, maquinas] = await Promise.all([
     listarResponsablesPorArea(areaId),
     listarActividades(areaId, anio, semana),
     tareasPorAsignar(areaId, anio, semana),
-    listarLotes(),
     listarMaquinas(),
   ])
   const esMaquinaria = areaActual.nombre.toLowerCase().includes('maquinaria')
@@ -127,8 +125,8 @@ export default async function ProgramarPage({
                     tareaId={t.id}
                     descripcion={t.descripcion}
                     lotesTarea={t.lotes}
+                    bultosPorLote={t.bultosPorLote as Record<string, number> | null}
                     responsables={responsablesActivos}
-                    lotes={lotes}
                     esMaquinaria={esMaquinaria}
                     maquinas={maquinas}
                     ocupacion={ocupacion}

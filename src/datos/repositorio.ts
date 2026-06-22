@@ -252,6 +252,7 @@ export async function asignarTarea(
   loteIdFallback: string | null,
   turno: string,
   maquinaPorDia: Record<number, string | null> = {},
+  esMaquinaria = true,
 ): Promise<
   | { ok: false; motivo: 'tarea' }
   | { ok: false; motivo: 'conflicto'; conflictos: Conflicto[] }
@@ -299,7 +300,7 @@ export async function asignarTarea(
             semana,
             dia,
             descripcion: tarea.descripcion,
-            turno: turno.trim() || turnoPorDia(dia),
+            turno: esMaquinaria ? (turno.trim() || turnoPorDia(dia)) : '',
             vecesReprogramada: tarea.vecesReprogramada,
             areaId: tarea.areaId,
             fincaId,

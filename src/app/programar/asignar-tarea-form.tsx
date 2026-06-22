@@ -3,18 +3,15 @@
 import { useState } from 'react'
 import { turnoPorDia } from '@/dominio/turno'
 import { turnoEfectivo } from '@/dominio/programacion'
-import { SelectFincaLote } from '../_componentes/select-finca-lote'
 
 const DIAS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
-
-type Lote = { id: string; nombre: string; finca: { nombre: string } }
 
 export function AsignarTareaForm({
   tareaId,
   descripcion,
   lotesTarea,
+  bultosPorLote,
   responsables,
-  lotes,
   esMaquinaria,
   maquinas,
   ocupacion,
@@ -26,9 +23,9 @@ export function AsignarTareaForm({
 }: {
   tareaId: string
   descripcion: string
-  lotesTarea: { nombre: string }[]
+  lotesTarea: { id: string; nombre: string }[]
+  bultosPorLote?: Record<string, number> | null
   responsables: { id: string; nombre: string }[]
-  lotes: Lote[]
   esMaquinaria: boolean
   maquinas: { id: string; nombre: string }[]
   ocupacion: { dia: number; turno: string; maquinaId: string | null; responsableId: string }[]
@@ -38,14 +35,13 @@ export function AsignarTareaForm({
   semana: number
   accion: (formData: FormData) => void | Promise<void>
 }) {
-  const [turno, setTurno] = useState(turnoPorDia(1))
+  const [turno, setTurno] = useState(esMaquinaria ? turnoPorDia(1) : '')
   const [dias, setDias] = useState<number[]>([])
   const [responsableIds, setResponsableIds] = useState<string[]>(responsables[0] ? [responsables[0].id] : [])
   const [respAbierto, setRespAbierto] = useState(false)
   const toggleResp = (id: string) =>
     setResponsableIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
   const nombresSel = responsables.filter((r) => responsableIds.includes(r.id)).map((r) => r.nombre)
-  const tieneLotes = lotesTarea.length > 0
 
   const toggleDia = (d: number) => {
     if (diasPasados.includes(d)) return
@@ -69,6 +65,7 @@ export function AsignarTareaForm({
       <input type="hidden" name="areaId" value={areaId} />
       <input type="hidden" name="anio" value={anio} />
       <input type="hidden" name="semana" value={semana} />
+      <input type="hidden" name="esMaquinaria" value={esMaquinaria ? '1' : ''} />
       <span className="min-w-[160px] flex-1 font-medium">{descripcion}</span>
       <div className="relative flex flex-col text-xs">
         Responsables
@@ -129,15 +126,17 @@ export function AsignarTareaForm({
           })}
         </div>
       </div>
-      <label className="flex flex-col text-xs">
-        Turno
-        <input
-          name="turno"
-          value={turno}
-          onChange={(e) => setTurno(e.target.value)}
-          className="w-28 rounded border p-1 text-sm"
-        />
-      </label>
+      {esMaquinaria && (
+        <label className="flex flex-col text-xs">
+          Turno
+          <input
+            name="turno"
+            value={turno}
+            onChange={(e) => setTurno(e.target.value)}
+            className="w-28 rounded border p-1 text-sm"
+          />
+        </label>
+      )}
       {esMaquinaria && dias.length > 0 && (
         <div className="flex w-full flex-col gap-1 text-xs">
           <span className="text-gray-500">Máquina por día (solo disponibles · opcional)</span>
@@ -171,14 +170,16 @@ export function AsignarTareaForm({
           ⚠️ Conflicto de turno: {conflictosResp.map((c) => `${responsables.find((r) => r.id === c.rid)?.nombre ?? ''} (${DIAS[c.dia - 1]})`).join(', ')}
         </p>
       )}
-      {tieneLotes ? (
-        <span className="text-xs text-gray-600">Lote(s): {lotesTarea.map((l) => l.nombre).join(', ')}</span>
-      ) : (
-        <label className="flex flex-col text-xs">
-          Finca y lote
-          <SelectFincaLote lotes={lotes} name="loteId" />
-        </label>
-      )}
+      <span className="text-xs text-gray-600">
+        {lotesTarea.length > 0
+          ? `Lote(s): ${lotesTarea
+              .map((l) => {
+                const bb = bultosPorLote?.[l.id]
+                return typeof bb === 'number' ? `${l.nombre} (${bb} bultos)` : l.nombre
+              })
+              .join(', ')}`
+          : 'Sin lote'}
+      </span>
       <button
         disabled={responsableIds.length === 0 || conflictosResp.length > 0}
         className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
