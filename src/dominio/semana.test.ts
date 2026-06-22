@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { isoSemanaDeFecha, siguienteSemana, semanaAnterior } from './semana'
+import { isoSemanaDeFecha, siguienteSemana, semanaAnterior, esSemanaFutura } from './semana'
 
 describe('isoSemanaDeFecha', () => {
   it('calcula la semana ISO de una fecha conocida', () => {
@@ -83,6 +83,25 @@ describe('esSemanaPasada', () => {
   })
   it('un año futuro no es pasada', () => {
     expect(esSemanaPasada(2027, 1, ref)).toBe(false)
+  })
+})
+
+describe('esSemanaFutura', () => {
+  const ref = { anio: 2026, semana: 25 }
+  it('semana posterior del mismo año es futura', () => {
+    expect(esSemanaFutura(2026, 26, ref)).toBe(true)
+  })
+  it('la misma semana NO es futura', () => {
+    expect(esSemanaFutura(2026, 25, ref)).toBe(false)
+  })
+  it('semana anterior NO es futura', () => {
+    expect(esSemanaFutura(2026, 24, ref)).toBe(false)
+  })
+  it('año siguiente es futura', () => {
+    expect(esSemanaFutura(2027, 1, ref)).toBe(true)
+  })
+  it('año anterior NO es futura', () => {
+    expect(esSemanaFutura(2025, 52, ref)).toBe(false)
   })
 })
 

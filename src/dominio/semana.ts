@@ -93,6 +93,11 @@ export function esSemanaPasada(anio: number, semana: number, referencia: Semana)
   return anio < referencia.anio || (anio === referencia.anio && semana < referencia.semana)
 }
 
+// ¿La semana (anio, semana) es estrictamente posterior a la de referencia?
+export function esSemanaFutura(anio: number, semana: number, referencia: Semana): boolean {
+  return anio > referencia.anio || (anio === referencia.anio && semana > referencia.semana)
+}
+
 // Día ISO de una fecha en UTC: lunes = 1 ... domingo = 7.
 export function diaIsoDeFecha(fecha: Date): number {
   const d = new Date(Date.UTC(fecha.getUTCFullYear(), fecha.getUTCMonth(), fecha.getUTCDate()))
