@@ -279,14 +279,16 @@ export default async function CumplimientoPage({
                                   <button className="text-xs text-gray-500 underline hover:text-gray-700">↩ desmarcar</button>
                                 </form>
                               </div>
-                              {a.estado === 'PARCIAL' && a.lotes.length > 0 && (
+                              {a.estado === 'PARCIAL' && (
                                 <div className="mt-1 flex w-full flex-col gap-1 text-sm">
-                                  <span className="text-gray-600">
-                                    Progreso: {a.lotes.length - lotesPendientes(a.lotes, a.avancePorLote as AvancePorLote | null).length} de {a.lotes.length} lotes
-                                    {textoAvancePorLote(a.lotes, a.avancePorLote as AvancePorLote | null) ? ` · ${textoAvancePorLote(a.lotes, a.avancePorLote as AvancePorLote | null)}` : ''}
-                                  </span>
+                                  {a.lotes.length > 0 && (
+                                    <span className="text-gray-600">
+                                      Progreso: {a.lotes.length - lotesPendientes(a.lotes, a.avancePorLote as AvancePorLote | null).length} de {a.lotes.length} lotes
+                                      {textoAvancePorLote(a.lotes, a.avancePorLote as AvancePorLote | null) ? ` · ${textoAvancePorLote(a.lotes, a.avancePorLote as AvancePorLote | null)}` : ''}
+                                    </span>
+                                  )}
                                   <div className="flex flex-wrap items-center gap-2">
-                                    {lotesPendientes(a.lotes, a.avancePorLote as AvancePorLote | null).length > 0 && (
+                                    {a.lotes.length > 0 && lotesPendientes(a.lotes, a.avancePorLote as AvancePorLote | null).length > 0 && (
                                       <FormAvanceLote
                                         actividadId={a.id}
                                         diaActividad={a.dia}

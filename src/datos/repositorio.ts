@@ -478,6 +478,7 @@ export async function registrarAvanceLote(
 ) {
   const act = await prisma.actividad.findUnique({ where: { id: actividadId }, include: { lotes: true } })
   if (!act) return null
+  if (act.estado !== 'PARCIAL') return null // solo se registran avances sobre un parcial
   const actual =
     (act.avancePorLote as Record<string, { dia: number; maquinaId: string | null; cantidad: number }> | null) ?? {}
   for (const a of avances) {
