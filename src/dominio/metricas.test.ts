@@ -362,6 +362,17 @@ describe('fraccionFila (parcial proporcional por lotes)', () => {
   })
 })
 
+describe('fraccionFila con avancePorLote en lista', () => {
+  it('cuenta como hecho cada lote que tenga clave (lista de entradas)', () => {
+    const fila = {
+      estado: 'PARCIAL' as const,
+      lotes: [{ id: 'a' }, { id: 'b' }],
+      avancePorLote: { a: [{ dia: 1, maquinaId: null, cantidad: 3 }] },
+    }
+    expect(fraccionFila(fila)).toBe(0.5) // 1 de 2 lotes con avance
+  })
+})
+
 describe('porcentajeCumplimiento con parcial proporcional', () => {
   it('una actividad parcial con 2 de 4 lotes aporta 0.5', () => {
     const acts = [act({ id: 'p', tareaId: 'T', estado: 'PARCIAL', lotes: [{ id: '1' }, { id: '2' }, { id: '3' }, { id: '4' }], avancePorLote: { '1': { dia: 1, maquinaId: null, cantidad: 1 }, '2': { dia: 1, maquinaId: null, cantidad: 1 } } })]

@@ -4,7 +4,7 @@ import { usuarioActual } from '@/auth/sesion'
 import { listarAreas, listarActividades, listarActividadesEstipuladas } from '@/datos/repositorio'
 import { fechasDeSemana } from '@/dominio/semana'
 import { COLUMNAS_CUMPLIMIENTO, filaCumplimiento } from '@/dominio/cumplimiento-export'
-import { textoAvanceConFecha, type AvancePorLote } from '@/dominio/avance-lote'
+import { textoAvanceConFecha, normalizarAvancePorLote, type AvanceEntrada } from '@/dominio/avance-lote'
 import { unidadDe, unidadAbreviada } from '@/dominio/unidad'
 import type { BultosPorLote } from '@/dominio/bultos'
 
@@ -53,7 +53,12 @@ export async function GET(req: NextRequest) {
   for (const a of filas) {
     const fecha = fechas[a.dia - 1] ? fmtFecha(fechas[a.dia - 1]) : ''
     const unidadAbrev = unidadAbreviada(unidadDe(unidadPorNombre, a.descripcion))
-    const avanceTexto = textoAvanceConFecha(a.lotes, a.avancePorLote as AvancePorLote | null, unidadAbrev, etiquetaDia)
+    const avanceTexto = textoAvanceConFecha(
+      a.lotes,
+      normalizarAvancePorLote(a.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null),
+      unidadAbrev,
+      etiquetaDia,
+    )
     ws.addRow(filaCumplimiento(
       { ...a, bultosPorLote: a.bultosPorLote as BultosPorLote | null, lotesHechos: a.lotesHechos as string[] | null },
       fecha,
