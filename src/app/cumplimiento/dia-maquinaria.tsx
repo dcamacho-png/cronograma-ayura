@@ -76,6 +76,7 @@ export function DiaMaquinaria({
           type="number"
           step="any"
           min="0"
+          required
           defaultValue={haProgramada}
           className="w-28 rounded border p-1 text-sm"
         />
