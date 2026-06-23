@@ -54,6 +54,8 @@ export function agruparPorActividad<T extends { id: string; tareaId?: string | n
 // ese estado; si hay mezcla, PARCIAL. (Una actividad con días en distinto estado
 // está, por definición, parcialmente cumplida.)
 export function estadoActividad(dias: { estado: Estado }[]): Estado {
+  // Una actividad sin ningún día-fila no tiene progreso: PENDIENTE.
+  if (dias.length === 0) return 'PENDIENTE'
   const estados = new Set(dias.map((d) => d.estado))
   if (estados.size === 1) return [...estados][0]
   return 'PARCIAL'

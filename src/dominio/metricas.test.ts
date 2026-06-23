@@ -382,10 +382,14 @@ describe('estadoActividad', () => {
     expect(estadoActividad([{ estado: 'CUMPLIDA' }, { estado: 'CUMPLIDA' }])).toBe('CUMPLIDA')
     expect(estadoActividad([{ estado: 'PENDIENTE' }])).toBe('PENDIENTE')
     expect(estadoActividad([{ estado: 'NO_CUMPLIDA' }, { estado: 'NO_CUMPLIDA' }])).toBe('NO_CUMPLIDA')
+    expect(estadoActividad([{ estado: 'REPROGRAMADA' }, { estado: 'REPROGRAMADA' }])).toBe('REPROGRAMADA')
   })
   it('si hay mezcla de estados, devuelve PARCIAL', () => {
     expect(estadoActividad([{ estado: 'CUMPLIDA' }, { estado: 'PENDIENTE' }])).toBe('PARCIAL')
     expect(estadoActividad([{ estado: 'PARCIAL' }, { estado: 'CUMPLIDA' }])).toBe('PARCIAL')
+  })
+  it('lista vacía devuelve PENDIENTE (sin progreso)', () => {
+    expect(estadoActividad([])).toBe('PENDIENTE')
   })
 })
 
