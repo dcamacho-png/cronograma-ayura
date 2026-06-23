@@ -5,7 +5,7 @@ import { listarAreas, listarMotivos, listarActividades, listarLotes, listarMaqui
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana } from '@/dominio/semana'
 import { unidadDe, unidadAbreviada } from '@/dominio/unidad'
 import { textoLotesHechos } from '@/dominio/lotes-hechos'
-import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, responsablesDistintos } from '@/dominio/metricas'
+import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, responsablesDistintos, conteoEstadoActividades, tieneDiaPendiente } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
 import { lotesPendientes, textoAvanceConFecha, type AvancePorLote } from '@/dominio/avance-lote'
 import { registrarAccion, agregarActividadRealizadaAccion, marcarEstadoAccion, desmarcarAccion, registrarAvanceLoteAccion, devolverAlBancoAccion } from './acciones'
@@ -75,8 +75,6 @@ export default async function CumplimientoPage({
   const motivoCambioId = motivos.find((m) => m.nombre === 'Cambio de actividad')?.id ?? null
   const unidadPorNombre = Object.fromEntries(estipuladas.map((e) => [e.nombre, e.unidad]))
 
-  const pendientes = actividades.filter((a) => a.estado === 'PENDIENTE').length
-
   // Agrupar las filas-día en actividades (misma tarea = una tarjeta).
   // Cada grupo se ordena por día; las tarjetas, por el primer día de la actividad.
   const gruposActividad = [...agruparPorActividad(actividades).values()]
@@ -85,12 +83,12 @@ export default async function CumplimientoPage({
 
   const dominio = actividades as unknown as ActividadDominio[]
   const pct = porcentajeCumplimiento(dominio)
-  const conteoEstado = {
-    CUMPLIDA: actividades.filter((a) => a.estado === 'CUMPLIDA').length,
-    PARCIAL: actividades.filter((a) => a.estado === 'PARCIAL').length,
-    NO_CUMPLIDA: actividades.filter((a) => a.estado === 'NO_CUMPLIDA').length,
-    REPROGRAMADA: actividades.filter((a) => a.estado === 'REPROGRAMADA').length,
-  }
+  // Contadores por actividad única (agrupada por tarea), no por filas-día.
+  const gruposDominio = [...agruparPorActividad(dominio).values()]
+  const totalActividades = gruposDominio.length
+  const conteoEstado = conteoEstadoActividades(dominio)
+  // Actividades que aún tienen algún día sin registrar (para aviso y bloqueo de semana).
+  const pendientes = gruposDominio.filter(tieneDiaPendiente).length
 
   const previa = semanaAnterior(anio, semana)
   const proxima = siguienteSemana(anio, semana)
@@ -147,7 +145,7 @@ export default async function CumplimientoPage({
         </span>
         <span className="rounded bg-gray-100 px-3 py-1 text-sm">
           ✅ <b>{conteoEstado.CUMPLIDA}</b> · 🟡 <b>{conteoEstado.PARCIAL}</b> · 🔴 <b>{conteoEstado.NO_CUMPLIDA}</b> · 🔄 <b>{conteoEstado.REPROGRAMADA}</b>{' '}
-          <span className="text-gray-400">de {actividades.length}</span>
+          <span className="text-gray-400">de {totalActividades}</span>
         </span>
       </div>
 
