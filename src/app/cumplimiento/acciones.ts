@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { marcarEstado, reprogramarActividad, registrarCumplimiento, crearActividadRealizada, reabrirActividad, registrarAvanceLote, devolverAlBanco } from '@/datos/repositorio'
+import { marcarEstado, reprogramarActividad, registrarCumplimiento, crearActividadRealizada, reabrirActividad, registrarAvanceLote, devolverAlBanco, marcarCumplidaDesdeParcial } from '@/datos/repositorio'
 import { siguienteSemana } from '@/dominio/semana'
 
 const ESTADOS_VALIDOS = ['PENDIENTE', 'CUMPLIDA', 'PARCIAL', 'NO_CUMPLIDA', 'REPROGRAMADA']
@@ -115,5 +115,12 @@ export async function devolverAlBancoAccion(form: FormData) {
   const id = texto(form, 'id')
   if (!id) return
   await devolverAlBanco(id)
+  revalidatePath('/cumplimiento')
+}
+
+export async function marcarCumplidaParcialAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (!id) return
+  await marcarCumplidaDesdeParcial(id)
   revalidatePath('/cumplimiento')
 }
