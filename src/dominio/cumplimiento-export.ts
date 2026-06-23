@@ -3,7 +3,7 @@ import { textoBultosPorLote, type BultosPorLote } from './bultos'
 import { textoLotesHechos } from './lotes-hechos'
 
 export const COLUMNAS_CUMPLIMIENTO = [
-  'Día', 'Fecha', 'Responsable', 'Actividad', 'Máquina', 'Lote(s)', 'Estado', 'Medida realizada', 'Unidad', 'Bultos por lote', 'Centro de costo', 'Potreros realizados',
+  'Día', 'Fecha', 'Responsable', 'Actividad', 'Máquina', 'Lote(s)', 'Estado', 'Medida realizada', 'Unidad', 'Bultos por lote', 'Centro de costo', 'Potreros realizados', 'Avance por lote',
 ] as const
 
 const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
@@ -32,10 +32,12 @@ export type ActividadExport = {
 // Fila del Excel para una actividad, en el orden de COLUMNAS_CUMPLIMIENTO.
 // `fecha` la calcula el llamador (fecha corta del día). La unidad se deriva de
 // la descripción contra el catálogo; medida y unidad quedan vacías sin haRealizada.
+// `avanceTexto` es el resumen de avance por lote con fecha, calculado en la ruta.
 export function filaCumplimiento(
   a: ActividadExport,
   fecha: string,
   unidadPorNombre: Record<string, string>,
+  avanceTexto = '',
 ): (string | number)[] {
   const unidad: Unidad = normalizarUnidad(unidadPorNombre[a.descripcion])
   return [
@@ -51,5 +53,6 @@ export function filaCumplimiento(
     textoBultosPorLote(a.lotes, a.bultosPorLote),
     a.centroCosto ?? '',
     textoLotesHechos(a.lotes, a.lotesHechos),
+    avanceTexto,
   ]
 }

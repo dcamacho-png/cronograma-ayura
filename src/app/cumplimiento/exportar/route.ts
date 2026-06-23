@@ -4,6 +4,8 @@ import { usuarioActual } from '@/auth/sesion'
 import { listarAreas, listarActividades, listarActividadesEstipuladas } from '@/datos/repositorio'
 import { fechasDeSemana } from '@/dominio/semana'
 import { COLUMNAS_CUMPLIMIENTO, filaCumplimiento } from '@/dominio/cumplimiento-export'
+import { textoAvanceConFecha, type AvancePorLote } from '@/dominio/avance-lote'
+import { unidadDe, unidadAbreviada } from '@/dominio/unidad'
 import type { BultosPorLote } from '@/dominio/bultos'
 
 // exceljs necesita runtime Node (no edge).
@@ -42,9 +44,22 @@ export async function GET(req: NextRequest) {
   const ws = wb.addWorksheet('Cumplimiento')
   const header = ws.addRow([...COLUMNAS_CUMPLIMIENTO])
   header.font = { bold: true }
-  for (const a of actividades) {
+  const NOMBRES_DIA = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+  const etiquetaDia = (dia: number) =>
+    `${NOMBRES_DIA[dia] ?? ''} ${fechas[dia - 1] ? fmtFecha(fechas[dia - 1]) : ''}`.trim()
+
+  // Solo actividades cumplidas o parciales.
+  const filas = actividades.filter((a) => a.estado === 'CUMPLIDA' || a.estado === 'PARCIAL')
+  for (const a of filas) {
     const fecha = fechas[a.dia - 1] ? fmtFecha(fechas[a.dia - 1]) : ''
-    ws.addRow(filaCumplimiento({ ...a, bultosPorLote: a.bultosPorLote as BultosPorLote | null, lotesHechos: a.lotesHechos as string[] | null }, fecha, unidadPorNombre))
+    const unidadAbrev = unidadAbreviada(unidadDe(unidadPorNombre, a.descripcion))
+    const avanceTexto = textoAvanceConFecha(a.lotes, a.avancePorLote as AvancePorLote | null, unidadAbrev, etiquetaDia)
+    ws.addRow(filaCumplimiento(
+      { ...a, bultosPorLote: a.bultosPorLote as BultosPorLote | null, lotesHechos: a.lotesHechos as string[] | null },
+      fecha,
+      unidadPorNombre,
+      avanceTexto,
+    ))
   }
 
   const buffer = await wb.xlsx.writeBuffer()
