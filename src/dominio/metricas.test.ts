@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { pesoEstado, porcentajeCumplimiento, agruparPorActividad, diasDistintos, responsablesDistintos, fraccionFila } from './metricas'
+import { pesoEstado, porcentajeCumplimiento, agruparPorActividad, diasDistintos, responsablesDistintos, fraccionFila, estadoActividad, tieneDiaPendiente, conteoEstadoActividades } from './metricas'
 import type { Actividad } from './tipos'
 
 // Ayuda para crear actividades de prueba con valores por defecto.
@@ -374,5 +374,43 @@ describe('porcentajeCumplimiento con parcial proporcional', () => {
     ]
     // (1/3 + 1) / 2 = 0.667 → 67
     expect(porcentajeCumplimiento(acts)).toBe(67)
+  })
+})
+
+describe('estadoActividad', () => {
+  it('si todas las filas comparten estado, devuelve ese estado', () => {
+    expect(estadoActividad([{ estado: 'CUMPLIDA' }, { estado: 'CUMPLIDA' }])).toBe('CUMPLIDA')
+    expect(estadoActividad([{ estado: 'PENDIENTE' }])).toBe('PENDIENTE')
+    expect(estadoActividad([{ estado: 'NO_CUMPLIDA' }, { estado: 'NO_CUMPLIDA' }])).toBe('NO_CUMPLIDA')
+  })
+  it('si hay mezcla de estados, devuelve PARCIAL', () => {
+    expect(estadoActividad([{ estado: 'CUMPLIDA' }, { estado: 'PENDIENTE' }])).toBe('PARCIAL')
+    expect(estadoActividad([{ estado: 'PARCIAL' }, { estado: 'CUMPLIDA' }])).toBe('PARCIAL')
+  })
+})
+
+describe('tieneDiaPendiente', () => {
+  it('true si alguna fila está PENDIENTE', () => {
+    expect(tieneDiaPendiente([{ estado: 'CUMPLIDA' }, { estado: 'PENDIENTE' }])).toBe(true)
+  })
+  it('false si ninguna fila está PENDIENTE', () => {
+    expect(tieneDiaPendiente([{ estado: 'CUMPLIDA' }, { estado: 'PARCIAL' }])).toBe(false)
+  })
+})
+
+describe('conteoEstadoActividades', () => {
+  it('cuenta actividades agrupadas por tareaId usando el estado agrupado', () => {
+    const acts = [
+      // tarea T1: dos días, mezcla -> PARCIAL
+      { id: 'a', tareaId: 'T1', estado: 'CUMPLIDA' as const },
+      { id: 'b', tareaId: 'T1', estado: 'PENDIENTE' as const },
+      // tarea T2: un día cumplido -> CUMPLIDA
+      { id: 'c', tareaId: 'T2', estado: 'CUMPLIDA' as const },
+      // suelta sin tarea: PENDIENTE
+      { id: 'd', tareaId: null, estado: 'PENDIENTE' as const },
+    ]
+    expect(conteoEstadoActividades(acts)).toEqual({
+      PENDIENTE: 1, CUMPLIDA: 1, PARCIAL: 1, NO_CUMPLIDA: 0, REPROGRAMADA: 0,
+    })
   })
 })

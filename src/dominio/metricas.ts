@@ -50,6 +50,33 @@ export function agruparPorActividad<T extends { id: string; tareaId?: string | n
   return grupos
 }
 
+// Estado de UNA actividad a partir de sus filas-día: si todas comparten estado,
+// ese estado; si hay mezcla, PARCIAL. (Una actividad con días en distinto estado
+// está, por definición, parcialmente cumplida.)
+export function estadoActividad(dias: { estado: Estado }[]): Estado {
+  const estados = new Set(dias.map((d) => d.estado))
+  if (estados.size === 1) return [...estados][0]
+  return 'PARCIAL'
+}
+
+// ¿La actividad tiene algún día aún sin registrar (PENDIENTE)?
+export function tieneDiaPendiente(dias: { estado: Estado }[]): boolean {
+  return dias.some((d) => d.estado === 'PENDIENTE')
+}
+
+// Cuenta actividades (agrupadas por tareaId) por su estado agrupado.
+export function conteoEstadoActividades<
+  T extends { id: string; tareaId?: string | null; estado: Estado },
+>(actividades: T[]): Record<Estado, number> {
+  const r: Record<Estado, number> = {
+    PENDIENTE: 0, CUMPLIDA: 0, PARCIAL: 0, NO_CUMPLIDA: 0, REPROGRAMADA: 0,
+  }
+  for (const dias of agruparPorActividad(actividades).values()) {
+    r[estadoActividad(dias)] += 1
+  }
+  return r
+}
+
 // Nº de días distintos entre las filas (varias filas pueden compartir día si hay
 // varios responsables). Para el contador "N días" de la tarjeta.
 export function diasDistintos<T extends { dia: number }>(filas: T[]): number {
