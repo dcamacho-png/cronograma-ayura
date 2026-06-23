@@ -3,15 +3,15 @@ import { redirect } from 'next/navigation'
 import { usuarioActual } from '@/auth/sesion'
 import { listarAreas, listarMotivos, listarActividades, listarLotes, listarMaquinas, listarResponsablesPorArea, listarActividadesEstipuladas } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana } from '@/dominio/semana'
-import { unidadDe } from '@/dominio/unidad'
+import { unidadDe, unidadAbreviada } from '@/dominio/unidad'
 import { textoLotesHechos } from '@/dominio/lotes-hechos'
-import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad } from '@/dominio/metricas'
+import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, responsablesDistintos } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
-import { registrarAccion, agregarActividadRealizadaAccion, marcarEstadoAccion } from './acciones'
+import { registrarAccion, agregarActividadRealizadaAccion, marcarEstadoAccion, desmarcarAccion } from './acciones'
 import { FormActividadRealizada } from './form-actividad-realizada'
 import { InfoLotes } from '../_componentes/info-lotes'
-import { FormRegistrar } from './form-registrar'
 import { DiaNoMaquinaria } from './dia-no-maquinaria'
+import { DiaMaquinaria } from './dia-maquinaria'
 
 const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
@@ -187,13 +187,25 @@ export default async function CumplimientoPage({
           {gruposActividad.map((dias) => {
             const cab = dias[0]
             const pctAct = porcentajeCumplimiento(dias as unknown as ActividadDominio[])
-            const esMultiDia = dias.length > 1
+            const nDias = diasDistintos(dias)
+            const multiResp = responsablesDistintos(dias) > 1
+            // nombres de responsables distintos, en orden de aparición
+            const nombresResp = [...new Map(dias.map((a) => [a.responsableId, a.responsable.nombre])).values()]
+            // agrupar las filas del grupo por día (cada día una vez)
+            const porDia = new Map<number, typeof dias>()
+            for (const a of dias) {
+              const lista = porDia.get(a.dia) ?? []
+              lista.push(a)
+              porDia.set(a.dia, lista)
+            }
+            const diasOrdenados = [...porDia.entries()].sort((x, y) => x[0] - y[0])
+            const unidad = unidadDe(unidadPorNombre, cab.descripcion)
             return (
               <li key={cab.tareaId ?? cab.id} className="rounded-lg border p-3">
                 <div className="mb-2 flex items-center gap-2 text-sm">
                   <span className="font-medium">{cab.descripcion}</span>
                   <span>·</span>
-                  <span>{cab.responsable.nombre}</span>
+                  <span>{nombresResp.join(', ')}</span>
                   {cab.maquina && <span className="text-gray-600">· 🚜 {cab.maquina.nombre}</span>}
                   {cab.vecesReprogramada > 0 && (
                     <span
@@ -204,65 +216,70 @@ export default async function CumplimientoPage({
                     </span>
                   )}
                   <span className="ml-auto rounded bg-gray-100 px-2 py-0.5 text-xs">
-                    {esMultiDia ? `${dias.length} días · ` : ''}Cumplido: <b>{pctAct === null ? '—' : `${pctAct}%`}</b>
+                    {nDias > 1 ? `${nDias} días · ` : ''}Cumplido: <b>{pctAct === null ? '—' : `${pctAct}%`}</b>
                   </span>
                 </div>
                 <InfoLotes lotes={cab.lotes} bultosPorLote={cab.bultosPorLote as Record<string, number> | null} className="mb-2" />
 
                 <ul className="space-y-2">
-                  {dias.map((a) => (
-                    <li key={a.id} className="rounded border border-gray-100 bg-gray-50/50 p-2">
+                  {diasOrdenados.map(([dia, filas]) => (
+                    <li key={dia} className="rounded border border-gray-100 bg-gray-50/50 p-2">
                       <div className="mb-1 text-xs font-semibold text-gray-600">
-                        {DIAS[a.dia] ?? ''} {fechas[a.dia - 1] ? fmtFecha(fechas[a.dia - 1]) : ''}
+                        {DIAS[dia] ?? ''} {fechas[dia - 1] ? fmtFecha(fechas[dia - 1]) : ''}
                       </div>
-                      {a.estado === 'PENDIENTE' ? (
-                        esMaquinaria ? (
-                          <FormRegistrar
-                            actividadId={a.id}
-                            esMaquinaria={esMaquinaria}
-                            unidad={unidadDe(unidadPorNombre, a.descripcion)}
-                            motivos={motivos}
-                            motivoCambioId={motivoCambioId}
-                            lotes={lotes}
-                            maquinas={maquinas}
-                            estipuladas={estipuladas}
-                            haProgramada={a.lotes.reduce((s, l) => s + (l.hectareas ?? 0), 0)}
-                            lotesActividad={a.lotes}
-                            accion={registrarAccion}
-                          />
-                        ) : (
-                          <DiaNoMaquinaria
-                            actividadId={a.id}
-                            motivos={motivos}
-                            motivoCambioId={motivoCambioId}
-                            lotes={lotes}
-                            maquinas={maquinas}
-                            estipuladas={estipuladas}
-                            lotesActividad={a.lotes}
-                            unidad={unidadDe(unidadPorNombre, a.descripcion)}
-                            marcarCumplido={marcarEstadoAccion}
-                            accionRegistrar={registrarAccion}
-                          />
-                        )
-                      ) : (
-                        <div className="flex flex-wrap items-center gap-2 text-sm">
-                          <span className="font-semibold">{ESTADOS.find((e) => e.valor === a.estado)?.etiqueta ?? a.estado}</span>
-                          {a.motivo && <span className="text-gray-500">· {a.motivo.nombre}</span>}
-                          {a.nota && <span className="text-gray-500">· {a.nota}</span>}
-                          {a.centroCosto && <span className="text-gray-500">· 🏷️ {a.centroCosto}</span>}
-                          {textoLotesHechos(a.lotes, a.lotesHechos as string[] | null) && (
-                            <span className="text-gray-500">· ✅ Realizados: {textoLotesHechos(a.lotes, a.lotesHechos as string[] | null)}</span>
-                          )}
-                          <span className="text-xs text-gray-400">🔒 registrada</span>
-                          {!esMaquinaria && (
-                            <form action={marcarEstadoAccion} className="ml-auto">
-                              <input type="hidden" name="id" value={a.id} />
-                              <input type="hidden" name="estado" value="PENDIENTE" />
-                              <button className="text-xs text-gray-500 underline hover:text-gray-700">↩ desmarcar</button>
-                            </form>
-                          )}
-                        </div>
-                      )}
+                      <ul className="space-y-2">
+                        {filas.map((a) => (
+                          <li key={a.id} className="flex flex-col gap-1">
+                            {multiResp && <span className="text-xs text-gray-500">{a.responsable.nombre}</span>}
+                            {a.estado === 'PENDIENTE' ? (
+                              esMaquinaria ? (
+                                <DiaMaquinaria
+                                  actividadId={a.id}
+                                  unidad={unidad}
+                                  motivos={motivos}
+                                  motivoCambioId={motivoCambioId}
+                                  lotes={lotes}
+                                  maquinas={maquinas}
+                                  estipuladas={estipuladas}
+                                  lotesActividad={a.lotes}
+                                  haProgramada={a.lotes.reduce((s, l) => s + (l.hectareas ?? 0), 0)}
+                                  accionRegistrar={registrarAccion}
+                                />
+                              ) : (
+                                <DiaNoMaquinaria
+                                  actividadId={a.id}
+                                  motivos={motivos}
+                                  motivoCambioId={motivoCambioId}
+                                  lotes={lotes}
+                                  maquinas={maquinas}
+                                  estipuladas={estipuladas}
+                                  lotesActividad={a.lotes}
+                                  unidad={unidad}
+                                  marcarCumplido={marcarEstadoAccion}
+                                  accionRegistrar={registrarAccion}
+                                />
+                              )
+                            ) : (
+                              <div className="flex flex-wrap items-center gap-2 text-sm">
+                                <span className="font-semibold">{ESTADOS.find((e) => e.valor === a.estado)?.etiqueta ?? a.estado}</span>
+                                {a.haRealizada != null && (
+                                  <span className="text-gray-500">· {a.haRealizada} {unidadAbreviada(unidad)}</span>
+                                )}
+                                {a.motivo && <span className="text-gray-500">· {a.motivo.nombre}</span>}
+                                {a.nota && <span className="text-gray-500">· {a.nota}</span>}
+                                {a.centroCosto && <span className="text-gray-500">· 🏷️ {a.centroCosto}</span>}
+                                {textoLotesHechos(a.lotes, a.lotesHechos as string[] | null) && (
+                                  <span className="text-gray-500">· ✅ Realizados: {textoLotesHechos(a.lotes, a.lotesHechos as string[] | null)}</span>
+                                )}
+                                <form action={desmarcarAccion} className="ml-auto">
+                                  <input type="hidden" name="id" value={a.id} />
+                                  <button className="text-xs text-gray-500 underline hover:text-gray-700">↩ desmarcar</button>
+                                </form>
+                              </div>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
                     </li>
                   ))}
                 </ul>
