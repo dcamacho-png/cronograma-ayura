@@ -78,6 +78,22 @@ export function marcarEstado(
   })
 }
 
+// Devuelve un día a PENDIENTE y limpia lo capturado al registrar (medida, centro de
+// costo, motivo, nota, potreros). Para el "↩ desmarcar" sin dejar datos huérfanos.
+export function reabrirActividad(id: string) {
+  return prisma.actividad.update({
+    where: { id },
+    data: {
+      estado: 'PENDIENTE',
+      haRealizada: null,
+      centroCosto: null,
+      motivoId: null,
+      nota: null,
+      lotesHechos: Prisma.DbNull,
+    },
+  })
+}
+
 // Crea un responsable nuevo en un área.
 export function crearResponsable(nombre: string, areaId: string) {
   return prisma.responsable.create({ data: { nombre, areaId } })
