@@ -7,8 +7,10 @@ import { unidadDe, unidadAbreviada } from '@/dominio/unidad'
 import { textoLotesHechos } from '@/dominio/lotes-hechos'
 import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, responsablesDistintos } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
-import { registrarAccion, agregarActividadRealizadaAccion, marcarEstadoAccion, desmarcarAccion } from './acciones'
+import { lotesPendientes, textoAvancePorLote, type AvancePorLote } from '@/dominio/avance-lote'
+import { registrarAccion, agregarActividadRealizadaAccion, marcarEstadoAccion, desmarcarAccion, registrarAvanceLoteAccion, devolverAlBancoAccion } from './acciones'
 import { FormActividadRealizada } from './form-actividad-realizada'
+import { FormAvanceLote } from './form-avance-lote'
 import { InfoLotes } from '../_componentes/info-lotes'
 import { DiaNoMaquinaria } from './dia-no-maquinaria'
 import { DiaMaquinaria } from './dia-maquinaria'
@@ -260,6 +262,7 @@ export default async function CumplimientoPage({
                                 />
                               )
                             ) : (
+                              <>
                               <div className="flex flex-wrap items-center gap-2 text-sm">
                                 <span className="font-semibold">{ESTADOS.find((e) => e.valor === a.estado)?.etiqueta ?? a.estado}</span>
                                 {a.haRealizada != null && (
@@ -276,6 +279,32 @@ export default async function CumplimientoPage({
                                   <button className="text-xs text-gray-500 underline hover:text-gray-700">↩ desmarcar</button>
                                 </form>
                               </div>
+                              {a.estado === 'PARCIAL' && a.lotes.length > 0 && (
+                                <div className="mt-1 flex w-full flex-col gap-1 text-sm">
+                                  <span className="text-gray-600">
+                                    Progreso: {a.lotes.length - lotesPendientes(a.lotes, a.avancePorLote as AvancePorLote | null).length} de {a.lotes.length} lotes
+                                    {textoAvancePorLote(a.lotes, a.avancePorLote as AvancePorLote | null) ? ` · ${textoAvancePorLote(a.lotes, a.avancePorLote as AvancePorLote | null)}` : ''}
+                                  </span>
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    {lotesPendientes(a.lotes, a.avancePorLote as AvancePorLote | null).length > 0 && (
+                                      <FormAvanceLote
+                                        actividadId={a.id}
+                                        diaActividad={a.dia}
+                                        esMaquinaria={esMaquinaria}
+                                        maquinas={maquinas}
+                                        unidad={unidad}
+                                        pendientes={lotesPendientes(a.lotes, a.avancePorLote as AvancePorLote | null)}
+                                        accion={registrarAvanceLoteAccion}
+                                      />
+                                    )}
+                                    <form action={devolverAlBancoAccion}>
+                                      <input type="hidden" name="id" value={a.id} />
+                                      <button className="rounded border px-2 py-1 text-xs text-gray-600 hover:bg-gray-50">Devolver al banco</button>
+                                    </form>
+                                  </div>
+                                </div>
+                              )}
+                              </>
                             )}
                           </li>
                         ))}
