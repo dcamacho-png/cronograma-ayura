@@ -26,7 +26,7 @@ export interface Actividad {
 
   // Lotes y avance por lote (para el cálculo proporcional del parcial).
   lotes?: { id: string }[]
-  avancePorLote?: Record<string, { dia: number; maquinaId: string | null; cantidad: number }> | null
+  avancePorLote?: Record<string, { dia: number; maquinaId: string | null; cantidad: number }[]> | null
 
   // Campos específicos de maquinaria (opcionales en otras áreas):
   maquinaId?: string | null

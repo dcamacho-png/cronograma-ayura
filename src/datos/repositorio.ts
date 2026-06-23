@@ -468,16 +468,16 @@ export async function registrarCumplimiento(
   return true
 }
 
-// Registra el avance de uno o varios lotes en una actividad parcial: fusiona en
-// avancePorLote { loteId: { dia, maquinaId, cantidad } }. Si quedan TODOS los lotes
-// de la actividad registrados, pasa a CUMPLIDA; si no, queda PARCIAL.
+// Agrega un avance (incremental, por día) al historial de cada lote indicado.
+// `avancePorLote` es Record<loteId, AvanceEntrada[]>. La actividad queda SIEMPRE
+// PARCIAL; CUMPLIDA se marca a mano con marcarCumplidaDesdeParcial.
 export async function registrarAvanceLote(
   actividadId: string,
   dia: number,
   maquinaId: string | null,
   avances: { loteId: string; cantidad: number }[],
 ) {
-  const act = await prisma.actividad.findUnique({ where: { id: actividadId }, include: { lotes: true } })
+  const act = await prisma.actividad.findUnique({ where: { id: actividadId } })
   if (!act) return null
   if (act.estado !== 'PARCIAL') return null // solo se registran avances sobre un parcial
   const actual = agregarAvances(

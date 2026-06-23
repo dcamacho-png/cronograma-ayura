@@ -5,8 +5,8 @@ import { etiquetaMedida, type Unidad } from '@/dominio/unidad'
 
 const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
-// Formulario para registrar el avance de uno o varios lotes pendientes de una
-// actividad parcial: día, máquina (maquinaria) y, por lote, casilla + cantidad.
+// Formulario para registrar el avance de uno o varios lotes de una actividad
+// parcial: día, máquina (maquinaria) y, por lote, casilla + cantidad.
 export function FormAvanceLote({
   actividadId,
   diaActividad,
