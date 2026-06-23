@@ -62,10 +62,26 @@ export function responsablesDistintos<T extends { responsableId: string }>(filas
   return new Set(filas.map((f) => f.responsableId)).size
 }
 
-// Fracción de cumplimiento (0..1) de UNA actividad: promedio del peso de sus
-// días. Pendiente/Reprogramada cuentan 0; el denominador son todos los días.
-function fraccionActividad(dias: { estado: Estado }[]): number {
-  const suma = dias.reduce((acc, a) => acc + (pesoEstado(a.estado) ?? 0), 0)
+// Fracción (0..1) de UNA fila-actividad. CUMPLIDA=1; PARCIAL=lotes realizados/total
+// (0.5 si la fila no tiene lotes); el resto (No cumplida/Pendiente/Reprogramada)=0.
+export function fraccionFila(a: {
+  estado: Estado
+  lotes?: { id: string }[]
+  avancePorLote?: Record<string, unknown> | null
+}): number {
+  if (a.estado === 'CUMPLIDA') return 1
+  if (a.estado === 'PARCIAL') {
+    const total = a.lotes?.length ?? 0
+    if (total === 0) return 0.5
+    const hechos = a.lotes!.filter((l) => !!a.avancePorLote && l.id in a.avancePorLote).length
+    return hechos / total
+  }
+  return 0
+}
+
+// Fracción de cumplimiento (0..1) de UNA actividad: promedio de fraccionFila por día/fila.
+function fraccionActividad(dias: Actividad[]): number {
+  const suma = dias.reduce((acc, a) => acc + fraccionFila(a), 0)
   return suma / dias.length
 }
 

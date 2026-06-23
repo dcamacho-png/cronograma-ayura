@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { pesoEstado, porcentajeCumplimiento, agruparPorActividad, diasDistintos, responsablesDistintos } from './metricas'
+import { pesoEstado, porcentajeCumplimiento, agruparPorActividad, diasDistintos, responsablesDistintos, fraccionFila } from './metricas'
 import type { Actividad } from './tipos'
 
 // Ayuda para crear actividades de prueba con valores por defecto.
@@ -342,5 +342,37 @@ describe('porcentajeCumplimiento con varios responsables', () => {
       act({ id: 'J2', tareaId: 'T1', responsableId: 'J', dia: 2, estado: 'NO_CUMPLIDA' }),
     ]
     expect(porcentajeCumplimiento(acts)).toBe(50)
+  })
+})
+
+describe('fraccionFila (parcial proporcional por lotes)', () => {
+  it('CUMPLIDA = 1', () => {
+    expect(fraccionFila({ estado: 'CUMPLIDA' })).toBe(1)
+  })
+  it('PARCIAL con 1 de 3 lotes = 1/3', () => {
+    expect(fraccionFila({ estado: 'PARCIAL', lotes: [{ id: 'a' }, { id: 'b' }, { id: 'c' }], avancePorLote: { a: {} } })).toBeCloseTo(1 / 3)
+  })
+  it('PARCIAL sin lotes = 0.5', () => {
+    expect(fraccionFila({ estado: 'PARCIAL' })).toBe(0.5)
+  })
+  it('NO_CUMPLIDA / PENDIENTE / REPROGRAMADA = 0', () => {
+    expect(fraccionFila({ estado: 'NO_CUMPLIDA' })).toBe(0)
+    expect(fraccionFila({ estado: 'PENDIENTE' })).toBe(0)
+    expect(fraccionFila({ estado: 'REPROGRAMADA' })).toBe(0)
+  })
+})
+
+describe('porcentajeCumplimiento con parcial proporcional', () => {
+  it('una actividad parcial con 2 de 4 lotes aporta 0.5', () => {
+    const acts = [act({ id: 'p', tareaId: 'T', estado: 'PARCIAL', lotes: [{ id: '1' }, { id: '2' }, { id: '3' }, { id: '4' }], avancePorLote: { '1': { dia: 1, maquinaId: null, cantidad: 1 }, '2': { dia: 1, maquinaId: null, cantidad: 1 } } })]
+    expect(porcentajeCumplimiento(acts)).toBe(50)
+  })
+  it('parcial (1/3) + cumplida → 67', () => {
+    const acts = [
+      act({ id: 'p', tareaId: 'T1', estado: 'PARCIAL', lotes: [{ id: '1' }, { id: '2' }, { id: '3' }], avancePorLote: { '1': { dia: 1, maquinaId: null, cantidad: 1 } } }),
+      act({ id: 'c', tareaId: 'T2', estado: 'CUMPLIDA' }),
+    ]
+    // (1/3 + 1) / 2 = 0.667 → 67
+    expect(porcentajeCumplimiento(acts)).toBe(67)
   })
 })
