@@ -50,6 +50,18 @@ export function agruparPorActividad<T extends { id: string; tareaId?: string | n
   return grupos
 }
 
+// Nº de días distintos entre las filas (varias filas pueden compartir día si hay
+// varios responsables). Para el contador "N días" de la tarjeta.
+export function diasDistintos<T extends { dia: number }>(filas: T[]): number {
+  return new Set(filas.map((f) => f.dia)).size
+}
+
+// Nº de responsables distintos entre las filas. Si es > 1, la tarjeta muestra el
+// nombre del responsable en cada fila.
+export function responsablesDistintos<T extends { responsableId: string }>(filas: T[]): number {
+  return new Set(filas.map((f) => f.responsableId)).size
+}
+
 // Fracción de cumplimiento (0..1) de UNA actividad: promedio del peso de sus
 // días. Pendiente/Reprogramada cuentan 0; el denominador son todos los días.
 function fraccionActividad(dias: { estado: Estado }[]): number {

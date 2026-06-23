@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { pesoEstado, porcentajeCumplimiento, agruparPorActividad } from './metricas'
+import { pesoEstado, porcentajeCumplimiento, agruparPorActividad, diasDistintos, responsablesDistintos } from './metricas'
 import type { Actividad } from './tipos'
 
 // Ayuda para crear actividades de prueba con valores por defecto.
@@ -307,5 +307,40 @@ describe('agruparPorActividad', () => {
     expect(grupos.size).toBe(3)               // T1 (2 días) + 2 sueltas
     expect(grupos.get('T1')?.length).toBe(2)
     expect(grupos.get('solo:s1')?.length).toBe(1)
+  })
+})
+
+describe('diasDistintos / responsablesDistintos', () => {
+  it('cuenta días distintos ignorando filas repetidas del mismo día', () => {
+    const filas = [act({ id: 'a', dia: 1 }), act({ id: 'b', dia: 1 }), act({ id: 'c', dia: 2 })]
+    expect(diasDistintos(filas)).toBe(2)
+  })
+  it('cuenta responsables distintos', () => {
+    const filas = [
+      act({ id: 'a', responsableId: 'P' }),
+      act({ id: 'b', responsableId: 'J' }),
+      act({ id: 'c', responsableId: 'P' }),
+    ]
+    expect(responsablesDistintos(filas)).toBe(2)
+  })
+})
+
+describe('porcentajeCumplimiento con varios responsables', () => {
+  it('una actividad con 2 responsables × 2 días cuenta como UNA', () => {
+    const acts: Actividad[] = []
+    for (const rid of ['P', 'J']) for (const dia of [1, 2]) {
+      acts.push(act({ id: `${rid}${dia}`, tareaId: 'T1', responsableId: rid, dia, estado: 'CUMPLIDA' }))
+    }
+    // 4 filas (responsable-día) todas cumplidas → 100
+    expect(porcentajeCumplimiento(acts)).toBe(100)
+  })
+  it('la mitad de las filas cumplidas → 50%', () => {
+    const acts: Actividad[] = [
+      act({ id: 'P1', tareaId: 'T1', responsableId: 'P', dia: 1, estado: 'CUMPLIDA' }),
+      act({ id: 'P2', tareaId: 'T1', responsableId: 'P', dia: 2, estado: 'CUMPLIDA' }),
+      act({ id: 'J1', tareaId: 'T1', responsableId: 'J', dia: 1, estado: 'NO_CUMPLIDA' }),
+      act({ id: 'J2', tareaId: 'T1', responsableId: 'J', dia: 2, estado: 'NO_CUMPLIDA' }),
+    ]
+    expect(porcentajeCumplimiento(acts)).toBe(50)
   })
 })
