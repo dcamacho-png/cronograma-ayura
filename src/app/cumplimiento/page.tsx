@@ -7,7 +7,7 @@ import { unidadDe, unidadAbreviada } from '@/dominio/unidad'
 import { textoLotesHechos } from '@/dominio/lotes-hechos'
 import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, responsablesDistintos } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
-import { lotesPendientes, textoAvancePorLote, type AvancePorLote } from '@/dominio/avance-lote'
+import { lotesPendientes, textoAvanceConFecha, type AvancePorLote } from '@/dominio/avance-lote'
 import { registrarAccion, agregarActividadRealizadaAccion, marcarEstadoAccion, desmarcarAccion, registrarAvanceLoteAccion, devolverAlBancoAccion } from './acciones'
 import { FormActividadRealizada } from './form-actividad-realizada'
 import { FormAvanceLote } from './form-avance-lote'
@@ -136,21 +136,12 @@ export default async function CumplimientoPage({
             Semana {proxima.semana} →
           </Link>
         )}
-        {pendientes > 0 ? (
-          <span
-            className="cursor-not-allowed rounded border px-3 py-1 text-sm text-gray-300"
-            title="Registra todas las actividades para descargar el Excel"
-          >
-            📥 Descargar Excel
-          </span>
-        ) : (
-          <a
-            href={`/cumplimiento/exportar?area=${areaId}&anio=${anio}&semana=${semana}`}
-            className="rounded border border-[#11603a] px-3 py-1 text-sm font-semibold text-[#11603a] hover:bg-green-50"
-          >
-            📥 Descargar Excel
-          </a>
-        )}
+        <a
+          href={`/cumplimiento/exportar?area=${areaId}&anio=${anio}&semana=${semana}`}
+          className="rounded border border-[#11603a] px-3 py-1 text-sm font-semibold text-[#11603a] hover:bg-green-50"
+        >
+          📥 Descargar Excel
+        </a>
         <span className="ml-auto rounded bg-gray-100 px-3 py-1 text-sm">
           Cumplido: <b>{pct === null ? '—' : `${pct}%`}</b>
         </span>
@@ -284,7 +275,11 @@ export default async function CumplimientoPage({
                                   {a.lotes.length > 0 && (
                                     <span className="text-gray-600">
                                       Progreso: {a.lotes.length - lotesPendientes(a.lotes, a.avancePorLote as AvancePorLote | null).length} de {a.lotes.length} lotes
-                                      {textoAvancePorLote(a.lotes, a.avancePorLote as AvancePorLote | null) ? ` · ${textoAvancePorLote(a.lotes, a.avancePorLote as AvancePorLote | null)}` : ''}
+                                    </span>
+                                  )}
+                                  {a.lotes.length > 0 && textoAvanceConFecha(a.lotes, a.avancePorLote as AvancePorLote | null, unidadAbreviada(unidad), (dia) => `${DIAS[dia] ?? ''} ${fechas[dia - 1] ? fmtFecha(fechas[dia - 1]) : ''}`.trim()) && (
+                                    <span className="text-gray-600">
+                                      Avances: {textoAvanceConFecha(a.lotes, a.avancePorLote as AvancePorLote | null, unidadAbreviada(unidad), (dia) => `${DIAS[dia] ?? ''} ${fechas[dia - 1] ? fmtFecha(fechas[dia - 1]) : ''}`.trim())}
                                     </span>
                                   )}
                                   <div className="flex flex-wrap items-center gap-2">
