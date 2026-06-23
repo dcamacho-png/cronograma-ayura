@@ -1,9 +1,8 @@
-import { porcentajeCumplimiento, porcentajeReprogramadas, motivosFrecuentes, colorSemaforo } from '@/dominio/metricas'
+import { porcentajeCumplimiento, porcentajeReprogramadas, motivosFrecuentes, colorSemaforo, conteoEstadoActividades, agruparPorActividad } from '@/dominio/metricas'
 import {
   colorPorcentaje,
   actividadesConCambio,
   extremosFinalizadas,
-  conteoPorEstado,
   medidasPorUnidad,
 } from '@/dominio/resumen'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
@@ -62,7 +61,9 @@ export function ResumenArea({
   const dominio = actividades as unknown as ActividadDominio[]
   const pct = porcentajeCumplimiento(dominio)
   const pctRep = porcentajeReprogramadas(dominio)
-  const conteo = conteoPorEstado(dominio)
+  // Conteo por actividad única (agrupada por tareaId)
+  const conteo = conteoEstadoActividades(dominio)
+  const totalActividades = agruparPorActividad(dominio).size
   const { mas, menos } = extremosFinalizadas(dominio)
   const motivosTop = motivosFrecuentes(dominio)
   const cambios = actividadesConCambio(dominio) as unknown as ActividadResumen[]
@@ -118,7 +119,7 @@ export function ResumenArea({
         <div className="rounded-2xl border p-5">
           <div className="mb-1 text-sm text-gray-500">Cumplidas</div>
           <div className="text-4xl font-extrabold">
-            {conteo.CUMPLIDA}<span className="text-2xl font-semibold text-gray-400">/{actividades.length}</span>
+            {conteo.CUMPLIDA}<span className="text-2xl font-semibold text-gray-400">/{totalActividades}</span>
           </div>
         </div>
         <div className="rounded-2xl border p-5">
