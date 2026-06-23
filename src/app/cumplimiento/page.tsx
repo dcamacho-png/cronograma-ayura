@@ -7,8 +7,8 @@ import { unidadDe, unidadAbreviada } from '@/dominio/unidad'
 import { textoLotesHechos } from '@/dominio/lotes-hechos'
 import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, responsablesDistintos, conteoEstadoActividades, tieneDiaPendiente } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
-import { lotesPendientes, textoAvanceConFecha, type AvancePorLote } from '@/dominio/avance-lote'
-import { registrarAccion, agregarActividadRealizadaAccion, marcarEstadoAccion, desmarcarAccion, registrarAvanceLoteAccion, devolverAlBancoAccion } from './acciones'
+import { lotesPendientes, textoAvanceConFecha, normalizarAvancePorLote, type AvanceEntrada } from '@/dominio/avance-lote'
+import { registrarAccion, agregarActividadRealizadaAccion, marcarEstadoAccion, desmarcarAccion, registrarAvanceLoteAccion, devolverAlBancoAccion, marcarCumplidaParcialAccion } from './acciones'
 import { FormActividadRealizada } from './form-actividad-realizada'
 import { FormAvanceLote } from './form-avance-lote'
 import { InfoLotes } from '../_componentes/info-lotes'
@@ -268,37 +268,47 @@ export default async function CumplimientoPage({
                                   <button className="text-xs text-gray-500 underline hover:text-gray-700">↩ desmarcar</button>
                                 </form>
                               </div>
-                              {a.estado === 'PARCIAL' && (
+                              {a.estado === 'PARCIAL' && (() => {
+                                const avances = normalizarAvancePorLote(
+                                  a.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null,
+                                )
+                                const etiquetaDia = (dia: number) =>
+                                  `${DIAS[dia] ?? ''} ${fechas[dia - 1] ? fmtFecha(fechas[dia - 1]) : ''}`.trim()
+                                const resumenAvances = textoAvanceConFecha(a.lotes, avances, unidadAbreviada(unidad), etiquetaDia)
+                                return (
                                 <div className="mt-1 flex w-full flex-col gap-1 text-sm">
                                   {a.lotes.length > 0 && (
                                     <span className="text-gray-600">
-                                      Progreso: {a.lotes.length - lotesPendientes(a.lotes, a.avancePorLote as AvancePorLote | null).length} de {a.lotes.length} lotes
+                                      Progreso: {a.lotes.length - lotesPendientes(a.lotes, avances).length} de {a.lotes.length} lotes
                                     </span>
                                   )}
-                                  {a.lotes.length > 0 && textoAvanceConFecha(a.lotes, a.avancePorLote as AvancePorLote | null, unidadAbreviada(unidad), (dia) => `${DIAS[dia] ?? ''} ${fechas[dia - 1] ? fmtFecha(fechas[dia - 1]) : ''}`.trim()) && (
-                                    <span className="text-gray-600">
-                                      Avances: {textoAvanceConFecha(a.lotes, a.avancePorLote as AvancePorLote | null, unidadAbreviada(unidad), (dia) => `${DIAS[dia] ?? ''} ${fechas[dia - 1] ? fmtFecha(fechas[dia - 1]) : ''}`.trim())}
-                                    </span>
+                                  {resumenAvances && (
+                                    <span className="text-gray-600">Avances: {resumenAvances}</span>
                                   )}
                                   <div className="flex flex-wrap items-center gap-2">
-                                    {a.lotes.length > 0 && lotesPendientes(a.lotes, a.avancePorLote as AvancePorLote | null).length > 0 && (
+                                    {a.lotes.length > 0 && (
                                       <FormAvanceLote
                                         actividadId={a.id}
                                         diaActividad={a.dia}
                                         esMaquinaria={esMaquinaria}
                                         maquinas={maquinas}
                                         unidad={unidad}
-                                        pendientes={lotesPendientes(a.lotes, a.avancePorLote as AvancePorLote | null)}
+                                        lotes={a.lotes}
                                         accion={registrarAvanceLoteAccion}
                                       />
                                     )}
+                                    <form action={marcarCumplidaParcialAccion}>
+                                      <input type="hidden" name="id" value={a.id} />
+                                      <button className="rounded border border-[#11603a] px-2 py-1 text-xs font-semibold text-[#11603a] hover:bg-green-50">✓ Marcar cumplida</button>
+                                    </form>
                                     <form action={devolverAlBancoAccion}>
                                       <input type="hidden" name="id" value={a.id} />
                                       <button className="rounded border px-2 py-1 text-xs text-gray-600 hover:bg-gray-50">Devolver al banco</button>
                                     </form>
                                   </div>
                                 </div>
-                              )}
+                                )
+                              })()}
                               </>
                             )}
                           </li>
