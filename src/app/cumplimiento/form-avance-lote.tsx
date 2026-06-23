@@ -13,7 +13,7 @@ export function FormAvanceLote({
   esMaquinaria,
   maquinas,
   unidad,
-  pendientes,
+  lotes,
   accion,
 }: {
   actividadId: string
@@ -21,7 +21,7 @@ export function FormAvanceLote({
   esMaquinaria: boolean
   maquinas: { id: string; nombre: string }[]
   unidad: Unidad
-  pendientes: { id: string; nombre: string }[]
+  lotes: { id: string; nombre: string }[]
   accion: (formData: FormData) => void | Promise<void>
 }) {
   const [abierto, setAbierto] = useState(false)
@@ -64,7 +64,7 @@ export function FormAvanceLote({
       </div>
       <div className="flex flex-col gap-1">
         <span className="font-semibold text-gray-700">Lotes realizados — {etiquetaMedida(unidad)}</span>
-        {pendientes.map((l) => (
+        {lotes.map((l) => (
           <div key={l.id} className="flex items-center gap-2">
             <label className="flex items-center gap-1">
               <input type="checkbox" name="loteAvance" value={l.id} className="accent-[#11603a]" />
