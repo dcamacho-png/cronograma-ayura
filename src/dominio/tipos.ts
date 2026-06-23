@@ -24,6 +24,10 @@ export interface Actividad {
   origenId: string | null     // id de la actividad de la que proviene (reprogramación)
   tareaId: string | null      // tarea de origen; null si es una actividad suelta
 
+  // Lotes y avance por lote (para el cálculo proporcional del parcial).
+  lotes?: { id: string }[]
+  avancePorLote?: Record<string, { dia: number; maquinaId: string | null; cantidad: number }> | null
+
   // Campos específicos de maquinaria (opcionales en otras áreas):
   maquinaId?: string | null
   areaTareaId?: string | null // a qué área de producción le sirve la tarea
