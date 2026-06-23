@@ -484,12 +484,14 @@ export async function registrarAvanceLote(
   for (const a of avances) {
     actual[a.loteId] = { dia, maquinaId, cantidad: a.cantidad }
   }
-  const completa = act.lotes.length > 0 && act.lotes.every((l) => l.id in actual)
+  // Registrar avance nunca cierra la actividad: queda siempre PARCIAL (un lote puede
+  // tomar uno o más días, y tener avance en todos los lotes no implica que terminó).
+  // CUMPLIDA se marca a mano cuando el trabajo realmente se completó.
   return prisma.actividad.update({
     where: { id: actividadId },
     data: {
       avancePorLote: actual as Prisma.InputJsonValue,
-      estado: completa ? 'CUMPLIDA' : 'PARCIAL',
+      estado: 'PARCIAL',
     },
   })
 }
