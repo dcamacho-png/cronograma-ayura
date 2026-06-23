@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { marcarEstado, reprogramarActividad, registrarCumplimiento, crearActividadRealizada, reabrirActividad } from '@/datos/repositorio'
+import { marcarEstado, reprogramarActividad, registrarCumplimiento, crearActividadRealizada, reabrirActividad, registrarAvanceLote, devolverAlBanco } from '@/datos/repositorio'
 import { siguienteSemana } from '@/dominio/semana'
 
 const ESTADOS_VALIDOS = ['PENDIENTE', 'CUMPLIDA', 'PARCIAL', 'NO_CUMPLIDA', 'REPROGRAMADA']
@@ -96,5 +96,24 @@ export async function registrarAccion(form: FormData) {
       }
     : null
   await registrarCumplimiento(id, estado, motivoId, nota, haRealizada, reemplazo, centroCosto, lotesHechos)
+  revalidatePath('/cumplimiento')
+}
+
+export async function registrarAvanceLoteAccion(form: FormData) {
+  const id = texto(form, 'id')
+  const dia = Number(texto(form, 'dia'))
+  if (!id || !(dia >= 1 && dia <= 7)) return
+  const maquinaId = textoOpcional(form, 'maquinaId')
+  const loteIds = form.getAll('loteAvance').map((v) => String(v))
+  const avances = loteIds.map((loteId) => ({ loteId, cantidad: numeroOpcional(form, `cantidad_${loteId}`) ?? 0 }))
+  if (avances.length === 0) return
+  await registrarAvanceLote(id, dia, maquinaId, avances)
+  revalidatePath('/cumplimiento')
+}
+
+export async function devolverAlBancoAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (!id) return
+  await devolverAlBanco(id)
   revalidatePath('/cumplimiento')
 }

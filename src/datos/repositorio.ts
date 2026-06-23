@@ -90,6 +90,7 @@ export function reabrirActividad(id: string) {
       motivoId: null,
       nota: null,
       lotesHechos: Prisma.DbNull,
+      avancePorLote: Prisma.DbNull,
     },
   })
 }
@@ -148,7 +149,7 @@ export function listarActividadesDeSemanas(semanas: { anio: number; semana: numb
   }
   return prisma.actividad.findMany({
     where: { OR: semanas.map((s) => ({ anio: s.anio, semana: s.semana })) },
-    include: { area: true, motivo: true },
+    include: { area: true, motivo: true, lotes: { select: { id: true } } },
     orderBy: [{ anio: 'asc' }, { semana: 'asc' }],
   })
 }
@@ -423,9 +424,9 @@ export async function registrarCumplimiento(
     },
   })
 
-  // Novedad (todo lo que no es 100% cumplido): la tarea vuelve al banco sin semana,
-  // conservando el contador. Solo aplica a tareas de UN día (única actividad en su semana).
-  if (estado !== 'CUMPLIDA' && act.tareaId) {
+  // Novedad que vuelve al banco automáticamente: solo No cumplida / Reprogramada
+  // (el Parcial se maneja con los botones de la UI). Solo tareas de un día.
+  if ((estado === 'NO_CUMPLIDA' || estado === 'REPROGRAMADA') && act.tareaId) {
     const enLaSemana = await prisma.actividad.count({
       where: { tareaId: act.tareaId, anio: act.anio, semana: act.semana },
     })
@@ -464,6 +465,44 @@ export async function registrarCumplimiento(
   }
 
   return true
+}
+
+// Registra el avance de uno o varios lotes en una actividad parcial: fusiona en
+// avancePorLote { loteId: { dia, maquinaId, cantidad } }. Si quedan TODOS los lotes
+// de la actividad registrados, pasa a CUMPLIDA; si no, queda PARCIAL.
+export async function registrarAvanceLote(
+  actividadId: string,
+  dia: number,
+  maquinaId: string | null,
+  avances: { loteId: string; cantidad: number }[],
+) {
+  const act = await prisma.actividad.findUnique({ where: { id: actividadId }, include: { lotes: true } })
+  if (!act) return null
+  const actual =
+    (act.avancePorLote as Record<string, { dia: number; maquinaId: string | null; cantidad: number }> | null) ?? {}
+  for (const a of avances) {
+    actual[a.loteId] = { dia, maquinaId, cantidad: a.cantidad }
+  }
+  const completa = act.lotes.length > 0 && act.lotes.every((l) => l.id in actual)
+  return prisma.actividad.update({
+    where: { id: actividadId },
+    data: {
+      avancePorLote: actual as Prisma.InputJsonValue,
+      estado: completa ? 'CUMPLIDA' : 'PARCIAL',
+    },
+  })
+}
+
+// Devuelve al banco la tarea de origen de una actividad (conserva la actividad
+// registrada): tarea PENDIENTE, sin semana, +1 reprogramada. Misma lógica que la
+// devolución que antes era automática para las novedades de un día.
+export async function devolverAlBanco(actividadId: string) {
+  const act = await prisma.actividad.findUnique({ where: { id: actividadId } })
+  if (!act || !act.tareaId) return null
+  return prisma.tarea.update({
+    where: { id: act.tareaId },
+    data: { estado: 'PENDIENTE', anioSel: null, semanaSel: null, vecesReprogramada: act.vecesReprogramada + 1 },
+  })
 }
 
 // Crea una solicitud: una tarea que ejecuta `areaEjecutoraId`, pedida por `solicitadaPorAreaId`.
