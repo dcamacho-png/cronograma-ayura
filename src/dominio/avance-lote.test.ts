@@ -1,11 +1,32 @@
 import { describe, it, expect } from 'vitest'
-import { lotesPendientes, textoAvancePorLote, textoAvanceConFecha, type AvancePorLote } from './avance-lote'
+import {
+  lotesPendientes, textoAvancePorLote, textoAvanceConFecha,
+  normalizarAvancePorLote, totalAvance, agregarAvances, type AvancePorLote,
+} from './avance-lote'
 
 const lotes = [{ id: 'a', nombre: 'L-A' }, { id: 'b', nombre: 'L-B' }, { id: 'c', nombre: 'L-C' }]
-const avance: AvancePorLote = { a: { dia: 1, maquinaId: null, cantidad: 3 }, b: { dia: 2, maquinaId: 'm1', cantidad: 2 } }
+// Forma nueva: lista por lote. L-A con dos avances (lun 3, mar 2), L-B con uno (mar 2).
+const avance: AvancePorLote = {
+  a: [{ dia: 1, maquinaId: null, cantidad: 3 }, { dia: 2, maquinaId: null, cantidad: 2 }],
+  b: [{ dia: 2, maquinaId: 'm1', cantidad: 2 }],
+}
+
+describe('normalizarAvancePorLote', () => {
+  it('envuelve la forma vieja (un objeto por lote) en lista', () => {
+    const viejo = { a: { dia: 1, maquinaId: null, cantidad: 3 } }
+    expect(normalizarAvancePorLote(viejo)).toEqual({ a: [{ dia: 1, maquinaId: null, cantidad: 3 }] })
+  })
+  it('deja intacta la forma nueva (lista)', () => {
+    expect(normalizarAvancePorLote(avance)).toEqual(avance)
+  })
+  it('null/undefined -> {}', () => {
+    expect(normalizarAvancePorLote(null)).toEqual({})
+    expect(normalizarAvancePorLote(undefined)).toEqual({})
+  })
+})
 
 describe('lotesPendientes', () => {
-  it('devuelve los lotes sin avance', () => {
+  it('devuelve los lotes sin ninguna entrada', () => {
     expect(lotesPendientes(lotes, avance).map((l) => l.id)).toEqual(['c'])
   })
   it('sin avance devuelve todos', () => {
@@ -14,8 +35,8 @@ describe('lotesPendientes', () => {
 })
 
 describe('textoAvancePorLote', () => {
-  it('lista los lotes con avance y su cantidad, en orden', () => {
-    expect(textoAvancePorLote(lotes, avance)).toBe('L-A: 3, L-B: 2')
+  it('lista la SUMA por lote con avance, en orden', () => {
+    expect(textoAvancePorLote(lotes, avance)).toBe('L-A: 5, L-B: 2')
   })
   it('vacío si no hay avance', () => {
     expect(textoAvancePorLote(lotes, null)).toBe('')
@@ -23,12 +44,32 @@ describe('textoAvancePorLote', () => {
 })
 
 describe('textoAvanceConFecha', () => {
-  it('arma "<día> · <lote> — <cantidad> <unidad>" por cada lote con avance, en orden', () => {
-    const lotes = [{ id: 'a', nombre: 'L-A' }, { id: 'b', nombre: 'L-B' }, { id: 'c', nombre: 'L-C' }]
-    const avance: AvancePorLote = { a: { dia: 1, maquinaId: null, cantidad: 3 }, b: { dia: 2, maquinaId: null, cantidad: 2 } }
-    expect(textoAvanceConFecha(lotes, avance, 'ha', (d) => `D${d}`)).toBe('D1 · L-A — 3 ha; D2 · L-B — 2 ha')
+  it('arma una entrada por cada avance (varias por lote), en orden lote→día', () => {
+    expect(textoAvanceConFecha(lotes, avance, 'ha', (d) => `D${d}`))
+      .toBe('D1 · L-A — 3 ha; D2 · L-A — 2 ha; D2 · L-B — 2 ha')
   })
   it('vacío si no hay avance', () => {
     expect(textoAvanceConFecha([{ id: 'a', nombre: 'L-A' }], null, 'ha', (d) => `D${d}`)).toBe('')
+  })
+})
+
+describe('totalAvance', () => {
+  it('suma todas las cantidades de todas las entradas', () => {
+    expect(totalAvance(avance)).toBe(7)
+  })
+  it('0 si no hay avance', () => {
+    expect(totalAvance(null)).toBe(0)
+  })
+})
+
+describe('agregarAvances', () => {
+  it('agrega una entrada nueva a la lista del lote (sin mutar la entrada original)', () => {
+    const base: AvancePorLote = { a: [{ dia: 1, maquinaId: null, cantidad: 3 }] }
+    const out = agregarAvances(base, 2, 'm1', [{ loteId: 'a', cantidad: 2 }, { loteId: 'b', cantidad: 4 }])
+    expect(out).toEqual({
+      a: [{ dia: 1, maquinaId: null, cantidad: 3 }, { dia: 2, maquinaId: 'm1', cantidad: 2 }],
+      b: [{ dia: 2, maquinaId: 'm1', cantidad: 4 }],
+    })
+    expect(base).toEqual({ a: [{ dia: 1, maquinaId: null, cantidad: 3 }] }) // intacto
   })
 })
