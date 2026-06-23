@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { lotesPendientes, textoAvancePorLote, type AvancePorLote } from './avance-lote'
+import { lotesPendientes, textoAvancePorLote, textoAvanceConFecha, type AvancePorLote } from './avance-lote'
 
 const lotes = [{ id: 'a', nombre: 'L-A' }, { id: 'b', nombre: 'L-B' }, { id: 'c', nombre: 'L-C' }]
 const avance: AvancePorLote = { a: { dia: 1, maquinaId: null, cantidad: 3 }, b: { dia: 2, maquinaId: 'm1', cantidad: 2 } }
@@ -19,5 +19,16 @@ describe('textoAvancePorLote', () => {
   })
   it('vacío si no hay avance', () => {
     expect(textoAvancePorLote(lotes, null)).toBe('')
+  })
+})
+
+describe('textoAvanceConFecha', () => {
+  it('arma "<día> · <lote> — <cantidad> <unidad>" por cada lote con avance, en orden', () => {
+    const lotes = [{ id: 'a', nombre: 'L-A' }, { id: 'b', nombre: 'L-B' }, { id: 'c', nombre: 'L-C' }]
+    const avance: AvancePorLote = { a: { dia: 1, maquinaId: null, cantidad: 3 }, b: { dia: 2, maquinaId: null, cantidad: 2 } }
+    expect(textoAvanceConFecha(lotes, avance, 'ha', (d) => `D${d}`)).toBe('D1 · L-A — 3 ha; D2 · L-B — 2 ha')
+  })
+  it('vacío si no hay avance', () => {
+    expect(textoAvanceConFecha([{ id: 'a', nombre: 'L-A' }], null, 'ha', (d) => `D${d}`)).toBe('')
   })
 })
