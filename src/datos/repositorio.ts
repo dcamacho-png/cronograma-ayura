@@ -5,6 +5,7 @@ import { duplicarActividades, datosReprogramacion, detectarConflictosAsignacion 
 import { turnoPorDia } from '@/dominio/turno'
 import type { BorradorActividad, Conflicto } from '@/dominio/programacion'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
+import { normalizarAvancePorLote, agregarAvances, totalAvance, type AvanceEntrada } from '@/dominio/avance-lote'
 
 export function listarAreas() {
   return prisma.area.findMany({ orderBy: { nombre: 'asc' } })
@@ -479,13 +480,13 @@ export async function registrarAvanceLote(
   const act = await prisma.actividad.findUnique({ where: { id: actividadId }, include: { lotes: true } })
   if (!act) return null
   if (act.estado !== 'PARCIAL') return null // solo se registran avances sobre un parcial
-  const actual =
-    (act.avancePorLote as Record<string, { dia: number; maquinaId: string | null; cantidad: number }> | null) ?? {}
-  for (const a of avances) {
-    actual[a.loteId] = { dia, maquinaId, cantidad: a.cantidad }
-  }
-  // Registrar avance nunca cierra la actividad: queda siempre PARCIAL (un lote puede
-  // tomar uno o más días, y tener avance en todos los lotes no implica que terminó).
+  const actual = agregarAvances(
+    normalizarAvancePorLote(act.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null),
+    dia,
+    maquinaId,
+    avances.map((a) => ({ loteId: a.loteId, cantidad: a.cantidad })),
+  )
+  // Registrar avance nunca cierra la actividad: queda siempre PARCIAL.
   // CUMPLIDA se marca a mano cuando el trabajo realmente se completó.
   return prisma.actividad.update({
     where: { id: actividadId },
@@ -493,6 +494,20 @@ export async function registrarAvanceLote(
       avancePorLote: actual as Prisma.InputJsonValue,
       estado: 'PARCIAL',
     },
+  })
+}
+
+// Cierra manualmente un parcial: estado CUMPLIDA y medida realizada = suma de avances.
+// Conserva el historial de avances. Devuelve null si la actividad no está PARCIAL.
+export async function marcarCumplidaDesdeParcial(actividadId: string) {
+  const act = await prisma.actividad.findUnique({ where: { id: actividadId } })
+  if (!act || act.estado !== 'PARCIAL') return null
+  const avance = normalizarAvancePorLote(
+    act.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null,
+  )
+  return prisma.actividad.update({
+    where: { id: actividadId },
+    data: { estado: 'CUMPLIDA', haRealizada: totalAvance(avance) },
   })
 }
 
