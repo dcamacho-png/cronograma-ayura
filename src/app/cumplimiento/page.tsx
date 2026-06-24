@@ -234,7 +234,9 @@ export default async function CumplimientoPage({
                                   estipuladas={estipuladas}
                                   lotesActividad={a.lotes}
                                   haProgramada={a.lotes.reduce((s, l) => s + (l.hectareas ?? 0), 0)}
+                                  dia={a.dia}
                                   accionRegistrar={registrarAccion}
+                                  accionAvance={registrarAvanceLoteAccion}
                                 />
                               ) : (
                                 <DiaNoMaquinaria

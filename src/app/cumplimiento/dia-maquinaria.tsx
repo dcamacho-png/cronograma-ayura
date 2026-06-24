@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { etiquetaMedida, type Unidad } from '@/dominio/unidad'
 import { CENTROS_COSTO } from '@/dominio/centro-costo'
 import { FormRegistrar } from './form-registrar'
+import { FormAvanceLote } from './form-avance-lote'
 
 type Motivo = { id: string; nombre: string }
 type Lote = { id: string; nombre: string; finca: { nombre: string } }
@@ -22,7 +23,9 @@ export function DiaMaquinaria({
   estipuladas,
   lotesActividad,
   haProgramada,
+  dia,
   accionRegistrar,
+  accionAvance,
 }: {
   actividadId: string
   unidad: Unidad
@@ -33,7 +36,9 @@ export function DiaMaquinaria({
   estipuladas: Estipulada[]
   lotesActividad: { id: string; nombre: string }[]
   haProgramada: number
+  dia: number
   accionRegistrar: (formData: FormData) => void | Promise<void>
+  accionAvance: (formData: FormData) => void | Promise<void>
 }) {
   const [novedad, setNovedad] = useState(false)
   const [centro, setCentro] = useState('')
@@ -66,46 +71,59 @@ export function DiaMaquinaria({
   }
 
   return (
-    <form action={accionRegistrar} className="flex flex-wrap items-end gap-2">
-      <input type="hidden" name="id" value={actividadId} />
-      <input type="hidden" name="estado" value="CUMPLIDA" />
-      <label className="flex flex-col text-xs">
-        {etiquetaMedida(unidad)}
-        <input
-          name="haRealizada"
-          type="number"
-          step="any"
-          min="0"
-          required
-          defaultValue={haProgramada}
-          className="w-28 rounded border p-1 text-sm"
-        />
-      </label>
-      <label className="flex flex-col text-xs">
-        Centro de costo
-        <select
-          name="centroCosto"
-          value={centro}
-          onChange={(e) => setCentro(e.target.value)}
-          className="rounded border p-1 text-sm"
-        >
-          <option value="">— sin centro —</option>
-          {CENTROS_COSTO.map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-          <option value="__otra__">Otras…</option>
-        </select>
-      </label>
-      {centro === '__otra__' && (
+    <div className="flex flex-col gap-2">
+      <form action={accionRegistrar} className="flex flex-wrap items-end gap-2">
+        <input type="hidden" name="id" value={actividadId} />
+        <input type="hidden" name="estado" value="CUMPLIDA" />
         <label className="flex flex-col text-xs">
-          Otras (texto libre)
-          <input name="centroCostoOtra" className="w-40 rounded border p-1 text-sm" />
+          {etiquetaMedida(unidad)}
+          <input
+            name="haRealizada"
+            type="number"
+            step="any"
+            min="0"
+            required
+            defaultValue={haProgramada}
+            className="w-28 rounded border p-1 text-sm"
+          />
         </label>
+        <label className="flex flex-col text-xs">
+          Centro de costo
+          <select
+            name="centroCosto"
+            value={centro}
+            onChange={(e) => setCentro(e.target.value)}
+            className="rounded border p-1 text-sm"
+          >
+            <option value="">— sin centro —</option>
+            {CENTROS_COSTO.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+            <option value="__otra__">Otras…</option>
+          </select>
+        </label>
+        {centro === '__otra__' && (
+          <label className="flex flex-col text-xs">
+            Otras (texto libre)
+            <input name="centroCostoOtra" className="w-40 rounded border p-1 text-sm" />
+          </label>
+        )}
+        <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">Guardar avance</button>
+        <button type="button" onClick={() => setNovedad(true)} className="text-xs text-gray-500 underline">
+          registrar novedad
+        </button>
+      </form>
+      {lotesActividad.length > 0 && (
+        <FormAvanceLote
+          actividadId={actividadId}
+          diaActividad={dia}
+          esMaquinaria={true}
+          maquinas={maquinas}
+          unidad={unidad}
+          lotes={lotesActividad}
+          accion={accionAvance}
+        />
       )}
-      <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">Guardar avance</button>
-      <button type="button" onClick={() => setNovedad(true)} className="text-xs text-gray-500 underline">
-        registrar novedad
-      </button>
-    </form>
+    </div>
   )
 }
