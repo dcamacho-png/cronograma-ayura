@@ -38,9 +38,9 @@ export function FormRegistrar({
   const [motivoId, setMotivoId] = useState('')
   const [reemplazoDesc, setReemplazoDesc] = useState('')
   const [centroCosto, setCentroCosto] = useState('')
-  const requiereMotivo = estado !== '' && estado !== 'CUMPLIDA'
+  const requiereMotivo = estado !== ''
   const requierePotreros = (estado === 'PARCIAL' || estado === 'REPROGRAMADA') && lotesActividad.length > 1
-  const esCambio = estado !== '' && estado !== 'CUMPLIDA' && motivoId !== '' && motivoId === motivoCambioId
+  const esCambio = estado !== '' && motivoId !== '' && motivoId === motivoCambioId
 
   // Unidad de la actividad de reemplazo elegida ("Otra"/vacío ⇒ ha).
   const unidadPorNombre = new Map(estipuladas.map((e) => [e.nombre, normalizarUnidad(e.unidad)]))
@@ -60,7 +60,6 @@ export function FormRegistrar({
           className="rounded border p-1 text-sm"
         >
           <option value="">— marcar —</option>
-          <option value="CUMPLIDA">✅ Cumplida</option>
           <option value="NO_CUMPLIDA">🔴 No cumplida</option>
           <option value="PARCIAL">🟡 Parcial</option>
           <option value="REPROGRAMADA">🔄 Reprogramada</option>
