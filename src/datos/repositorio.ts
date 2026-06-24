@@ -5,7 +5,7 @@ import { duplicarActividades, datosReprogramacion, detectarConflictosAsignacion 
 import { turnoPorDia } from '@/dominio/turno'
 import type { BorradorActividad, Conflicto } from '@/dominio/programacion'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
-import { normalizarAvancePorLote, agregarAvances, totalAvance, type AvanceEntrada } from '@/dominio/avance-lote'
+import { normalizarAvancePorLote, agregarAvances, totalAvanceLotes, type AvanceEntrada } from '@/dominio/avance-lote'
 
 export function listarAreas() {
   return prisma.area.findMany({ orderBy: { nombre: 'asc' } })
@@ -497,17 +497,20 @@ export async function registrarAvanceLote(
   })
 }
 
-// Cierra manualmente un parcial: estado CUMPLIDA y medida realizada = suma de avances.
-// Conserva el historial de avances. Devuelve null si la actividad no está PARCIAL.
+// Cierra manualmente un parcial: estado CUMPLIDA y medida realizada = suma de
+// avances de los lotes vigentes. Conserva el historial. null si no está PARCIAL.
 export async function marcarCumplidaDesdeParcial(actividadId: string) {
-  const act = await prisma.actividad.findUnique({ where: { id: actividadId } })
+  const act = await prisma.actividad.findUnique({
+    where: { id: actividadId },
+    include: { lotes: { select: { id: true } } },
+  })
   if (!act || act.estado !== 'PARCIAL') return null
   const avance = normalizarAvancePorLote(
     act.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null,
   )
   return prisma.actividad.update({
     where: { id: actividadId },
-    data: { estado: 'CUMPLIDA', haRealizada: totalAvance(avance) },
+    data: { estado: 'CUMPLIDA', haRealizada: totalAvanceLotes(act.lotes, avance) },
   })
 }
 
