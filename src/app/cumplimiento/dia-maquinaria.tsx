@@ -108,7 +108,7 @@ export function DiaMaquinaria({
             <input name="centroCostoOtra" className="w-40 rounded border p-1 text-sm" />
           </label>
         )}
-        <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">Guardar avance</button>
+        <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">✓ Registrar cumplimiento</button>
         <button type="button" onClick={() => setNovedad(true)} className="text-xs text-gray-500 underline">
           registrar novedad
         </button>
