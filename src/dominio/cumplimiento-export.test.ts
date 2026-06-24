@@ -1,7 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import { filaCumplimiento, COLUMNAS_CUMPLIMIENTO, type ActividadExport } from './cumplimiento-export'
+import { filasCumplimiento, COLUMNAS_CUMPLIMIENTO, type ActividadExport } from './cumplimiento-export'
 
 const mapa: Record<string, string> = { ESTERCOLERO: 'hora', GRANEL: 'kg', ENCALADORA: 'ha' }
+const ctx = {
+  fechaDeDia: (d: number) => `D${d}`,
+  nombreMaquina: (id: string | null) => (id ? `MAQ-${id}` : ''),
+}
 
 function act(p: Partial<ActividadExport>): ActividadExport {
   return {
@@ -15,62 +19,72 @@ function act(p: Partial<ActividadExport>): ActividadExport {
     bultosPorLote: null,
     centroCosto: null,
     lotesHechos: null,
+    avancePorLote: null,
     ...p,
   }
 }
 
 describe('COLUMNAS_CUMPLIMIENTO', () => {
-  it('tiene las 13 columnas en el orden acordado', () => {
+  it('tiene las 12 columnas en el orden acordado (sin "Avance por lote")', () => {
     expect([...COLUMNAS_CUMPLIMIENTO]).toEqual([
-      'Día', 'Fecha', 'Responsable', 'Actividad', 'Máquina', 'Lote(s)', 'Estado', 'Medida realizada', 'Unidad', 'Bultos por lote', 'Centro de costo', 'Potreros realizados', 'Avance por lote',
+      'Día', 'Fecha', 'Responsable', 'Actividad', 'Máquina', 'Lote(s)', 'Estado', 'Medida realizada', 'Unidad', 'Bultos por lote', 'Centro de costo', 'Potreros realizados',
     ])
   })
 })
 
-describe('filaCumplimiento', () => {
+describe('filasCumplimiento — sin avances (una fila, como antes)', () => {
   it('actividad de ha con medida', () => {
-    expect(filaCumplimiento(act({}), '15 jun', mapa)).toEqual(
-      ['Lun', '15 jun', 'Ana', 'ENCALADORA', '6603', 'L1', 'Cumplida', 3, 'ha', '', '', '', ''],
-    )
-  })
-  it('actividad de hora usa "horas"', () => {
-    expect(filaCumplimiento(act({ descripcion: 'ESTERCOLERO', haRealizada: 6 }), '16 jun', mapa)).toEqual(
-      ['Lun', '16 jun', 'Ana', 'ESTERCOLERO', '6603', 'L1', 'Cumplida', 6, 'horas', '', '', '', ''],
-    )
-  })
-  it('actividad de kg', () => {
-    expect(filaCumplimiento(act({ descripcion: 'GRANEL', haRealizada: 100 }), '', mapa)).toEqual(
-      ['Lun', '', 'Ana', 'GRANEL', '6603', 'L1', 'Cumplida', 100, 'kg', '', '', '', ''],
-    )
+    expect(filasCumplimiento(act({}), '15 jun', mapa, ctx)).toEqual([
+      ['Lun', '15 jun', 'Ana', 'ENCALADORA', '6603', 'L1', 'Cumplida', 3, 'ha', '', '', ''],
+    ])
   })
   it('sin medida deja medida y unidad vacías; traduce el estado', () => {
-    expect(filaCumplimiento(act({ haRealizada: null, estado: 'NO_CUMPLIDA' }), '', mapa)).toEqual(
-      ['Lun', '', 'Ana', 'ENCALADORA', '6603', 'L1', 'No cumplida', '', '', '', '', '', ''],
-    )
+    expect(filasCumplimiento(act({ haRealizada: null, estado: 'NO_CUMPLIDA' }), '', mapa, ctx)).toEqual([
+      ['Lun', '', 'Ana', 'ENCALADORA', '6603', 'L1', 'No cumplida', '', '', '', '', ''],
+    ])
   })
   it('descripción fuera del catálogo → ha; máquina y lotes vacíos; día 3 = Mié', () => {
-    expect(filaCumplimiento(act({ descripcion: 'Algo libre', haRealizada: 2, maquina: null, lotes: [], dia: 3 }), '', mapa)).toEqual(
-      ['Mié', '', 'Ana', 'Algo libre', '', '', 'Cumplida', 2, 'ha', '', '', '', ''],
-    )
+    expect(filasCumplimiento(act({ descripcion: 'Algo libre', haRealizada: 2, maquina: null, lotes: [], dia: 3 }), '', mapa, ctx)).toEqual([
+      ['Mié', '', 'Ana', 'Algo libre', '', '', 'Cumplida', 2, 'ha', '', '', ''],
+    ])
   })
-  it('incluye el avance por lote (texto pre-formateado) en la última columna', () => {
-    expect(filaCumplimiento(act({}), '15 jun', mapa, 'Lun 22 · L1 — 3 ha')[12]).toBe('Lun 22 · L1 — 3 ha')
+})
+
+describe('filasCumplimiento — con avances (una fila por avance)', () => {
+  it('dos avances del mismo lote en días distintos → dos filas con la cantidad de cada avance', () => {
+    const a = act({
+      lotes: [{ id: 'l1', nombre: 'L1' }],
+      avancePorLote: { l1: [{ dia: 1, maquinaId: null, cantidad: 2 }, { dia: 2, maquinaId: 'm9', cantidad: 3 }] },
+    })
+    expect(filasCumplimiento(a, '15 jun', mapa, ctx)).toEqual([
+      // máquina null → cae a la máquina de la actividad (6603)
+      ['Lun', 'D1', 'Ana', 'ENCALADORA', '6603', 'L1', 'Cumplida', 2, 'ha', '', '', ''],
+      // máquina del avance → MAQ-m9
+      ['Mar', 'D2', 'Ana', 'ENCALADORA', 'MAQ-m9', 'L1', 'Cumplida', 3, 'ha', '', '', ''],
+    ])
   })
-  it('incluye los bultos por lote cuando existen', () => {
+  it('avances en dos lotes → filas en orden lote→día (según a.lotes), no según las claves del JSON', () => {
     const a = act({
       lotes: [{ id: 'l1', nombre: 'L1' }, { id: 'l2', nombre: 'L2' }],
-      bultosPorLote: { l1: 3, l2: 2.5 },
+      avancePorLote: { l2: [{ dia: 3, maquinaId: null, cantidad: 1 }], l1: [{ dia: 1, maquinaId: null, cantidad: 2 }] },
     })
-    expect(filaCumplimiento(a, '15 jun', mapa)[9]).toBe('L1: 3, L2: 2.5')
+    const filas = filasCumplimiento(a, '15 jun', mapa, ctx)
+    expect(filas.map((f) => [f[5], f[7]])).toEqual([['L1', 2], ['L2', 1]])
   })
-  it('incluye el centro de costo cuando existe', () => {
-    expect(filaCumplimiento(act({ centroCosto: 'Biodigestor' }), '15 jun', mapa)[10]).toBe('Biodigestor')
-  })
-  it('incluye los potreros realizados cuando existen', () => {
+  it('repite los datos de actividad (bultos, centro de costo, potreros) en cada fila de avance', () => {
     const a = act({
-      lotes: [{ id: 'l1', nombre: 'L1' }, { id: 'l2', nombre: 'L2' }, { id: 'l3', nombre: 'L3' }],
-      lotesHechos: ['l1', 'l3'],
+      lotes: [{ id: 'l1', nombre: 'L1' }, { id: 'l2', nombre: 'L2' }],
+      bultosPorLote: { l1: 3, l2: 2 },
+      centroCosto: 'Ceba',
+      lotesHechos: ['l1'],
+      avancePorLote: { l1: [{ dia: 1, maquinaId: null, cantidad: 2 }, { dia: 2, maquinaId: null, cantidad: 4 }] },
     })
-    expect(filaCumplimiento(a, '15 jun', mapa)[11]).toBe('L1, L3')
+    const filas = filasCumplimiento(a, '15 jun', mapa, ctx)
+    expect(filas.length).toBe(2)
+    for (const f of filas) {
+      expect(f[9]).toBe('L1: 3, L2: 2') // bultos por lote
+      expect(f[10]).toBe('Ceba')         // centro de costo
+      expect(f[11]).toBe('L1')           // potreros realizados
+    }
   })
 })
