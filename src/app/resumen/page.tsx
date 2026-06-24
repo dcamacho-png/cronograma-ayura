@@ -49,7 +49,7 @@ export default async function ResumenPage({
 
   return (
     <main className="mx-auto max-w-6xl p-6">
-      <h1 className="mb-4 text-2xl font-bold text-[#11603a]">Resumen semanal</h1>
+      <h1 className="mb-4 text-2xl font-bold text-bosque">Resumen semanal</h1>
 
       {esAdmin ? (
         <div className="mb-3 flex flex-wrap gap-2">
@@ -57,7 +57,7 @@ export default async function ResumenPage({
             <Link
               key={a.id}
               href={url(a.id, anio, semana)}
-              className={`rounded-full px-3 py-1 text-sm ${a.id === areaId ? 'bg-[#11603a] text-white' : 'bg-gray-100 text-gray-700'}`}
+              className={`rounded-full px-3 py-1 text-sm ${a.id === areaId ? 'bg-bosque text-white' : 'bg-gray-100 text-gray-700'}`}
             >
               {a.nombre}
             </Link>

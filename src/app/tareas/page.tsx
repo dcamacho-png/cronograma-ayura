@@ -58,7 +58,7 @@ export default async function TareasPage({
 
   return (
     <main className="mx-auto max-w-5xl p-6">
-      <h1 className="mb-4 text-2xl font-bold text-[#11603a]">🗂️ Banco de tareas</h1>
+      <h1 className="mb-4 text-2xl font-bold text-bosque">🗂️ Banco de tareas</h1>
 
       {esAdmin ? (
         <div className="mb-4 flex flex-wrap gap-2">
@@ -66,7 +66,7 @@ export default async function TareasPage({
             <Link
               key={a.id}
               href={url(a.id)}
-              className={`rounded-full px-3 py-1 text-sm ${a.id === areaId ? 'bg-[#11603a] text-white' : 'bg-gray-100 text-gray-700'}`}
+              className={`rounded-full px-3 py-1 text-sm ${a.id === areaId ? 'bg-bosque text-white' : 'bg-gray-100 text-gray-700'}`}
             >
               {a.nombre}
             </Link>
@@ -92,7 +92,7 @@ export default async function TareasPage({
                 Finca y lote (opcional)
                 <SelectFincaLote lotes={lotes} name="loteId" />
               </label>
-              <button className="rounded bg-[#11603a] px-4 py-2 text-sm font-semibold text-white">+ Agregar al banco</button>
+              <button className="rounded bg-bosque px-4 py-2 text-sm font-semibold text-white">+ Agregar al banco</button>
             </form>
           )}
         </div>
@@ -147,7 +147,7 @@ export default async function TareasPage({
                         ))}
                       </select>
                     </label>
-                    <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">Guardar</button>
+                    <button className="rounded bg-bosque px-3 py-1 text-sm font-semibold text-white">Guardar</button>
                   </form>
                   {t.solicitadaPorArea ? (
                     <form action={devolverAlSolicitanteAccion}>

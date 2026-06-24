@@ -72,7 +72,7 @@ export default async function ProgramarPage({
   const url = (a: string, an: number, se: number) => `/programar?area=${a}&anio=${an}&semana=${se}`
   return (
     <main className="mx-auto max-w-6xl p-6">
-      <h1 className="mb-4 text-2xl font-bold text-[#11603a]">Programar semana</h1>
+      <h1 className="mb-4 text-2xl font-bold text-bosque">Programar semana</h1>
 
       {sp.error && (
         <div className="mb-4 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-800">
@@ -86,7 +86,7 @@ export default async function ProgramarPage({
             <Link
               key={a.id}
               href={url(a.id, anio, semana)}
-              className={`rounded-full px-3 py-1 text-sm ${a.id === areaId ? 'bg-[#11603a] text-white' : 'bg-gray-100 text-gray-700'}`}
+              className={`rounded-full px-3 py-1 text-sm ${a.id === areaId ? 'bg-bosque text-white' : 'bg-gray-100 text-gray-700'}`}
             >
               {a.nombre}
             </Link>

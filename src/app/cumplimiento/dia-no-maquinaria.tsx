@@ -72,7 +72,7 @@ export function DiaNoMaquinaria({
       <form action={marcarCumplido}>
         <input type="hidden" name="id" value={actividadId} />
         <input type="hidden" name="estado" value="CUMPLIDA" />
-        <button className="flex items-center gap-1 rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">
+        <button className="flex items-center gap-1 rounded bg-bosque px-3 py-1 text-sm font-semibold text-white">
           ✓ Cumplido
         </button>
       </form>

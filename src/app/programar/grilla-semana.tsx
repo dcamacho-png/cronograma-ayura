@@ -42,7 +42,7 @@ export function GrillaSemana({
   return (
     <div className="rounded-xl border bg-white text-gray-900">
       <div className="border-b p-3">
-        <div className="text-lg font-bold text-[#11603a]">{areaNombre}</div>
+        <div className="text-lg font-bold text-bosque">{areaNombre}</div>
         <div className="text-sm text-gray-500">Semana {semana}{rango ? ` · ${rango}` : ''}</div>
       </div>
       {responsables.length === 0 ? (
@@ -80,7 +80,7 @@ export function GrillaSemana({
                                 <input type="hidden" name="anio" value={anio} />
                                 <input type="hidden" name="semana" value={semana} />
                                 <input aria-label="Turno" name="turno" defaultValue={a.turno} className="w-20 rounded border p-0.5 text-xs" />
-                                <button type="submit" className="rounded bg-[#11603a] px-1.5 text-xs font-semibold text-white">✓</button>
+                                <button type="submit" className="rounded bg-bosque px-1.5 text-xs font-semibold text-white">✓</button>
                               </form>
                             ) : (
                               a.turno && <div className="text-xs text-gray-500">{a.turno}</div>

@@ -8,7 +8,7 @@ export default async function LoginPage({
   const sp = await searchParams
   return (
     <main className="mx-auto mt-16 max-w-sm rounded-2xl border p-8">
-      <h1 className="mb-4 text-2xl font-bold text-[#11603a]">🌱 Cronograma Ayurá</h1>
+      <h1 className="mb-4 text-2xl font-bold text-bosque">🌱 Cronograma Ayurá</h1>
       <h2 className="mb-4 text-lg font-semibold">Iniciar sesión</h2>
       {sp.error && (
         <p className="mb-3 rounded bg-red-50 px-3 py-2 text-sm text-red-700">Usuario o contraseña incorrectos.</p>
@@ -22,7 +22,7 @@ export default async function LoginPage({
           Contraseña
           <input name="password" type="password" required className="rounded border p-2" />
         </label>
-        <button className="rounded bg-[#11603a] px-4 py-2 font-semibold text-white">Entrar</button>
+        <button className="rounded bg-bosque px-4 py-2 font-semibold text-white">Entrar</button>
       </form>
     </main>
   )

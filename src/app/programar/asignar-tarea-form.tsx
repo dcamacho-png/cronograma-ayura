@@ -91,7 +91,7 @@ export function AsignarTareaForm({
                 value={r.id}
                 checked={responsableIds.includes(r.id)}
                 onChange={() => toggleResp(r.id)}
-                className="accent-[#11603a]"
+                className="accent-bosque"
               />
               {r.nombre}
             </label>
@@ -107,7 +107,7 @@ export function AsignarTareaForm({
               <label
                 key={d}
                 title={pasado ? 'Día ya pasado de esta semana' : undefined}
-                className={`flex flex-col items-center rounded border px-1.5 py-0.5 has-[:checked]:border-[#11603a] has-[:checked]:bg-green-50 ${
+                className={`flex flex-col items-center rounded border px-1.5 py-0.5 has-[:checked]:border-bosque has-[:checked]:bg-green-50 ${
                   pasado ? 'cursor-not-allowed bg-gray-100 text-gray-300' : 'cursor-pointer'
                 }`}
               >
@@ -119,7 +119,7 @@ export function AsignarTareaForm({
                   checked={dias.includes(i + 1)}
                   disabled={pasado}
                   onChange={() => toggleDia(i + 1)}
-                  className="accent-[#11603a]"
+                  className="accent-bosque"
                 />
               </label>
             )
@@ -182,7 +182,7 @@ export function AsignarTareaForm({
       </span>
       <button
         disabled={responsableIds.length === 0 || conflictosResp.length > 0}
-        className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
+        className="rounded bg-bosque px-3 py-1 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
       >
         Asignar →
       </button>

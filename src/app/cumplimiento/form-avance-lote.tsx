@@ -31,7 +31,7 @@ export function FormAvanceLote({
       <button
         type="button"
         onClick={() => setAbierto(true)}
-        className="rounded border border-[#11603a] px-2 py-1 text-xs font-semibold text-[#11603a] hover:bg-green-50"
+        className="rounded border border-bosque px-2 py-1 text-xs font-semibold text-bosque hover:bg-green-50"
       >
         Registrar avance
       </button>
@@ -67,7 +67,7 @@ export function FormAvanceLote({
         {lotes.map((l) => (
           <div key={l.id} className="flex items-center gap-2">
             <label className="flex items-center gap-1">
-              <input type="checkbox" name="loteAvance" value={l.id} className="accent-[#11603a]" />
+              <input type="checkbox" name="loteAvance" value={l.id} className="accent-bosque" />
               {l.nombre}
             </label>
             <input name={`cantidad_${l.id}`} type="number" step="any" min="0" placeholder="cantidad" className="w-24 rounded border p-1" />
@@ -75,7 +75,7 @@ export function FormAvanceLote({
         ))}
       </div>
       <div className="flex gap-2">
-        <button className="rounded bg-[#11603a] px-3 py-1 font-semibold text-white">Guardar avance</button>
+        <button className="rounded bg-bosque px-3 py-1 font-semibold text-white">Guardar avance</button>
         <button type="button" onClick={() => setAbierto(false)} className="text-gray-500 underline">cancelar</button>
       </div>
     </form>

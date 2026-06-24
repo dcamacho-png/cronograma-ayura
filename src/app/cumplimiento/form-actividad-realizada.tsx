@@ -134,7 +134,7 @@ export function FormActividadRealizada({
           )}
         </>
       )}
-      <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">Agregar</button>
+      <button className="rounded bg-bosque px-3 py-1 text-sm font-semibold text-white">Agregar</button>
     </form>
   )
 }

@@ -58,7 +58,7 @@ export function FormNuevaTareaMaquinaria({
         Detalle / instrucciones (opcional)
         <textarea name="detalle" rows={2} placeholder="Ej: aplicar urea, 2 bultos/ha" className="rounded border p-2 text-sm" />
       </label>
-      <button className="rounded bg-[#11603a] px-4 py-2 text-sm font-semibold text-white">+ Agregar al banco</button>
+      <button className="rounded bg-bosque px-4 py-2 text-sm font-semibold text-white">+ Agregar al banco</button>
     </form>
   )
 }

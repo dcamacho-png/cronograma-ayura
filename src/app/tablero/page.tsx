@@ -64,7 +64,7 @@ export default async function TableroPage({
 
   return (
     <main className="mx-auto max-w-6xl p-6">
-      <h1 className="mb-4 text-2xl font-bold text-[#11603a]">Tablero mensual</h1>
+      <h1 className="mb-4 text-2xl font-bold text-bosque">Tablero mensual</h1>
 
       <div className="mb-6 flex items-center gap-3">
         <Link href={url(previo.anio, previo.mes)} className="rounded border px-3 py-1 text-sm">← {MESES[previo.mes]}</Link>

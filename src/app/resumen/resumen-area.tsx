@@ -104,7 +104,7 @@ export function ResumenArea({
   return (
     <div className="text-gray-900">
       <div className="mb-4 border-b pb-2">
-        <div className="text-lg font-bold text-[#11603a]">Resumen — {areaNombre}</div>
+        <div className="text-lg font-bold text-bosque">Resumen — {areaNombre}</div>
         <div className="text-sm text-gray-500">Semana {semana} · {anio}</div>
       </div>
 

@@ -28,7 +28,7 @@ export function BotonDescargarImagen({
     <button
       type="button"
       onClick={descargar}
-      className="rounded border border-[#11603a] px-3 py-1 text-sm font-semibold text-[#11603a] hover:bg-green-50"
+      className="rounded border border-bosque px-3 py-1 text-sm font-semibold text-bosque hover:bg-green-50"
     >
       📷 Descargar imagen
     </button>

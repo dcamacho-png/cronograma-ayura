@@ -126,7 +126,7 @@ export function FormRegistrar({
           <div className="flex flex-wrap gap-3">
             {lotesActividad.map((l) => (
               <label key={l.id} className="flex items-center gap-1">
-                <input type="checkbox" name="loteHecho" value={l.id} className="accent-[#11603a]" />
+                <input type="checkbox" name="loteHecho" value={l.id} className="accent-bosque" />
                 {l.nombre}
               </label>
             ))}
@@ -190,7 +190,7 @@ export function FormRegistrar({
           )}
         </div>
       )}
-      <button className="rounded bg-[#11603a] px-3 py-1 text-sm font-semibold text-white">Registrar</button>
+      <button className="rounded bg-bosque px-3 py-1 text-sm font-semibold text-white">Registrar</button>
     </form>
   )
 }

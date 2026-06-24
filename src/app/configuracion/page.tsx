@@ -37,7 +37,7 @@ import { LotesLista } from './lotes-lista'
 function Grupo({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
     <section className="mb-8">
-      <h2 className="mb-3 border-b pb-1 text-lg font-bold text-[#11603a]">{titulo}</h2>
+      <h2 className="mb-3 border-b pb-1 text-lg font-bold text-bosque">{titulo}</h2>
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">{children}</div>
     </section>
   )
@@ -64,7 +64,7 @@ export default async function ConfiguracionPage({
 
   return (
     <main className="mx-auto max-w-6xl p-6">
-      <h1 className="mb-4 text-2xl font-bold text-[#11603a]">Configuración</h1>
+      <h1 className="mb-4 text-2xl font-bold text-bosque">Configuración</h1>
 
       {sp.ok && (
         <div className="mb-4 rounded-lg border border-green-300 bg-green-50 p-3 text-sm text-green-800">
@@ -96,7 +96,7 @@ export default async function ConfiguracionPage({
           </ul>
           <form action={crearAreaAccion} className="flex gap-2">
             <input name="nombre" required placeholder="Nueva área" className="flex-1 rounded border p-2 text-sm" />
-            <button className="rounded bg-[#11603a] px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
+            <button className="rounded bg-bosque px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
           </form>
         </section>
 
@@ -113,7 +113,7 @@ export default async function ConfiguracionPage({
           </ul>
           <form action={crearFincaAccion} className="flex gap-2">
             <input name="nombre" required placeholder="Nueva finca" className="flex-1 rounded border p-2 text-sm" />
-            <button className="rounded bg-[#11603a] px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
+            <button className="rounded bg-bosque px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
           </form>
         </section>
 
@@ -131,7 +131,7 @@ export default async function ConfiguracionPage({
             </select>
             <input name="hectareas" type="number" step="0.01" placeholder="ha" className="w-20 rounded border p-2 text-sm" />
             <input name="tipoPasto" placeholder="Tipo de pasto" className="rounded border p-2 text-sm" />
-            <button className="rounded bg-[#11603a] px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
+            <button className="rounded bg-bosque px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
           </form>
         </section>
       </Grupo>
@@ -151,7 +151,7 @@ export default async function ConfiguracionPage({
           </ul>
           <form action={crearMaquinaAccion} className="flex flex-wrap gap-2">
             <input name="nombre" required placeholder="Máquina (placa/nombre)" className="flex-1 rounded border p-2 text-sm" />
-            <button className="rounded bg-[#11603a] px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
+            <button className="rounded bg-bosque px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
           </form>
         </section>
 
@@ -165,7 +165,7 @@ export default async function ConfiguracionPage({
                 <form action={renombrarActividadEstipuladaAccion} className="flex flex-1 items-center gap-1">
                   <input type="hidden" name="id" value={e.id} />
                   <input name="nombre" defaultValue={e.nombre} className="flex-1 rounded border p-1 text-sm" />
-                  <button className="text-xs font-semibold text-[#11603a] hover:underline">guardar</button>
+                  <button className="text-xs font-semibold text-bosque hover:underline">guardar</button>
                 </form>
                 <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">{e.unidad}</span>
                 <FormEliminar accion={eliminarActividadEstipuladaAccion} id={e.id} etiqueta={e.nombre} />
@@ -179,7 +179,7 @@ export default async function ConfiguracionPage({
               <option value="hora">Hora</option>
               <option value="kg">Kg</option>
             </select>
-            <button className="rounded bg-[#11603a] px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
+            <button className="rounded bg-bosque px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
           </form>
         </section>
       </Grupo>
@@ -199,7 +199,7 @@ export default async function ConfiguracionPage({
                 <form action={cambiarEstadoResponsableAccion}>
                   <input type="hidden" name="id" value={r.id} />
                   <input type="hidden" name="activo" value={r.activo ? '0' : '1'} />
-                  <button className="text-xs font-semibold text-[#11603a] hover:underline">
+                  <button className="text-xs font-semibold text-bosque hover:underline">
                     {r.activo ? 'Dar de baja' : 'Reactivar'}
                   </button>
                 </form>
@@ -216,7 +216,7 @@ export default async function ConfiguracionPage({
                 <option key={a.id} value={a.id}>{a.nombre}</option>
               ))}
             </select>
-            <button className="rounded bg-[#11603a] px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
+            <button className="rounded bg-bosque px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
           </form>
         </section>
 
@@ -232,7 +232,7 @@ export default async function ConfiguracionPage({
                 <form action={cambiarContrasenaAccion} className="flex items-center gap-1">
                   <input type="hidden" name="id" value={us.id} />
                   <input name="password" required placeholder="nueva contraseña" className="rounded border p-1 text-xs" />
-                  <button className="text-xs font-semibold text-[#11603a] hover:underline">cambiar</button>
+                  <button className="text-xs font-semibold text-bosque hover:underline">cambiar</button>
                 </form>
                 <FormEliminar accion={eliminarUsuarioAccion} id={us.id} etiqueta={us.usuario} />
               </li>
@@ -252,7 +252,7 @@ export default async function ConfiguracionPage({
                 <option key={a.id} value={a.id}>{a.nombre}</option>
               ))}
             </select>
-            <button className="rounded bg-[#11603a] px-3 py-2 text-sm font-semibold text-white">+ Usuario</button>
+            <button className="rounded bg-bosque px-3 py-2 text-sm font-semibold text-white">+ Usuario</button>
           </form>
         </section>
       </Grupo>
@@ -272,7 +272,7 @@ export default async function ConfiguracionPage({
           </ul>
           <form action={crearMotivoAccion} className="flex gap-2">
             <input name="nombre" required placeholder="Nuevo motivo" className="flex-1 rounded border p-2 text-sm" />
-            <button className="rounded bg-[#11603a] px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
+            <button className="rounded bg-bosque px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
           </form>
         </section>
       </Grupo>

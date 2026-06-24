@@ -39,7 +39,7 @@ export function PickerLotesBultos({ lotes }: { lotes: Lote[] }) {
             return (
               <div key={l.id} className="flex items-center gap-2 text-sm">
                 <label className="flex flex-1 items-center gap-1">
-                  <input type="checkbox" checked={checked} onChange={() => toggle(l.id)} className="accent-[#11603a]" />
+                  <input type="checkbox" checked={checked} onChange={() => toggle(l.id)} className="accent-bosque" />
                   {l.nombre}
                 </label>
                 {checked && (
