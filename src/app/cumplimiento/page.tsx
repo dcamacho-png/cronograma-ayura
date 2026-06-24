@@ -7,7 +7,7 @@ import { unidadDe, unidadAbreviada } from '@/dominio/unidad'
 import { textoLotesHechos } from '@/dominio/lotes-hechos'
 import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, responsablesDistintos, conteoEstadoActividades, tieneDiaPendiente } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
-import { lotesPendientes, textoAvanceConFecha, normalizarAvancePorLote, totalAvance, type AvanceEntrada } from '@/dominio/avance-lote'
+import { lotesPendientes, textoAvanceConFecha, normalizarAvancePorLote, totalAvanceLotes, type AvanceEntrada } from '@/dominio/avance-lote'
 import { registrarAccion, agregarActividadRealizadaAccion, marcarEstadoAccion, desmarcarAccion, registrarAvanceLoteAccion, devolverAlBancoAccion, marcarCumplidaParcialAccion } from './acciones'
 import { FormActividadRealizada } from './form-actividad-realizada'
 import { FormAvanceLote } from './form-avance-lote'
@@ -263,7 +263,7 @@ export default async function CumplimientoPage({
                               <div className="flex flex-wrap items-center gap-2 text-sm">
                                 <span className="font-semibold">{ESTADOS.find((e) => e.valor === a.estado)?.etiqueta ?? a.estado}</span>
                                 {(tieneAvances || a.haRealizada != null) && (
-                                  <span className="text-gray-500">· {tieneAvances ? totalAvance(avances) : a.haRealizada} {unidadAbreviada(unidad)}</span>
+                                  <span className="text-gray-500">· {tieneAvances ? totalAvanceLotes(a.lotes, avances) : a.haRealizada} {unidadAbreviada(unidad)}</span>
                                 )}
                                 {a.motivo && <span className="text-gray-500">· {a.motivo.nombre}</span>}
                                 {a.nota && <span className="text-gray-500">· {a.nota}</span>}
