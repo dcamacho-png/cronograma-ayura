@@ -105,7 +105,11 @@ export async function registrarAvanceLoteAccion(form: FormData) {
   if (!id || !(dia >= 1 && dia <= 7)) return
   const maquinaId = textoOpcional(form, 'maquinaId')
   const loteIds = form.getAll('loteAvance').map((v) => String(v))
-  const avances = loteIds.map((loteId) => ({ loteId, cantidad: numeroOpcional(form, `cantidad_${loteId}`) ?? 0 }))
+  // Solo cuentan los lotes con cantidad real (> 0). Un lote tildado pero sin cantidad
+  // no es un avance: la actividad debe quedar PENDIENTE, no pasar a PARCIAL.
+  const avances = loteIds
+    .map((loteId) => ({ loteId, cantidad: numeroOpcional(form, `cantidad_${loteId}`) ?? 0 }))
+    .filter((a) => a.cantidad > 0)
   if (avances.length === 0) return
   await registrarAvanceLote(id, dia, maquinaId, avances)
   revalidatePath('/cumplimiento')
