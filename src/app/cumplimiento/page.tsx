@@ -7,7 +7,7 @@ import { unidadDe, unidadAbreviada } from '@/dominio/unidad'
 import { textoLotesHechos } from '@/dominio/lotes-hechos'
 import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, responsablesDistintos, conteoEstadoActividades, tieneDiaPendiente } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
-import { lotesPendientes, textoAvanceConFecha, normalizarAvancePorLote, type AvanceEntrada } from '@/dominio/avance-lote'
+import { lotesPendientes, textoAvanceConFecha, normalizarAvancePorLote, totalAvance, type AvanceEntrada } from '@/dominio/avance-lote'
 import { registrarAccion, agregarActividadRealizadaAccion, marcarEstadoAccion, desmarcarAccion, registrarAvanceLoteAccion, devolverAlBancoAccion, marcarCumplidaParcialAccion } from './acciones'
 import { FormActividadRealizada } from './form-actividad-realizada'
 import { FormAvanceLote } from './form-avance-lote'
@@ -250,12 +250,20 @@ export default async function CumplimientoPage({
                                   accionRegistrar={registrarAccion}
                                 />
                               )
-                            ) : (
+                            ) : (() => {
+                              const avances = normalizarAvancePorLote(
+                                a.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null,
+                              )
+                              const tieneAvances = Object.values(avances).some((es) => es.length > 0)
+                              const etiquetaDia = (dia: number) =>
+                                `${DIAS[dia] ?? ''} ${fechas[dia - 1] ? fmtFecha(fechas[dia - 1]) : ''}`.trim()
+                              const resumenAvances = textoAvanceConFecha(a.lotes, avances, unidadAbreviada(unidad), etiquetaDia)
+                              return (
                               <>
                               <div className="flex flex-wrap items-center gap-2 text-sm">
                                 <span className="font-semibold">{ESTADOS.find((e) => e.valor === a.estado)?.etiqueta ?? a.estado}</span>
-                                {a.haRealizada != null && (
-                                  <span className="text-gray-500">· {a.haRealizada} {unidadAbreviada(unidad)}</span>
+                                {(tieneAvances || a.haRealizada != null) && (
+                                  <span className="text-gray-500">· {tieneAvances ? totalAvance(avances) : a.haRealizada} {unidadAbreviada(unidad)}</span>
                                 )}
                                 {a.motivo && <span className="text-gray-500">· {a.motivo.nombre}</span>}
                                 {a.nota && <span className="text-gray-500">· {a.nota}</span>}
@@ -268,22 +276,16 @@ export default async function CumplimientoPage({
                                   <button className="text-xs text-gray-500 underline hover:text-gray-700">↩ desmarcar</button>
                                 </form>
                               </div>
-                              {a.estado === 'PARCIAL' && (() => {
-                                const avances = normalizarAvancePorLote(
-                                  a.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null,
-                                )
-                                const etiquetaDia = (dia: number) =>
-                                  `${DIAS[dia] ?? ''} ${fechas[dia - 1] ? fmtFecha(fechas[dia - 1]) : ''}`.trim()
-                                const resumenAvances = textoAvanceConFecha(a.lotes, avances, unidadAbreviada(unidad), etiquetaDia)
-                                return (
+                              {/* Resumen de avances (solo lectura): visible en cualquier estado no-pendiente con avances. */}
+                              {resumenAvances && (
+                                <span className="mt-1 text-sm text-gray-600">Avances: {resumenAvances}</span>
+                              )}
+                              {a.estado === 'PARCIAL' && (
                                 <div className="mt-1 flex w-full flex-col gap-1 text-sm">
                                   {a.lotes.length > 0 && (
                                     <span className="text-gray-600">
                                       Progreso: {a.lotes.length - lotesPendientes(a.lotes, avances).length} de {a.lotes.length} lotes
                                     </span>
-                                  )}
-                                  {resumenAvances && (
-                                    <span className="text-gray-600">Avances: {resumenAvances}</span>
                                   )}
                                   <div className="flex flex-wrap items-center gap-2">
                                     {a.lotes.length > 0 && (
@@ -307,10 +309,10 @@ export default async function CumplimientoPage({
                                     </form>
                                   </div>
                                 </div>
-                                )
-                              })()}
+                              )}
                               </>
-                            )}
+                              )
+                            })()}
                           </li>
                         ))}
                       </ul>
