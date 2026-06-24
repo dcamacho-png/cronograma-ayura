@@ -18,7 +18,7 @@ export function NavPrincipal({ usuario }: { usuario: { nombre: string; rol: stri
     ruta === href ? 'font-semibold underline underline-offset-4' : 'opacity-90 hover:underline'
 
   return (
-    <header className="bg-bosque text-white print:hidden">
+    <header className="bg-gradient-to-r from-bosque-hondo to-bosque text-white print:hidden">
       <div className="mx-auto flex max-w-6xl items-center gap-x-4 gap-y-2 px-6 py-3">
         <Link href="/" className="font-bold">🌱 Cronograma Ayurá</Link>
 
