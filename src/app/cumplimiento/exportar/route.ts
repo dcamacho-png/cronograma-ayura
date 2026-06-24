@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import ExcelJS from 'exceljs'
 import { usuarioActual } from '@/auth/sesion'
-import { listarAreas, listarActividades, listarActividadesEstipuladas } from '@/datos/repositorio'
+import { listarAreas, listarActividades, listarActividadesEstipuladas, listarMaquinas } from '@/datos/repositorio'
 import { fechasDeSemana } from '@/dominio/semana'
-import { COLUMNAS_CUMPLIMIENTO, filaCumplimiento } from '@/dominio/cumplimiento-export'
-import { textoAvanceConFecha, normalizarAvancePorLote, type AvanceEntrada } from '@/dominio/avance-lote'
-import { unidadDe, unidadAbreviada } from '@/dominio/unidad'
+import { COLUMNAS_CUMPLIMIENTO, filasCumplimiento } from '@/dominio/cumplimiento-export'
+import type { AvanceEntrada } from '@/dominio/avance-lote'
 import type { BultosPorLote } from '@/dominio/bultos'
 
 // exceljs necesita runtime Node (no edge).
@@ -31,10 +30,13 @@ export async function GET(req: NextRequest) {
     return new NextResponse('Parámetros inválidos', { status: 400 })
   }
 
-  const [actividades, estipuladas] = await Promise.all([
+  const [actividades, estipuladas, maquinas] = await Promise.all([
     listarActividades(area.id, anio, semana),
     listarActividadesEstipuladas(),
+    listarMaquinas(),
   ])
+  const nombrePorMaquina = new Map(maquinas.map((m) => [m.id, m.nombre]))
+  const nombreMaquina = (id: string | null) => (id ? nombrePorMaquina.get(id) ?? '' : '')
   const unidadPorNombre = Object.fromEntries(estipuladas.map((e) => [e.nombre, e.unidad]))
   const fechas = fechasDeSemana(anio, semana)
   const fmtFecha = (f: Date) =>
@@ -44,27 +46,25 @@ export async function GET(req: NextRequest) {
   const ws = wb.addWorksheet('Cumplimiento')
   const header = ws.addRow([...COLUMNAS_CUMPLIMIENTO])
   header.font = { bold: true }
-  const NOMBRES_DIA = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
-  const etiquetaDia = (dia: number) =>
-    `${NOMBRES_DIA[dia] ?? ''} ${fechas[dia - 1] ? fmtFecha(fechas[dia - 1]) : ''}`.trim()
+  const fechaDeDia = (dia: number) => (fechas[dia - 1] ? fmtFecha(fechas[dia - 1]) : '')
 
   // Solo actividades cumplidas o parciales.
   const filas = actividades.filter((a) => a.estado === 'CUMPLIDA' || a.estado === 'PARCIAL')
   for (const a of filas) {
-    const fecha = fechas[a.dia - 1] ? fmtFecha(fechas[a.dia - 1]) : ''
-    const unidadAbrev = unidadAbreviada(unidadDe(unidadPorNombre, a.descripcion))
-    const avanceTexto = textoAvanceConFecha(
-      a.lotes,
-      normalizarAvancePorLote(a.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null),
-      unidadAbrev,
-      etiquetaDia,
-    )
-    ws.addRow(filaCumplimiento(
-      { ...a, bultosPorLote: a.bultosPorLote as BultosPorLote | null, lotesHechos: a.lotesHechos as string[] | null },
+    const fecha = fechaDeDia(a.dia)
+    for (const fila of filasCumplimiento(
+      {
+        ...a,
+        bultosPorLote: a.bultosPorLote as BultosPorLote | null,
+        lotesHechos: a.lotesHechos as string[] | null,
+        avancePorLote: a.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null,
+      },
       fecha,
       unidadPorNombre,
-      avanceTexto,
-    ))
+      { fechaDeDia, nombreMaquina },
+    )) {
+      ws.addRow(fila)
+    }
   }
 
   const buffer = await wb.xlsx.writeBuffer()
