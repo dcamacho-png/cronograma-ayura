@@ -246,8 +246,10 @@ export default async function CumplimientoPage({
                                   estipuladas={estipuladas}
                                   lotesActividad={a.lotes}
                                   unidad={unidad}
+                                  dia={a.dia}
                                   marcarCumplido={marcarEstadoAccion}
                                   accionRegistrar={registrarAccion}
+                                  accionAvance={registrarAvanceLoteAccion}
                                 />
                               )
                             ) : (() => {

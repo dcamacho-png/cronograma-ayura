@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import type { Unidad } from '@/dominio/unidad'
 import { FormRegistrar } from './form-registrar'
+import { FormAvanceLote } from './form-avance-lote'
 
 type Motivo = { id: string; nombre: string }
 type Lote = { id: string; nombre: string; finca: { nombre: string } }
@@ -19,8 +20,10 @@ export function DiaNoMaquinaria({
   estipuladas,
   lotesActividad,
   unidad,
+  dia,
   marcarCumplido,
   accionRegistrar,
+  accionAvance,
 }: {
   actividadId: string
   motivos: Motivo[]
@@ -30,8 +33,10 @@ export function DiaNoMaquinaria({
   estipuladas: Estipulada[]
   lotesActividad: { id: string; nombre: string }[]
   unidad: Unidad
+  dia: number
   marcarCumplido: (formData: FormData) => void | Promise<void>
   accionRegistrar: (formData: FormData) => void | Promise<void>
+  accionAvance: (formData: FormData) => void | Promise<void>
 }) {
   const [novedad, setNovedad] = useState(false)
 
@@ -78,6 +83,17 @@ export function DiaNoMaquinaria({
       >
         registrar novedad
       </button>
+      {lotesActividad.length > 0 && (
+        <FormAvanceLote
+          actividadId={actividadId}
+          diaActividad={dia}
+          esMaquinaria={false}
+          maquinas={maquinas}
+          unidad={unidad}
+          lotes={lotesActividad}
+          accion={accionAvance}
+        />
+      )}
     </div>
   )
 }
