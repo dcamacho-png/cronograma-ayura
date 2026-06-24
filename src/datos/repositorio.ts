@@ -479,7 +479,9 @@ export async function registrarAvanceLote(
 ) {
   const act = await prisma.actividad.findUnique({ where: { id: actividadId } })
   if (!act) return null
-  if (act.estado !== 'PARCIAL') return null // solo se registran avances sobre un parcial
+  // Se permite arrancar desde PENDIENTE (el primer avance lo pasa a PARCIAL) o seguir
+  // sumando en PARCIAL. No se registran avances sobre cerradas/no cumplidas/reprogramadas.
+  if (act.estado !== 'PENDIENTE' && act.estado !== 'PARCIAL') return null
   const actual = agregarAvances(
     normalizarAvancePorLote(act.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null),
     dia,
