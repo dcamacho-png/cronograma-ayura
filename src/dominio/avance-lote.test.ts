@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   lotesPendientes, textoAvancePorLote, textoAvanceConFecha,
-  normalizarAvancePorLote, totalAvance, agregarAvances, type AvancePorLote,
+  normalizarAvancePorLote, totalAvanceLotes, agregarAvances, type AvancePorLote,
 } from './avance-lote'
 
 const lotes = [{ id: 'a', nombre: 'L-A' }, { id: 'b', nombre: 'L-B' }, { id: 'c', nombre: 'L-C' }]
@@ -53,12 +53,15 @@ describe('textoAvanceConFecha', () => {
   })
 })
 
-describe('totalAvance', () => {
-  it('suma todas las cantidades de todas las entradas', () => {
-    expect(totalAvance(avance)).toBe(7)
+describe('totalAvanceLotes', () => {
+  it('suma las cantidades de los lotes dados (todas sus entradas)', () => {
+    expect(totalAvanceLotes(lotes, avance)).toBe(7) // a: 3+2, b: 2, c: sin avance
+  })
+  it('ignora entradas de lotes ausentes de la lista', () => {
+    expect(totalAvanceLotes([{ id: 'a' }], avance)).toBe(5) // solo a (3+2); b se ignora
   })
   it('0 si no hay avance', () => {
-    expect(totalAvance(null)).toBe(0)
+    expect(totalAvanceLotes(lotes, null)).toBe(0)
   })
 })
 

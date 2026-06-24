@@ -57,12 +57,17 @@ export function textoAvanceConFecha(
   return partes.join('; ')
 }
 
-// Suma de todas las cantidades de todas las entradas (total de la actividad).
-export function totalAvance(avance: AvancePorLote | null | undefined): number {
+// Suma de las cantidades de los avances, ACOTADA a los lotes dados (los
+// vigentes de la actividad). Ignora entradas de lotes que ya no pertenecen.
+// Mismo recorrido que textoAvanceConFecha/filasCumplimiento.
+export function totalAvanceLotes(
+  lotes: { id: string }[],
+  avance: AvancePorLote | null | undefined,
+): number {
   if (!avance) return 0
   let total = 0
-  for (const entradas of Object.values(avance)) {
-    for (const e of entradas) total += e.cantidad
+  for (const l of lotes) {
+    for (const e of avance[l.id] ?? []) total += e.cantidad
   }
   return total
 }
