@@ -13,17 +13,17 @@ export default async function Home() {
   return (
     <main className="mx-auto max-w-5xl p-6">
       <h1 className="mb-1 text-2xl font-extrabold text-bosque">Hola, {u.nombre} 👋</h1>
-      <p className="mb-6 text-sm text-gray-500">Semana {hoy.semana} · {hoy.anio}</p>
+      <p className="mb-6 text-sm text-tierra">Semana {hoy.semana} · {hoy.anio}</p>
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
         {secciones.map((s) => (
           <Link
             key={s.href}
             href={s.href}
-            className="flex flex-col items-start gap-1 rounded-2xl border p-5 transition hover:-translate-y-0.5 hover:border-bosque hover:shadow-lg"
+            className="tarjeta flex flex-col items-start gap-2 p-5 transition hover:-translate-y-0.5 hover:border-bosque hover:shadow-md"
           >
-            <span className="text-4xl">{s.icono}</span>
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-arena text-3xl">{s.icono}</span>
             <span className="text-lg font-bold text-bosque">{s.texto}</span>
-            <span className="text-sm text-gray-500">{s.descripcion}</span>
+            <span className="text-sm text-tierra">{s.descripcion}</span>
           </Link>
         ))}
       </div>
