@@ -375,12 +375,12 @@ describe('fraccionFila con avancePorLote en lista', () => {
 
 describe('porcentajeCumplimiento con parcial proporcional', () => {
   it('una actividad parcial con 2 de 4 lotes aporta 0.5', () => {
-    const acts = [act({ id: 'p', tareaId: 'T', estado: 'PARCIAL', lotes: [{ id: '1' }, { id: '2' }, { id: '3' }, { id: '4' }], avancePorLote: { '1': { dia: 1, maquinaId: null, cantidad: 1 }, '2': { dia: 1, maquinaId: null, cantidad: 1 } } })]
+    const acts = [act({ id: 'p', tareaId: 'T', estado: 'PARCIAL', lotes: [{ id: '1' }, { id: '2' }, { id: '3' }, { id: '4' }], avancePorLote: { '1': [{ dia: 1, maquinaId: null, cantidad: 1 }], '2': [{ dia: 1, maquinaId: null, cantidad: 1 }] } })]
     expect(porcentajeCumplimiento(acts)).toBe(50)
   })
   it('parcial (1/3) + cumplida → 67', () => {
     const acts = [
-      act({ id: 'p', tareaId: 'T1', estado: 'PARCIAL', lotes: [{ id: '1' }, { id: '2' }, { id: '3' }], avancePorLote: { '1': { dia: 1, maquinaId: null, cantidad: 1 } } }),
+      act({ id: 'p', tareaId: 'T1', estado: 'PARCIAL', lotes: [{ id: '1' }, { id: '2' }, { id: '3' }], avancePorLote: { '1': [{ dia: 1, maquinaId: null, cantidad: 1 }] } }),
       act({ id: 'c', tareaId: 'T2', estado: 'CUMPLIDA' }),
     ]
     // (1/3 + 1) / 2 = 0.667 → 67
