@@ -38,28 +38,31 @@ body {
   body { background: #ffffff; }
 }
 
-@layer components {
-  /* Superficie estándar de tarjeta/panel */
-  .tarjeta {
-    background: var(--color-marfil);
-    border: 1px solid var(--color-borde);
-    border-radius: 1rem; /* 16px */
-    box-shadow: var(--shadow-tarjeta);
-  }
-  /* Chip de estado: base + variantes */
-  .chip-estado {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    border-radius: 9999px;
-    padding: 0.25rem 0.75rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    line-height: 1.2;
-  }
-  .chip-pendiente    { background: var(--color-est-pendiente-bg);    color: var(--color-est-pendiente); }
-  .chip-parcial      { background: var(--color-est-parcial-bg);      color: var(--color-est-parcial); }
-  .chip-cumplida     { background: var(--color-est-cumplida-bg);     color: var(--color-est-cumplida); }
-  .chip-nocumplida   { background: var(--color-est-nocumplida-bg);   color: var(--color-est-nocumplida); }
-  .chip-reprogramada { background: var(--color-est-reprogramada-bg); color: var(--color-est-reprogramada); }
+/* Clases de componente. En Tailwind v4 se usan `@utility` (no `@layer
+   components`, que v4 no emite). Cada @utility vive en la capa utilities y
+   compone con variantes (p. ej. `hover:border-bosque` sobre `.tarjeta`). */
+
+/* Superficie estándar de tarjeta/panel */
+@utility tarjeta {
+  background: var(--color-marfil);
+  border: 1px solid var(--color-borde);
+  border-radius: 1rem; /* 16px */
+  box-shadow: var(--shadow-tarjeta);
 }
+
+/* Chip de estado: base + variantes */
+@utility chip-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+@utility chip-pendiente    { background: var(--color-est-pendiente-bg);    color: var(--color-est-pendiente); }
+@utility chip-parcial      { background: var(--color-est-parcial-bg);      color: var(--color-est-parcial); }
+@utility chip-cumplida     { background: var(--color-est-cumplida-bg);     color: var(--color-est-cumplida); }
+@utility chip-nocumplida   { background: var(--color-est-nocumplida-bg);   color: var(--color-est-nocumplida); }
+@utility chip-reprogramada { background: var(--color-est-reprogramada-bg); color: var(--color-est-reprogramada); }
