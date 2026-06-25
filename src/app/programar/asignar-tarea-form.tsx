@@ -72,18 +72,18 @@ export function AsignarTareaForm({
         <button
           type="button"
           onClick={() => setRespAbierto((v) => !v)}
-          className="flex w-48 items-center justify-between rounded border p-1 text-sm"
+          className="flex w-48 items-center justify-between rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
         >
           <span className="truncate">{nombresSel.length > 0 ? nombresSel.join(', ') : '— elegir —'}</span>
-          <span className="ml-1 text-gray-500">▾</span>
+          <span className="ml-1 text-tierra">▾</span>
         </button>
         <div
-          className={`absolute top-full left-0 z-10 mt-1 max-h-52 w-56 flex-col gap-1 overflow-auto rounded border bg-white p-2 shadow-lg ${respAbierto ? 'flex' : 'hidden'}`}
+          className={`absolute top-full left-0 z-10 mt-1 max-h-52 w-56 flex-col gap-1 overflow-auto rounded-lg border border-borde bg-white p-2 shadow-lg ${respAbierto ? 'flex' : 'hidden'}`}
         >
           {responsables.map((r) => (
             <label
               key={r.id}
-              className="flex cursor-pointer items-center gap-1 rounded px-1 py-0.5 hover:bg-gray-50"
+              className="flex cursor-pointer items-center gap-1 rounded px-1 py-0.5 hover:bg-arena/40"
             >
               <input
                 type="checkbox"
@@ -107,8 +107,8 @@ export function AsignarTareaForm({
               <label
                 key={d}
                 title={pasado ? 'Día ya pasado de esta semana' : undefined}
-                className={`flex flex-col items-center rounded border px-1.5 py-0.5 has-[:checked]:border-bosque has-[:checked]:bg-green-50 ${
-                  pasado ? 'cursor-not-allowed bg-gray-100 text-gray-300' : 'cursor-pointer'
+                className={`flex flex-col items-center rounded-lg border border-borde px-1.5 py-0.5 has-[:checked]:border-bosque has-[:checked]:bg-green-50 ${
+                  pasado ? 'cursor-not-allowed bg-arena text-tierra/50' : 'cursor-pointer'
                 }`}
               >
                 <span>{d}</span>
@@ -133,13 +133,13 @@ export function AsignarTareaForm({
             name="turno"
             value={turno}
             onChange={(e) => setTurno(e.target.value)}
-            className="w-28 rounded border p-1 text-sm"
+            className="w-28 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
           />
         </label>
       )}
       {esMaquinaria && dias.length > 0 && (
         <div className="flex w-full flex-col gap-1 text-xs">
-          <span className="text-gray-500">Máquina por día (solo disponibles · opcional)</span>
+          <span className="text-tierra">Máquina por día (solo disponibles · opcional)</span>
           {[...dias].sort((a, b) => a - b).map((d) => {
             const turnoEf = turnoEfectivo(turno, d)
             const ocupadas = new Set(
@@ -151,7 +151,7 @@ export function AsignarTareaForm({
             return (
               <label key={d} className="flex items-center gap-1">
                 <span className="w-8">{DIAS[d - 1]}</span>
-                <select name={`maquina_${d}`} className="rounded border p-1 text-sm">
+                <select name={`maquina_${d}`} className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
                   <option value="">— sin máquina —</option>
                   {disponibles.map((m) => (
                     <option key={m.id} value={m.id}>{m.nombre}</option>
@@ -170,7 +170,7 @@ export function AsignarTareaForm({
           ⚠️ Conflicto de turno: {conflictosResp.map((c) => `${responsables.find((r) => r.id === c.rid)?.nombre ?? ''} (${DIAS[c.dia - 1]})`).join(', ')}
         </p>
       )}
-      <span className="text-xs text-gray-600">
+      <span className="text-xs text-tierra">
         {lotesTarea.length > 0
           ? `Lote(s): ${lotesTarea
               .map((l) => {
@@ -182,7 +182,7 @@ export function AsignarTareaForm({
       </span>
       <button
         disabled={responsableIds.length === 0 || conflictosResp.length > 0}
-        className="rounded bg-bosque px-3 py-1 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
+        className="rounded-lg bg-bosque px-3 py-1 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-arena disabled:text-tierra"
       >
         Asignar →
       </button>

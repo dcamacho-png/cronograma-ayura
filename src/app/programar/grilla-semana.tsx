@@ -40,23 +40,23 @@ export function GrillaSemana({
 }) {
   const rango = fechas.length === 7 ? `${fmtFecha(fechas[0])} – ${fmtFecha(fechas[6])}` : ''
   return (
-    <div className="rounded-xl border bg-white text-gray-900">
-      <div className="border-b p-3">
+    <div className="rounded-xl border border-borde bg-white text-tinta">
+      <div className="border-b border-borde p-3">
         <div className="text-lg font-bold text-bosque">{areaNombre}</div>
-        <div className="text-sm text-gray-500">Semana {semana}{rango ? ` · ${rango}` : ''}</div>
+        <div className="text-sm text-tierra">Semana {semana}{rango ? ` · ${rango}` : ''}</div>
       </div>
       {responsables.length === 0 ? (
-        <p className="p-4 text-center text-sm italic text-gray-400">Sin actividades programadas</p>
+        <p className="p-4 text-center text-sm italic text-tierra">Sin actividades programadas</p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr>
-                <th className="border bg-gray-50 p-2 text-left">Responsable</th>
+                <th className="border border-borde bg-arena p-2 text-left">Responsable</th>
                 {DIAS.map((d, i) => (
-                  <th key={d} className="border bg-gray-50 p-2 text-left">
+                  <th key={d} className="border border-borde bg-arena p-2 text-left">
                     {d}
-                    <div className="text-xs font-normal text-gray-400">{fechas[i] ? fmtFecha(fechas[i]) : ''}</div>
+                    <div className="text-xs font-normal text-tierra">{fechas[i] ? fmtFecha(fechas[i]) : ''}</div>
                   </th>
                 ))}
               </tr>
@@ -64,14 +64,14 @@ export function GrillaSemana({
             <tbody>
               {responsables.map((r) => (
                 <tr key={r.id}>
-                  <td className="border p-2 font-medium">{r.nombre}</td>
+                  <td className="border border-borde p-2 font-medium">{r.nombre}</td>
                   {DIAS.map((_, i) => {
                     const dia = i + 1
                     const celdas = actividades.filter((a) => a.responsableId === r.id && a.dia === dia)
                     return (
-                      <td key={dia} className="border p-2 align-top">
+                      <td key={dia} className="border border-borde p-2 align-top">
                         {celdas.map((a) => (
-                          <div key={a.id} className="mb-1 rounded bg-green-50 p-1">
+                          <div key={a.id} className="mb-1 rounded-lg bg-green-50 p-1">
                             <div>{a.descripcion}</div>
                             {esMaquinaria && (turnoEditable ? (
                               <form action={actualizarActividadAccion} className="mt-0.5 flex items-center gap-1">
@@ -79,13 +79,13 @@ export function GrillaSemana({
                                 <input type="hidden" name="descripcion" value={a.descripcion} />
                                 <input type="hidden" name="anio" value={anio} />
                                 <input type="hidden" name="semana" value={semana} />
-                                <input aria-label="Turno" name="turno" defaultValue={a.turno} className="w-20 rounded border p-0.5 text-xs" />
-                                <button type="submit" className="rounded bg-bosque px-1.5 text-xs font-semibold text-white">✓</button>
+                                <input aria-label="Turno" name="turno" defaultValue={a.turno} className="w-20 rounded-lg border border-borde bg-marfil p-0.5 text-xs focus:outline-none focus:ring-2 focus:ring-bosque/40" />
+                                <button type="submit" className="rounded-lg bg-bosque px-1.5 text-xs font-semibold text-white">✓</button>
                               </form>
                             ) : (
-                              a.turno && <div className="text-xs text-gray-500">{a.turno}</div>
+                              a.turno && <div className="text-xs text-tierra">{a.turno}</div>
                             ))}
-                            {a.maquina && <div className="text-xs text-gray-500">🚜 {a.maquina.nombre}</div>}
+                            {a.maquina && <div className="text-xs text-tierra">🚜 {a.maquina.nombre}</div>}
                             <InfoLotes lotes={a.lotes} bultosPorLote={a.bultosPorLote as Record<string, number> | null} className="mt-1" />
                             {turnoEditable && a.tareaId && (
                               <form action={devolverAAsignacionAccion} className="mt-0.5">

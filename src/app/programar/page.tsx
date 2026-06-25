@@ -86,22 +86,22 @@ export default async function ProgramarPage({
             <Link
               key={a.id}
               href={url(a.id, anio, semana)}
-              className={`rounded-full px-3 py-1 text-sm ${a.id === areaId ? 'bg-bosque text-white' : 'bg-gray-100 text-gray-700'}`}
+              className={`rounded-full px-3 py-1 text-sm ${a.id === areaId ? 'bg-bosque text-white' : 'bg-arena text-tierra'}`}
             >
               {a.nombre}
             </Link>
           ))}
         </div>
       ) : (
-        <div className="mb-3 text-sm text-gray-500">Área: <b className="text-gray-800">{areaActual.nombre}</b></div>
+        <div className="mb-3 text-sm text-tierra">Área: <b className="text-tinta">{areaActual.nombre}</b></div>
       )}
 
       <div className="mb-5 flex items-center gap-3">
-        <Link href={url(areaId, previa.anio, previa.semana)} className="rounded border px-3 py-1 text-sm">
+        <Link href={url(areaId, previa.anio, previa.semana)} className="rounded-lg border border-borde bg-marfil px-3 py-1 text-sm text-tinta">
           ← Semana {previa.semana}
         </Link>
         <span className="font-semibold">Semana {semana} · {anio}</span>
-        <Link href={url(areaId, proxima.anio, proxima.semana)} className="rounded border px-3 py-1 text-sm">
+        <Link href={url(areaId, proxima.anio, proxima.semana)} className="rounded-lg border border-borde bg-marfil px-3 py-1 text-sm text-tinta">
           Semana {proxima.semana} →
         </Link>
       </div>
@@ -113,10 +113,10 @@ export default async function ProgramarPage({
       )}
 
       {futura && porAsignar.length > 0 && (
-        <div className="mb-6 rounded-xl border border-blue-200 bg-blue-50 p-4">
-          <h2 className="mb-3 font-semibold text-blue-900">📌 Tareas por asignar — semana {semana}</h2>
+        <div className="mb-6 rounded-xl border border-borde bg-arena p-4">
+          <h2 className="mb-3 font-semibold text-bosque">📌 Tareas por asignar — semana {semana}</h2>
           {responsablesActivos.length === 0 ? (
-            <p className="text-sm text-blue-900">Primero agrega responsables a esta área para poder asignar.</p>
+            <p className="text-sm text-tierra">Primero agrega responsables a esta área para poder asignar.</p>
           ) : (
             <ul className="space-y-2">
               {porAsignar.map((t) => (
@@ -138,7 +138,7 @@ export default async function ProgramarPage({
                   />
                   <form action={devolverAlBancoAccion} className="mt-1">
                     <input type="hidden" name="tareaId" value={t.id} />
-                    <button className="text-xs text-gray-500 hover:underline">↩️ Devolver al banco</button>
+                    <button className="text-xs text-tierra hover:underline">↩️ Devolver al banco</button>
                   </form>
                 </li>
               ))}
@@ -160,7 +160,7 @@ export default async function ProgramarPage({
               href={`/programar/exportar?anio=${anio}&semana=${semana}`}
               target="_blank"
               rel="noopener"
-              className="rounded border border-purple-700 px-3 py-1 text-sm font-semibold text-purple-700 hover:bg-purple-50"
+              className="rounded-lg border border-arcilla px-3 py-1 text-sm font-semibold text-arcilla hover:bg-arena/40"
             >
               🖨️ Exportar PDF (todas las áreas)
             </a>
