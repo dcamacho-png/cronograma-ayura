@@ -102,50 +102,50 @@ export function ResumenArea({
   const medidaActividadLista = [...medidaPorActividad.entries()].sort((a, b) => b[1].valor - a[1].valor)
 
   return (
-    <div className="text-gray-900">
-      <div className="mb-4 border-b pb-2">
+    <div className="text-tinta">
+      <div className="mb-4 border-b border-borde pb-2">
         <div className="text-lg font-bold text-bosque">Resumen — {areaNombre}</div>
-        <div className="text-sm text-gray-500">Semana {semana} · {anio}</div>
+        <div className="text-sm text-tierra">Semana {semana} · {anio}</div>
       </div>
 
       {/* Tarjetas grandes */}
       <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <div className="rounded-2xl border p-5">
-          <div className="mb-1 text-sm text-gray-500">Cumplimiento</div>
+        <div className="tarjeta p-5">
+          <div className="mb-1 text-sm text-tierra">Cumplimiento</div>
           <div className="text-4xl font-extrabold" style={{ color: COLOR_HEX[colorPorcentaje(pct)] }}>
             {pct === null ? '—' : `${pct}%`}
           </div>
         </div>
-        <div className="rounded-2xl border p-5">
-          <div className="mb-1 text-sm text-gray-500">Cumplidas</div>
+        <div className="tarjeta p-5">
+          <div className="mb-1 text-sm text-tierra">Cumplidas</div>
           <div className="text-4xl font-extrabold">
-            {conteo.CUMPLIDA}<span className="text-2xl font-semibold text-gray-400">/{totalActividades}</span>
+            {conteo.CUMPLIDA}<span className="text-2xl font-semibold text-tierra">/{totalActividades}</span>
           </div>
         </div>
-        <div className="rounded-2xl border p-5">
-          <div className="mb-1 text-sm text-gray-500">Reprogramadas</div>
+        <div className="tarjeta p-5">
+          <div className="mb-1 text-sm text-tierra">Reprogramadas</div>
           <div className="text-4xl font-extrabold" style={{ color: COLOR_HEX[pctRep > 0 ? 'naranja' : 'verde'] }}>{pctRep}%</div>
         </div>
         {esMaquinaria && (
-          <div className="rounded-2xl border p-5">
-            <div className="mb-1 text-sm text-gray-500">Realizado</div>
+          <div className="tarjeta p-5">
+            <div className="mb-1 text-sm text-tierra">Realizado</div>
             <div className="text-2xl font-extrabold text-[#2e9e5b]">{totalUnidades || '—'}</div>
           </div>
         )}
-        <div className="rounded-2xl border p-5">
-          <div className="mb-1 text-sm text-gray-500">Nuevas (no programadas)</div>
+        <div className="tarjeta p-5">
+          <div className="mb-1 text-sm text-tierra">Nuevas (no programadas)</div>
           <div className="text-4xl font-extrabold">{nuevas.length}</div>
         </div>
       </div>
 
       {/* Detalle por estado */}
-      <h2 className="mb-2 text-lg font-semibold">📊 Detalle por estado</h2>
+      <h2 className="mb-2 text-lg font-semibold text-tinta">📊 Detalle por estado</h2>
       <div className="mb-8 flex flex-wrap gap-3 text-sm">
-        <span className="rounded-full bg-green-50 px-3 py-1">✅ Cumplidas: <b>{conteo.CUMPLIDA}</b></span>
-        <span className="rounded-full bg-yellow-50 px-3 py-1">🟡 Parciales: <b>{conteo.PARCIAL}</b></span>
-        <span className="rounded-full bg-red-50 px-3 py-1">🔴 No cumplidas: <b>{conteo.NO_CUMPLIDA}</b></span>
-        <span className="rounded-full bg-blue-50 px-3 py-1">🔄 Reprogramadas: <b>{conteo.REPROGRAMADA}</b></span>
-        <span className="rounded-full bg-gray-100 px-3 py-1">⏳ Pendientes: <b>{conteo.PENDIENTE}</b></span>
+        <span className="chip-estado chip-cumplida">✅ Cumplidas: <b>{conteo.CUMPLIDA}</b></span>
+        <span className="chip-estado chip-parcial">🟡 Parciales: <b>{conteo.PARCIAL}</b></span>
+        <span className="chip-estado chip-nocumplida">🔴 No cumplidas: <b>{conteo.NO_CUMPLIDA}</b></span>
+        <span className="chip-estado chip-reprogramada">🔄 Reprogramadas: <b>{conteo.REPROGRAMADA}</b></span>
+        <span className="chip-estado chip-pendiente">⏳ Pendientes: <b>{conteo.PENDIENTE}</b></span>
       </div>
 
       <div className="mb-8 space-y-3">
@@ -164,8 +164,8 @@ export function ResumenArea({
           const items = [...grupos.values()]
           return (
             <div key={v}>
-              <div className="text-sm font-semibold">{etq} ({items.length})</div>
-              <ul className="ml-4 list-disc text-sm text-gray-600">
+              <div className="text-sm font-semibold text-tinta">{etq} ({items.length})</div>
+              <ul className="ml-4 list-disc text-sm text-tierra">
                 {items.map((g, i) => (
                   <li key={i}>
                     {g.descripcion}
@@ -182,8 +182,8 @@ export function ResumenArea({
 
       <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Ranking simple */}
-        <div className="rounded-xl border p-4">
-          <h2 className="mb-3 text-lg font-semibold">⭐ Ranking (finalizadas)</h2>
+        <div className="tarjeta p-4">
+          <h2 className="mb-3 text-lg font-semibold text-tinta">⭐ Ranking (finalizadas)</h2>
           {mas ? (
             <div className="space-y-2">
               <div className="flex items-center gap-2">
@@ -198,15 +198,15 @@ export function ResumenArea({
               </div>
             </div>
           ) : (
-            <p className="text-sm text-gray-500">Sin actividades esta semana.</p>
+            <p className="text-sm text-tierra">Sin actividades esta semana.</p>
           )}
         </div>
 
         {/* Motivos */}
-        <div className="rounded-xl border p-4">
-          <h2 className="mb-3 text-lg font-semibold">⚠️ Motivos más frecuentes</h2>
+        <div className="tarjeta p-4">
+          <h2 className="mb-3 text-lg font-semibold text-tinta">⚠️ Motivos más frecuentes</h2>
           {motivosTop.length === 0 ? (
-            <p className="text-sm text-gray-500">Sin motivos registrados.</p>
+            <p className="text-sm text-tierra">Sin motivos registrados.</p>
           ) : (
             <ul className="space-y-1 text-sm">
               {motivosTop.map((m) => (
@@ -222,10 +222,10 @@ export function ResumenArea({
 
       {esMaquinaria && medidaActividadLista.length > 0 && (
         <div className="mb-8">
-          <h2 className="mb-2 text-lg font-semibold">🚜 Realizado por actividad</h2>
+          <h2 className="mb-2 text-lg font-semibold text-tinta">🚜 Realizado por actividad</h2>
           <ul className="space-y-1 text-sm">
             {medidaActividadLista.map(([desc, { valor, unidad }]) => (
-              <li key={desc} className="flex justify-between rounded border px-3 py-1">
+              <li key={desc} className="flex justify-between rounded-lg border border-borde bg-marfil px-3 py-1">
                 <span>{desc}</span>
                 <b>{Math.round(valor * 10) / 10} {unidadAbreviada(unidad)}</b>
               </li>
@@ -236,14 +236,14 @@ export function ResumenArea({
 
       {nuevas.length > 0 && (
         <div className="mb-8">
-          <h2 className="mb-2 text-lg font-semibold">🆕 Actividades nuevas (no programadas) ({nuevas.length})</h2>
+          <h2 className="mb-2 text-lg font-semibold text-tinta">🆕 Actividades nuevas (no programadas) ({nuevas.length})</h2>
           <ul className="space-y-1 text-sm">
             {nuevas.map((a) => (
-              <li key={a.id} className="rounded border px-3 py-1">
+              <li key={a.id} className="rounded-lg border border-borde bg-marfil px-3 py-1">
                 {a.descripcion}
-                <span className="text-gray-500"> · {a.responsable.nombre}</span>
+                <span className="text-tierra"> · {a.responsable.nombre}</span>
                 {a.lotes.length > 0 ? (
-                  <span className="text-gray-500"> · 📍 {a.lotes.map((l) => l.nombre).join(', ')}</span>
+                  <span className="text-tierra"> · 📍 {a.lotes.map((l) => l.nombre).join(', ')}</span>
                 ) : null}
               </li>
             ))}
@@ -252,18 +252,18 @@ export function ResumenArea({
       )}
 
       {/* Cambios / reprogramadas */}
-      <h2 className="mb-2 text-lg font-semibold">🔄 Actividades cambiadas o reprogramadas</h2>
+      <h2 className="mb-2 text-lg font-semibold text-tinta">🔄 Actividades cambiadas o reprogramadas</h2>
       {cambios.length === 0 ? (
-        <p className="text-sm text-gray-500">Ninguna actividad cambió esta semana. 🎉</p>
+        <p className="text-sm text-tierra">Ninguna actividad cambió esta semana. 🎉</p>
       ) : (
         <ul className="space-y-2">
           {cambios.map((a) => (
-            <li key={a.id} className="flex items-center gap-3 rounded-lg border p-3 text-sm">
+            <li key={a.id} className="flex items-center gap-3 tarjeta p-3 text-sm">
               <span className="flex-1">
                 {a.descripcion}
-                <span className="text-gray-500"> · {a.responsable.nombre}</span>
-                {a.motivo && <span className="text-gray-500"> · {a.motivo.nombre}</span>}
-                {a.nota && <span className="text-xs text-gray-500">· {a.nota}</span>}
+                <span className="text-tierra"> · {a.responsable.nombre}</span>
+                {a.motivo && <span className="text-tierra"> · {a.motivo.nombre}</span>}
+                {a.nota && <span className="text-xs text-tierra">· {a.nota}</span>}
               </span>
               {a.vecesReprogramada > 0 && (
                 <span className="rounded px-2 py-0.5 text-xs font-semibold text-white" style={{ backgroundColor: COLOR_HEX[colorSemaforo(a.vecesReprogramada)] }}>

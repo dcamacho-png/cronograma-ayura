@@ -57,25 +57,25 @@ export default async function ResumenPage({
             <Link
               key={a.id}
               href={url(a.id, anio, semana)}
-              className={`rounded-full px-3 py-1 text-sm ${a.id === areaId ? 'bg-bosque text-white' : 'bg-gray-100 text-gray-700'}`}
+              className={`rounded-full px-3 py-1 text-sm ${a.id === areaId ? 'bg-bosque text-white' : 'bg-arena text-tierra'}`}
             >
               {a.nombre}
             </Link>
           ))}
         </div>
       ) : (
-        <div className="mb-3 text-sm text-gray-500">Área: <b className="text-gray-800">{areaActual.nombre}</b></div>
+        <div className="mb-3 text-sm text-tierra">Área: <b className="text-tinta">{areaActual.nombre}</b></div>
       )}
 
       <div className="mb-6 flex flex-wrap items-center gap-3">
-        <Link href={url(areaId, previa.anio, previa.semana)} className="rounded border px-3 py-1 text-sm">← Semana {previa.semana}</Link>
+        <Link href={url(areaId, previa.anio, previa.semana)} className="rounded-lg border border-borde bg-marfil px-3 py-1 text-sm text-tinta">← Semana {previa.semana}</Link>
         <span className="font-semibold">Semana {semana} · {anio}</span>
-        <Link href={url(areaId, proxima.anio, proxima.semana)} className="rounded border px-3 py-1 text-sm">Semana {proxima.semana} →</Link>
+        <Link href={url(areaId, proxima.anio, proxima.semana)} className="rounded-lg border border-borde bg-marfil px-3 py-1 text-sm text-tinta">Semana {proxima.semana} →</Link>
         <a
           href={`/resumen/exportar?area=${areaId}&anio=${anio}&semana=${semana}`}
           target="_blank"
           rel="noopener"
-          className="rounded border border-purple-700 px-3 py-1 text-sm font-semibold text-purple-700 hover:bg-purple-50"
+          className="rounded-lg border border-arcilla px-3 py-1 text-sm font-semibold text-arcilla hover:bg-arena/40"
         >
           🖨️ Exportar PDF
         </a>
@@ -84,7 +84,7 @@ export default async function ResumenPage({
             href={`/resumen/exportar?todas=1&anio=${anio}&semana=${semana}`}
             target="_blank"
             rel="noopener"
-            className="rounded border border-purple-700 px-3 py-1 text-sm font-semibold text-purple-700 hover:bg-purple-50"
+            className="rounded-lg border border-arcilla px-3 py-1 text-sm font-semibold text-arcilla hover:bg-arena/40"
           >
             🖨️ Exportar PDF (todas las áreas)
           </a>
