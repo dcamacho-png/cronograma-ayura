@@ -31,9 +31,9 @@ export default async function ExportarPage({
   )
 
   return (
-    <main className="mx-auto max-w-6xl p-6">
+    <main className="mx-auto max-w-6xl bg-white p-6 text-tinta">
       <AutoImprimir />
-      <h1 className="mb-4 text-2xl font-bold text-[#11603a] print:hidden">
+      <h1 className="mb-4 text-2xl font-bold text-bosque print:hidden">
         Exportar cronogramas — Semana {semana}
       </h1>
       <div className="space-y-8">

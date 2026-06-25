@@ -37,9 +37,9 @@ export default async function ExportarResumenPage({
       })),
     )
     return (
-      <main className="mx-auto max-w-6xl p-6">
+      <main className="mx-auto max-w-6xl bg-white p-6 text-tinta">
         <AutoImprimir />
-        <h1 className="mb-4 text-2xl font-bold text-[#11603a] print:hidden">Resumen — todas las áreas · Semana {semana}</h1>
+        <h1 className="mb-4 text-2xl font-bold text-bosque print:hidden">Resumen — todas las áreas · Semana {semana}</h1>
         <div className="space-y-8">
           {datos.map(({ area, responsables, motivos, actividades }, i) => (
             <div key={area.id} style={i < datos.length - 1 ? { breakAfter: 'page' } : undefined}>
@@ -74,7 +74,7 @@ export default async function ExportarResumenPage({
   ])
 
   return (
-    <main className="mx-auto max-w-6xl p-6">
+    <main className="mx-auto max-w-6xl bg-white p-6 text-tinta">
       <AutoImprimir />
       <ResumenArea
         areaNombre={area.nombre}

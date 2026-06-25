@@ -12,7 +12,7 @@ export function AutoImprimir() {
       <button
         type="button"
         onClick={() => window.print()}
-        className="rounded bg-[#11603a] px-4 py-2 text-sm font-semibold text-white"
+        className="rounded-lg bg-bosque px-4 py-2 text-sm font-semibold text-white"
       >
         🖨️ Imprimir / Guardar PDF
       </button>
