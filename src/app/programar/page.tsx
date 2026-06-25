@@ -24,7 +24,7 @@ export default async function ProgramarPage({
   if (areas.length === 0) {
     return (
       <main className="p-8">
-        <p className="text-gray-600">No hay áreas. Corre <code>npm run db:seed</code> para sembrar los catálogos.</p>
+        <p className="text-tierra">No hay áreas. Corre <code>npm run db:seed</code> para sembrar los catálogos.</p>
       </main>
     )
   }

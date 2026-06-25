@@ -19,7 +19,7 @@ export function InfoLotes({
   }
   const nombres = lotes.map(etiqueta).join(', ')
   return (
-    <div className={`text-xs text-gray-500 ${className}`}>
+    <div className={`text-xs text-tierra ${className}`}>
       📍 {nombres}
       {ha > 0 ? <> · <b>{ha.toFixed(1)} ha</b></> : null}
     </div>
