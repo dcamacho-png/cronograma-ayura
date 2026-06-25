@@ -20,7 +20,7 @@ export function FormEliminar({
       }}
     >
       <input type="hidden" name="id" value={id} />
-      <button className="text-gray-400 hover:text-red-600" title="Eliminar" aria-label="Eliminar">✕</button>
+      <button className="text-tierra/60 hover:text-red-600" title="Eliminar" aria-label="Eliminar">✕</button>
     </form>
   )
 }

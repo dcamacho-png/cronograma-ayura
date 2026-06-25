@@ -33,9 +33,9 @@ export function LotesLista({
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="Buscar lote por nombre o finca…"
-        className="mb-2 w-full rounded border p-2 text-sm"
+        className="mb-2 w-full rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
       />
-      <p className="mb-2 text-xs text-gray-500">
+      <p className="mb-2 text-xs text-tierra">
         {filtrados.length} de {lotes.length} lotes
       </p>
       <ul className="mb-3 max-h-72 space-y-1 overflow-y-auto">
@@ -43,7 +43,7 @@ export function LotesLista({
           <li key={l.id} className="flex items-center gap-2 text-sm">
             <span className="flex-1">
               {l.nombre}
-              <span className="text-gray-500">
+              <span className="text-tierra">
                 {' · '}
                 {l.finca.nombre}
                 {l.hectareas ? ` · ${l.hectareas} ha` : ''}
@@ -53,7 +53,7 @@ export function LotesLista({
             <FormEliminar accion={eliminar} id={l.id} etiqueta={l.nombre} />
           </li>
         ))}
-        {filtrados.length === 0 && <li className="text-sm text-gray-400">Sin resultados.</li>}
+        {filtrados.length === 0 && <li className="text-sm text-tierra/60">Sin resultados.</li>}
       </ul>
     </>
   )
