@@ -67,34 +67,34 @@ export default async function TableroPage({
       <h1 className="mb-4 text-2xl font-bold text-bosque">Tablero mensual</h1>
 
       <div className="mb-6 flex items-center gap-3">
-        <Link href={url(previo.anio, previo.mes)} className="rounded border px-3 py-1 text-sm">← {MESES[previo.mes]}</Link>
+        <Link href={url(previo.anio, previo.mes)} className="rounded-lg border border-borde bg-marfil px-3 py-1 text-sm text-tinta">← {MESES[previo.mes]}</Link>
         <span className="font-semibold">{MESES[mes]} · {anio}</span>
-        <Link href={url(proximo.anio, proximo.mes)} className="rounded border px-3 py-1 text-sm">{MESES[proximo.mes]} →</Link>
+        <Link href={url(proximo.anio, proximo.mes)} className="rounded-lg border border-borde bg-marfil px-3 py-1 text-sm text-tinta">{MESES[proximo.mes]} →</Link>
       </div>
 
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="rounded-2xl border p-5">
-          <div className="mb-1 text-sm text-gray-500">Cumplimiento general del mes</div>
+        <div className="tarjeta p-5">
+          <div className="mb-1 text-sm text-tierra">Cumplimiento general del mes</div>
           <div className="text-5xl font-extrabold" style={{ color: COLOR_HEX[colorPorcentaje(pctGeneral)] }}>
             {pctGeneral === null ? '—' : `${pctGeneral}%`}
           </div>
         </div>
-        <div className="rounded-2xl border p-5">
-          <div className="mb-1 text-sm text-gray-500">Reprogramadas del mes</div>
+        <div className="tarjeta p-5">
+          <div className="mb-1 text-sm text-tierra">Reprogramadas del mes</div>
           <div className="text-5xl font-extrabold" style={{ color: COLOR_HEX[pctRep > 0 ? 'naranja' : 'verde'] }}>
             {pctRep}%
           </div>
         </div>
       </div>
 
-      <h2 className="mb-3 text-lg font-semibold">📊 Cumplimiento por área</h2>
+      <h2 className="mb-3 text-lg font-semibold text-tinta">📊 Cumplimiento por área</h2>
       <div className="mb-8 space-y-3">
         {areas.map((a) => {
           const p = pctPorAreaId.get(a.id) ?? null
           return (
             <div key={a.id} className="flex items-center gap-3">
               <div className="w-40 text-sm font-medium">{a.nombre}</div>
-              <div className="h-6 flex-1 overflow-hidden rounded bg-gray-100">
+              <div className="h-6 flex-1 overflow-hidden rounded-lg bg-arena">
                 <div
                   className="flex h-full items-center justify-end pr-2 text-xs font-bold text-white"
                   style={{ width: `${p ?? 0}%`, backgroundColor: COLOR_HEX[colorPorcentaje(p)] }}
@@ -108,11 +108,11 @@ export default async function TableroPage({
         })}
       </div>
 
-      <h2 className="mb-3 text-lg font-semibold">📈 Tendencia semana a semana</h2>
+      <h2 className="mb-3 text-lg font-semibold text-tinta">📈 Tendencia semana a semana</h2>
       {tendencia.length === 0 ? (
-        <p className="mb-8 text-sm text-gray-500">No hay actividades evaluadas este mes.</p>
+        <p className="mb-8 text-sm text-tierra">No hay actividades evaluadas este mes.</p>
       ) : (
-        <div className="mb-8 flex items-end gap-4 rounded-xl border p-4" style={{ height: '160px' }}>
+        <div className="mb-8 flex items-end gap-4 tarjeta p-4" style={{ height: '160px' }}>
           {tendencia.map((t) => (
             <div key={`${t.anio}-${t.semana}`} className="flex flex-1 flex-col items-center justify-end">
               <div className="mb-1 text-xs font-semibold">{t.porcentaje === null ? '—' : `${t.porcentaje}%`}</div>
@@ -120,23 +120,23 @@ export default async function TableroPage({
                 className="w-full rounded-t"
                 style={{ height: `${t.porcentaje ?? 0}px`, backgroundColor: COLOR_HEX[colorPorcentaje(t.porcentaje)] }}
               />
-              <div className="mt-1 text-xs text-gray-500">S{t.semana}</div>
+              <div className="mt-1 text-xs text-tierra">S{t.semana}</div>
             </div>
           ))}
         </div>
       )}
 
-      <h2 className="mb-3 text-lg font-semibold">⚠️ Motivos más frecuentes</h2>
+      <h2 className="mb-3 text-lg font-semibold text-tinta">⚠️ Motivos más frecuentes</h2>
       {motivosTop.length === 0 ? (
-        <p className="text-sm text-gray-500">No se registraron motivos este mes.</p>
+        <p className="text-sm text-tierra">No se registraron motivos este mes.</p>
       ) : (
         <div className="space-y-2">
           {motivosTop.map((m) => (
             <div key={m.motivoId} className="flex items-center gap-3">
               <div className="w-40 text-sm">{nombreMotivo.get(m.motivoId) ?? 'Motivo'}</div>
-              <div className="h-5 flex-1 overflow-hidden rounded bg-gray-100">
+              <div className="h-5 flex-1 overflow-hidden rounded-lg bg-arena">
                 <div
-                  className="h-full rounded bg-gray-400"
+                  className="h-full rounded-lg bg-tierra"
                   style={{ width: `${maxMotivo > 0 ? (m.conteo / maxMotivo) * 100 : 0}%` }}
                 />
               </div>
