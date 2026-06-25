@@ -26,14 +26,14 @@ export function PickerLotesBultos({ lotes }: { lotes: Lote[] }) {
 
   return (
     <div className="flex flex-col gap-1">
-      <select value={finca} onChange={(e) => setFinca(e.target.value)} className="rounded border p-2 text-sm">
+      <select value={finca} onChange={(e) => setFinca(e.target.value)} className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
         <option value="">— elegir finca —</option>
         {fincas.map((f) => (
           <option key={f} value={f}>{f}</option>
         ))}
       </select>
       {finca && (
-        <div className="flex max-h-48 flex-col gap-1 overflow-auto rounded border p-2">
+        <div className="flex max-h-48 flex-col gap-1 overflow-auto rounded-lg border border-borde bg-marfil p-2">
           {filtrados.map((l) => {
             const checked = l.id in sel
             return (
@@ -50,7 +50,7 @@ export function PickerLotesBultos({ lotes }: { lotes: Lote[] }) {
                     placeholder="bultos"
                     value={sel[l.id]}
                     onChange={(e) => setBultos(l.id, e.target.value)}
-                    className="w-24 rounded border p-1 text-sm"
+                    className="w-24 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
                   />
                 )}
               </div>
@@ -65,7 +65,7 @@ export function PickerLotesBultos({ lotes }: { lotes: Lote[] }) {
         </span>
       ))}
       {seleccionados.length > 0 && (
-        <div className="text-xs text-gray-500">Lotes: {seleccionados.map((l) => l.nombre).join(', ')}</div>
+        <div className="text-xs text-tierra">Lotes: {seleccionados.map((l) => l.nombre).join(', ')}</div>
       )}
     </div>
   )

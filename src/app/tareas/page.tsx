@@ -66,19 +66,19 @@ export default async function TareasPage({
             <Link
               key={a.id}
               href={url(a.id)}
-              className={`rounded-full px-3 py-1 text-sm ${a.id === areaId ? 'bg-bosque text-white' : 'bg-gray-100 text-gray-700'}`}
+              className={`rounded-full px-3 py-1 text-sm ${a.id === areaId ? 'bg-bosque text-white' : 'bg-arena text-tierra'}`}
             >
               {a.nombre}
             </Link>
           ))}
         </div>
       ) : (
-        <div className="mb-4 text-sm text-gray-500">Área: <b className="text-gray-800">{areaActual.nombre}</b></div>
+        <div className="mb-4 text-sm text-tierra">Área: <b className="text-tinta">{areaActual.nombre}</b></div>
       )}
 
       <div className="mb-6 grid gap-4 md:grid-cols-2">
-        <div className="rounded-xl border p-4">
-          <h2 className="mb-2 font-semibold">➕ Agregar al banco</h2>
+        <div className="tarjeta p-4">
+          <h2 className="mb-2 font-semibold text-tinta">➕ Agregar al banco</h2>
           {esMaquinaria ? (
             <FormNuevaTareaMaquinaria areaId={areaId} estipuladas={estipuladas} lotes={lotes} accion={crearTareaAccion} />
           ) : (
@@ -86,13 +86,13 @@ export default async function TareasPage({
               <input type="hidden" name="areaId" value={areaId} />
               <label className="flex flex-1 flex-col text-sm">
                 Nueva tarea
-                <input name="descripcion" required placeholder="Ej: Arreglo de saladero" className="rounded border p-2" />
+                <input name="descripcion" required placeholder="Ej: Arreglo de saladero" className="rounded-lg border border-borde bg-marfil p-2 focus:outline-none focus:ring-2 focus:ring-bosque/40" />
               </label>
               <label className="flex flex-col text-sm">
                 Finca y lote (opcional)
                 <SelectFincaLote lotes={lotes} name="loteId" />
               </label>
-              <button className="rounded bg-bosque px-4 py-2 text-sm font-semibold text-white">+ Agregar al banco</button>
+              <button className="rounded-lg bg-bosque px-4 py-2 text-sm font-semibold text-white">+ Agregar al banco</button>
             </form>
           )}
         </div>
@@ -106,12 +106,12 @@ export default async function TareasPage({
         />
       </div>
 
-      <div className="mb-6 rounded-xl border p-4">
-        <h2 className="mb-3 font-semibold">Tareas pendientes ({tareas.length})</h2>
+      <div className="mb-6 tarjeta p-4">
+        <h2 className="mb-3 font-semibold text-tinta">Tareas pendientes ({tareas.length})</h2>
         {tareas.length === 0 ? (
-          <p className="text-sm text-gray-500">No hay tareas pendientes. Agrega una arriba.</p>
+          <p className="text-sm text-tierra">No hay tareas pendientes. Agrega una arriba.</p>
         ) : (
-          <ul className="divide-y">
+          <ul className="divide-y divide-borde">
             {tareas.map((t) => {
               const actual = t.anioSel && t.semanaSel ? `${t.anioSel}-${t.semanaSel}` : ''
               const opciones = [...semanas]
@@ -124,21 +124,21 @@ export default async function TareasPage({
                     <div className="font-medium">
                       {t.descripcion}
                       {t.solicitadaPorArea && (
-                        <span className="ml-2 rounded-full bg-purple-100 px-2 py-0.5 text-xs font-semibold text-purple-700">
+                        <span className="ml-2 rounded-full bg-arena px-2 py-0.5 text-xs font-semibold text-arcilla">
                           📨 {t.solicitadaPorArea.nombre}
                         </span>
                       )}
                     </div>
                     <InfoLotes lotes={t.lotes} bultosPorLote={t.bultosPorLote as Record<string, number> | null} />
                     {t.detalle && (
-                      <div className="mt-1 whitespace-pre-line text-xs text-gray-600">📝 {t.detalle}</div>
+                      <div className="mt-1 whitespace-pre-line text-xs text-tierra">📝 {t.detalle}</div>
                     )}
                   </div>
                   <form action={programarTareaAccion} className="flex items-end gap-1">
                     <input type="hidden" name="id" value={t.id} />
                     <label className="flex flex-col text-xs">
                       Programar para
-                      <select name="anioSemana" defaultValue={actual} className="rounded border p-1 text-sm">
+                      <select name="anioSemana" defaultValue={actual} className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
                         <option value="">Elegir semana…</option>
                         {opciones.map((s) => (
                           <option key={`${s.anio}-${s.semana}`} value={`${s.anio}-${s.semana}`}>
@@ -147,7 +147,7 @@ export default async function TareasPage({
                         ))}
                       </select>
                     </label>
-                    <button className="rounded bg-bosque px-3 py-1 text-sm font-semibold text-white">Guardar</button>
+                    <button className="rounded-lg bg-bosque px-3 py-1 text-sm font-semibold text-white">Guardar</button>
                   </form>
                   {t.solicitadaPorArea ? (
                     <form action={devolverAlSolicitanteAccion}>
@@ -167,30 +167,30 @@ export default async function TareasPage({
         )}
       </div>
 
-      <div className="mb-4 rounded-xl border p-4">
-        <h2 className="mb-3 font-semibold">📨 Mis solicitudes a otras áreas</h2>
+      <div className="mb-4 tarjeta p-4">
+        <h2 className="mb-3 font-semibold text-tinta">📨 Mis solicitudes a otras áreas</h2>
         {solicitudes.length === 0 ? (
-          <p className="text-sm text-gray-500">No has solicitado tareas a otras áreas.</p>
+          <p className="text-sm text-tierra">No has solicitado tareas a otras áreas.</p>
         ) : (
-          <ul className="divide-y text-sm">
+          <ul className="divide-y divide-borde text-sm">
             {solicitudes.map((s) => (
               <li key={s.id} className="py-2">
                 <div className="flex items-center justify-between">
                   <span>
-                    {s.descripcion} <span className="text-gray-500">· para {s.area.nombre}</span>
+                    {s.descripcion} <span className="text-tierra">· para {s.area.nombre}</span>
                   </span>
-                  <span className={s.estado === 'PROGRAMADA' ? 'text-[#2e9e5b]' : s.estado === 'DEVUELTA' ? 'text-red-600' : 'text-gray-500'}>
+                  <span className={s.estado === 'PROGRAMADA' ? 'text-[#2e9e5b]' : s.estado === 'DEVUELTA' ? 'text-red-600' : 'text-tierra'}>
                     {s.estado === 'PROGRAMADA' ? '✅ Programada' : s.estado === 'DEVUELTA' ? '🔴 No realizada' : '🕓 En banco'}
                   </span>
                 </div>
                 <InfoLotes lotes={s.lotes} bultosPorLote={s.bultosPorLote as Record<string, number> | null} />
                 {s.detalle && (
-                  <div className="mt-1 whitespace-pre-line text-xs text-gray-600">📝 {s.detalle}</div>
+                  <div className="mt-1 whitespace-pre-line text-xs text-tierra">📝 {s.detalle}</div>
                 )}
                 {s.estado === 'DEVUELTA' && (
                   <form action={reenviarSolicitudAccion} className="mt-1">
                     <input type="hidden" name="id" value={s.id} />
-                    <button className="text-xs font-semibold text-purple-700 hover:underline">Reenviar</button>
+                    <button className="text-xs font-semibold text-arcilla hover:underline">Reenviar</button>
                   </form>
                 )}
               </li>

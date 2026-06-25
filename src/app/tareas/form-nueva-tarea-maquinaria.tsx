@@ -23,7 +23,7 @@ export function FormNuevaTareaMaquinaria({
   const conBultos = usaBultos(estipulada)
 
   return (
-    <form action={accion} className="flex flex-wrap items-end gap-2 rounded-xl border p-4">
+    <form action={accion} className="flex flex-wrap items-end gap-2 rounded-xl border border-borde p-4">
       <input type="hidden" name="areaId" value={areaId} />
       <label className="flex flex-col text-sm">
         Actividad (lista)
@@ -31,7 +31,7 @@ export function FormNuevaTareaMaquinaria({
           name="estipulada"
           value={estipulada}
           onChange={(e) => setEstipulada(e.target.value)}
-          className="rounded border p-2"
+          className="rounded-lg border border-borde bg-marfil p-2 focus:outline-none focus:ring-2 focus:ring-bosque/40"
         >
           <option value="">— elegir —</option>
           {estipuladas.map((e) => (
@@ -43,7 +43,7 @@ export function FormNuevaTareaMaquinaria({
       {estipulada === '__otra__' && (
         <label className="flex flex-1 flex-col text-sm">
           Otra (escribe la actividad)
-          <input name="otra" placeholder="¿Qué actividad?" className="rounded border p-2" />
+          <input name="otra" placeholder="¿Qué actividad?" className="rounded-lg border border-borde bg-marfil p-2 focus:outline-none focus:ring-2 focus:ring-bosque/40" />
         </label>
       )}
       <label className="flex flex-col text-sm">
@@ -56,9 +56,9 @@ export function FormNuevaTareaMaquinaria({
       </label>
       <label className="flex w-full flex-col text-sm">
         Detalle / instrucciones (opcional)
-        <textarea name="detalle" rows={2} placeholder="Ej: aplicar urea, 2 bultos/ha" className="rounded border p-2 text-sm" />
+        <textarea name="detalle" rows={2} placeholder="Ej: aplicar urea, 2 bultos/ha" className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
       </label>
-      <button className="rounded bg-bosque px-4 py-2 text-sm font-semibold text-white">+ Agregar al banco</button>
+      <button className="rounded-lg bg-bosque px-4 py-2 text-sm font-semibold text-white">+ Agregar al banco</button>
     </form>
   )
 }

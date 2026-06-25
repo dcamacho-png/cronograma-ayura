@@ -30,7 +30,7 @@ export function SelectFincaLote({
       <select
         value={finca}
         onChange={(e) => setFinca(e.target.value)}
-        className="rounded border p-2 text-sm"
+        className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
       >
         <option value="">— elegir finca —</option>
         {fincas.map((f) => (
@@ -43,7 +43,7 @@ export function SelectFincaLote({
         multiple={multiple}
         size={multiple ? 6 : undefined}
         disabled={!finca}
-        className="rounded border p-2 text-sm disabled:bg-gray-100 disabled:text-gray-400"
+        className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40 disabled:bg-arena disabled:text-tierra/60"
       >
         {!multiple && (
           <option value="">{finca ? '— elegir lote —' : '— elige la finca primero —'}</option>

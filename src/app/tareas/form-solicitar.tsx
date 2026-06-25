@@ -30,8 +30,8 @@ export function FormSolicitar({
   const conBultos = usaBultos(estipulada)
 
   return (
-    <form action={accion} className="flex flex-col gap-2 rounded-xl border border-purple-200 bg-purple-50 p-4">
-      <h2 className="font-semibold text-purple-900">📨 Solicitar a otra área</h2>
+    <form action={accion} className="flex flex-col gap-2 rounded-xl border border-borde bg-arena p-4">
+      <h2 className="font-semibold text-arcilla">📨 Solicitar a otra área</h2>
       <input type="hidden" name="solicitanteAreaId" value={solicitanteAreaId} />
       <label className="flex flex-col text-sm">
         Área que la ejecuta
@@ -40,7 +40,7 @@ export function FormSolicitar({
           required
           value={areaEjecutoraId}
           onChange={(e) => setAreaEjecutoraId(e.target.value)}
-          className="rounded border p-2 text-sm"
+          className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
         >
           <option value="">— elegir área —</option>
           {areas.filter((a) => a.id !== solicitanteAreaId).map((a) => (
@@ -52,7 +52,7 @@ export function FormSolicitar({
         <>
           <label className="flex flex-col text-sm">
             Actividad (lista)
-            <select name="estipulada" value={estipulada} onChange={(e) => setEstipulada(e.target.value)} className="rounded border p-2 text-sm">
+            <select name="estipulada" value={estipulada} onChange={(e) => setEstipulada(e.target.value)} className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
               <option value="">— elegir —</option>
               {estipuladas.map((e) => (
                 <option key={e.id} value={e.nombre}>{e.nombre}</option>
@@ -63,7 +63,7 @@ export function FormSolicitar({
           {estipulada === '__otra__' && (
             <label className="flex flex-col text-sm">
               Otra (escribe la actividad)
-              <input name="otra" placeholder="¿Qué actividad?" className="rounded border p-2 text-sm" />
+              <input name="otra" placeholder="¿Qué actividad?" className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
             </label>
           )}
           <label className="flex flex-col text-sm">
@@ -76,16 +76,16 @@ export function FormSolicitar({
           </label>
           <label className="flex flex-col text-sm">
             Detalle / instrucciones (opcional)
-            <textarea name="detalle" rows={2} placeholder="Ej: aplicar urea, 2 bultos/ha" className="rounded border p-2 text-sm" />
+            <textarea name="detalle" rows={2} placeholder="Ej: aplicar urea, 2 bultos/ha" className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
           </label>
         </>
       ) : (
         <label className="flex flex-col text-sm">
           Descripción
-          <input name="descripcion" placeholder="Ej: pasar renovador en lote X" className="rounded border p-2 text-sm" />
+          <input name="descripcion" placeholder="Ej: pasar renovador en lote X" className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
         </label>
       )}
-      <button className="self-start rounded bg-purple-700 px-4 py-2 text-sm font-semibold text-white">📨 Solicitar</button>
+      <button className="self-start rounded-lg bg-arcilla px-4 py-2 text-sm font-semibold text-white">📨 Solicitar</button>
     </form>
   )
 }
