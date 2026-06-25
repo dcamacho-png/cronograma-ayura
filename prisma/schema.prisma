@@ -10,6 +10,10 @@ datasource db {
 model Area {
   id            String        @id @default(cuid())
   nombre        String        @unique
+  maqTareas       Boolean @default(false)
+  maqProgramar    Boolean @default(false)
+  maqCumplimiento Boolean @default(false)
+  maqResumen      Boolean @default(false)
   actividades   Actividad[]   @relation("AreaDeActividad")
   tareasMaquina Actividad[]   @relation("AreaDeTarea")
   responsables  Responsable[]
@@ -26,6 +30,7 @@ model Usuario {
   rol     String  @default("AREA")
   areaId  String?
   area    Area?   @relation(fields: [areaId], references: [id])
+  pantallas String?
 }
 
 model Finca {
