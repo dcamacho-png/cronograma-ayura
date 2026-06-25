@@ -62,7 +62,7 @@ export function DiaMaquinaria({
         <button
           type="button"
           onClick={() => setNovedad(false)}
-          className="mt-1 text-xs text-gray-500 underline"
+          className="mt-1 text-xs text-tierra underline"
         >
           cancelar novedad
         </button>
@@ -84,7 +84,7 @@ export function DiaMaquinaria({
             min="0"
             required
             defaultValue={haProgramada}
-            className="w-28 rounded border p-1 text-sm"
+            className="w-28 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
           />
         </label>
         <label className="flex flex-col text-xs">
@@ -93,7 +93,7 @@ export function DiaMaquinaria({
             name="centroCosto"
             value={centro}
             onChange={(e) => setCentro(e.target.value)}
-            className="rounded border p-1 text-sm"
+            className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
           >
             <option value="">— sin centro —</option>
             {CENTROS_COSTO.map((c) => (
@@ -105,11 +105,11 @@ export function DiaMaquinaria({
         {centro === '__otra__' && (
           <label className="flex flex-col text-xs">
             Otras (texto libre)
-            <input name="centroCostoOtra" className="w-40 rounded border p-1 text-sm" />
+            <input name="centroCostoOtra" className="w-40 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
           </label>
         )}
-        <button className="rounded bg-bosque px-3 py-1 text-sm font-semibold text-white">✓ Registrar cumplimiento</button>
-        <button type="button" onClick={() => setNovedad(true)} className="text-xs text-gray-500 underline">
+        <button className="rounded-lg bg-bosque px-3 py-1 text-sm font-semibold text-white">✓ Registrar cumplimiento</button>
+        <button type="button" onClick={() => setNovedad(true)} className="text-xs text-tierra underline">
           registrar novedad
         </button>
       </form>

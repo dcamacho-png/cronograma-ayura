@@ -107,45 +107,45 @@ export default async function CumplimientoPage({
             <Link
               key={a.id}
               href={url(a.id, anio, semana)}
-              className={`rounded-full px-3 py-1 text-sm ${a.id === areaId ? 'bg-bosque text-white' : 'bg-gray-100 text-gray-700'}`}
+              className={`rounded-full px-3 py-1 text-sm ${a.id === areaId ? 'bg-bosque text-white' : 'bg-arena text-tierra'}`}
             >
               {a.nombre}
             </Link>
           ))}
         </div>
       ) : (
-        <div className="mb-3 text-sm text-gray-500">Área: <b className="text-gray-800">{areaActual.nombre}</b></div>
+        <div className="mb-3 text-sm text-tierra">Área: <b className="text-tinta">{areaActual.nombre}</b></div>
       )}
 
       <div className="mb-5 flex flex-wrap items-center gap-3">
-        <Link href={url(areaId, previa.anio, previa.semana)} className="rounded border px-3 py-1 text-sm">
+        <Link href={url(areaId, previa.anio, previa.semana)} className="rounded-lg border border-borde bg-marfil px-3 py-1 text-sm text-tinta">
           ← Semana {previa.semana}
         </Link>
         <span className="font-semibold">Semana {semana} · {anio}</span>
         {pendientes > 0 ? (
           <span
-            className="cursor-not-allowed rounded border px-3 py-1 text-sm text-gray-300"
+            className="cursor-not-allowed rounded-lg border border-borde px-3 py-1 text-sm text-tierra/50"
             title="Registra todas las actividades para pasar a la siguiente semana"
           >
             Semana {proxima.semana} →
           </span>
         ) : (
-          <Link href={url(areaId, proxima.anio, proxima.semana)} className="rounded border px-3 py-1 text-sm">
+          <Link href={url(areaId, proxima.anio, proxima.semana)} className="rounded-lg border border-borde bg-marfil px-3 py-1 text-sm text-tinta">
             Semana {proxima.semana} →
           </Link>
         )}
         <a
           href={`/cumplimiento/exportar?area=${areaId}&anio=${anio}&semana=${semana}`}
-          className="rounded border border-bosque px-3 py-1 text-sm font-semibold text-bosque hover:bg-green-50"
+          className="rounded-lg border border-bosque px-3 py-1 text-sm font-semibold text-bosque hover:bg-arena/40"
         >
           📥 Descargar Excel
         </a>
-        <span className="ml-auto rounded bg-gray-100 px-3 py-1 text-sm">
+        <span className="ml-auto rounded-lg bg-arena px-3 py-1 text-sm">
           Cumplido: <b>{pct === null ? '—' : `${pct}%`}</b>
         </span>
-        <span className="rounded bg-gray-100 px-3 py-1 text-sm">
+        <span className="rounded-lg bg-arena px-3 py-1 text-sm">
           ✅ <b>{conteoEstado.CUMPLIDA}</b> · 🟡 <b>{conteoEstado.PARCIAL}</b> · 🔴 <b>{conteoEstado.NO_CUMPLIDA}</b> · 🔄 <b>{conteoEstado.REPROGRAMADA}</b>{' '}
-          <span className="text-gray-400">de {totalActividades}</span>
+          <span className="text-tierra">de {totalActividades}</span>
         </span>
       </div>
 
@@ -170,7 +170,7 @@ export default async function CumplimientoPage({
       )}
 
       {actividades.length === 0 ? (
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-tierra">
           No hay actividades en esta semana. Prográmalas en la pestaña <b>Programar</b>.
         </p>
       ) : (
@@ -192,12 +192,12 @@ export default async function CumplimientoPage({
             const diasOrdenados = [...porDia.entries()].sort((x, y) => x[0] - y[0])
             const unidad = unidadDe(unidadPorNombre, cab.descripcion)
             return (
-              <li key={cab.tareaId ?? cab.id} className="rounded-lg border p-3">
+              <li key={cab.tareaId ?? cab.id} className="tarjeta p-3">
                 <div className="mb-2 flex items-center gap-2 text-sm">
                   <span className="font-medium">{cab.descripcion}</span>
                   <span>·</span>
                   <span>{nombresResp.join(', ')}</span>
-                  {cab.maquina && <span className="text-gray-600">· 🚜 {cab.maquina.nombre}</span>}
+                  {cab.maquina && <span className="text-tierra">· 🚜 {cab.maquina.nombre}</span>}
                   {cab.vecesReprogramada > 0 && (
                     <span
                       className="rounded px-2 py-0.5 text-xs font-semibold text-white"
@@ -206,7 +206,7 @@ export default async function CumplimientoPage({
                       reprogramada {cab.vecesReprogramada}×
                     </span>
                   )}
-                  <span className="ml-auto rounded bg-gray-100 px-2 py-0.5 text-xs">
+                  <span className="ml-auto rounded-lg bg-arena px-2 py-0.5 text-xs">
                     {nDias > 1 ? `${nDias} días · ` : ''}Cumplido: <b>{pctAct === null ? '—' : `${pctAct}%`}</b>
                   </span>
                 </div>
@@ -214,14 +214,14 @@ export default async function CumplimientoPage({
 
                 <ul className="space-y-2">
                   {diasOrdenados.map(([dia, filas]) => (
-                    <li key={dia} className="rounded border border-gray-100 bg-gray-50/50 p-2">
-                      <div className="mb-1 text-xs font-semibold text-gray-600">
+                    <li key={dia} className="rounded-lg border border-borde bg-arena/40 p-2">
+                      <div className="mb-1 text-xs font-semibold text-tierra">
                         {DIAS[dia] ?? ''} {fechas[dia - 1] ? fmtFecha(fechas[dia - 1]) : ''}
                       </div>
                       <ul className="space-y-2">
                         {filas.map((a) => (
                           <li key={a.id} className="flex flex-col gap-1">
-                            {multiResp && <span className="text-xs text-gray-500">{a.responsable.nombre}</span>}
+                            {multiResp && <span className="text-xs text-tierra">{a.responsable.nombre}</span>}
                             {a.estado === 'PENDIENTE' ? (
                               esMaquinaria ? (
                                 <DiaMaquinaria
@@ -267,27 +267,27 @@ export default async function CumplimientoPage({
                               <div className="flex flex-wrap items-center gap-2 text-sm">
                                 <span className="font-semibold">{ESTADOS.find((e) => e.valor === a.estado)?.etiqueta ?? a.estado}</span>
                                 {(tieneAvances || a.haRealizada != null) && (
-                                  <span className="text-gray-500">· {tieneAvances ? totalAvanceLotes(a.lotes, avances) : a.haRealizada} {unidadAbreviada(unidad)}</span>
+                                  <span className="text-tierra">· {tieneAvances ? totalAvanceLotes(a.lotes, avances) : a.haRealizada} {unidadAbreviada(unidad)}</span>
                                 )}
-                                {a.motivo && <span className="text-gray-500">· {a.motivo.nombre}</span>}
-                                {a.nota && <span className="text-gray-500">· {a.nota}</span>}
-                                {a.centroCosto && <span className="text-gray-500">· 🏷️ {a.centroCosto}</span>}
+                                {a.motivo && <span className="text-tierra">· {a.motivo.nombre}</span>}
+                                {a.nota && <span className="text-tierra">· {a.nota}</span>}
+                                {a.centroCosto && <span className="text-tierra">· 🏷️ {a.centroCosto}</span>}
                                 {textoLotesHechos(a.lotes, a.lotesHechos as string[] | null) && (
-                                  <span className="text-gray-500">· ✅ Realizados: {textoLotesHechos(a.lotes, a.lotesHechos as string[] | null)}</span>
+                                  <span className="text-tierra">· ✅ Realizados: {textoLotesHechos(a.lotes, a.lotesHechos as string[] | null)}</span>
                                 )}
                                 <form action={desmarcarAccion} className="ml-auto">
                                   <input type="hidden" name="id" value={a.id} />
-                                  <button className="text-xs text-gray-500 underline hover:text-gray-700">↩ desmarcar</button>
+                                  <button className="text-xs text-tierra underline hover:text-tinta">↩ desmarcar</button>
                                 </form>
                               </div>
                               {/* Resumen de avances (solo lectura): visible en cualquier estado no-pendiente con avances. */}
                               {resumenAvances && (
-                                <span className="mt-1 text-sm text-gray-600">Avances: {resumenAvances}</span>
+                                <span className="mt-1 text-sm text-tierra">Avances: {resumenAvances}</span>
                               )}
                               {a.estado === 'PARCIAL' && (
                                 <div className="mt-1 flex w-full flex-col gap-1 text-sm">
                                   {a.lotes.length > 0 && (
-                                    <span className="text-gray-600">
+                                    <span className="text-tierra">
                                       Progreso: {a.lotes.length - lotesPendientes(a.lotes, avances).length} de {a.lotes.length} lotes
                                     </span>
                                   )}
@@ -305,11 +305,11 @@ export default async function CumplimientoPage({
                                     )}
                                     <form action={marcarCumplidaParcialAccion}>
                                       <input type="hidden" name="id" value={a.id} />
-                                      <button className="rounded border border-bosque px-2 py-1 text-xs font-semibold text-bosque hover:bg-green-50">✓ Marcar cumplida</button>
+                                      <button className="rounded-lg border border-bosque px-2 py-1 text-xs font-semibold text-bosque hover:bg-arena/40">✓ Marcar cumplida</button>
                                     </form>
                                     <form action={devolverAlBancoAccion}>
                                       <input type="hidden" name="id" value={a.id} />
-                                      <button className="rounded border px-2 py-1 text-xs text-gray-600 hover:bg-gray-50">Devolver al banco</button>
+                                      <button className="rounded-lg border border-borde px-2 py-1 text-xs text-tierra hover:bg-arena/40">Devolver al banco</button>
                                     </form>
                                   </div>
                                 </div>

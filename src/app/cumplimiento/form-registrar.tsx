@@ -57,7 +57,7 @@ export function FormRegistrar({
           required
           value={estado}
           onChange={(e) => setEstado(e.target.value)}
-          className="rounded border p-1 text-sm"
+          className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
         >
           <option value="">— marcar —</option>
           <option value="NO_CUMPLIDA">🔴 No cumplida</option>
@@ -72,7 +72,7 @@ export function FormRegistrar({
           required={requiereMotivo}
           value={motivoId}
           onChange={(e) => setMotivoId(e.target.value)}
-          className="rounded border p-1 text-sm"
+          className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
         >
           <option value="">—</option>
           {motivos.map((m) => (
@@ -82,7 +82,7 @@ export function FormRegistrar({
       </label>
       <label className="flex flex-1 flex-col text-xs">
         Observación / lo que faltó
-        <input name="nota" placeholder="(para parcial o reprogramada)" className="rounded border p-1 text-sm" />
+        <input name="nota" placeholder="(para parcial o reprogramada)" className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
       </label>
       {esMaquinaria && (
         <label className="flex flex-col text-xs">
@@ -93,7 +93,7 @@ export function FormRegistrar({
             step="any"
             min="0"
             defaultValue={haProgramada}
-            className="w-28 rounded border p-1 text-sm"
+            className="w-28 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
           />
         </label>
       )}
@@ -104,7 +104,7 @@ export function FormRegistrar({
             name="centroCosto"
             value={centroCosto}
             onChange={(e) => setCentroCosto(e.target.value)}
-            className="rounded border p-1 text-sm"
+            className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
           >
             <option value="">— sin centro —</option>
             {CENTROS_COSTO.map((c) => (
@@ -117,12 +117,12 @@ export function FormRegistrar({
       {esMaquinaria && centroCosto === '__otra__' && (
         <label className="flex flex-col text-xs">
           Otras (texto libre)
-          <input name="centroCostoOtra" className="w-40 rounded border p-1 text-sm" />
+          <input name="centroCostoOtra" className="w-40 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
         </label>
       )}
       {requierePotreros && (
-        <div className="flex w-full flex-col gap-1 rounded border border-gray-200 bg-gray-50 p-2 text-xs">
-          <span className="font-semibold text-gray-700">¿En cuáles potreros se realizó? (opcional)</span>
+        <div className="flex w-full flex-col gap-1 rounded-lg border border-borde bg-arena p-2 text-xs">
+          <span className="font-semibold text-tinta">¿En cuáles potreros se realizó? (opcional)</span>
           <div className="flex flex-wrap gap-3">
             {lotesActividad.map((l) => (
               <label key={l.id} className="flex items-center gap-1">
@@ -145,7 +145,7 @@ export function FormRegistrar({
                   required
                   value={reemplazoDesc}
                   onChange={(e) => setReemplazoDesc(e.target.value)}
-                  className="rounded border p-1 text-sm"
+                  className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
                 >
                   <option value="" disabled>— elige —</option>
                   {estipuladas.map((e) => (
@@ -157,14 +157,14 @@ export function FormRegistrar({
               {reemplazoOtra && (
                 <label className="flex flex-1 flex-col text-xs">
                   Otra (texto libre) *
-                  <input name="reemplazoDescripcionOtra" required className="rounded border p-1 text-sm" />
+                  <input name="reemplazoDescripcionOtra" required className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
                 </label>
               )}
             </>
           ) : (
             <label className="flex flex-1 flex-col text-xs">
               Descripción *
-              <input name="reemplazoDescripcion" required className="rounded border p-1 text-sm" />
+              <input name="reemplazoDescripcion" required className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
             </label>
           )}
           <label className="flex flex-col text-xs">
@@ -175,7 +175,7 @@ export function FormRegistrar({
             <>
               <label className="flex flex-col text-xs">
                 Máquina
-                <select name="reemplazoMaquinaId" className="rounded border p-1 text-sm">
+                <select name="reemplazoMaquinaId" className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
                   <option value="">— sin máquina —</option>
                   {maquinas.map((m) => (
                     <option key={m.id} value={m.id}>{m.nombre}</option>
@@ -184,13 +184,13 @@ export function FormRegistrar({
               </label>
               <label className="flex flex-col text-xs">
                 {etiquetaMedida(reemplazoUnidad)} (opcional)
-                <input name="reemplazoMedida" type="number" step="any" min="0" className="w-28 rounded border p-1 text-sm" />
+                <input name="reemplazoMedida" type="number" step="any" min="0" className="w-28 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
               </label>
             </>
           )}
         </div>
       )}
-      <button className="rounded bg-bosque px-3 py-1 text-sm font-semibold text-white">Registrar</button>
+      <button className="rounded-lg bg-bosque px-3 py-1 text-sm font-semibold text-white">Registrar</button>
     </form>
   )
 }

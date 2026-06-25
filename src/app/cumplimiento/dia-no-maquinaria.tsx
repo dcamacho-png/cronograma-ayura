@@ -59,7 +59,7 @@ export function DiaNoMaquinaria({
         <button
           type="button"
           onClick={() => setNovedad(false)}
-          className="mt-1 text-xs text-gray-500 underline"
+          className="mt-1 text-xs text-tierra underline"
         >
           cancelar novedad
         </button>
@@ -72,14 +72,14 @@ export function DiaNoMaquinaria({
       <form action={marcarCumplido}>
         <input type="hidden" name="id" value={actividadId} />
         <input type="hidden" name="estado" value="CUMPLIDA" />
-        <button className="flex items-center gap-1 rounded bg-bosque px-3 py-1 text-sm font-semibold text-white">
+        <button className="flex items-center gap-1 rounded-lg bg-bosque px-3 py-1 text-sm font-semibold text-white">
           ✓ Cumplido
         </button>
       </form>
       <button
         type="button"
         onClick={() => setNovedad(true)}
-        className="text-xs text-gray-500 underline"
+        className="text-xs text-tierra underline"
       >
         registrar novedad
       </button>

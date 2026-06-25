@@ -39,14 +39,14 @@ export function FormActividadRealizada({
   const unidadSel: Unidad = esOtra || desc === '' ? 'ha' : unidadPorNombre.get(desc) ?? 'ha'
 
   return (
-    <form action={accion} className="mb-6 flex flex-wrap items-end gap-2 rounded-xl border border-blue-200 bg-blue-50 p-3">
-      <span className="w-full text-sm font-semibold text-blue-900">➕ Agregar actividad realizada (no programada)</span>
+    <form action={accion} className="mb-6 flex flex-wrap items-end gap-2 rounded-xl border border-borde bg-arena p-3">
+      <span className="w-full text-sm font-semibold text-bosque">➕ Agregar actividad realizada (no programada)</span>
       <input type="hidden" name="areaId" value={areaId} />
       <input type="hidden" name="anio" value={anio} />
       <input type="hidden" name="semana" value={semana} />
       <label className="flex flex-col text-xs">
         Responsable
-        <select name="responsableId" required className="rounded border p-1 text-sm">
+        <select name="responsableId" required className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
           {responsables.map((r) => (
             <option key={r.id} value={r.id}>{r.nombre}</option>
           ))}
@@ -54,7 +54,7 @@ export function FormActividadRealizada({
       </label>
       <label className="flex flex-col text-xs">
         Día
-        <select name="dia" required defaultValue="" className="rounded border p-1 text-sm">
+        <select name="dia" required defaultValue="" className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
           <option value="" disabled>—</option>
           {DIAS.map((d, i) => (
             <option key={d} value={i + 1}>{d}</option>
@@ -70,7 +70,7 @@ export function FormActividadRealizada({
               required
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
-              className="rounded border p-1 text-sm"
+              className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
             >
               <option value="" disabled>— elige —</option>
               {estipuladas.map((e) => (
@@ -82,14 +82,14 @@ export function FormActividadRealizada({
           {esOtra && (
             <label className="flex flex-1 flex-col text-xs">
               Otra (texto libre)
-              <input name="descripcionOtra" required placeholder="¿Qué se hizo?" className="rounded border p-1 text-sm" />
+              <input name="descripcionOtra" required placeholder="¿Qué se hizo?" className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
             </label>
           )}
         </>
       ) : (
         <label className="flex flex-1 flex-col text-xs">
           Descripción
-          <input name="descripcion" required placeholder="¿Qué se hizo?" className="rounded border p-1 text-sm" />
+          <input name="descripcion" required placeholder="¿Qué se hizo?" className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
         </label>
       )}
       <label className="flex flex-col text-xs">
@@ -100,7 +100,7 @@ export function FormActividadRealizada({
         <>
           <label className="flex flex-col text-xs">
             Máquina
-            <select name="maquinaId" className="rounded border p-1 text-sm">
+            <select name="maquinaId" className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
               <option value="">— sin máquina —</option>
               {maquinas.map((m) => (
                 <option key={m.id} value={m.id}>{m.nombre}</option>
@@ -109,7 +109,7 @@ export function FormActividadRealizada({
           </label>
           <label className="flex flex-col text-xs">
             {etiquetaMedida(unidadSel)} (opcional)
-            <input name="medida" type="number" step="any" min="0" className="w-28 rounded border p-1 text-sm" />
+            <input name="medida" type="number" step="any" min="0" className="w-28 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
           </label>
           <label className="flex flex-col text-xs">
             Centro de costo
@@ -117,7 +117,7 @@ export function FormActividadRealizada({
               name="centroCosto"
               value={centroCosto}
               onChange={(e) => setCentroCosto(e.target.value)}
-              className="rounded border p-1 text-sm"
+              className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
             >
               <option value="">— sin centro —</option>
               {CENTROS_COSTO.map((c) => (
@@ -129,12 +129,12 @@ export function FormActividadRealizada({
           {centroCosto === '__otra__' && (
             <label className="flex flex-col text-xs">
               Otras (texto libre)
-              <input name="centroCostoOtra" className="w-40 rounded border p-1 text-sm" />
+              <input name="centroCostoOtra" className="w-40 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
             </label>
           )}
         </>
       )}
-      <button className="rounded bg-bosque px-3 py-1 text-sm font-semibold text-white">Agregar</button>
+      <button className="rounded-lg bg-bosque px-3 py-1 text-sm font-semibold text-white">Agregar</button>
     </form>
   )
 }
