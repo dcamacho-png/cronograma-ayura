@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { SelectFincaLote } from '../_componentes/select-finca-lote'
 import { PickerLotesBultos } from './picker-lotes-bultos'
 import { usaBultos } from '@/dominio/bultos'
+import { CasillasDias, CasillasColaboradores } from './campos-sugerencia'
 
 type Lote = { id: string; nombre: string; finca: { nombre: string } }
 type Estipulada = { id: string; nombre: string }
@@ -15,17 +16,20 @@ export function FormSolicitar({
   estipuladas,
   lotes,
   accion,
+  responsablesPorArea,
 }: {
   solicitanteAreaId: string
   areas: Area[]
   estipuladas: Estipulada[]
   lotes: Lote[]
   accion: (formData: FormData) => void | Promise<void>
+  responsablesPorArea: Record<string, { id: string; nombre: string }[]>
 }) {
   const [areaEjecutoraId, setAreaEjecutoraId] = useState('')
   const [estipulada, setEstipulada] = useState('')
   const esMaquinaria = areas.find((a) => a.id === areaEjecutoraId)?.maqTareas ?? false
   const conBultos = usaBultos(estipulada)
+  const responsablesB = responsablesPorArea[areaEjecutoraId] ?? []
 
   return (
     <form action={accion} className="flex flex-col gap-2 rounded-xl border border-borde bg-arena p-4">
@@ -76,12 +80,30 @@ export function FormSolicitar({
             Detalle / instrucciones (opcional)
             <textarea name="detalle" rows={2} placeholder="Ej: aplicar urea, 2 bultos/ha" className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
           </label>
+          <div className="flex flex-col gap-1 text-sm">
+            <span>Día sugerido (opcional)</span>
+            <CasillasDias />
+          </div>
         </>
       ) : (
-        <label className="flex flex-col text-sm">
-          Descripción
-          <input name="descripcion" placeholder="Ej: pasar renovador en lote X" className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
-        </label>
+        <>
+          <label className="flex flex-col text-sm">
+            Descripción
+            <input name="descripcion" placeholder="Ej: pasar renovador en lote X" className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
+          </label>
+          <label className="flex flex-col text-sm">
+            Descripción (opcional)
+            <textarea name="detalle" rows={2} placeholder="Detalles / instrucciones" className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
+          </label>
+          <div className="flex flex-col gap-1 text-sm">
+            <span>Día sugerido (opcional)</span>
+            <CasillasDias />
+          </div>
+          <div className="flex flex-col gap-1 text-sm">
+            <span>Colaboradores sugeridos (opcional)</span>
+            <CasillasColaboradores key={areaEjecutoraId} responsables={responsablesB} />
+          </div>
+        </>
       )}
       <button className="self-start rounded-lg bg-arcilla px-4 py-2 text-sm font-semibold text-white">📨 Solicitar</button>
     </form>

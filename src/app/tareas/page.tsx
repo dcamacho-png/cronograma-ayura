@@ -6,6 +6,7 @@ import {
   listarActividadesEstipuladas,
   listarLotes,
   listarSolicitudesDeArea,
+  listarResponsablesTodos,
 } from '@/datos/repositorio'
 import { semanaActual, siguienteSemana } from '@/dominio/semana'
 import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
@@ -41,12 +42,18 @@ export default async function TareasPage({
   const areaActual = areas.find((a) => a.id === areaId)!
   const esMaquinaria = esMaquinariaVar(areaActual, 'tareas')
 
-  const [tareas, estipuladas, lotes, solicitudes] = await Promise.all([
+  const [tareas, estipuladas, lotes, solicitudes, responsablesTodos] = await Promise.all([
     listarTareasPendientes(areaId),
     listarActividadesEstipuladas(),
     listarLotes(),
     listarSolicitudesDeArea(areaId),
+    listarResponsablesTodos(),
   ])
+  const responsablesPorArea: Record<string, { id: string; nombre: string }[]> = {}
+  for (const r of responsablesTodos) {
+    if (!r.activo) continue
+    ;(responsablesPorArea[r.areaId] ??= []).push({ id: r.id, nombre: r.nombre })
+  }
 
   const semanas: { anio: number; semana: number }[] = []
   let w = siguienteSemana(semanaActual().anio, semanaActual().semana)
@@ -103,6 +110,7 @@ export default async function TareasPage({
           estipuladas={estipuladas}
           lotes={lotes}
           accion={crearSolicitudAccion}
+          responsablesPorArea={responsablesPorArea}
         />
       </div>
 
