@@ -536,6 +536,8 @@ export function crearSolicitud(
   loteIds: string[],
   bultosPorLote: Record<string, number> | null = null,
   detalle: string | null = null,
+  diasSugeridos: string | null = null,
+  responsablesSugeridosIds: string | null = null,
 ) {
   return prisma.tarea.create({
     data: {
@@ -543,6 +545,8 @@ export function crearSolicitud(
       descripcion,
       solicitadaPorAreaId,
       detalle,
+      diasSugeridos,
+      responsablesSugeridosIds,
       lotes: { connect: loteIds.map((id) => ({ id })) },
       ...(bultosPorLote ? { bultosPorLote } : {}),
     },
@@ -557,10 +561,10 @@ export async function devolverAAsignacion(tareaId: string, anio: number, semana:
 }
 
 // Maquinaria devuelve una tarea solicitada al área que la pidió (no la elimina).
-export function devolverAlSolicitante(id: string) {
+export function devolverAlSolicitante(id: string, observacion: string | null) {
   return prisma.tarea.update({
     where: { id },
-    data: { estado: 'DEVUELTA', anioSel: null, semanaSel: null },
+    data: { estado: 'DEVUELTA', anioSel: null, semanaSel: null, observacionDevolucion: observacion },
   })
 }
 
@@ -568,7 +572,31 @@ export function devolverAlSolicitante(id: string) {
 export function reenviarSolicitud(id: string) {
   return prisma.tarea.update({
     where: { id },
-    data: { estado: 'PENDIENTE', anioSel: null, semanaSel: null },
+    data: { estado: 'PENDIENTE', anioSel: null, semanaSel: null, observacionDevolucion: null },
+  })
+}
+
+export function editarSolicitud(
+  id: string,
+  datos: {
+    descripcion: string
+    detalle: string | null
+    loteIds: string[]
+    bultosPorLote: Record<string, number> | null
+    diasSugeridos: string | null
+    responsablesSugeridosIds: string | null
+  },
+) {
+  return prisma.tarea.update({
+    where: { id },
+    data: {
+      descripcion: datos.descripcion,
+      detalle: datos.detalle,
+      diasSugeridos: datos.diasSugeridos,
+      responsablesSugeridosIds: datos.responsablesSugeridosIds,
+      bultosPorLote: datos.bultosPorLote ?? undefined,
+      lotes: { set: datos.loteIds.map((lid) => ({ id: lid })) },
+    },
   })
 }
 

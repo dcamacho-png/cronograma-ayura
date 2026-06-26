@@ -9,6 +9,7 @@ import {
   crearSolicitud,
   devolverAlSolicitante,
   reenviarSolicitud,
+  editarSolicitud,
 } from '@/datos/repositorio'
 import { esSemanaPasada, esSemanaFutura, semanaActual } from '@/dominio/semana'
 
@@ -83,19 +84,42 @@ export async function crearSolicitudAccion(form: FormData) {
     if (b != null) bultos[id] = b
   }
   const detalle = textoOpcional(form, 'detalle')
-  await crearSolicitud(areaEjecutoraId, descripcion, solicitanteAreaId, loteIds, Object.keys(bultos).length > 0 ? bultos : null, detalle)
+  const diasSugeridos = form.getAll('diaSugerido').map((v) => String(v).trim()).filter(Boolean).join(',') || null
+  const responsablesSugeridosIds = form.getAll('responsableSugerido').map((v) => String(v).trim()).filter(Boolean).join(',') || null
+  await crearSolicitud(areaEjecutoraId, descripcion, solicitanteAreaId, loteIds, Object.keys(bultos).length > 0 ? bultos : null, detalle, diasSugeridos, responsablesSugeridosIds)
   revalidatePath('/tareas')
 }
 
 export async function devolverAlSolicitanteAccion(form: FormData) {
   const id = texto(form, 'id')
-  if (id) await devolverAlSolicitante(id)
+  if (id) await devolverAlSolicitante(id, textoOpcional(form, 'observacion'))
   revalidatePath('/tareas')
 }
 
 export async function reenviarSolicitudAccion(form: FormData) {
   const id = texto(form, 'id')
   if (id) await reenviarSolicitud(id)
+  revalidatePath('/tareas')
+}
+
+export async function editarSolicitudAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (!id) return
+  const est = textoOpcional(form, 'estipulada')
+  const descripcion = est === '__otra__'
+    ? textoOpcional(form, 'otra')
+    : (est ?? textoOpcional(form, 'descripcion'))
+  if (!descripcion) return
+  const loteIds = form.getAll('loteId').map((v) => String(v).trim()).filter(Boolean)
+  const bultos: Record<string, number> = {}
+  for (const lid of loteIds) {
+    const b = numeroOpcional(form, `bultos_${lid}`)
+    if (b != null) bultos[lid] = b
+  }
+  const detalle = textoOpcional(form, 'detalle')
+  const diasSugeridos = form.getAll('diaSugerido').map((v) => String(v).trim()).filter(Boolean).join(',') || null
+  const responsablesSugeridosIds = form.getAll('responsableSugerido').map((v) => String(v).trim()).filter(Boolean).join(',') || null
+  await editarSolicitud(id, { descripcion, detalle, loteIds, bultosPorLote: Object.keys(bultos).length > 0 ? bultos : null, diasSugeridos, responsablesSugeridosIds })
   revalidatePath('/tareas')
 }
 
