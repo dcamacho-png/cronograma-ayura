@@ -1,7 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, setResponsableActivo, crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, crearLote, eliminarLote, crearUsuario, cambiarContrasena, eliminarUsuario, BloqueoError } from '@/datos/repositorio'
+import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, setResponsableActivo, crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, crearLote, eliminarLote, crearUsuario, cambiarContrasena, eliminarUsuario, BloqueoError, setPantallasUsuario, setVariantesArea } from '@/datos/repositorio'
 
 function texto(form: FormData, clave: string): string {
   const v = form.get(clave)
@@ -170,4 +170,27 @@ export async function eliminarUsuarioAccion(form: FormData) {
   const id = texto(form, 'id')
   if (!id) faltanDatos()
   await correr(() => eliminarUsuario(id), 'Usuario eliminado.')
+}
+
+export async function actualizarPantallasUsuarioAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (!id) faltanDatos()
+  const claves = form.getAll('pantalla').filter((v): v is string => typeof v === 'string')
+  const csv = claves.length > 0 ? claves.join(',') : ''
+  await correr(() => setPantallasUsuario(id, csv), 'Pantallas del usuario actualizadas.')
+}
+
+export async function actualizarVariantesAreaAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (!id) faltanDatos()
+  const flag = (k: string) => form.get(k) === '1'
+  await correr(
+    () => setVariantesArea(id, {
+      maqTareas: flag('maqTareas'),
+      maqProgramar: flag('maqProgramar'),
+      maqCumplimiento: flag('maqCumplimiento'),
+      maqResumen: flag('maqResumen'),
+    }),
+    'Variantes del área actualizadas.',
+  )
 }

@@ -30,9 +30,13 @@ import {
   crearUsuarioAccion,
   cambiarContrasenaAccion,
   eliminarUsuarioAccion,
+  actualizarPantallasUsuarioAccion,
+  actualizarVariantesAreaAccion,
 } from './acciones'
 import { FormEliminar } from './form-eliminar'
 import { LotesLista } from './lotes-lista'
+import { UsuarioPantallas } from './usuario-pantallas'
+import { AreaVariantes } from './area-variantes'
 
 function Grupo({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
@@ -98,6 +102,18 @@ export default async function ConfiguracionPage({
             <input name="nombre" required placeholder="Nueva área" className="flex-1 rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
             <button className="rounded-lg bg-bosque px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
           </form>
+          <div className="mt-3 flex flex-col gap-2">
+            <h4 className="text-sm font-semibold text-tinta">Variante por pantalla</h4>
+            {areas.map((a) => (
+              <AreaVariantes
+                key={a.id}
+                id={a.id}
+                nombre={a.nombre}
+                valores={{ maqTareas: a.maqTareas, maqProgramar: a.maqProgramar, maqCumplimiento: a.maqCumplimiento, maqResumen: a.maqResumen }}
+                accion={actualizarVariantesAreaAccion}
+              />
+            ))}
+          </div>
         </section>
 
         {/* Fincas */}
@@ -229,6 +245,12 @@ export default async function ConfiguracionPage({
                 <span className="flex-1">
                   <b>{us.usuario}</b> · {us.nombre} · {us.rol}{us.area ? ` · ${us.area.nombre}` : ''}
                 </span>
+                <UsuarioPantallas
+                  id={us.id}
+                  esAdmin={us.rol === 'ADMIN'}
+                  pantallas={us.pantallas}
+                  accion={actualizarPantallasUsuarioAccion}
+                />
                 <form action={cambiarContrasenaAccion} className="flex items-center gap-1">
                   <input type="hidden" name="id" value={us.id} />
                   <input name="password" required placeholder="nueva contraseña" className="rounded-lg border border-borde bg-marfil p-1 text-xs focus:outline-none focus:ring-2 focus:ring-bosque/40" />

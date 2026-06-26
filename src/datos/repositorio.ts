@@ -618,6 +618,17 @@ export async function crearActividadRealizada(datos: {
   })
 }
 
+export function setPantallasUsuario(id: string, pantallas: string | null) {
+  return prisma.usuario.update({ where: { id }, data: { pantallas } })
+}
+
+export function setVariantesArea(
+  id: string,
+  flags: { maqTareas: boolean; maqProgramar: boolean; maqCumplimiento: boolean; maqResumen: boolean },
+) {
+  return prisma.area.update({ where: { id }, data: flags })
+}
+
 // Crea una actividad enlazada a uno o varios lotes; la finca se deduce del primer lote.
 export async function crearActividadDesdeLotes(
   base: {
