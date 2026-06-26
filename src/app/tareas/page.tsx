@@ -218,6 +218,7 @@ export default async function TareasPage({
                       responsablesB={responsablesPorArea[s.areaId] ?? []}
                       estipuladas={estipuladas}
                       lotes={lotes}
+                      lotesActuales={s.lotes}
                       accion={editarSolicitudAccion}
                     />
                     <FormEliminar accion={eliminarTareaAccion} id={s.id} etiqueta={s.descripcion} />

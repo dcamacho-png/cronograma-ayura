@@ -595,7 +595,7 @@ export function editarSolicitud(
       diasSugeridos: datos.diasSugeridos,
       responsablesSugeridosIds: datos.responsablesSugeridosIds,
       bultosPorLote: datos.bultosPorLote ?? undefined,
-      lotes: { set: datos.loteIds.map((lid) => ({ id: lid })) },
+      ...(datos.loteIds.length > 0 ? { lotes: { set: datos.loteIds.map((lid) => ({ id: lid })) } } : {}),
     },
   })
 }

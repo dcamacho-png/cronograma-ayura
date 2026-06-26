@@ -18,6 +18,7 @@ export function FormEditarSolicitud({
   responsablesB,
   estipuladas,
   lotes,
+  lotesActuales,
   accion,
 }: {
   id: string
@@ -29,6 +30,7 @@ export function FormEditarSolicitud({
   responsablesB: { id: string; nombre: string }[]
   estipuladas: Estipulada[]
   lotes: Lote[]
+  lotesActuales: { nombre: string }[]
   accion: (formData: FormData) => void | Promise<void>
 }) {
   const [abierto, setAbierto] = useState(false)
@@ -63,6 +65,11 @@ export function FormEditarSolicitud({
       </label>
       <label className="flex flex-col text-xs">
         Finca y lote
+        {lotesActuales.length > 0 && (
+          <span className="text-xs text-tierra">
+            Lotes actuales: {lotesActuales.map((l) => l.nombre).join(', ')} (elige nuevos solo si quieres reemplazarlos)
+          </span>
+        )}
         {esMaquinaria ? <PickerLotesBultos lotes={lotes} /> : <SelectFincaLote lotes={lotes} name="loteId" />}
       </label>
       <div className="flex flex-col gap-1 text-xs">
