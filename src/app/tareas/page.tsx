@@ -9,6 +9,7 @@ import {
 } from '@/datos/repositorio'
 import { semanaActual, siguienteSemana } from '@/dominio/semana'
 import { usuarioActual } from '@/auth/sesion'
+import { puedeVer } from '@/auth/permisos'
 import { InfoLotes } from '../_componentes/info-lotes'
 import { SelectFincaLote } from '../_componentes/select-finca-lote'
 import { FormNuevaTareaMaquinaria } from './form-nueva-tarea-maquinaria'
@@ -31,6 +32,7 @@ export default async function TareasPage({
   }
   const u = await usuarioActual()
   if (!u) redirect('/login')
+  if (!puedeVer(u, 'tareas')) redirect('/')
   const esAdmin = u.rol === 'ADMIN'
   const areaId = esAdmin
     ? (sp.area && areas.some((a) => a.id === sp.area) ? sp.area : areas[0].id)

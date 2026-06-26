@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { usuarioActual } from '@/auth/sesion'
+import { puedeVer } from '@/auth/permisos'
 import {
   listarAreas,
   listarResponsablesPorArea,
@@ -31,6 +32,7 @@ export default async function ProgramarPage({
 
   const u = await usuarioActual()
   if (!u) redirect('/login')
+  if (!puedeVer(u, 'programar')) redirect('/')
   const esAdmin = u.rol === 'ADMIN'
 
   const areaId = esAdmin

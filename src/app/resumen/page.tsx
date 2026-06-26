@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { usuarioActual } from '@/auth/sesion'
+import { puedeVer } from '@/auth/permisos'
 import { listarAreas, listarResponsablesPorArea, listarMotivos, listarActividades, listarActividadesEstipuladas } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual } from '@/dominio/semana'
 import { ResumenArea } from './resumen-area'
@@ -22,6 +23,7 @@ export default async function ResumenPage({
 
   const u = await usuarioActual()
   if (!u) redirect('/login')
+  if (!puedeVer(u, 'resumen')) redirect('/')
   const esAdmin = u.rol === 'ADMIN'
 
   const areaId = esAdmin

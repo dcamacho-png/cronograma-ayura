@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { usuarioActual } from '@/auth/sesion'
+import { puedeVer } from '@/auth/permisos'
 import { listarAreas, listarMotivos, listarActividades, listarLotes, listarMaquinas, listarResponsablesPorArea, listarActividadesEstipuladas } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana } from '@/dominio/semana'
 import { unidadDe, unidadAbreviada } from '@/dominio/unidad'
@@ -50,6 +51,7 @@ export default async function CumplimientoPage({
 
   const u = await usuarioActual()
   if (!u) redirect('/login')
+  if (!puedeVer(u, 'cumplimiento')) redirect('/')
   const esAdmin = u.rol === 'ADMIN'
 
   const areaId = esAdmin
