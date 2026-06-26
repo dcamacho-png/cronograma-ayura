@@ -110,6 +110,13 @@ export function esSemanaFutura(anio: number, semana: number, referencia: Semana)
   return anio > referencia.anio || (anio === referencia.anio && semana > referencia.semana)
 }
 
+// El plazo para diligenciar el cumplimiento de una semana vence al terminar su domingo,
+// es decir, cuando esa semana ya es pasada respecto a hoy (la semana ISO termina el domingo
+// 23:59 y "hoy" se evalúa en hora de Colombia vía semanaActual()).
+export function plazoCumplimientoVencido(anio: number, semana: number, hoy: Semana): boolean {
+  return esSemanaPasada(anio, semana, hoy)
+}
+
 // Día ISO de una fecha en UTC: lunes = 1 ... domingo = 7.
 export function diaIsoDeFecha(fecha: Date): number {
   const d = new Date(Date.UTC(fecha.getUTCFullYear(), fecha.getUTCMonth(), fecha.getUTCDate()))

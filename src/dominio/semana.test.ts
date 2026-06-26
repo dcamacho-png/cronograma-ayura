@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { isoSemanaDeFecha, siguienteSemana, semanaAnterior, esSemanaFutura } from './semana'
+import { isoSemanaDeFecha, siguienteSemana, semanaAnterior, esSemanaFutura, plazoCumplimientoVencido } from './semana'
 
 describe('isoSemanaDeFecha', () => {
   it('calcula la semana ISO de una fecha conocida', () => {
@@ -155,5 +155,20 @@ describe('aHoraColombia (UTC-5, sin horario de verano)', () => {
     const instante = new Date('2026-06-22T05:00:00Z')
     expect(isoSemanaDeFecha(aHoraColombia(instante))).toEqual({ anio: 2026, semana: 26 })
     expect(diaIsoDeFecha(aHoraColombia(instante))).toBe(1) // lunes
+  })
+})
+
+describe('plazoCumplimientoVencido', () => {
+  it('una semana pasada está vencida', () => {
+    expect(plazoCumplimientoVencido(2026, 24, { anio: 2026, semana: 25 })).toBe(true)
+  })
+  it('la semana en curso NO está vencida (se puede hasta el domingo)', () => {
+    expect(plazoCumplimientoVencido(2026, 25, { anio: 2026, semana: 25 })).toBe(false)
+  })
+  it('una semana futura NO está vencida', () => {
+    expect(plazoCumplimientoVencido(2026, 26, { anio: 2026, semana: 25 })).toBe(false)
+  })
+  it('cruza el cambio de año: 2026 s53 está vencida frente a 2027 s1', () => {
+    expect(plazoCumplimientoVencido(2026, 53, { anio: 2027, semana: 1 })).toBe(true)
   })
 })
