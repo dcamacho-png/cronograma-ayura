@@ -24,8 +24,11 @@ Dos ajustes solicitados sobre pantallas existentes:
   "Tareas por asignar". **Pero solo se muestra en semanas futuras** (`turnoEditable = futura`),
   por eso no aparece cuando la semana ya empezó.
 - Decisión del usuario: el botón "Editar" que pidió **es el mismo "Devolver a asignar"**
-  (reusar lo existente, no duplicar lógica de asignación). Por tanto **no se agrega un botón
-  nuevo**; se amplía la disponibilidad del que ya hay.
+  (reusar lo existente, no duplicar lógica de asignación).
+- **Decisión de alcance (2026-06-26):** la grilla se edita **solo en semanas futuras** (como
+  hoy). El usuario confirmó que las correcciones siempre son de la **tarea completa** y que el
+  límite de edición se queda igual. En consecuencia, **Feature 2 ya está construido**
+  (desde el 2026-06-21) y **no requiere ningún cambio**. Este spec queda reducido a Feature 1.
 
 ## Feature 1 — Plazo de cumplimiento
 
@@ -62,33 +65,20 @@ es verdadero, **salvo** que el usuario sea ADMIN (`u.rol === 'ADMIN'`), que nunc
   unitario (semana pasada → vencido; semana actual y futura → no vencido). Decisión menor a
   tomar en implementación; el comportamiento es el descrito arriba.
 
-## Feature 2 — Corregir asignación en la parrilla
+## Feature 2 — Corregir asignación en la parrilla (YA EXISTE, sin cambios)
 
-### Cambio de visibilidad (`src/app/programar/grilla-semana.tsx`)
-- Mostrar "↩️ Devolver a asignar" cuando la semana **no es pasada** (en curso **o** futura),
-  no solo futura. La página ya distingue `futura`; se añade el caso "semana en curso".
-  Concretamente, el botón se muestra si `(futura || enCurso) && a.tareaId`.
+El comportamiento pedido ya está implementado desde el 2026-06-21:
 
-### Salvaguarda de datos
-Como en la semana en curso puede haber días ya registrados (CUMPLIDA/PARCIAL/etc.) y
-`devolverAAsignacion` borra **todas** las actividades de la tarea en la semana, hay que
-evitar borrar cumplimiento ya diligenciado:
+- En semanas **futuras**, cada actividad de la grilla con `tareaId` muestra
+  "↩️ Devolver a asignar" (`src/app/programar/grilla-semana.tsx:90`).
+- La acción `devolverAAsignacionAccion` → repo `devolverAAsignacion` borra las actividades de
+  la tarea en esa semana y la devuelve a `PENDIENTE`, con lo que reaparece en
+  "📌 Tareas por asignar" para reasignarla.
+- Funciona para maquinaria y no-maquinaria; el texto del botón ya es "Devolver a asignar".
 
-- En el repositorio, `devolverAAsignacion(tareaId, anio, semana)` **rechaza** la operación si
-  alguna actividad de esa tarea/semana tiene `estado !== 'PENDIENTE'` (devuelve un resultado
-  tipo `{ ok: false, motivo: 'tieneRegistros' }`); solo borra y devuelve a `PENDIENTE` cuando
-  todas están pendientes.
-- La acción `devolverAAsignacionAccion`:
-  - Relaja el guard de `esSemanaFutura` a "no pasada" (en curso o futura).
-  - Si el repo responde `tieneRegistros`, redirige con un mensaje de error
-    (mismo patrón `?error=` que usa `asignarTareaAccion`): "No se devolvió: la tarea ya tiene
-    días registrados en cumplimiento."
-
-### Reconciliación con la respuesta del usuario
-El usuario marcó "ambos botones" y luego "Editar = Devolver a asignar". Se concluye que
-**basta un botón** ("Devolver a asignar"); no se agrega un "Editar" separado, evitando
-duplicación. Si tras probarlo el usuario quiere edición en línea de responsable/día, se hará
-en una iteración posterior.
+Como el usuario confirmó que (a) corrige la **tarea completa** y (b) el límite de edición se
+queda en **solo semanas futuras**, este comportamiento ya satisface el requisito.
+**No se requiere ningún cambio de código para Feature 2.**
 
 ## Componentes y límites
 
@@ -97,9 +87,7 @@ en una iteración posterior.
 - `src/datos/repositorio.ts`: nuevo `semanaDeActividad`; ajuste de `devolverAAsignacion`.
 - `src/app/cumplimiento/acciones.ts`: guard `bloqueado` + return temprano en cada acción.
 - `src/app/cumplimiento/page.tsx`: cálculo de `bloqueado`, aviso y ocultar formularios.
-- `src/app/programar/grilla-semana.tsx`: visibilidad del botón en semana en curso.
-- `src/app/programar/acciones.ts`: guard relajado + manejo de `tieneRegistros`.
-- `src/app/programar/page.tsx`: pasar el indicador de "en curso" a la grilla si hace falta.
+- `src/app/programar/*`: **sin cambios** (Feature 2 ya existe).
 
 ## Fuera de alcance (YAGNI)
 
