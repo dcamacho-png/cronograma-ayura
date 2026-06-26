@@ -96,6 +96,11 @@ export function reabrirActividad(id: string) {
   })
 }
 
+// Año/semana ISO a la que pertenece una actividad; null si no existe.
+export function semanaDeActividad(id: string) {
+  return prisma.actividad.findUnique({ where: { id }, select: { anio: true, semana: true } })
+}
+
 // Crea un responsable nuevo en un área.
 export function crearResponsable(nombre: string, areaId: string) {
   return prisma.responsable.create({ data: { nombre, areaId } })
