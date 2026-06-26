@@ -11,6 +11,7 @@ import {
 } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, esSemanaFutura, diaActual, esDiaPasado } from '@/dominio/semana'
 import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
+import { textoSugerencia } from '@/dominio/sugerencia'
 import { asignarTareaAccion, devolverAlBancoAccion } from './acciones'
 import { AsignarTareaForm } from './asignar-tarea-form'
 import { GrillaSemana } from './grilla-semana'
@@ -59,6 +60,7 @@ export default async function ProgramarPage({
   ])
   const esMaquinaria = esMaquinariaVar(areaActual, 'programar')
   const responsablesActivos = responsables.filter((r) => r.activo)
+  const nombrePorResp = new Map(responsables.map((r) => [r.id, r.nombre]))
   const actividadesCronograma = actividades.filter((a) => !a.noProgramada)
   // Ocupación en la semana: máquina y responsable usados en cada día+turno.
   const ocupacion = actividadesCronograma.map((a) => ({
@@ -139,6 +141,15 @@ export default async function ProgramarPage({
                     semana={semana}
                     accion={asignarTareaAccion}
                   />
+                  {(() => {
+                    const sug = textoSugerencia(
+                      t.solicitadaPorArea?.nombre ?? '',
+                      t.diasSugeridos,
+                      t.responsablesSugeridosIds,
+                      nombrePorResp,
+                    )
+                    return sug ? <p className="mt-1 text-xs italic text-tierra">💡 {sug}</p> : null
+                  })()}
                   <form action={devolverAlBancoAccion} className="mt-1">
                     <input type="hidden" name="tareaId" value={t.id} />
                     <button className="text-xs text-tierra hover:underline">↩️ Devolver al banco</button>
