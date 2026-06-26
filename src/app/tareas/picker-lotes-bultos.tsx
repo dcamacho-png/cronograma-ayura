@@ -7,9 +7,9 @@ type Lote = { id: string; nombre: string; finca: { nombre: string } }
 // Selector de varios lotes con cantidad de bultos por lote. Envía un <input name="loteId">
 // por lote marcado y, si tiene cantidad, <input name="bultos_<id>">. La selección persiste
 // aunque se cambie de finca (estado por id de lote).
-export function PickerLotesBultos({ lotes }: { lotes: Lote[] }) {
+export function PickerLotesBultos({ lotes, seleccionInicial = {} }: { lotes: Lote[]; seleccionInicial?: Record<string, string> }) {
   const [finca, setFinca] = useState('')
-  const [sel, setSel] = useState<Record<string, string>>({}) // loteId -> bultos (texto); presencia = marcado
+  const [sel, setSel] = useState<Record<string, string>>(seleccionInicial) // loteId -> bultos (texto); presencia = marcado
 
   const fincas = [...new Set(lotes.map((l) => l.finca.nombre))].sort()
   const filtrados = finca ? lotes.filter((l) => l.finca.nombre === finca) : []

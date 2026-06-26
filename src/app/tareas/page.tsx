@@ -219,6 +219,7 @@ export default async function TareasPage({
                       estipuladas={estipuladas}
                       lotes={lotes}
                       lotesActuales={s.lotes}
+                      bultosActuales={s.bultosPorLote as Record<string, number> | null}
                       accion={editarSolicitudAccion}
                     />
                     <FormEliminar accion={eliminarTareaAccion} id={s.id} etiqueta={s.descripcion} />

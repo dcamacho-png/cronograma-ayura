@@ -88,7 +88,7 @@ export function FormSolicitar({
       ) : (
         <>
           <label className="flex flex-col text-sm">
-            Descripción
+            Actividad
             <input name="descripcion" placeholder="Ej: pasar renovador en lote X" className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
           </label>
           <label className="flex flex-col text-sm">

@@ -19,6 +19,7 @@ export function FormEditarSolicitud({
   estipuladas,
   lotes,
   lotesActuales,
+  bultosActuales,
   accion,
 }: {
   id: string
@@ -30,9 +31,13 @@ export function FormEditarSolicitud({
   responsablesB: { id: string; nombre: string }[]
   estipuladas: Estipulada[]
   lotes: Lote[]
-  lotesActuales: { nombre: string }[]
+  lotesActuales: { id: string; nombre: string }[]
+  bultosActuales: Record<string, number> | null
   accion: (formData: FormData) => void | Promise<void>
 }) {
+  const seleccionBultos = Object.fromEntries(
+    lotesActuales.map((l) => [l.id, bultosActuales?.[l.id] != null ? String(bultosActuales[l.id]) : '']),
+  )
   const [abierto, setAbierto] = useState(false)
   if (!abierto) {
     return (
@@ -55,7 +60,7 @@ export function FormEditarSolicitud({
         </label>
       ) : (
         <label className="flex flex-col text-xs">
-          Descripción
+          Actividad
           <input name="descripcion" defaultValue={descripcion} className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
         </label>
       )}
@@ -67,10 +72,12 @@ export function FormEditarSolicitud({
         Finca y lote
         {lotesActuales.length > 0 && (
           <span className="text-xs text-tierra">
-            Lotes actuales: {lotesActuales.map((l) => l.nombre).join(', ')} (elige nuevos solo si quieres reemplazarlos)
+            Lotes actuales (ya seleccionados): {lotesActuales.map((l) => l.nombre).join(', ')}
           </span>
         )}
-        {esMaquinaria ? <PickerLotesBultos lotes={lotes} /> : <SelectFincaLote lotes={lotes} name="loteId" />}
+        {esMaquinaria
+          ? <PickerLotesBultos lotes={lotes} seleccionInicial={seleccionBultos} />
+          : <SelectFincaLote lotes={lotes} name="loteId" valorInicial={lotesActuales[0]?.id ?? ''} />}
       </label>
       <div className="flex flex-col gap-1 text-xs">
         <span>Día sugerido</span>

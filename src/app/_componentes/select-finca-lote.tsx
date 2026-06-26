@@ -14,13 +14,18 @@ export function SelectFincaLote({
   name = 'loteId',
   required = false,
   multiple = false,
+  valorInicial = '',
 }: {
   lotes: Lote[]
   name?: string
   required?: boolean
   multiple?: boolean
+  // Solo modo simple: id de lote a preseleccionar (deriva la finca automáticamente).
+  valorInicial?: string
 }) {
-  const [finca, setFinca] = useState('')
+  const fincaInicial = valorInicial ? (lotes.find((l) => l.id === valorInicial)?.finca.nombre ?? '') : ''
+  const [finca, setFinca] = useState(fincaInicial)
+  const [lote, setLote] = useState(valorInicial)
 
   const fincas = [...new Set(lotes.map((l) => l.finca.nombre))].sort()
   const filtrados = finca ? lotes.filter((l) => l.finca.nombre === finca) : []
@@ -29,7 +34,7 @@ export function SelectFincaLote({
     <div className="flex flex-col gap-1">
       <select
         value={finca}
-        onChange={(e) => setFinca(e.target.value)}
+        onChange={(e) => { setFinca(e.target.value); setLote('') }}
         className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
       >
         <option value="">— elegir finca —</option>
@@ -43,6 +48,7 @@ export function SelectFincaLote({
         multiple={multiple}
         size={multiple ? 6 : undefined}
         disabled={!finca}
+        {...(multiple ? {} : { value: lote, onChange: (e) => setLote(e.target.value) })}
         className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40 disabled:bg-arena disabled:text-tierra/60"
       >
         {!multiple && (
