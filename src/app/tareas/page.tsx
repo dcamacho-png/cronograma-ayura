@@ -16,7 +16,10 @@ import { InfoLotes } from '../_componentes/info-lotes'
 import { SelectFincaLote } from '../_componentes/select-finca-lote'
 import { FormNuevaTareaMaquinaria } from './form-nueva-tarea-maquinaria'
 import { FormSolicitar } from './form-solicitar'
-import { crearTareaAccion, eliminarTareaAccion, programarTareaAccion, crearSolicitudAccion, devolverAlSolicitanteAccion, reenviarSolicitudAccion } from './acciones'
+import { crearTareaAccion, eliminarTareaAccion, programarTareaAccion, crearSolicitudAccion, devolverAlSolicitanteAccion, reenviarSolicitudAccion, editarSolicitudAccion } from './acciones'
+import { FormEditarSolicitud } from './form-editar-solicitud'
+import { FormEliminar } from './form-eliminar'
+import { parseCsv } from '@/dominio/sugerencia'
 
 export default async function TareasPage({
   searchParams,
@@ -158,9 +161,10 @@ export default async function TareasPage({
                     <button className="rounded-lg bg-bosque px-3 py-1 text-sm font-semibold text-white">Guardar</button>
                   </form>
                   {t.solicitadaPorArea ? (
-                    <form action={devolverAlSolicitanteAccion}>
+                    <form action={devolverAlSolicitanteAccion} className="flex items-center gap-1">
                       <input type="hidden" name="id" value={t.id} />
-                      <button className="text-sm text-amber-700 hover:underline">↩️ Devolver al solicitante</button>
+                      <input name="observacion" placeholder="motivo (opcional)" className="w-44 rounded-lg border border-borde bg-marfil px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-bosque/40" />
+                      <button className="text-sm text-amber-700 hover:underline">↩️ Devolver</button>
                     </form>
                   ) : (
                     <form action={eliminarTareaAccion}>
@@ -195,11 +199,29 @@ export default async function TareasPage({
                 {s.detalle && (
                   <div className="mt-1 whitespace-pre-line text-xs text-tierra">📝 {s.detalle}</div>
                 )}
+                {s.estado === 'DEVUELTA' && s.observacionDevolucion && (
+                  <div className="mt-1 text-xs italic text-tierra">Obs.: {s.observacionDevolucion}</div>
+                )}
                 {s.estado === 'DEVUELTA' && (
-                  <form action={reenviarSolicitudAccion} className="mt-1">
-                    <input type="hidden" name="id" value={s.id} />
-                    <button className="text-xs font-semibold text-arcilla hover:underline">Reenviar</button>
-                  </form>
+                  <div className="mt-1 flex flex-wrap items-center gap-3">
+                    <form action={reenviarSolicitudAccion}>
+                      <input type="hidden" name="id" value={s.id} />
+                      <button className="text-xs font-semibold text-arcilla hover:underline">Reenviar</button>
+                    </form>
+                    <FormEditarSolicitud
+                      id={s.id}
+                      esMaquinaria={s.area.maqTareas}
+                      descripcion={s.descripcion}
+                      detalle={s.detalle}
+                      diasSeleccion={parseCsv(s.diasSugeridos)}
+                      responsablesSeleccion={parseCsv(s.responsablesSugeridosIds)}
+                      responsablesB={responsablesPorArea[s.areaId] ?? []}
+                      estipuladas={estipuladas}
+                      lotes={lotes}
+                      accion={editarSolicitudAccion}
+                    />
+                    <FormEliminar accion={eliminarTareaAccion} id={s.id} etiqueta={s.descripcion} />
+                  </div>
                 )}
               </li>
             ))}
