@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { usuarioActual } from '@/auth/sesion'
 import { puedeVer } from '@/auth/permisos'
 import { listarAreas, listarMotivos, listarActividades, listarLotes, listarMaquinas, listarResponsablesPorArea, listarActividadesEstipuladas } from '@/datos/repositorio'
-import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana } from '@/dominio/semana'
+import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, plazoCumplimientoVencido } from '@/dominio/semana'
 import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
 import { unidadDe, unidadAbreviada } from '@/dominio/unidad'
 import { textoLotesHechos } from '@/dominio/lotes-hechos'
@@ -65,6 +65,8 @@ export default async function CumplimientoPage({
   const semanaRaw = Number(sp.semana)
   const anio = sp.anio && Number.isInteger(anioRaw) ? anioRaw : hoy.anio
   const semana = sp.semana && Number.isInteger(semanaRaw) ? semanaRaw : hoy.semana
+  // Una semana queda en solo lectura para las áreas una vez vencido el plazo (fin del domingo).
+  const bloqueado = !esAdmin && plazoCumplimientoVencido(anio, semana, hoy)
 
   const [motivos, actividades, lotes, maquinas, responsablesTodos, estipuladas] = await Promise.all([
     listarMotivos(),
@@ -158,7 +160,13 @@ export default async function CumplimientoPage({
         </div>
       )}
 
-      {responsables.length > 0 && (
+      {bloqueado && (
+        <div className="mb-5 rounded-lg border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-800">
+          ⛔ Plazo vencido: el cumplimiento de esta semana ya no se puede modificar. Solo el administrador puede hacer cambios.
+        </div>
+      )}
+
+      {responsables.length > 0 && !bloqueado && (
         <FormActividadRealizada
           areaId={areaId}
           anio={anio}
@@ -226,7 +234,9 @@ export default async function CumplimientoPage({
                           <li key={a.id} className="flex flex-col gap-1">
                             {multiResp && <span className="text-xs text-tierra">{a.responsable.nombre}</span>}
                             {a.estado === 'PENDIENTE' ? (
-                              esMaquinaria ? (
+                              bloqueado ? (
+                                <span className="text-sm text-tierra">Pendiente (plazo vencido)</span>
+                              ) : esMaquinaria ? (
                                 <DiaMaquinaria
                                   actividadId={a.id}
                                   unidad={unidad}
@@ -278,16 +288,18 @@ export default async function CumplimientoPage({
                                 {textoLotesHechos(a.lotes, a.lotesHechos as string[] | null) && (
                                   <span className="text-tierra">· ✅ Realizados: {textoLotesHechos(a.lotes, a.lotesHechos as string[] | null)}</span>
                                 )}
-                                <form action={desmarcarAccion} className="ml-auto">
-                                  <input type="hidden" name="id" value={a.id} />
-                                  <button className="text-xs text-tierra underline hover:text-tinta">↩ desmarcar</button>
-                                </form>
+                                {!bloqueado && (
+                                  <form action={desmarcarAccion} className="ml-auto">
+                                    <input type="hidden" name="id" value={a.id} />
+                                    <button className="text-xs text-tierra underline hover:text-tinta">↩ desmarcar</button>
+                                  </form>
+                                )}
                               </div>
                               {/* Resumen de avances (solo lectura): visible en cualquier estado no-pendiente con avances. */}
                               {resumenAvances && (
                                 <span className="mt-1 text-sm text-tierra">Avances: {resumenAvances}</span>
                               )}
-                              {a.estado === 'PARCIAL' && (
+                              {a.estado === 'PARCIAL' && !bloqueado && (
                                 <div className="mt-1 flex w-full flex-col gap-1 text-sm">
                                   {a.lotes.length > 0 && (
                                     <span className="text-tierra">
