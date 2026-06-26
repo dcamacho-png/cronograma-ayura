@@ -4,6 +4,7 @@ import { usuarioActual } from '@/auth/sesion'
 import { puedeVer } from '@/auth/permisos'
 import { listarAreas, listarMotivos, listarActividades, listarLotes, listarMaquinas, listarResponsablesPorArea, listarActividadesEstipuladas } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana } from '@/dominio/semana'
+import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
 import { unidadDe, unidadAbreviada } from '@/dominio/unidad'
 import { textoLotesHechos } from '@/dominio/lotes-hechos'
 import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, responsablesDistintos, conteoEstadoActividades, tieneDiaPendiente } from '@/dominio/metricas'
@@ -58,7 +59,7 @@ export default async function CumplimientoPage({
     ? (sp.area && areas.some((a) => a.id === sp.area) ? sp.area : areas[0].id)
     : (u.areaId && areas.some((a) => a.id === u.areaId) ? u.areaId : areas[0].id)
   const areaActual = areas.find((a) => a.id === areaId)!
-  const esMaquinaria = areaActual.nombre.toLowerCase().includes('maquinaria')
+  const esMaquinaria = esMaquinariaVar(areaActual, 'cumplimiento')
   const hoy = semanaActual()
   const anioRaw = Number(sp.anio)
   const semanaRaw = Number(sp.semana)

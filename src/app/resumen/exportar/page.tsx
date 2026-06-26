@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { usuarioActual } from '@/auth/sesion'
 import { listarAreas, listarResponsablesPorArea, listarMotivos, listarActividades, listarActividadesEstipuladas } from '@/datos/repositorio'
 import { semanaActual } from '@/dominio/semana'
+import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
 import { ResumenArea } from '../resumen-area'
 import { AutoImprimir } from '../../_componentes/auto-imprimir'
 
@@ -23,8 +24,6 @@ export default async function ExportarResumenPage({
   const areas = await listarAreas()
   const estipuladas = await listarActividadesEstipuladas()
   const unidadPorNombre = Object.fromEntries(estipuladas.map((e) => [e.nombre, e.unidad]))
-  const esMaquinaria = (nombre: string) => nombre.toLowerCase().includes('maquinaria')
-
   // Modo "todas las áreas": solo ADMIN.
   if (sp.todas === '1') {
     if (u.rol !== 'ADMIN') redirect('/resumen')
@@ -47,7 +46,7 @@ export default async function ExportarResumenPage({
                 areaNombre={area.nombre}
                 semana={semana}
                 anio={anio}
-                esMaquinaria={esMaquinaria(area.nombre)}
+                esMaquinaria={esMaquinariaVar(area, 'resumen')}
                 unidadPorNombre={unidadPorNombre}
                 actividades={actividades}
                 responsables={responsables}
@@ -80,7 +79,7 @@ export default async function ExportarResumenPage({
         areaNombre={area.nombre}
         semana={semana}
         anio={anio}
-        esMaquinaria={esMaquinaria(area.nombre)}
+        esMaquinaria={esMaquinariaVar(area, 'resumen')}
         unidadPorNombre={unidadPorNombre}
         actividades={actividades}
         responsables={responsables}

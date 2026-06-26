@@ -7,26 +7,24 @@ import { usaBultos } from '@/dominio/bultos'
 
 type Lote = { id: string; nombre: string; finca: { nombre: string } }
 type Estipulada = { id: string; nombre: string }
-type Area = { id: string; nombre: string }
+type Area = { id: string; nombre: string; maqTareas: boolean }
 
 export function FormSolicitar({
   solicitanteAreaId,
   areas,
-  maquinariaAreaId,
   estipuladas,
   lotes,
   accion,
 }: {
   solicitanteAreaId: string
   areas: Area[]
-  maquinariaAreaId: string
   estipuladas: Estipulada[]
   lotes: Lote[]
   accion: (formData: FormData) => void | Promise<void>
 }) {
   const [areaEjecutoraId, setAreaEjecutoraId] = useState('')
   const [estipulada, setEstipulada] = useState('')
-  const esMaquinaria = areaEjecutoraId !== '' && areaEjecutoraId === maquinariaAreaId
+  const esMaquinaria = areas.find((a) => a.id === areaEjecutoraId)?.maqTareas ?? false
   const conBultos = usaBultos(estipulada)
 
   return (

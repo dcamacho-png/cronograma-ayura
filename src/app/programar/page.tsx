@@ -10,6 +10,7 @@ import {
   listarMaquinas,
 } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, esSemanaFutura, diaActual, esDiaPasado } from '@/dominio/semana'
+import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
 import { asignarTareaAccion, devolverAlBancoAccion } from './acciones'
 import { AsignarTareaForm } from './asignar-tarea-form'
 import { GrillaSemana } from './grilla-semana'
@@ -56,7 +57,7 @@ export default async function ProgramarPage({
     tareasPorAsignar(areaId, anio, semana),
     listarMaquinas(),
   ])
-  const esMaquinaria = areaActual.nombre.toLowerCase().includes('maquinaria')
+  const esMaquinaria = esMaquinariaVar(areaActual, 'programar')
   const responsablesActivos = responsables.filter((r) => r.activo)
   const actividadesCronograma = actividades.filter((a) => !a.noProgramada)
   // Ocupación en la semana: máquina y responsable usados en cada día+turno.

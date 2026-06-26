@@ -8,6 +8,7 @@ import {
   listarSolicitudesDeArea,
 } from '@/datos/repositorio'
 import { semanaActual, siguienteSemana } from '@/dominio/semana'
+import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
 import { usuarioActual } from '@/auth/sesion'
 import { puedeVer } from '@/auth/permisos'
 import { InfoLotes } from '../_componentes/info-lotes'
@@ -38,9 +39,7 @@ export default async function TareasPage({
     ? (sp.area && areas.some((a) => a.id === sp.area) ? sp.area : areas[0].id)
     : (u.areaId && areas.some((a) => a.id === u.areaId) ? u.areaId : areas[0].id)
   const areaActual = areas.find((a) => a.id === areaId)!
-  const esMaquinaria = areaActual.nombre.toLowerCase().includes('maquinaria')
-  const maquinariaArea = areas.find((a) => a.nombre.toLowerCase().includes('maquinaria'))
-  const maquinariaAreaId = maquinariaArea?.id ?? ''
+  const esMaquinaria = esMaquinariaVar(areaActual, 'tareas')
 
   const [tareas, estipuladas, lotes, solicitudes] = await Promise.all([
     listarTareasPendientes(areaId),
@@ -100,8 +99,7 @@ export default async function TareasPage({
         </div>
         <FormSolicitar
           solicitanteAreaId={areaId}
-          areas={areas}
-          maquinariaAreaId={maquinariaAreaId}
+          areas={areas.map((a) => ({ id: a.id, nombre: a.nombre, maqTareas: a.maqTareas }))}
           estipuladas={estipuladas}
           lotes={lotes}
           accion={crearSolicitudAccion}
