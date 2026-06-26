@@ -129,6 +129,9 @@ model Tarea {
   lotes       Lote[]      @relation("TareaLotesMulti")
   bultosPorLote Json?
   detalle String?
+  observacionDevolucion String?
+  diasSugeridos String?
+  responsablesSugeridosIds String?
 
   actividades Actividad[]
 
