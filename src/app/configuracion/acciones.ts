@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, setResponsableActivo, crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, crearLote, eliminarLote, crearUsuario, cambiarContrasena, eliminarUsuario, BloqueoError, setPantallasUsuario, setVariantesArea } from '@/datos/repositorio'
+import { usuarioActual } from '@/auth/sesion'
 
 function texto(form: FormData, clave: string): string {
   const v = form.get(clave)
@@ -24,6 +25,8 @@ function mensajeError(e: unknown): string {
 
 // Ejecuta la operación y redirige a /configuracion con un aviso de éxito o error.
 async function correr(fn: () => Promise<unknown>, okMsg: string): Promise<never> {
+  const u = await usuarioActual()
+  if (!u || u.rol !== 'ADMIN') redirect('/')
   let url: string
   try {
     await fn()
