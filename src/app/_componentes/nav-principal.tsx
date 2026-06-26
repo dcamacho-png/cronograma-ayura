@@ -6,12 +6,12 @@ import { usePathname } from 'next/navigation'
 import { cerrarSesionAccion } from '@/app/login/acciones'
 import { seccionesVisibles } from './secciones'
 
-export function NavPrincipal({ usuario }: { usuario: { nombre: string; rol: string } | null }) {
+export function NavPrincipal({ usuario }: { usuario: { nombre: string; rol: string; pantallas: string | null } | null }) {
   const ruta = usePathname()
   const [abierto, setAbierto] = useState(false)
 
   const enlaces = usuario
-    ? [{ href: '/', texto: 'Inicio', icono: '🏠' }, ...seccionesVisibles(usuario.rol)]
+    ? [{ href: '/', texto: 'Inicio', icono: '🏠' }, ...seccionesVisibles({ rol: usuario.rol, pantallas: usuario.pantallas })]
     : []
 
   const claseEnlace = (href: string) =>

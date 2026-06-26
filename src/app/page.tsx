@@ -7,7 +7,7 @@ import { seccionesVisibles } from './_componentes/secciones'
 export default async function Home() {
   const u = await usuarioActual()
   if (!u) redirect('/login')
-  const secciones = seccionesVisibles(u.rol)
+  const secciones = seccionesVisibles({ rol: u.rol, pantallas: u.pantallas })
   const hoy = semanaActual()
 
   return (

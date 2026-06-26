@@ -31,7 +31,7 @@ export default async function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <NavPrincipal usuario={u ? { nombre: u.nombre, rol: u.rol } : null} />
+        <NavPrincipal usuario={u ? { nombre: u.nombre, rol: u.rol, pantallas: u.pantallas } : null} />
         {children}
       </body>
     </html>

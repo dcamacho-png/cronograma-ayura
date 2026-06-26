@@ -1,22 +1,21 @@
 import { describe, it, expect } from 'vitest'
-import { SECCIONES, seccionesVisibles } from './secciones'
+import { seccionesVisibles } from './secciones'
 
 describe('seccionesVisibles', () => {
-  it('ADMIN ve todas las secciones', () => {
-    expect(seccionesVisibles('ADMIN')).toEqual(SECCIONES)
-    expect(seccionesVisibles('ADMIN')).toHaveLength(6)
+  it('AREA por defecto ve 4 (sin tablero ni configuracion)', () => {
+    const claves = seccionesVisibles({ rol: 'AREA', pantallas: null }).map((s) => s.clave)
+    expect(claves.sort()).toEqual(['cumplimiento', 'programar', 'resumen', 'tareas'])
   })
 
-  it('AREA no ve Tablero ni Configuración', () => {
-    const v = seccionesVisibles('AREA')
-    const hrefs = v.map((s) => s.href)
-    expect(hrefs).not.toContain('/tablero')
-    expect(hrefs).not.toContain('/configuracion')
-    expect(v).toHaveLength(4)
+  it('ADMIN ve también tablero y configuracion', () => {
+    const claves = seccionesVisibles({ rol: 'ADMIN', pantallas: null }).map((s) => s.clave)
+    expect(claves).toContain('tablero')
+    expect(claves).toContain('configuracion')
   })
 
-  it('cualquier rol no-admin excluye las soloAdmin', () => {
-    const v = seccionesVisibles('OTRO')
-    expect(v.every((s) => !s.soloAdmin)).toBe(true)
+  it('AREA con tablero concedido lo ve', () => {
+    const claves = seccionesVisibles({ rol: 'AREA', pantallas: 'tareas,tablero' }).map((s) => s.clave)
+    expect(claves).toContain('tablero')
+    expect(claves).not.toContain('configuracion')
   })
 })
