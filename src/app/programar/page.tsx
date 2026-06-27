@@ -181,7 +181,7 @@ export default async function ProgramarPage({
           )}
         </div>
       )}
-      <div id="grilla-export" className="mb-6">
+      <div className="mb-6">
         <GrillaSemana
           areaNombre={areaActual.nombre}
           anio={anio}
@@ -192,6 +192,23 @@ export default async function ProgramarPage({
           turnoEditable={futura}
           esMaquinaria={esMaquinaria}
         />
+      </div>
+      {/* Grilla SOLO para exportar como imagen: recortada (h-0 overflow-hidden) para no
+          ocupar espacio ni afectar la pantalla. html2canvas (BotonDescargarImagen) clona
+          este #grilla-export y lo renderiza a tamaño completo igualmente. */}
+      <div aria-hidden="true" className="h-0 overflow-hidden">
+        <div id="grilla-export">
+          <GrillaSemana
+            areaNombre={areaActual.nombre}
+            anio={anio}
+            semana={semana}
+            fechas={fechas}
+            responsables={responsablesActivos}
+            actividades={actividadesCronograma}
+            esMaquinaria={esMaquinaria}
+            paraExportar
+          />
+        </div>
       </div>
     </main>
   )
