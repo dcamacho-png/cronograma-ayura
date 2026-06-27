@@ -533,6 +533,177 @@ export async function devolverAlBanco(actividadId: string) {
   })
 }
 
+// ---- Cumplimiento a nivel de ACTIVIDAD (grupo tareaId), versión estándar ----
+
+// Filas hermanas: todas las de la misma (tareaId, anio, semana). A partir de un id
+// representativo. Sin tareaId, el grupo es solo esa fila. Incluye lotes (compartidos).
+async function filasHermanas(id: string) {
+  const base = await prisma.actividad.findUnique({ where: { id }, include: { lotes: true } })
+  if (!base) return null
+  if (!base.tareaId) return { base, filas: [base] }
+  const filas = await prisma.actividad.findMany({
+    where: { tareaId: base.tareaId, anio: base.anio, semana: base.semana },
+    include: { lotes: true },
+  })
+  return { base, filas }
+}
+
+// Agrega un avance por lote a TODA la actividad: mismo avancePorLote consolidado en
+// cada fila del grupo; todas quedan PARCIAL. Solo afecta filas PENDIENTE/PARCIAL.
+export async function registrarAvanceLoteGrupo(
+  id: string,
+  dia: number,
+  maquinaId: string | null,
+  avances: { loteId: string; cantidad: number }[],
+) {
+  const g = await filasHermanas(id)
+  if (!g) return null
+  const actual = agregarAvances(
+    normalizarAvancePorLote(g.base.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null),
+    dia,
+    maquinaId,
+    avances,
+  )
+  await prisma.$transaction(
+    g.filas
+      .filter((f) => f.estado === 'PENDIENTE' || f.estado === 'PARCIAL')
+      .map((f) =>
+        prisma.actividad.update({
+          where: { id: f.id },
+          data: { avancePorLote: actual as Prisma.InputJsonValue, estado: 'PARCIAL' },
+        }),
+      ),
+  )
+  return true
+}
+
+// Avance "genérico" (actividad SIN lotes): guarda la observación en nota de todas las
+// filas y las deja PARCIAL. Editable (sobrescribe la nota previa).
+export async function registrarAvanceObservacionGrupo(id: string, nota: string) {
+  const g = await filasHermanas(id)
+  if (!g) return null
+  await prisma.$transaction(
+    g.filas
+      .filter((f) => f.estado === 'PENDIENTE' || f.estado === 'PARCIAL')
+      .map((f) =>
+        prisma.actividad.update({ where: { id: f.id }, data: { nota, estado: 'PARCIAL' } }),
+      ),
+  )
+  return true
+}
+
+// Cierra la actividad: todas las filas no cumplidas pasan a CUMPLIDA. Si hay lotes,
+// haRealizada = suma de avances de los lotes vigentes (igual en todas las filas).
+export async function marcarCumplidaGrupo(id: string) {
+  const g = await filasHermanas(id)
+  if (!g) return null
+  const total = totalAvanceLotes(
+    g.base.lotes,
+    normalizarAvancePorLote(g.base.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null),
+  )
+  const tieneLotes = g.base.lotes.length > 0
+  await prisma.$transaction(
+    g.filas
+      .filter((f) => f.estado !== 'CUMPLIDA')
+      .map((f) =>
+        prisma.actividad.update({
+          where: { id: f.id },
+          data: { estado: 'CUMPLIDA', ...(tieneLotes ? { haRealizada: total } : {}) },
+        }),
+      ),
+  )
+  return true
+}
+
+// Novedad de la actividad completa: aplica estado (NO_CUMPLIDA/PARCIAL/REPROGRAMADA) +
+// motivo/nota a todas las filas. Para No cumplida/Reprogramada devuelve la tarea al banco
+// (toda la actividad es una sola novedad). Cambio de actividad: crea UNA actividad de
+// reemplazo (cumplida) con el día/responsable de la fila base.
+export async function registrarNovedadGrupo(
+  id: string,
+  estado: string,
+  motivoId: string | null,
+  nota: string | null,
+  reemplazo?: { descripcion: string; loteId: string | null } | null,
+  lotesHechos: string[] = [],
+) {
+  const g = await filasHermanas(id)
+  if (!g) return null
+  const notaFinal = reemplazo ? `Cambiada por: ${reemplazo.descripcion}` : nota
+  let fincaId: string | null = null
+  if (reemplazo?.loteId) {
+    const lote = await prisma.lote.findUnique({ where: { id: reemplazo.loteId } })
+    fincaId = lote?.fincaId ?? null
+  }
+  await prisma.$transaction(async (tx) => {
+    for (const f of g.filas) {
+      if (f.estado === 'CUMPLIDA') continue
+      await tx.actividad.update({
+        where: { id: f.id },
+        data: {
+          estado,
+          motivoId,
+          nota: notaFinal,
+          ...(lotesHechos.length ? { lotesHechos: lotesHechos as Prisma.InputJsonValue } : {}),
+        },
+      })
+    }
+    if ((estado === 'NO_CUMPLIDA' || estado === 'REPROGRAMADA') && g.base.tareaId) {
+      await tx.tarea.update({
+        where: { id: g.base.tareaId },
+        data: {
+          estado: 'PENDIENTE',
+          anioSel: null,
+          semanaSel: null,
+          vecesReprogramada: g.base.vecesReprogramada + 1,
+        },
+      })
+    }
+    if (reemplazo?.descripcion) {
+      await tx.actividad.create({
+        data: {
+          anio: g.base.anio,
+          semana: g.base.semana,
+          dia: g.base.dia,
+          descripcion: reemplazo.descripcion,
+          turno: g.base.turno,
+          estado: 'CUMPLIDA',
+          areaId: g.base.areaId,
+          fincaId,
+          responsableId: g.base.responsableId,
+          nota: `En reemplazo de: ${g.base.descripcion}`,
+          lotes: reemplazo.loteId ? { connect: [{ id: reemplazo.loteId }] } : undefined,
+        },
+      })
+    }
+  })
+  return true
+}
+
+// Desmarca toda la actividad: todas las filas vuelven a PENDIENTE y se limpia lo
+// capturado (medida, centro de costo, motivo, nota, potreros, avances).
+export async function reabrirGrupo(id: string) {
+  const g = await filasHermanas(id)
+  if (!g) return null
+  await prisma.$transaction(
+    g.filas.map((f) =>
+      prisma.actividad.update({
+        where: { id: f.id },
+        data: {
+          estado: 'PENDIENTE',
+          haRealizada: null,
+          centroCosto: null,
+          motivoId: null,
+          nota: null,
+          lotesHechos: Prisma.DbNull,
+          avancePorLote: Prisma.DbNull,
+        },
+      }),
+    ),
+  )
+  return true
+}
+
 // Crea una solicitud: una tarea que ejecuta `areaEjecutoraId`, pedida por `solicitadaPorAreaId`.
 export function crearSolicitud(
   areaEjecutoraId: string,
