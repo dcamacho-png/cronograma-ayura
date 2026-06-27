@@ -7,15 +7,16 @@ import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, plazoCum
 import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
 import { unidadDe, unidadAbreviada } from '@/dominio/unidad'
 import { textoLotesHechos } from '@/dominio/lotes-hechos'
-import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, responsablesDistintos, conteoEstadoActividades, tieneDiaPendiente } from '@/dominio/metricas'
-import type { Actividad as ActividadDominio } from '@/dominio/tipos'
+import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, responsablesDistintos, conteoEstadoActividades, tieneDiaPendiente, estadoActividad } from '@/dominio/metricas'
+import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
 import { lotesPendientes, textoAvanceConFecha, normalizarAvancePorLote, totalAvanceLotes, type AvanceEntrada } from '@/dominio/avance-lote'
-import { registrarAccion, agregarActividadRealizadaAccion, marcarEstadoAccion, desmarcarAccion, registrarAvanceLoteAccion, devolverAlBancoAccion, marcarCumplidaParcialAccion } from './acciones'
+import { registrarAccion, agregarActividadRealizadaAccion, marcarEstadoAccion, desmarcarAccion, registrarAvanceLoteAccion, devolverAlBancoAccion, marcarCumplidaParcialAccion, registrarAvanceLoteActividadAccion, registrarAvanceObservacionAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion } from './acciones'
 import { FormActividadRealizada } from './form-actividad-realizada'
 import { FormAvanceLote } from './form-avance-lote'
 import { InfoLotes } from '../_componentes/info-lotes'
 import { DiaNoMaquinaria } from './dia-no-maquinaria'
 import { DiaMaquinaria } from './dia-maquinaria'
+import { ActividadEstandar } from './actividad-estandar'
 
 const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
@@ -188,6 +189,7 @@ export default async function CumplimientoPage({
         <ul className="space-y-4">
           {gruposActividad.map((dias) => {
             const cab = dias[0]
+            const estadoGrupo = estadoActividad(dias as unknown as { estado: Estado }[])
             const pctAct = porcentajeCumplimiento(dias as unknown as ActividadDominio[])
             const nDias = diasDistintos(dias)
             const multiResp = responsablesDistintos(dias) > 1
@@ -223,6 +225,7 @@ export default async function CumplimientoPage({
                 </div>
                 <InfoLotes lotes={cab.lotes} bultosPorLote={cab.bultosPorLote as Record<string, number> | null} className="mb-2" />
 
+                {esMaquinaria && (
                 <ul className="space-y-2">
                   {diasOrdenados.map(([dia, filas]) => (
                     <li key={dia} className="rounded-lg border border-borde bg-arena/40 p-2">
@@ -338,6 +341,73 @@ export default async function CumplimientoPage({
                     </li>
                   ))}
                 </ul>
+                )}
+
+                {!esMaquinaria && (() => {
+                  const avances = normalizarAvancePorLote(
+                    cab.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null,
+                  )
+                  const tieneAvances = Object.values(avances).some((es) => es.length > 0)
+                  const etiquetaDia = (d: number) =>
+                    `${DIAS[d] ?? ''} ${fechas[d - 1] ? fmtFecha(fechas[d - 1]) : ''}`.trim()
+                  const resumenAvances = textoAvanceConFecha(cab.lotes, avances, unidadAbreviada(unidad), etiquetaDia)
+                  const tieneLotes = cab.lotes.length > 0
+                  const interactivo = estadoGrupo === 'PENDIENTE' || estadoGrupo === 'PARCIAL'
+                  return (
+                    <div className="flex flex-col gap-2">
+                      {/* Estado/resumen (no PENDIENTE): solo lectura */}
+                      {estadoGrupo !== 'PENDIENTE' && (
+                        <div className="flex flex-wrap items-center gap-2 text-sm">
+                          <span className="font-semibold">{ESTADOS.find((e) => e.valor === estadoGrupo)?.etiqueta ?? estadoGrupo}</span>
+                          {(tieneAvances || cab.haRealizada != null) && (
+                            <span className="text-tierra">· {tieneAvances ? totalAvanceLotes(cab.lotes, avances) : cab.haRealizada} {unidadAbreviada(unidad)}</span>
+                          )}
+                          {cab.motivo && <span className="text-tierra">· {cab.motivo.nombre}</span>}
+                          {cab.nota && <span className="text-tierra">· {cab.nota}</span>}
+                          {textoLotesHechos(cab.lotes, cab.lotesHechos as string[] | null) && (
+                            <span className="text-tierra">· ✅ Realizados: {textoLotesHechos(cab.lotes, cab.lotesHechos as string[] | null)}</span>
+                          )}
+                          {estadoGrupo !== 'PARCIAL' && !bloqueado && (
+                            <form action={desmarcarActividadAccion} className="ml-auto">
+                              <input type="hidden" name="id" value={cab.id} />
+                              <button className="text-xs text-tierra underline hover:text-tinta">↩ desmarcar</button>
+                            </form>
+                          )}
+                        </div>
+                      )}
+                      {resumenAvances && (
+                        <span className="text-sm text-tierra">Avances: {resumenAvances}</span>
+                      )}
+                      {/* Controles interactivos (PENDIENTE/PARCIAL) */}
+                      {interactivo && (
+                        bloqueado ? (
+                          estadoGrupo === 'PENDIENTE' && (
+                            <span className="text-sm text-tierra">Pendiente (plazo vencido)</span>
+                          )
+                        ) : (
+                          <ActividadEstandar
+                            actividadId={cab.id}
+                            estado={estadoGrupo}
+                            unidad={unidad}
+                            dia={cab.dia}
+                            tieneLotes={tieneLotes}
+                            lotesActividad={cab.lotes}
+                            lotesCatalogo={lotes}
+                            estipuladas={estipuladas}
+                            motivos={motivos}
+                            motivoCambioId={motivoCambioId}
+                            nota={cab.nota}
+                            registrarAvanceLote={registrarAvanceLoteActividadAccion}
+                            registrarObservacion={registrarAvanceObservacionAccion}
+                            marcarCumplida={marcarCumplidaActividadAccion}
+                            registrarNovedad={registrarNovedadActividadAccion}
+                            devolverAlBanco={devolverAlBancoAccion}
+                          />
+                        )
+                      )}
+                    </div>
+                  )
+                })()}
               </li>
             )
           })}
