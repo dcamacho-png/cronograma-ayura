@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { marcarEstado, reprogramarActividad, registrarCumplimiento, crearActividadRealizada, reabrirActividad, registrarAvanceLote, devolverAlBanco, marcarCumplidaDesdeParcial, semanaDeActividad } from '@/datos/repositorio'
+import { marcarEstado, reprogramarActividad, registrarCumplimiento, crearActividadRealizada, reabrirActividad, registrarAvanceLote, devolverAlBanco, marcarCumplidaDesdeParcial, semanaDeActividad, registrarAvanceLoteGrupo, registrarAvanceObservacionGrupo, marcarCumplidaGrupo, registrarNovedadGrupo, reabrirGrupo } from '@/datos/repositorio'
 import { siguienteSemana, plazoCumplimientoVencido, semanaActual } from '@/dominio/semana'
 import { usuarioActual } from '@/auth/sesion'
 
@@ -151,5 +151,64 @@ export async function marcarCumplidaParcialAccion(form: FormData) {
   if (!id) return
   if (await bloqueadoPorPlazoActividad(id)) return
   await marcarCumplidaDesdeParcial(id)
+  revalidatePath('/cumplimiento')
+}
+
+// ---- Acciones a nivel de ACTIVIDAD (estándar). El `id` es una fila representativa. ----
+
+export async function registrarAvanceLoteActividadAccion(form: FormData) {
+  const id = texto(form, 'id')
+  const dia = Number(texto(form, 'dia'))
+  if (!id || !(dia >= 1 && dia <= 7)) return
+  if (await bloqueadoPorPlazoActividad(id)) return
+  const loteIds = form.getAll('loteAvance').map((v) => String(v))
+  const avances = loteIds
+    .map((loteId) => ({ loteId, cantidad: numeroOpcional(form, `cantidad_${loteId}`) ?? 0 }))
+    .filter((a) => a.cantidad > 0)
+  if (avances.length === 0) return
+  await registrarAvanceLoteGrupo(id, dia, null, avances)
+  revalidatePath('/cumplimiento')
+}
+
+export async function registrarAvanceObservacionAccion(form: FormData) {
+  const id = texto(form, 'id')
+  const nota = texto(form, 'nota')
+  if (!id || nota === '') return
+  if (await bloqueadoPorPlazoActividad(id)) return
+  await registrarAvanceObservacionGrupo(id, nota)
+  revalidatePath('/cumplimiento')
+}
+
+export async function marcarCumplidaActividadAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (!id) return
+  if (await bloqueadoPorPlazoActividad(id)) return
+  await marcarCumplidaGrupo(id)
+  revalidatePath('/cumplimiento')
+}
+
+export async function registrarNovedadActividadAccion(form: FormData) {
+  const id = texto(form, 'id')
+  const estado = texto(form, 'estado')
+  if (!id || !ESTADOS_VALIDOS.includes(estado) || estado === 'PENDIENTE' || estado === 'CUMPLIDA') return
+  const motivoId = textoOpcional(form, 'motivoId')
+  if (!motivoId) return
+  if (await bloqueadoPorPlazoActividad(id)) return
+  const nota = textoOpcional(form, 'nota')
+  const lotesHechos = form.getAll('loteHecho').map((v) => String(v))
+  // Cambio de actividad (estándar): descripción + lote, sin máquina/medida.
+  const reemplazoDesc = texto(form, 'reemplazoDescripcion')
+  const reemplazo = reemplazoDesc
+    ? { descripcion: reemplazoDesc, loteId: textoOpcional(form, 'reemplazoLoteId') }
+    : null
+  await registrarNovedadGrupo(id, estado, motivoId, nota, reemplazo, lotesHechos)
+  revalidatePath('/cumplimiento')
+}
+
+export async function desmarcarActividadAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (!id) return
+  if (await bloqueadoPorPlazoActividad(id)) return
+  await reabrirGrupo(id)
   revalidatePath('/cumplimiento')
 }
