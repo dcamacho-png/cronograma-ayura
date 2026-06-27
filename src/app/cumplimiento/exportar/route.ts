@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import ExcelJS from 'exceljs'
 import { usuarioActual } from '@/auth/sesion'
-import { listarAreas, listarActividades, listarActividadesEstipuladas, listarMaquinas } from '@/datos/repositorio'
+import { listarAreas, listarActividades, listarActividadesSolicitadas, listarActividadesEstipuladas, listarMaquinas } from '@/datos/repositorio'
 import { fechasDeSemana } from '@/dominio/semana'
-import { COLUMNAS_CUMPLIMIENTO, filasCumplimiento } from '@/dominio/cumplimiento-export'
+import { COLUMNAS_CUMPLIMIENTO, filasCumplimientoGrupo } from '@/dominio/cumplimiento-export'
+import { agruparPorActividad, estadoActividad } from '@/dominio/metricas'
+import type { Estado } from '@/dominio/tipos'
 import type { AvanceEntrada } from '@/dominio/avance-lote'
 import type { BultosPorLote } from '@/dominio/bultos'
 
@@ -30,8 +32,9 @@ export async function GET(req: NextRequest) {
     return new NextResponse('Parámetros inválidos', { status: 400 })
   }
 
-  const [actividades, estipuladas, maquinas] = await Promise.all([
+  const [actividades, solicitadas, estipuladas, maquinas] = await Promise.all([
     listarActividades(area.id, anio, semana),
+    listarActividadesSolicitadas(area.id, anio, semana),
     listarActividadesEstipuladas(),
     listarMaquinas(),
   ])
@@ -48,24 +51,39 @@ export async function GET(req: NextRequest) {
   header.font = { bold: true }
   const fechaDeDia = (dia: number) => (fechas[dia - 1] ? fmtFecha(fechas[dia - 1]) : '')
 
-  // Solo actividades cumplidas o parciales.
-  const filas = actividades.filter((a) => a.estado === 'CUMPLIDA' || a.estado === 'PARCIAL')
-  for (const a of filas) {
-    const fecha = fechaDeDia(a.dia)
-    for (const fila of filasCumplimiento(
-      {
-        ...a,
-        bultosPorLote: a.bultosPorLote as BultosPorLote | null,
-        lotesHechos: a.lotesHechos as string[] | null,
-        avancePorLote: a.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null,
-      },
-      fecha,
-      unidadPorNombre,
-      { fechaDeDia, nombreMaquina },
-    )) {
-      ws.addRow(fila)
+  // Una actividad es UNA sola aunque tenga varios responsables/días (filas hermanas con
+  // el mismo tareaId). Agrupamos por actividad y emitimos una fila representativa; el
+  // estado de la actividad es CUMPLIDA/PARCIAL si el grupo lo es.
+  const aExport = (a: (typeof actividades)[number] | (typeof solicitadas)[number]) => ({
+    ...a,
+    bultosPorLote: a.bultosPorLote as BultosPorLote | null,
+    lotesHechos: a.lotesHechos as string[] | null,
+    avancePorLote: a.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null,
+  })
+  const agregarGrupos = (
+    items: ((typeof actividades)[number] | (typeof solicitadas)[number])[],
+    ejecutadaPor: (grupo: typeof items) => string,
+  ) => {
+    for (const grupo of agruparPorActividad(items).values()) {
+      const e = estadoActividad(grupo.map((a) => ({ estado: a.estado as Estado })))
+      if (e !== 'CUMPLIDA' && e !== 'PARCIAL') continue
+      const fecha = fechaDeDia(grupo[0].dia)
+      for (const fila of filasCumplimientoGrupo(
+        grupo.map(aExport),
+        fecha,
+        unidadPorNombre,
+        { fechaDeDia, nombreMaquina },
+        ejecutadaPor(grupo),
+      )) {
+        ws.addRow(fila)
+      }
     }
   }
+
+  // Actividades propias del área.
+  agregarGrupos(actividades, () => '')
+  // Actividades que esta área solicitó a otra (ejecutadas por la otra área).
+  agregarGrupos(solicitadas, (grupo) => (grupo[0] as (typeof solicitadas)[number]).area.nombre)
 
   const buffer = await wb.xlsx.writeBuffer()
   const safe = area.nombre.replace(/[^\p{L}\p{N}]+/gu, '-')

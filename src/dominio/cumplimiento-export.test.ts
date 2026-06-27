@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { filasCumplimiento, COLUMNAS_CUMPLIMIENTO, type ActividadExport } from './cumplimiento-export'
+import { filasCumplimiento, filasCumplimientoGrupo, COLUMNAS_CUMPLIMIENTO, type ActividadExport } from './cumplimiento-export'
 
 const mapa: Record<string, string> = { ESTERCOLERO: 'hora', GRANEL: 'kg', ENCALADORA: 'ha' }
 const ctx = {
@@ -25,27 +25,32 @@ function act(p: Partial<ActividadExport>): ActividadExport {
 }
 
 describe('COLUMNAS_CUMPLIMIENTO', () => {
-  it('tiene las 12 columnas en el orden acordado (sin "Avance por lote")', () => {
+  it('tiene las 13 columnas en el orden acordado ("Ejecutada por" al final)', () => {
     expect([...COLUMNAS_CUMPLIMIENTO]).toEqual([
-      'Día', 'Fecha', 'Responsable', 'Actividad', 'Máquina', 'Lote(s)', 'Estado', 'Medida realizada', 'Unidad', 'Bultos por lote', 'Centro de costo', 'Potreros realizados',
+      'Día', 'Fecha', 'Responsable', 'Actividad', 'Máquina', 'Lote(s)', 'Estado', 'Medida realizada', 'Unidad', 'Bultos por lote', 'Centro de costo', 'Potreros realizados', 'Ejecutada por',
     ])
   })
 })
 
 describe('filasCumplimiento — sin avances (una fila, como antes)', () => {
-  it('actividad de ha con medida', () => {
+  it('actividad de ha con medida; "Ejecutada por" vacía cuando es propia', () => {
     expect(filasCumplimiento(act({}), '15 jun', mapa, ctx)).toEqual([
-      ['Lun', '15 jun', 'Ana', 'ENCALADORA', '6603', 'L1', 'Cumplida', 3, 'ha', '', '', ''],
+      ['Lun', '15 jun', 'Ana', 'ENCALADORA', '6603', 'L1', 'Cumplida', 3, 'ha', '', '', '', ''],
     ])
   })
   it('sin medida deja medida y unidad vacías; traduce el estado', () => {
     expect(filasCumplimiento(act({ haRealizada: null, estado: 'NO_CUMPLIDA' }), '', mapa, ctx)).toEqual([
-      ['Lun', '', 'Ana', 'ENCALADORA', '6603', 'L1', 'No cumplida', '', '', '', '', ''],
+      ['Lun', '', 'Ana', 'ENCALADORA', '6603', 'L1', 'No cumplida', '', '', '', '', '', ''],
     ])
   })
   it('descripción fuera del catálogo → ha; máquina y lotes vacíos; día 3 = Mié', () => {
     expect(filasCumplimiento(act({ descripcion: 'Algo libre', haRealizada: 2, maquina: null, lotes: [], dia: 3 }), '', mapa, ctx)).toEqual([
-      ['Mié', '', 'Ana', 'Algo libre', '', '', 'Cumplida', 2, 'ha', '', '', ''],
+      ['Mié', '', 'Ana', 'Algo libre', '', '', 'Cumplida', 2, 'ha', '', '', '', ''],
+    ])
+  })
+  it('rellena "Ejecutada por" con el área ejecutora cuando se pasa (actividad solicitada a otra área)', () => {
+    expect(filasCumplimiento(act({}), '15 jun', mapa, ctx, 'Maquinaria')).toEqual([
+      ['Lun', '15 jun', 'Ana', 'ENCALADORA', '6603', 'L1', 'Cumplida', 3, 'ha', '', '', '', 'Maquinaria'],
     ])
   })
 })
@@ -58,9 +63,9 @@ describe('filasCumplimiento — con avances (una fila por avance)', () => {
     })
     expect(filasCumplimiento(a, '15 jun', mapa, ctx)).toEqual([
       // máquina null → cae a la máquina de la actividad (6603)
-      ['Lun', 'D1', 'Ana', 'ENCALADORA', '6603', 'L1', 'Cumplida', 2, 'ha', '', '', ''],
+      ['Lun', 'D1', 'Ana', 'ENCALADORA', '6603', 'L1', 'Cumplida', 2, 'ha', '', '', '', ''],
       // máquina del avance → MAQ-m9
-      ['Mar', 'D2', 'Ana', 'ENCALADORA', 'MAQ-m9', 'L1', 'Cumplida', 3, 'ha', '', '', ''],
+      ['Mar', 'D2', 'Ana', 'ENCALADORA', 'MAQ-m9', 'L1', 'Cumplida', 3, 'ha', '', '', '', ''],
     ])
   })
   it('avances en dos lotes → filas en orden lote→día (según a.lotes), no según las claves del JSON', () => {
@@ -71,6 +76,52 @@ describe('filasCumplimiento — con avances (una fila por avance)', () => {
     const filas = filasCumplimiento(a, '15 jun', mapa, ctx)
     expect(filas.map((f) => [f[5], f[7]])).toEqual([['L1', 2], ['L2', 1]])
   })
+})
+
+describe('filasCumplimientoGrupo — una sola fila por actividad aunque tenga varios responsables', () => {
+  it('grupo de 2 responsables sin avances → UNA fila, nombres unidos, medida NO duplicada', () => {
+    // Las acciones de grupo consolidan la misma medida en cada hermana: aquí ambas
+    // traen haRealizada=3. El export debe mostrar 3 una sola vez, no 6.
+    const grupo = [
+      act({ responsable: { nombre: 'Ana' }, haRealizada: 3 }),
+      act({ responsable: { nombre: 'Beto' }, haRealizada: 3 }),
+    ]
+    expect(filasCumplimientoGrupo(grupo, '15 jun', mapa, ctx)).toEqual([
+      ['Lun', '15 jun', 'Ana, Beto', 'ENCALADORA', '6603', 'L1', 'Cumplida', 3, 'ha', '', '', '', ''],
+    ])
+  })
+
+  it('un solo responsable → igual que filasCumplimiento', () => {
+    const grupo = [act({})]
+    expect(filasCumplimientoGrupo(grupo, '15 jun', mapa, ctx)).toEqual(
+      filasCumplimiento(act({}), '15 jun', mapa, ctx),
+    )
+  })
+
+  it('estados mezclados entre hermanas → la actividad es Parcial', () => {
+    const grupo = [
+      act({ responsable: { nombre: 'Ana' }, estado: 'CUMPLIDA' }),
+      act({ responsable: { nombre: 'Beto' }, estado: 'PENDIENTE' }),
+    ]
+    const filas = filasCumplimientoGrupo(grupo, '15 jun', mapa, ctx)
+    expect(filas).toHaveLength(1)
+    expect(filas[0][6]).toBe('Parcial')        // Estado
+    expect(filas[0][2]).toBe('Ana, Beto')      // Responsable
+  })
+
+  it('propaga "Ejecutada por" (actividad solicitada a otra área)', () => {
+    const grupo = [act({ responsable: { nombre: 'Ana' } }), act({ responsable: { nombre: 'Beto' } })]
+    const filas = filasCumplimientoGrupo(grupo, '15 jun', mapa, ctx, 'Maquinaria')
+    expect(filas[0][12]).toBe('Maquinaria')
+  })
+
+  it('no repite responsables duplicados', () => {
+    const grupo = [act({ responsable: { nombre: 'Ana' } }), act({ responsable: { nombre: 'Ana' } })]
+    expect(filasCumplimientoGrupo(grupo, '15 jun', mapa, ctx)[0][2]).toBe('Ana')
+  })
+})
+
+describe('filasCumplimiento — con avances extra', () => {
   it('repite los datos de actividad (bultos, centro de costo, potreros) en cada fila de avance', () => {
     const a = act({
       lotes: [{ id: 'l1', nombre: 'L1' }, { id: 'l2', nombre: 'L2' }],
