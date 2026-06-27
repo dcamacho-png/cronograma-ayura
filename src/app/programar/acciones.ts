@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearResponsable, actualizarActividad, asignarTarea, quitarSeleccionTarea, devolverAAsignacion } from '@/datos/repositorio'
+import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearResponsable, actualizarActividad, asignarTarea, quitarSeleccionTarea, devolverAAsignacion, devolverGrillaAlBanco } from '@/datos/repositorio'
 import { semanaAnterior, esSemanaPasada, semanaActual, diaActual, esDiaPasado, esSemanaFutura } from '@/dominio/semana'
 
 const DIAS_CORTOS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
@@ -135,5 +135,15 @@ export async function devolverAAsignacionAccion(form: FormData) {
   if (!tareaId || !Number.isInteger(anio) || !Number.isInteger(semana)) return
   if (!esSemanaFutura(anio, semana, semanaActual())) return
   await devolverAAsignacion(tareaId, anio, semana)
+  revalidatePath('/programar')
+}
+
+export async function devolverGrillaAlBancoAccion(form: FormData) {
+  const tareaId = texto(form, 'tareaId')
+  const anio = Number(texto(form, 'anio'))
+  const semana = Number(texto(form, 'semana'))
+  if (!tareaId || !Number.isInteger(anio) || !Number.isInteger(semana)) return
+  if (!esSemanaFutura(anio, semana, semanaActual())) return
+  await devolverGrillaAlBanco(tareaId, anio, semana)
   revalidatePath('/programar')
 }

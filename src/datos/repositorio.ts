@@ -760,6 +760,17 @@ export async function devolverAAsignacion(tareaId: string, anio: number, semana:
   return prisma.tarea.update({ where: { id: tareaId }, data: { estado: 'PENDIENTE' } })
 }
 
+// Desde la grilla, en un solo paso: borra las actividades asignadas y devuelve la
+// tarea al banco (PENDIENTE, sin semana). Combina devolverAAsignacion + quitarSeleccion.
+// No cuenta como reprogramación: es planeación previa al inicio de la semana.
+export async function devolverGrillaAlBanco(tareaId: string, anio: number, semana: number) {
+  await prisma.actividad.deleteMany({ where: { tareaId, anio, semana } })
+  return prisma.tarea.update({
+    where: { id: tareaId },
+    data: { estado: 'PENDIENTE', anioSel: null, semanaSel: null },
+  })
+}
+
 // Maquinaria devuelve una tarea solicitada al área que la pidió (no la elimina).
 export function devolverAlSolicitante(id: string, observacion: string | null) {
   return prisma.tarea.update({

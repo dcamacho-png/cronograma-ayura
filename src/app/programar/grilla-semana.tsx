@@ -1,5 +1,5 @@
 import { InfoLotes } from '../_componentes/info-lotes'
-import { actualizarActividadAccion, devolverAAsignacionAccion } from './acciones'
+import { actualizarActividadAccion, devolverAAsignacionAccion, devolverGrillaAlBancoAccion } from './acciones'
 
 const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
 
@@ -88,12 +88,20 @@ export function GrillaSemana({
                             {a.maquina && <div className="text-xs text-tierra">🚜 {a.maquina.nombre}</div>}
                             <InfoLotes lotes={a.lotes} bultosPorLote={a.bultosPorLote as Record<string, number> | null} className="mt-1" />
                             {turnoEditable && a.tareaId && (
-                              <form action={devolverAAsignacionAccion} className="mt-0.5">
-                                <input type="hidden" name="tareaId" value={a.tareaId} />
-                                <input type="hidden" name="anio" value={anio} />
-                                <input type="hidden" name="semana" value={semana} />
-                                <button type="submit" className="text-xs text-amber-700 hover:underline">↩️ Devolver a asignar</button>
-                              </form>
+                              <>
+                                <form action={devolverAAsignacionAccion} className="mt-0.5">
+                                  <input type="hidden" name="tareaId" value={a.tareaId} />
+                                  <input type="hidden" name="anio" value={anio} />
+                                  <input type="hidden" name="semana" value={semana} />
+                                  <button type="submit" className="text-xs text-amber-700 hover:underline">↩️ Devolver a asignar</button>
+                                </form>
+                                <form action={devolverGrillaAlBancoAccion} className="mt-0.5">
+                                  <input type="hidden" name="tareaId" value={a.tareaId} />
+                                  <input type="hidden" name="anio" value={anio} />
+                                  <input type="hidden" name="semana" value={semana} />
+                                  <button type="submit" className="text-xs text-tierra hover:underline">↩️ Devolver al banco</button>
+                                </form>
+                              </>
                             )}
                           </div>
                         ))}
