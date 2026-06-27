@@ -43,6 +43,30 @@ export function listarActividades(areaId: string, anio: number, semana: number) 
   })
 }
 
+// Actividades que ESTE área solicitó a OTRA área (ejecutadas por la otra área).
+// Sirven para mostrar en el Excel del área solicitante el cumplimiento de lo que pidió.
+export function listarActividadesSolicitadas(areaId: string, anio: number, semana: number) {
+  return prisma.actividad.findMany({
+    where: {
+      anio,
+      semana,
+      areaId: { not: areaId },
+      tarea: { solicitadaPorAreaId: areaId },
+    },
+    include: {
+      responsable: true,
+      finca: true,
+      motivo: true,
+      maquina: true,
+      areaTarea: true,
+      area: true,
+      lotes: true,
+      _count: { select: { derivadas: true } },
+    },
+    orderBy: [{ dia: 'asc' }],
+  })
+}
+
 export function crearActividad(datos: BorradorActividad) {
   return prisma.actividad.create({ data: datos })
 }
@@ -604,7 +628,7 @@ export async function marcarCumplidaGrupo(id: string) {
   const tieneLotes = g.base.lotes.length > 0
   await prisma.$transaction(
     g.filas
-      .filter((f) => f.estado !== 'CUMPLIDA')
+      .filter((f) => f.estado === 'PENDIENTE' || f.estado === 'PARCIAL')
       .map((f) =>
         prisma.actividad.update({
           where: { id: f.id },
