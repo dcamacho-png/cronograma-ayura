@@ -33,6 +33,9 @@ export default async function ExportarPage({
 
   return (
     <main className="mx-auto max-w-6xl bg-white p-6 text-tinta">
+      {/* La hoja del cronograma sale horizontal (landscape) al imprimir/guardar PDF.
+          Acotado a esta ruta para no afectar otros PDF (p. ej. el resumen). */}
+      <style>{`@page { size: A4 landscape; margin: 10mm; }`}</style>
       <AutoImprimir />
       <h1 className="mb-4 text-2xl font-bold text-bosque print:hidden">
         Exportar cronogramas — Semana {semana}
