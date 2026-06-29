@@ -1,5 +1,6 @@
 import type { Actividad } from './tipos'
 import type { Unidad } from './unidad'
+import { agruparPorActividad, estadoActividad } from './metricas'
 
 export type ColorPorcentaje = 'gris' | 'verde' | 'amarillo' | 'rojo'
 
@@ -31,9 +32,16 @@ export function extremosFinalizadas(
   actividades: Actividad[],
 ): { mas: FilaFinalizadas | null; menos: FilaFinalizadas | null } {
   const conteo = new Map<string, number>()
+  // Todo responsable que aparezca arranca en 0 (para que "menos" pueda ser 0).
   for (const a of actividades) {
-    const prev = conteo.get(a.responsableId) ?? 0
-    conteo.set(a.responsableId, prev + (a.estado === 'CUMPLIDA' ? 1 : 0))
+    if (!conteo.has(a.responsableId)) conteo.set(a.responsableId, 0)
+  }
+  // Cada actividad CUMPLIDA suma 1 a cada responsable distinto del grupo.
+  for (const filas of agruparPorActividad(actividades).values()) {
+    if (estadoActividad(filas) !== 'CUMPLIDA') continue
+    for (const rid of new Set(filas.map((f) => f.responsableId))) {
+      conteo.set(rid, (conteo.get(rid) ?? 0) + 1)
+    }
   }
   const filas: FilaFinalizadas[] = [...conteo.entries()].map(([responsableId, finalizadas]) => ({
     responsableId,
