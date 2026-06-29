@@ -240,17 +240,26 @@ describe('cumplimientoPorArea (porcentaje null)', () => {
 import { motivosFrecuentes } from './metricas'
 
 describe('motivosFrecuentes', () => {
-  it('cuenta por motivoId e ignora actividades sin motivo, ordenado desc', () => {
+  it('cuenta por motivoId a nivel de ACTIVIDAD, ignora sin motivo, ordenado desc', () => {
     const acts = [
-      act({ motivoId: 'clima' }),
-      act({ motivoId: 'clima' }),
-      act({ motivoId: 'maquina' }),
-      act({ motivoId: null }),
+      act({ id: 'a', tareaId: 'T1', motivoId: 'clima' }),
+      act({ id: 'b', tareaId: 'T2', motivoId: 'clima' }),
+      act({ id: 'c', tareaId: 'T3', motivoId: 'maquina' }),
+      act({ id: 'd', tareaId: 'T4', motivoId: null }),
     ]
     expect(motivosFrecuentes(acts)).toEqual([
       { motivoId: 'clima', conteo: 2 },
       { motivoId: 'maquina', conteo: 1 },
     ])
+  })
+  it('una actividad multi-fila con el mismo motivo cuenta UNA vez', () => {
+    const acts = [
+      act({ id: 'a1', tareaId: 'T1', dia: 1, motivoId: 'clima' }),
+      act({ id: 'a2', tareaId: 'T1', dia: 2, motivoId: 'clima' }),
+      act({ id: 'a3', tareaId: 'T1', dia: 3, motivoId: 'clima' }),
+    ]
+    // por fila daría 3; por actividad = 1
+    expect(motivosFrecuentes(acts)).toEqual([{ motivoId: 'clima', conteo: 1 }])
   })
   it('devuelve lista vacía si no hay motivos', () => {
     expect(motivosFrecuentes([act({ motivoId: null })])).toEqual([])

@@ -223,9 +223,10 @@ export interface ConteoMotivo {
 // Cuenta las actividades por motivo (ignora las que no tienen), de mayor a menor.
 export function motivosFrecuentes(actividades: Actividad[]): ConteoMotivo[] {
   const conteo = new Map<string, number>()
-  for (const a of actividades) {
-    if (!a.motivoId) continue
-    conteo.set(a.motivoId, (conteo.get(a.motivoId) ?? 0) + 1)
+  for (const filas of agruparPorActividad(actividades).values()) {
+    const motivoId = filas.find((f) => f.motivoId)?.motivoId
+    if (!motivoId) continue
+    conteo.set(motivoId, (conteo.get(motivoId) ?? 0) + 1)
   }
   return [...conteo.entries()]
     .map(([motivoId, c]) => ({ motivoId, conteo: c }))
