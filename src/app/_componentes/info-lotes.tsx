@@ -6,10 +6,12 @@ export function InfoLotes({
   lotes,
   bultosPorLote,
   className = '',
+  tamano = 'text-xs',
 }: {
   lotes: LoteInfo[]
   bultosPorLote?: BultosPorLote | null
   className?: string
+  tamano?: string
 }) {
   if (lotes.length === 0) return null
   const ha = lotes.reduce((s, l) => s + (l.hectareas ?? 0), 0)
@@ -19,7 +21,7 @@ export function InfoLotes({
   }
   const nombres = lotes.map(etiqueta).join(', ')
   return (
-    <div className={`text-xs text-tierra ${className}`}>
+    <div className={`${tamano} text-tierra ${className}`}>
       📍 {nombres}
       {ha > 0 ? <> · <b>{ha.toFixed(1)} ha</b></> : null}
     </div>

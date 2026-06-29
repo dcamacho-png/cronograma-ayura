@@ -51,7 +51,7 @@ export function GrillaSemana({
       {DIAS.map((d, i) => (
         <th key={d} className="border border-borde bg-arena p-2 text-left">
           {d}
-          <div className="text-xs font-normal text-tierra">{fechas[i] ? fmtFecha(fechas[i]) : ''}</div>
+          <div className={`font-normal text-tierra ${paraExportar ? 'text-sm' : 'text-xs'}`}>{fechas[i] ? fmtFecha(fechas[i]) : ''}</div>
         </th>
       ))}
     </tr>
@@ -66,7 +66,7 @@ export function GrillaSemana({
         <p className="p-4 text-center text-sm italic text-tierra">Sin actividades programadas</p>
       ) : (
         <div className="overflow-x-auto">
-          <table className={`w-full border-collapse ${paraExportar ? 'text-base text-black' : 'text-sm'}`}>
+          <table className={`w-full border-collapse ${paraExportar ? 'text-lg text-black' : 'text-sm'}`}>
             <thead>{filaCabezado('head')}</thead>
             <tbody>
               {responsables.map((r, idx) => (
@@ -92,10 +92,10 @@ export function GrillaSemana({
                                   <button type="submit" className="rounded-lg bg-bosque px-1.5 text-xs font-semibold text-white">✓</button>
                                 </form>
                               ) : (
-                                a.turno && <div className="text-xs text-tierra">{a.turno}</div>
+                                a.turno && <div className={`text-tierra ${paraExportar ? 'text-sm' : 'text-xs'}`}>{a.turno}</div>
                               ))}
-                              {a.maquina && <div className="text-xs text-tierra">🚜 {a.maquina.nombre}</div>}
-                              <InfoLotes lotes={a.lotes} bultosPorLote={a.bultosPorLote as Record<string, number> | null} className="mt-1" />
+                              {a.maquina && <div className={`text-tierra ${paraExportar ? 'text-sm' : 'text-xs'}`}>🚜 {a.maquina.nombre}</div>}
+                              <InfoLotes lotes={a.lotes} bultosPorLote={a.bultosPorLote as Record<string, number> | null} className="mt-1" tamano={paraExportar ? 'text-sm' : 'text-xs'} />
                               {editable && a.tareaId && (
                                 <>
                                   <form action={devolverAAsignacionAccion} className="mt-0.5">

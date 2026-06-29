@@ -10,25 +10,18 @@ export function BotonDescargarImagen({
   async function descargar() {
     const el = document.getElementById(targetId)
     if (!el) return
-    // La imagen sale con la orientación del elemento capturado. En pantalla la grilla
-    // está acotada al ancho del contenedor (~1100px) y crece en alto con cada
-    // responsable, así que con varios responsables saldría vertical. Antes de capturar
-    // ensanchamos la grilla hasta que quede horizontal (ancho ≥ alto + 5% de margen):
-    // al ensanchar, las columnas-día caben mejor, el texto envuelve menos y baja el alto.
+    // La imagen se comparte sobre todo por WhatsApp/celular, donde lo que importa es que
+    // el texto sea grande y nítido (no que la imagen sea horizontal). Por eso fijamos un
+    // ancho cómodo y dejamos que el alto crezca con cada responsable: la imagen sale más
+    // vertical pero el texto se lee grande, y con scale alto queda nítido al ampliar.
+    const ANCHO = 1280
     const anchoPrevio = el.style.width
     const maxWidthPrevio = el.style.maxWidth
     el.style.maxWidth = 'none'
-    let ancho = 1600
-    el.style.width = `${ancho}px`
-    for (let i = 0; i < 5; i++) {
-      const alto = el.scrollHeight
-      if (ancho >= alto * 1.05) break
-      ancho = Math.min(Math.ceil(alto * 1.15), 4000)
-      el.style.width = `${ancho}px`
-    }
+    el.style.width = `${ANCHO}px`
     try {
       const { default: html2canvas } = await import('html2canvas-pro')
-      const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#ffffff', windowWidth: ancho })
+      const canvas = await html2canvas(el, { scale: 3, backgroundColor: '#ffffff', windowWidth: ANCHO })
       const enlace = document.createElement('a')
       enlace.href = canvas.toDataURL('image/png')
       enlace.download = nombreArchivo.replace(/\s+/g, '-')
