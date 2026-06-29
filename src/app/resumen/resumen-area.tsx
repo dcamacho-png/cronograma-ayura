@@ -1,11 +1,11 @@
-import { porcentajeCumplimiento, porcentajeReprogramadas, motivosFrecuentes, colorSemaforo, conteoEstadoActividades, agruparPorActividad } from '@/dominio/metricas'
+import { porcentajeCumplimiento, porcentajeReprogramadas, motivosFrecuentes, colorSemaforo, conteoEstadoActividades, agruparPorActividad, estadoActividad } from '@/dominio/metricas'
 import {
   colorPorcentaje,
   actividadesConCambio,
   extremosFinalizadas,
   medidasPorUnidad,
 } from '@/dominio/resumen'
-import type { Actividad as ActividadDominio } from '@/dominio/tipos'
+import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
 import { unidadDe, unidadAbreviada, type Unidad } from '@/dominio/unidad'
 
 const ESTADOS_ORDEN = [
@@ -27,6 +27,7 @@ const COLOR_HEX: Record<string, string> = {
 
 type ActividadResumen = {
   id: string
+  tareaId: string | null
   estado: string
   descripcion: string
   vecesReprogramada: number
@@ -67,19 +68,39 @@ export function ResumenArea({
   const { mas, menos } = extremosFinalizadas(dominio)
   const motivosTop = motivosFrecuentes(dominio)
   const cambios = actividadesConCambio(dominio) as unknown as ActividadResumen[]
-  const nuevas = actividades.filter((a) => a.noProgramada)
 
   const nombrePorId = new Map(responsables.map((r) => [r.id, r.nombre]))
   const nombreResp = (id: string) => nombrePorId.get(id) ?? 'Responsable'
   const nombreMotivo = new Map(motivos.map((m) => [m.id, m.nombre]))
 
   const haActividad = (a: ActividadResumen) => a.lotes.reduce((s, l) => s + (l.hectareas ?? 0), 0)
+
+  // Una sola "actividad" por grupo (tareaId): estado agrupado y medida tomada UNA vez.
+  // Las filas-hermanas comparten lotes y haRealizada, así que NO se suman entre sí.
+  const actividadesUnicas = [...agruparPorActividad(actividades).values()].map((filas) => {
+    const base = filas[0]
+    return {
+      id: base.id,
+      estado: estadoActividad(filas.map((f) => ({ estado: f.estado as Estado }))),
+      descripcion: base.descripcion,
+      unidad: unidadDe(unidadPorNombre, base.descripcion),
+      haProgramada: haActividad(base),
+      haRealizada: base.haRealizada ?? null,
+      lotes: base.lotes,
+      maquinas: new Set(filas.map((f) => f.maquina?.nombre).filter((n): n is string => !!n)),
+      responsable: base.responsable,
+      noProgramada: base.noProgramada,
+    }
+  })
+
+  const nuevas = actividadesUnicas.filter((a) => a.noProgramada)
+
   const totales = medidasPorUnidad(
-    actividades.map((a) => ({
+    actividadesUnicas.map((a) => ({
       estado: a.estado,
-      haProgramada: haActividad(a),
-      haRealizada: a.haRealizada ?? null,
-      unidad: unidadDe(unidadPorNombre, a.descripcion),
+      haProgramada: a.haProgramada,
+      haRealizada: a.haRealizada,
+      unidad: a.unidad,
     })),
   )
   const totalUnidades = (['ha', 'hora', 'kg'] as Unidad[])
@@ -87,16 +108,15 @@ export function ResumenArea({
     .map((u) => `${totales[u]} ${unidadAbreviada(u)}`)
     .join(' · ')
 
-  // Lista "realizado por actividad": valor + unidad de cada descripción.
+  // Lista "realizado por actividad": suma la medida (única) de cada actividad por descripción.
   const medidaPorActividad = new Map<string, { valor: number; unidad: Unidad }>()
-  for (const a of actividades) {
+  for (const a of actividadesUnicas) {
     if (a.estado === 'PENDIENTE') continue
-    const unidad = unidadDe(unidadPorNombre, a.descripcion)
-    const realizada = a.haRealizada ?? (unidad === 'ha' && a.estado === 'CUMPLIDA' ? haActividad(a) : 0)
+    const realizada = a.haRealizada ?? (a.unidad === 'ha' && a.estado === 'CUMPLIDA' ? a.haProgramada : 0)
     const prev = medidaPorActividad.get(a.descripcion)
     medidaPorActividad.set(a.descripcion, {
       valor: (prev?.valor ?? 0) + realizada,
-      unidad,
+      unidad: a.unidad,
     })
   }
   const medidaActividadLista = [...medidaPorActividad.entries()].sort((a, b) => b[1].valor - a[1].valor)
@@ -150,7 +170,7 @@ export function ResumenArea({
 
       <div className="mb-8 space-y-3">
         {ESTADOS_ORDEN.map(({ v, etq }) => {
-          const acts = actividades.filter((a) => a.estado === v)
+          const acts = actividadesUnicas.filter((a) => a.estado === v)
           if (acts.length === 0) return null
           const grupos = new Map<string, { descripcion: string; lotes: string[]; maquinas: Set<string>; conteo: number }>()
           for (const a of acts) {
@@ -158,13 +178,13 @@ export function ResumenArea({
             const clave = `${a.descripcion}|${lotesNombres.join(',')}`
             const g = grupos.get(clave) ?? { descripcion: a.descripcion, lotes: lotesNombres, maquinas: new Set<string>(), conteo: 0 }
             g.conteo += 1
-            if (a.maquina) g.maquinas.add(a.maquina.nombre)
+            for (const m of a.maquinas) g.maquinas.add(m)
             grupos.set(clave, g)
           }
           const items = [...grupos.values()]
           return (
             <div key={v}>
-              <div className="text-sm font-semibold text-tinta">{etq} ({items.length})</div>
+              <div className="text-sm font-semibold text-tinta">{etq} ({acts.length})</div>
               <ul className="ml-4 list-disc text-sm text-tierra">
                 {items.map((g, i) => (
                   <li key={i}>
