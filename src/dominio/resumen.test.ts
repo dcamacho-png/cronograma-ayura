@@ -45,6 +45,17 @@ describe('actividadesConCambio', () => {
     actividadesConCambio(acts)
     expect(acts).toEqual(copia)
   })
+
+  it('una actividad con varias filas aparece UNA sola vez', () => {
+    const acts = [
+      act({ id: 'a1', tareaId: 'T1', dia: 1, estado: 'NO_CUMPLIDA' }),
+      act({ id: 'a2', tareaId: 'T1', dia: 2, estado: 'NO_CUMPLIDA' }),
+      act({ id: 'b1', tareaId: 'T2', dia: 1, estado: 'CUMPLIDA' }),
+    ]
+    const r = actividadesConCambio(acts)
+    expect(r.length).toBe(1)
+    expect(r[0].tareaId).toBe('T1')
+  })
 })
 
 import { extremosFinalizadas, conteoPorEstado, hectareasRealizadas, medidasPorUnidad } from './resumen'

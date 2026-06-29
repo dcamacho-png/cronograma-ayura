@@ -17,9 +17,14 @@ const ESTADOS_CON_CAMBIO = ['PARCIAL', 'NO_CUMPLIDA', 'REPROGRAMADA']
 // Actividades que "cambiaron" en la semana (no cumplidas del todo o reprogramadas),
 // ordenadas por veces reprogramada (desc) y luego por día (asc). No muta la entrada.
 export function actividadesConCambio(actividades: Actividad[]): Actividad[] {
-  return actividades
-    .filter((a) => ESTADOS_CON_CAMBIO.includes(a.estado))
-    .sort((a, b) => b.vecesReprogramada - a.vecesReprogramada || a.dia - b.dia)
+  const reps: Actividad[] = []
+  for (const filas of agruparPorActividad(actividades).values()) {
+    if (!ESTADOS_CON_CAMBIO.includes(estadoActividad(filas))) continue
+    // Fila representativa: la de menor día (conserva descripción, responsable, motivo, nota).
+    const base = [...filas].sort((a, b) => a.dia - b.dia)[0]
+    reps.push(base)
+  }
+  return reps.sort((a, b) => b.vecesReprogramada - a.vecesReprogramada || a.dia - b.dia)
 }
 
 export interface FilaFinalizadas {
