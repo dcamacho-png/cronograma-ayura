@@ -96,14 +96,24 @@ describe('rankingResponsables', () => {
 import { porcentajeReprogramadas, colorSemaforo } from './metricas'
 
 describe('porcentajeReprogramadas', () => {
-  it('calcula el % de actividades con vecesReprogramada > 0', () => {
+  it('calcula el % de ACTIVIDADES con vecesReprogramada > 0 (no por fila)', () => {
     const acts = [
-      act({ vecesReprogramada: 0 }),
-      act({ vecesReprogramada: 1 }),
-      act({ vecesReprogramada: 3 }),
-      act({ vecesReprogramada: 0 }),
+      act({ id: 'a', tareaId: 'T1', vecesReprogramada: 0 }),
+      act({ id: 'b', tareaId: 'T2', vecesReprogramada: 1 }),
+      act({ id: 'c', tareaId: 'T3', vecesReprogramada: 3 }),
+      act({ id: 'd', tareaId: 'T4', vecesReprogramada: 0 }),
     ]
-    // 2 de 4 -> 50
+    // 2 de 4 actividades -> 50
+    expect(porcentajeReprogramadas(acts)).toBe(50)
+  })
+  it('una actividad multi-fila reprogramada cuenta UNA vez', () => {
+    const acts = [
+      act({ id: 'a1', tareaId: 'T1', dia: 1, vecesReprogramada: 2 }),
+      act({ id: 'a2', tareaId: 'T1', dia: 2, vecesReprogramada: 2 }),
+      act({ id: 'a3', tareaId: 'T1', dia: 3, vecesReprogramada: 2 }),
+      act({ id: 'b', tareaId: 'T2', vecesReprogramada: 0 }),
+    ]
+    // 1 de 2 actividades -> 50  (por fila daría 3/4 = 75)
     expect(porcentajeReprogramadas(acts)).toBe(50)
   })
   it('devuelve 0 con lista vacía', () => {

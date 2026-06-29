@@ -161,9 +161,13 @@ export function rankingResponsables(
 
 // % de actividades que son reprogramaciones (vecesReprogramada > 0).
 export function porcentajeReprogramadas(actividades: Actividad[]): number {
-  if (actividades.length === 0) return 0
-  const reprog = actividades.filter((a) => a.vecesReprogramada > 0).length
-  return Math.round((reprog / actividades.length) * 100)
+  const grupos = agruparPorActividad(actividades)
+  if (grupos.size === 0) return 0
+  let reprog = 0
+  for (const filas of grupos.values()) {
+    if (filas.some((f) => f.vecesReprogramada > 0)) reprog += 1
+  }
+  return Math.round((reprog / grupos.size) * 100)
 }
 
 export type ColorSemaforo = 'ninguno' | 'verde' | 'amarillo' | 'naranja' | 'rojo'
