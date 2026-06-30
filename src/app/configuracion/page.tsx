@@ -25,6 +25,7 @@ import {
   crearActividadEstipuladaAccion,
   eliminarActividadEstipuladaAccion,
   renombrarActividadEstipuladaAccion,
+  setUnidadActividadEstipuladaAccion,
   crearLoteAccion,
   eliminarLoteAccion,
   crearUsuarioAccion,
@@ -183,7 +184,16 @@ export default async function ConfiguracionPage({
                   <input name="nombre" defaultValue={e.nombre} className="flex-1 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
                   <button className="text-xs font-semibold text-bosque hover:underline">guardar</button>
                 </form>
-                <span className="rounded bg-arena px-2 py-0.5 text-xs text-tierra">{e.unidad}</span>
+                <form action={setUnidadActividadEstipuladaAccion} className="flex items-center gap-1">
+                  <input type="hidden" name="id" value={e.id} />
+                  <select name="unidad" defaultValue={e.unidad} className="rounded-lg border border-borde bg-marfil p-1 text-xs focus:outline-none focus:ring-2 focus:ring-bosque/40">
+                    <option value="ha">Ha</option>
+                    <option value="hora">Hora</option>
+                    <option value="kg">Kg</option>
+                    <option value="cantidad">Cantidad</option>
+                  </select>
+                  <button className="text-xs font-semibold text-bosque hover:underline">guardar</button>
+                </form>
                 <FormEliminar accion={eliminarActividadEstipuladaAccion} id={e.id} etiqueta={e.nombre} />
               </li>
             ))}
@@ -194,6 +204,7 @@ export default async function ConfiguracionPage({
               <option value="ha">Ha</option>
               <option value="hora">Hora</option>
               <option value="kg">Kg</option>
+              <option value="cantidad">Cantidad</option>
             </select>
             <button className="rounded-lg bg-bosque px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
           </form>

@@ -1,8 +1,9 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, setResponsableActivo, crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, crearLote, eliminarLote, crearUsuario, cambiarContrasena, eliminarUsuario, BloqueoError, setPantallasUsuario, setVariantesArea } from '@/datos/repositorio'
+import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, setResponsableActivo, crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, setUnidadActividadEstipulada, crearLote, eliminarLote, crearUsuario, cambiarContrasena, eliminarUsuario, BloqueoError, setPantallasUsuario, setVariantesArea } from '@/datos/repositorio'
 import { usuarioActual } from '@/auth/sesion'
+import { normalizarUnidad } from '@/dominio/unidad'
 
 function texto(form: FormData, clave: string): string {
   const v = form.get(clave)
@@ -115,8 +116,7 @@ export async function cambiarEstadoResponsableAccion(form: FormData) {
 export async function crearActividadEstipuladaAccion(form: FormData) {
   const nombre = texto(form, 'nombre')
   if (!nombre) faltanDatos()
-  const unidadRaw = texto(form, 'unidad')
-  const unidad = unidadRaw === 'hora' || unidadRaw === 'kg' ? unidadRaw : 'ha'
+  const unidad = normalizarUnidad(texto(form, 'unidad'))
   await correr(() => crearActividadEstipulada(nombre, unidad), 'Actividad agregada.')
 }
 
@@ -131,6 +131,13 @@ export async function renombrarActividadEstipuladaAccion(form: FormData) {
   const nombre = texto(form, 'nombre')
   if (!id || !nombre) faltanDatos()
   await correr(() => renombrarActividadEstipulada(id, nombre), 'Actividad actualizada.')
+}
+
+export async function setUnidadActividadEstipuladaAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (!id) faltanDatos()
+  const unidad = normalizarUnidad(texto(form, 'unidad'))
+  await correr(() => setUnidadActividadEstipulada(id, unidad), 'Unidad actualizada.')
 }
 
 export async function crearLoteAccion(form: FormData) {

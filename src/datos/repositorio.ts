@@ -384,6 +384,10 @@ export function renombrarActividadEstipulada(id: string, nombre: string) {
   return prisma.actividadEstipulada.update({ where: { id }, data: { nombre } })
 }
 
+export function setUnidadActividadEstipulada(id: string, unidad: string) {
+  return prisma.actividadEstipulada.update({ where: { id }, data: { unidad } })
+}
+
 export function obtenerUsuarioPorLogin(usuario: string) {
   return prisma.usuario.findUnique({ where: { usuario } })
 }
