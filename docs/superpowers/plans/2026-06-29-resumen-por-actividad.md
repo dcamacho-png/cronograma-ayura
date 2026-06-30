@@ -1,6 +1,8 @@
 # Resumen 100% por actividad — Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> ✅ **COMPLETADO** — implementado, revisado (final opus: Ready to merge) y desplegado a producción (commits e8554f5..5b63756, deploy dpl_HKFVJZkvm2SHyR5CvZvAT5TqzxgQ).
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Que todas las métricas de `/resumen` se evalúen por actividad (agrupando filas-hermanas por `tareaId`), de modo que una actividad culminada cuente una vez y su medida de maquinaria (ha/kg/horas) se cuente una sola vez.
 
@@ -34,7 +36,7 @@
 - Consumes: `agruparPorActividad(actividades)` (ya existe en el mismo archivo).
 - Produces: `porcentajeReprogramadas(actividades: Actividad[]): number` (firma sin cambios; ahora cuenta por actividad).
 
-- [ ] **Step 1: Reemplazar el test existente por la versión por actividad**
+- [x] **Step 1: Reemplazar el test existente por la versión por actividad**
 
 En `src/dominio/metricas.test.ts`, sustituir el bloque `describe('porcentajeReprogramadas', ...)` actual por:
 
@@ -66,12 +68,12 @@ describe('porcentajeReprogramadas', () => {
 })
 ```
 
-- [ ] **Step 2: Correr el test para verlo fallar**
+- [x] **Step 2: Correr el test para verlo fallar**
 
 Run: `npm test -- metricas`
 Expected: FALLA en "una actividad multi-fila reprogramada cuenta UNA vez" (hoy da 75, no 50).
 
-- [ ] **Step 3: Implementar la versión por actividad**
+- [x] **Step 3: Implementar la versión por actividad**
 
 En `src/dominio/metricas.ts`, reemplazar el cuerpo de `porcentajeReprogramadas` (líneas 163-167) por:
 
@@ -87,12 +89,12 @@ export function porcentajeReprogramadas(actividades: Actividad[]): number {
 }
 ```
 
-- [ ] **Step 4: Correr el test para verlo pasar**
+- [x] **Step 4: Correr el test para verlo pasar**
 
 Run: `npm test -- metricas`
 Expected: PASS (los 3 casos del `describe`).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/dominio/metricas.ts src/dominio/metricas.test.ts
@@ -111,7 +113,7 @@ git commit -m "feat(resumen): porcentajeReprogramadas cuenta por actividad (no p
 - Consumes: `agruparPorActividad(actividades)`.
 - Produces: `motivosFrecuentes(actividades: Actividad[]): ConteoMotivo[]` (firma sin cambios).
 
-- [ ] **Step 1: Reemplazar el test existente**
+- [x] **Step 1: Reemplazar el test existente**
 
 En `src/dominio/metricas.test.ts`, sustituir el bloque `describe('motivosFrecuentes', ...)` por:
 
@@ -144,12 +146,12 @@ describe('motivosFrecuentes', () => {
 })
 ```
 
-- [ ] **Step 2: Correr el test para verlo fallar**
+- [x] **Step 2: Correr el test para verlo fallar**
 
 Run: `npm test -- metricas`
 Expected: FALLA en "una actividad multi-fila con el mismo motivo cuenta UNA vez" (hoy da 3).
 
-- [ ] **Step 3: Implementar la versión por actividad**
+- [x] **Step 3: Implementar la versión por actividad**
 
 En `src/dominio/metricas.ts`, reemplazar el cuerpo de `motivosFrecuentes` (líneas 220-229) por:
 
@@ -167,12 +169,12 @@ export function motivosFrecuentes(actividades: Actividad[]): ConteoMotivo[] {
 }
 ```
 
-- [ ] **Step 4: Correr el test para verlo pasar**
+- [x] **Step 4: Correr el test para verlo pasar**
 
 Run: `npm test -- metricas`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/dominio/metricas.ts src/dominio/metricas.test.ts
@@ -191,7 +193,7 @@ git commit -m "feat(resumen): motivosFrecuentes cuenta por actividad (no por fil
 - Consumes: `agruparPorActividad`, `estadoActividad` (de `./metricas`).
 - Produces: `extremosFinalizadas(actividades: Actividad[]): { mas: FilaFinalizadas | null; menos: FilaFinalizadas | null }` (firma sin cambios; cada actividad CUMPLIDA suma 1 a cada responsable asignado).
 
-- [ ] **Step 1: Reemplazar el test existente**
+- [x] **Step 1: Reemplazar el test existente**
 
 En `src/dominio/resumen.test.ts`, sustituir el bloque `describe('extremosFinalizadas', ...)` por:
 
@@ -233,12 +235,12 @@ describe('extremosFinalizadas', () => {
 })
 ```
 
-- [ ] **Step 2: Correr el test para verlo fallar**
+- [x] **Step 2: Correr el test para verlo fallar**
 
 Run: `npm test -- resumen`
 Expected: FALLA en "una actividad multi-día cumplida cuenta UNA vez" (hoy da 3).
 
-- [ ] **Step 3: Añadir el import en `resumen.ts`**
+- [x] **Step 3: Añadir el import en `resumen.ts`**
 
 En `src/dominio/resumen.ts`, debajo de los imports existentes (tras la línea 2 `import type { Unidad } from './unidad'`), añadir:
 
@@ -246,7 +248,7 @@ En `src/dominio/resumen.ts`, debajo de los imports existentes (tras la línea 2 
 import { agruparPorActividad, estadoActividad } from './metricas'
 ```
 
-- [ ] **Step 4: Implementar la versión por actividad**
+- [x] **Step 4: Implementar la versión por actividad**
 
 En `src/dominio/resumen.ts`, reemplazar el cuerpo de `extremosFinalizadas` (líneas 30-45) por:
 
@@ -276,12 +278,12 @@ export function extremosFinalizadas(
 }
 ```
 
-- [ ] **Step 5: Correr el test para verlo pasar**
+- [x] **Step 5: Correr el test para verlo pasar**
 
 Run: `npm test -- resumen`
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/dominio/resumen.ts src/dominio/resumen.test.ts
@@ -300,7 +302,7 @@ git commit -m "feat(resumen): extremosFinalizadas cuenta actividades por respons
 - Consumes: `agruparPorActividad`, `estadoActividad` (importados en Task 3).
 - Produces: `actividadesConCambio(actividades: Actividad[]): Actividad[]` (firma sin cambios; devuelve UNA fila representativa por actividad con estado agrupado de cambio).
 
-- [ ] **Step 1: Añadir el caso multi-fila al test**
+- [x] **Step 1: Añadir el caso multi-fila al test**
 
 En `src/dominio/resumen.test.ts`, dentro del `describe('actividadesConCambio', ...)`, añadir este `it` (después del caso "no muta"):
 
@@ -317,12 +319,12 @@ En `src/dominio/resumen.test.ts`, dentro del `describe('actividadesConCambio', .
   })
 ```
 
-- [ ] **Step 2: Correr el test para verlo fallar**
+- [x] **Step 2: Correr el test para verlo fallar**
 
 Run: `npm test -- resumen`
 Expected: FALLA en "una actividad con varias filas aparece UNA sola vez" (hoy devuelve 2 filas).
 
-- [ ] **Step 3: Implementar la versión por actividad**
+- [x] **Step 3: Implementar la versión por actividad**
 
 En `src/dominio/resumen.ts`, reemplazar el cuerpo de `actividadesConCambio` (líneas 18-22) por:
 
@@ -339,12 +341,12 @@ export function actividadesConCambio(actividades: Actividad[]): Actividad[] {
 }
 ```
 
-- [ ] **Step 4: Correr el test para verlo pasar**
+- [x] **Step 4: Correr el test para verlo pasar**
 
 Run: `npm test -- resumen`
 Expected: PASS (incluido el caso nuevo y los 2 existentes: orden ['4','5','3'] y "no muta").
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/dominio/resumen.ts src/dominio/resumen.test.ts
@@ -362,7 +364,7 @@ git commit -m "feat(resumen): actividadesConCambio devuelve una fila por activid
 - Consumes: `agruparPorActividad`, `estadoActividad`, `medidasPorUnidad`, `unidadDe` (ya disponibles); tipo `Estado` de `@/dominio/tipos`.
 - Produces: nada para otras tareas (capa de presentación).
 
-- [ ] **Step 1: Ampliar imports**
+- [x] **Step 1: Ampliar imports**
 
 En `src/app/resumen/resumen-area.tsx`, reemplazar la línea 1:
 
@@ -382,7 +384,7 @@ Y en el import de tipos (línea 8) añadir `Estado`:
 import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
 ```
 
-- [ ] **Step 2: Añadir `tareaId` al tipo `ActividadResumen`**
+- [x] **Step 2: Añadir `tareaId` al tipo `ActividadResumen`**
 
 En el tipo `ActividadResumen` (líneas 28-40), añadir el campo `tareaId` (justo después de `id`):
 
@@ -393,7 +395,7 @@ type ActividadResumen = {
   estado: string
 ```
 
-- [ ] **Step 3: Reemplazar el bloque de cálculo por la versión consolidada**
+- [x] **Step 3: Reemplazar el bloque de cálculo por la versión consolidada**
 
 Reemplazar TODO el bloque de las líneas 61-102 (desde `const dominio = ...` hasta `const medidaActividadLista = ...`) por:
 
@@ -463,7 +465,7 @@ Reemplazar TODO el bloque de las líneas 61-102 (desde `const dominio = ...` has
 
 > Nota: `nuevas` ahora se deriva de `actividadesUnicas` (antes era `actividades.filter(...)`). El JSX de la sección "Actividades nuevas" y la tarjeta `{nuevas.length}` no cambian (usan `a.id`, `a.descripcion`, `a.responsable.nombre`, `a.lotes`, todos presentes).
 
-- [ ] **Step 4: Adaptar el "Detalle por estado" a actividades únicas**
+- [x] **Step 4: Adaptar el "Detalle por estado" a actividades únicas**
 
 En el bloque `ESTADOS_ORDEN.map(...)` (líneas 152-163), reemplazar:
 
@@ -503,7 +505,7 @@ Y en el encabezado del estado (línea ~167), cambiar el conteo para que cuadre c
               <div className="text-sm font-semibold text-tinta">{etq} ({acts.length})</div>
 ```
 
-- [ ] **Step 5: Typecheck**
+- [x] **Step 5: Typecheck**
 
 Run:
 ```bash
@@ -513,12 +515,12 @@ rm -f tsconfig.check.json
 ```
 Expected: sin salida (cero errores en `src/`).
 
-- [ ] **Step 6: Tests de dominio siguen verdes**
+- [x] **Step 6: Tests de dominio siguen verdes**
 
 Run: `npm test`
 Expected: PASS (todo el suite, incluidos Tasks 1-4).
 
-- [ ] **Step 7: Verificación manual**
+- [x] **Step 7: Verificación manual**
 
 Run: `npm run dev` y abrir `/resumen` en un área de **maquinaria** con una semana que tenga una labor de **varios días** (o varios responsables).
 Verificar:
@@ -529,7 +531,7 @@ Verificar:
 - El encabezado de cada estado en "Detalle por estado" coincide con el número del chip correspondiente.
 Si no hay datos multi-día a mano, dejar constancia y validar en el deploy de preview.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add src/app/resumen/resumen-area.tsx
