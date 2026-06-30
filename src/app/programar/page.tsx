@@ -16,6 +16,7 @@ import { asignarTareaAccion, devolverAlBancoAccion } from './acciones'
 import { AsignarTareaForm } from './asignar-tarea-form'
 import { GrillaSemana } from './grilla-semana'
 import { BotonDescargarImagen } from './boton-descargar-imagen'
+import { GrillaTractor } from './grilla-tractor'
 
 export default async function ProgramarPage({
   searchParams,
@@ -193,6 +194,9 @@ export default async function ProgramarPage({
           esMaquinaria={esMaquinaria}
         />
       </div>
+      {esMaquinaria && (
+        <GrillaTractor fechas={fechas} actividades={actividadesCronograma} />
+      )}
       {/* Grilla SOLO para exportar como imagen: recortada (h-0 overflow-hidden) para no
           ocupar espacio ni afectar la pantalla. html2canvas (BotonDescargarImagen) clona
           este #grilla-export y lo renderiza a tamaño completo igualmente. */}
