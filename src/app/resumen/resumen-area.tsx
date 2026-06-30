@@ -2,7 +2,7 @@ import { porcentajeCumplimiento, porcentajeReprogramadas, motivosFrecuentes, col
 import {
   colorPorcentaje,
   actividadesConCambio,
-  extremosFinalizadas,
+  finalizadasPorLabor,
   medidasPorUnidad,
 } from '@/dominio/resumen'
 import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
@@ -34,6 +34,7 @@ type ActividadResumen = {
   haRealizada: number | null
   nota: string | null
   lotes: { nombre: string; hectareas: number | null }[]
+  maquinaId: string | null
   maquina: { nombre: string } | null
   responsable: { nombre: string }
   motivo: { nombre: string } | null
@@ -65,12 +66,15 @@ export function ResumenArea({
   // Conteo por actividad única (agrupada por tareaId)
   const conteo = conteoEstadoActividades(dominio)
   const totalActividades = agruparPorActividad(dominio).size
-  const { mas, menos } = extremosFinalizadas(dominio)
+  const laboresFinalizadas = esMaquinaria ? finalizadasPorLabor(dominio) : []
   const motivosTop = motivosFrecuentes(dominio)
   const cambios = actividadesConCambio(dominio) as unknown as ActividadResumen[]
 
   const nombrePorId = new Map(responsables.map((r) => [r.id, r.nombre]))
   const nombreResp = (id: string) => nombrePorId.get(id) ?? 'Responsable'
+  const nombreMaquina = new Map(
+    actividades.filter((a) => a.maquinaId && a.maquina).map((a) => [a.maquinaId as string, a.maquina!.nombre]),
+  )
   const nombreMotivo = new Map(motivos.map((m) => [m.id, m.nombre]))
 
   const haActividad = (a: ActividadResumen) => a.lotes.reduce((s, l) => s + (l.hectareas ?? 0), 0)
@@ -201,26 +205,29 @@ export function ResumenArea({
       </div>
 
       <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-        {/* Ranking simple */}
-        <div className="tarjeta p-4">
-          <h2 className="mb-3 text-lg font-semibold text-tinta">⭐ Ranking (finalizadas)</h2>
-          {mas ? (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <span>🥇</span>
-                <span className="flex-1">Quien más finalizó: <b>{nombreResp(mas.responsableId)}</b></span>
-                <span className="font-bold">{mas.finalizadas}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span>🔻</span>
-                <span className="flex-1">Quien menos finalizó: <b>{menos ? nombreResp(menos.responsableId) : '—'}</b></span>
-                <span className="font-bold">{menos ? menos.finalizadas : ''}</span>
-              </div>
-            </div>
-          ) : (
-            <p className="text-sm text-tierra">Sin actividades esta semana.</p>
-          )}
-        </div>
+        {/* Finalizadas por labor (solo maquinaria) */}
+        {esMaquinaria && (
+          <div className="tarjeta p-4">
+            <h2 className="mb-3 text-lg font-semibold text-tinta">🏁 Finalizadas por labor</h2>
+            {laboresFinalizadas.length === 0 ? (
+              <p className="text-sm text-tierra">Sin actividades finalizadas.</p>
+            ) : (
+              <ul className="space-y-1 text-sm">
+                {laboresFinalizadas.map((l) => (
+                  <li key={l.descripcion} className="flex flex-wrap items-center gap-x-2">
+                    <span className="flex-1 font-medium">{l.descripcion}</span>
+                    {l.tractor && (
+                      <span className="text-tierra">🚜 {nombreMaquina.get(l.tractor.id) ?? 'Tractor'} ({l.tractor.conteo})</span>
+                    )}
+                    {l.responsable && (
+                      <span className="text-tierra">👤 {nombreResp(l.responsable.id)} ({l.responsable.conteo})</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
 
         {/* Motivos */}
         <div className="tarjeta p-4">

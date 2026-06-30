@@ -58,43 +58,7 @@ describe('actividadesConCambio', () => {
   })
 })
 
-import { extremosFinalizadas, conteoPorEstado, hectareasRealizadas, medidasPorUnidad, finalizadasPorLabor } from './resumen'
-
-describe('extremosFinalizadas', () => {
-  it('cuenta ACTIVIDADES finalizadas por responsable (no filas)', () => {
-    const acts = [
-      act({ id: 'a', tareaId: 'T1', responsableId: 'A', estado: 'CUMPLIDA' }),
-      act({ id: 'b', tareaId: 'T2', responsableId: 'A', estado: 'CUMPLIDA' }),
-      act({ id: 'c', tareaId: 'T3', responsableId: 'B', estado: 'CUMPLIDA' }),
-      act({ id: 'd', tareaId: 'T4', responsableId: 'B', estado: 'PARCIAL' }),
-      act({ id: 'e', tareaId: 'T5', responsableId: 'C', estado: 'NO_CUMPLIDA' }),
-    ]
-    const { mas, menos } = extremosFinalizadas(acts)
-    expect(mas).toEqual({ responsableId: 'A', finalizadas: 2 })
-    expect(menos).toEqual({ responsableId: 'C', finalizadas: 0 })
-  })
-  it('una actividad multi-día cumplida cuenta UNA vez para su responsable', () => {
-    const acts = [
-      act({ id: 'a1', tareaId: 'T1', dia: 1, responsableId: 'A', estado: 'CUMPLIDA' }),
-      act({ id: 'a2', tareaId: 'T1', dia: 2, responsableId: 'A', estado: 'CUMPLIDA' }),
-      act({ id: 'a3', tareaId: 'T1', dia: 3, responsableId: 'A', estado: 'CUMPLIDA' }),
-    ]
-    const { mas } = extremosFinalizadas(acts)
-    expect(mas).toEqual({ responsableId: 'A', finalizadas: 1 }) // por fila daría 3
-  })
-  it('una actividad con 2 responsables cumplida suma 1 a cada uno', () => {
-    const acts = [
-      act({ id: 'p1', tareaId: 'T1', dia: 1, responsableId: 'P', estado: 'CUMPLIDA' }),
-      act({ id: 'j1', tareaId: 'T1', dia: 1, responsableId: 'J', estado: 'CUMPLIDA' }),
-    ]
-    const { mas, menos } = extremosFinalizadas(acts)
-    expect(mas?.finalizadas).toBe(1)
-    expect(menos?.finalizadas).toBe(1)
-  })
-  it('devuelve null si no hay actividades', () => {
-    expect(extremosFinalizadas([])).toEqual({ mas: null, menos: null })
-  })
-})
+import { conteoPorEstado, hectareasRealizadas, medidasPorUnidad, finalizadasPorLabor } from './resumen'
 
 describe('conteoPorEstado', () => {
   it('cuenta por estado', () => {

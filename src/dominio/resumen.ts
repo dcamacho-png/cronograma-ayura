@@ -27,36 +27,6 @@ export function actividadesConCambio(actividades: Actividad[]): Actividad[] {
   return reps.sort((a, b) => b.vecesReprogramada - a.vecesReprogramada || a.dia - b.dia)
 }
 
-export interface FilaFinalizadas {
-  responsableId: string
-  finalizadas: number
-}
-
-// Entre los responsables con actividades, el que más finalizó (CUMPLIDA) y el que menos.
-export function extremosFinalizadas(
-  actividades: Actividad[],
-): { mas: FilaFinalizadas | null; menos: FilaFinalizadas | null } {
-  const conteo = new Map<string, number>()
-  // Todo responsable que aparezca arranca en 0 (para que "menos" pueda ser 0).
-  for (const a of actividades) {
-    if (!conteo.has(a.responsableId)) conteo.set(a.responsableId, 0)
-  }
-  // Cada actividad CUMPLIDA suma 1 a cada responsable distinto del grupo.
-  for (const filas of agruparPorActividad(actividades).values()) {
-    if (estadoActividad(filas) !== 'CUMPLIDA') continue
-    for (const rid of new Set(filas.map((f) => f.responsableId))) {
-      conteo.set(rid, (conteo.get(rid) ?? 0) + 1)
-    }
-  }
-  const filas: FilaFinalizadas[] = [...conteo.entries()].map(([responsableId, finalizadas]) => ({
-    responsableId,
-    finalizadas,
-  }))
-  if (filas.length === 0) return { mas: null, menos: null }
-  filas.sort((a, b) => b.finalizadas - a.finalizadas)
-  return { mas: filas[0], menos: filas[filas.length - 1] }
-}
-
 export function conteoPorEstado(actividades: Actividad[]): Record<string, number> {
   const r: Record<string, number> = {
     PENDIENTE: 0,
