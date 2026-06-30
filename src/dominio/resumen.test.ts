@@ -135,6 +135,15 @@ describe('medidasPorUnidad', () => {
       { estado: 'PENDIENTE', haProgramada: 9, haRealizada: 9, unidad: 'ha' },     // ignorada
       { estado: 'PARCIAL', haProgramada: 4, haRealizada: 1, unidad: 'ha' },       // 1 ha
     ])
-    expect(tot).toEqual({ ha: 6, hora: 6, kg: 100 })
+    expect(tot).toEqual({ ha: 6, hora: 6, kg: 100, cantidad: 0 })
+  })
+
+  it('totaliza la unidad cantidad desde la medida explícita', () => {
+    const tot = medidasPorUnidad([
+      { estado: 'CUMPLIDA', haProgramada: 0, haRealizada: 12, unidad: 'cantidad' },
+      { estado: 'PARCIAL', haProgramada: 0, haRealizada: 3, unidad: 'cantidad' },
+      { estado: 'PENDIENTE', haProgramada: 9, haRealizada: 9, unidad: 'cantidad' }, // ignorada
+    ])
+    expect(tot).toEqual({ ha: 0, hora: 0, kg: 0, cantidad: 15 })
   })
 })

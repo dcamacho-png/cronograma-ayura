@@ -90,11 +90,11 @@ export function hectareasRealizadas(
 export function medidasPorUnidad(
   filas: { estado: string; haProgramada: number; haRealizada: number | null; unidad: Unidad }[],
 ): Record<Unidad, number> {
-  const tot: Record<Unidad, number> = { ha: 0, hora: 0, kg: 0 }
+  const tot: Record<Unidad, number> = { ha: 0, hora: 0, kg: 0, cantidad: 0 }
   for (const f of filas) {
     if (f.estado === 'PENDIENTE') continue
     const medida = f.haRealizada ?? (f.unidad === 'ha' && f.estado === 'CUMPLIDA' ? f.haProgramada : 0)
     tot[f.unidad] += medida
   }
-  return { ha: r1(tot.ha), hora: r1(tot.hora), kg: r1(tot.kg) }
+  return { ha: r1(tot.ha), hora: r1(tot.hora), kg: r1(tot.kg), cantidad: r1(tot.cantidad) }
 }

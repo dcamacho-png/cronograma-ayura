@@ -9,6 +9,7 @@ describe('normalizarUnidad', () => {
     expect(normalizarUnidad('')).toBe('ha')
     expect(normalizarUnidad(undefined)).toBe('ha')
     expect(normalizarUnidad('litros')).toBe('ha')
+    expect(normalizarUnidad('cantidad')).toBe('cantidad')
   })
 })
 
@@ -27,6 +28,7 @@ describe('etiquetaMedida', () => {
     expect(etiquetaMedida('ha')).toBe('Hectáreas realizadas')
     expect(etiquetaMedida('hora')).toBe('Horas realizadas')
     expect(etiquetaMedida('kg')).toBe('Kg cosechados')
+    expect(etiquetaMedida('cantidad')).toBe('Cantidad realizada')
   })
 })
 
@@ -35,5 +37,6 @@ describe('unidadAbreviada', () => {
     expect(unidadAbreviada('ha')).toBe('ha')
     expect(unidadAbreviada('hora')).toBe('horas')
     expect(unidadAbreviada('kg')).toBe('kg')
+    expect(unidadAbreviada('cantidad')).toBe('cantidad')
   })
 })

@@ -103,7 +103,7 @@ export function ResumenArea({
       unidad: a.unidad,
     })),
   )
-  const totalUnidades = (['ha', 'hora', 'kg'] as Unidad[])
+  const totalUnidades = (['ha', 'hora', 'kg', 'cantidad'] as Unidad[])
     .filter((u) => totales[u] > 0)
     .map((u) => `${totales[u]} ${unidadAbreviada(u)}`)
     .join(' · ')
