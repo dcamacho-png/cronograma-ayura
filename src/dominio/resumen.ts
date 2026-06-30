@@ -98,3 +98,48 @@ export function medidasPorUnidad(
   }
   return { ha: r1(tot.ha), hora: r1(tot.hora), kg: r1(tot.kg), cantidad: r1(tot.cantidad) }
 }
+
+export interface TopConteo {
+  id: string
+  conteo: number
+}
+
+export interface FilaLabor {
+  descripcion: string
+  total: number
+  tractor: TopConteo | null
+  responsable: TopConteo | null
+}
+
+// Por cada labor (descripción) con actividades finalizadas (CUMPLIDA), el tractor y el
+// responsable que más la finalizaron. Cuenta por actividad (grupo tareaId); cada actividad
+// finalizada suma 1 a cada responsable/tractor distinto que participó.
+export function finalizadasPorLabor(actividades: Actividad[]): FilaLabor[] {
+  const labores = new Map<
+    string,
+    { total: number; tractores: Map<string, number>; responsables: Map<string, number> }
+  >()
+  for (const filas of agruparPorActividad(actividades).values()) {
+    if (estadoActividad(filas) !== 'CUMPLIDA') continue
+    const descripcion = filas[0].descripcion
+    const l = labores.get(descripcion) ?? { total: 0, tractores: new Map(), responsables: new Map() }
+    l.total += 1
+    for (const rid of new Set(filas.map((f) => f.responsableId))) {
+      l.responsables.set(rid, (l.responsables.get(rid) ?? 0) + 1)
+    }
+    for (const mid of new Set(filas.map((f) => f.maquinaId).filter((m): m is string => !!m))) {
+      l.tractores.set(mid, (l.tractores.get(mid) ?? 0) + 1)
+    }
+    labores.set(descripcion, l)
+  }
+  const top = (m: Map<string, number>): TopConteo | null => {
+    let best: TopConteo | null = null
+    for (const [id, conteo] of m) {
+      if (!best || conteo > best.conteo || (conteo === best.conteo && id < best.id)) best = { id, conteo }
+    }
+    return best
+  }
+  return [...labores.entries()]
+    .map(([descripcion, l]) => ({ descripcion, total: l.total, tractor: top(l.tractores), responsable: top(l.responsables) }))
+    .sort((a, b) => b.total - a.total || a.descripcion.localeCompare(b.descripcion))
+}

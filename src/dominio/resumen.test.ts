@@ -58,7 +58,7 @@ describe('actividadesConCambio', () => {
   })
 })
 
-import { extremosFinalizadas, conteoPorEstado, hectareasRealizadas, medidasPorUnidad } from './resumen'
+import { extremosFinalizadas, conteoPorEstado, hectareasRealizadas, medidasPorUnidad, finalizadasPorLabor } from './resumen'
 
 describe('extremosFinalizadas', () => {
   it('cuenta ACTIVIDADES finalizadas por responsable (no filas)', () => {
@@ -145,5 +145,50 @@ describe('medidasPorUnidad', () => {
       { estado: 'PENDIENTE', haProgramada: 9, haRealizada: 9, unidad: 'cantidad' }, // ignorada
     ])
     expect(tot).toEqual({ ha: 0, hora: 0, kg: 0, cantidad: 15 })
+  })
+})
+
+describe('finalizadasPorLabor', () => {
+  it('cuenta por actividad: una tarea multi-día CUMPLIDA cuenta 1', () => {
+    const acts = [1, 2, 3].map((dia) =>
+      act({ id: `a${dia}`, tareaId: 'T1', dia, descripcion: 'Arada', estado: 'CUMPLIDA', maquinaId: 'M1', responsableId: 'R1' }))
+    expect(finalizadasPorLabor(acts)).toEqual([
+      { descripcion: 'Arada', total: 1, tractor: { id: 'M1', conteo: 1 }, responsable: { id: 'R1', conteo: 1 } },
+    ])
+  })
+  it('una actividad con 2 responsables y 2 tractores suma 1 a cada uno (empate → menor id)', () => {
+    const acts = [
+      act({ id: 'p1', tareaId: 'T1', dia: 1, descripcion: 'Arada', estado: 'CUMPLIDA', responsableId: 'P', maquinaId: 'M1' }),
+      act({ id: 'j1', tareaId: 'T1', dia: 2, descripcion: 'Arada', estado: 'CUMPLIDA', responsableId: 'J', maquinaId: 'M2' }),
+    ]
+    const r = finalizadasPorLabor(acts)
+    expect(r[0].total).toBe(1)
+    expect(r[0].tractor).toEqual({ id: 'M1', conteo: 1 })      // M1 < M2
+    expect(r[0].responsable).toEqual({ id: 'J', conteo: 1 })   // J < P
+  })
+  it('ignora actividades no finalizadas', () => {
+    const acts = [
+      act({ id: 'a', tareaId: 'T1', descripcion: 'Arada', estado: 'PARCIAL', maquinaId: 'M1', responsableId: 'R1' }),
+      act({ id: 'b', tareaId: 'T2', descripcion: 'Rastrillo', estado: 'CUMPLIDA', maquinaId: 'M2', responsableId: 'R2' }),
+    ]
+    expect(finalizadasPorLabor(acts)).toEqual([
+      { descripcion: 'Rastrillo', total: 1, tractor: { id: 'M2', conteo: 1 }, responsable: { id: 'R2', conteo: 1 } },
+    ])
+  })
+  it('elige el de mayor conteo y ordena labores por total desc', () => {
+    const acts = [
+      act({ id: 'a1', tareaId: 'A1', descripcion: 'Arada', estado: 'CUMPLIDA', maquinaId: 'M1', responsableId: 'R1' }),
+      act({ id: 'a2', tareaId: 'A2', descripcion: 'Arada', estado: 'CUMPLIDA', maquinaId: 'M1', responsableId: 'R1' }),
+      act({ id: 'r1', tareaId: 'RT', descripcion: 'Rastrillo', estado: 'CUMPLIDA', maquinaId: 'M2', responsableId: 'R2' }),
+    ]
+    const r = finalizadasPorLabor(acts)
+    expect(r.map((x) => x.descripcion)).toEqual(['Arada', 'Rastrillo'])
+    expect(r[0]).toEqual({ descripcion: 'Arada', total: 2, tractor: { id: 'M1', conteo: 2 }, responsable: { id: 'R1', conteo: 2 } })
+  })
+  it('tractor null cuando la labor finalizada no tuvo máquina', () => {
+    const acts = [act({ id: 'e1', tareaId: 'E1', descripcion: 'Estercolero', estado: 'CUMPLIDA', maquinaId: null, responsableId: 'R1' })]
+    const r = finalizadasPorLabor(acts)
+    expect(r[0].tractor).toBeNull()
+    expect(r[0].responsable).toEqual({ id: 'R1', conteo: 1 })
   })
 })
