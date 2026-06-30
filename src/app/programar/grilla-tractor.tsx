@@ -24,10 +24,10 @@ export function GrillaTractor({
   actividades: ActividadTractor[]
 }) {
   // Solo actividades con tractor; agrupar por maquinaId (mostrando el nombre).
-  const tractores = new Map<string, { nombre: string; actividades: ActividadTractor[] }>()
+  const tractores = new Map<string, { maquinaId: string; nombre: string; actividades: ActividadTractor[] }>()
   for (const a of actividades) {
     if (!a.maquinaId || !a.maquina) continue
-    const g = tractores.get(a.maquinaId) ?? { nombre: a.maquina.nombre, actividades: [] }
+    const g = tractores.get(a.maquinaId) ?? { maquinaId: a.maquinaId, nombre: a.maquina.nombre, actividades: [] }
     g.actividades.push(a)
     tractores.set(a.maquinaId, g)
   }
@@ -52,7 +52,7 @@ export function GrillaTractor({
           </thead>
           <tbody>
             {filas.map((t) => (
-              <tr key={t.nombre}>
+              <tr key={t.maquinaId}>
                 <td className="border border-borde p-2 font-medium">🚜 {t.nombre}</td>
                 {DIAS.map((_, i) => {
                   const dia = i + 1
