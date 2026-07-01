@@ -1,6 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import { revalidatePath } from 'next/cache'
 import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, setResponsableActivo, crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, setUnidadActividadEstipulada, crearLote, eliminarLote, crearUsuario, cambiarContrasena, eliminarUsuario, BloqueoError, setPantallasUsuario, setVariantesArea } from '@/datos/repositorio'
 import { usuarioActual } from '@/auth/sesion'
 import { normalizarUnidad } from '@/dominio/unidad'
@@ -137,7 +138,13 @@ export async function setUnidadActividadEstipuladaAccion(form: FormData) {
   const id = texto(form, 'id')
   if (!id) faltanDatos()
   const unidad = normalizarUnidad(texto(form, 'unidad'))
-  await correr(() => setUnidadActividadEstipulada(id, unidad), 'Unidad actualizada.')
+  await correr(async () => {
+    await setUnidadActividadEstipulada(id, unidad)
+    // La unidad se lee en Cumplimiento y Resumen; refrescarlas para que el cambio
+    // se refleje sin tener que recargar manualmente (Router Cache).
+    revalidatePath('/cumplimiento')
+    revalidatePath('/resumen')
+  }, 'Unidad actualizada.')
 }
 
 export async function crearLoteAccion(form: FormData) {
