@@ -12,6 +12,7 @@ type ActividadGrilla = {
   turno: string
   tareaId: string | null
   maquina: { nombre: string } | null
+  finca: { nombre: string } | null
   lotes: { id: string; nombre: string; hectareas: number | null }[]
   bultosPorLote?: unknown
 }
@@ -95,6 +96,7 @@ export function GrillaSemana({
                                 a.turno && <div className={`text-tierra ${paraExportar ? 'text-sm' : 'text-xs'}`}>{a.turno}</div>
                               ))}
                               {a.maquina && <div className={`text-tierra ${paraExportar ? 'text-sm' : 'text-xs'}`}>🚜 {a.maquina.nombre}</div>}
+                              {esMaquinaria && a.finca && <div className={`text-tierra ${paraExportar ? 'text-sm' : 'text-xs'}`}>🏠 {a.finca.nombre}</div>}
                               <InfoLotes lotes={a.lotes} bultosPorLote={a.bultosPorLote as Record<string, number> | null} className="mt-1" tamano={paraExportar ? 'text-sm' : 'text-xs'} />
                               {editable && a.tareaId && (
                                 <>
