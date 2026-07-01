@@ -30,6 +30,7 @@ export function ActividadEstandar({
   marcarCumplida,
   registrarNovedad,
   devolverAlBanco,
+  editarPotreros,
 }: {
   actividadId: string
   estado: Estado
@@ -47,8 +48,10 @@ export function ActividadEstandar({
   marcarCumplida: (f: FormData) => void | Promise<void>
   registrarNovedad: (f: FormData) => void | Promise<void>
   devolverAlBanco: (f: FormData) => void | Promise<void>
+  editarPotreros: (f: FormData) => void | Promise<void>
 }) {
   const [novedad, setNovedad] = useState(false)
+  const [editandoPotreros, setEditandoPotreros] = useState(false)
   const esParcial = estado === 'PARCIAL'
   // Cumplida visible: sin lotes siempre; con lotes solo cuando ya hay avance (PARCIAL).
   const mostrarCumplida = !tieneLotes || esParcial
@@ -108,6 +111,31 @@ export function ActividadEstandar({
             Guardar avance
           </button>
         </form>
+      )}
+
+      {tieneLotes && (
+        editandoPotreros ? (
+          <form action={editarPotreros} className="flex w-full flex-col gap-2 rounded-lg border border-borde bg-arena p-2 text-xs">
+            <input type="hidden" name="id" value={actividadId} />
+            <span className="font-semibold text-tinta">Potreros de la actividad</span>
+            <div className="flex flex-wrap gap-x-3 gap-y-1">
+              {lotesCatalogo.map((l) => (
+                <label key={l.id} className="flex items-center gap-1">
+                  <input type="checkbox" name="loteId" value={l.id} defaultChecked={lotesActividad.some((x) => x.id === l.id)} />
+                  {l.nombre} <span className="text-tierra">({l.finca.nombre})</span>
+                </label>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <button className="rounded-lg bg-bosque px-2 py-1 font-semibold text-white">Guardar potreros</button>
+              <button type="button" onClick={() => setEditandoPotreros(false)} className="text-tierra underline">cancelar</button>
+            </div>
+          </form>
+        ) : (
+          <button type="button" onClick={() => setEditandoPotreros(true)} className="text-xs text-tierra underline">
+            Editar potreros
+          </button>
+        )
       )}
 
       {mostrarCumplida && (

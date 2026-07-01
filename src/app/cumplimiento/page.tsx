@@ -10,7 +10,7 @@ import { textoLotesHechos } from '@/dominio/lotes-hechos'
 import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, responsablesDistintos, conteoEstadoActividades, tieneDiaPendiente, estadoActividad } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
 import { lotesPendientes, textoAvanceConFecha, normalizarAvancePorLote, totalAvanceLotes, type AvanceEntrada } from '@/dominio/avance-lote'
-import { registrarAccion, agregarActividadRealizadaAccion, marcarEstadoAccion, desmarcarAccion, registrarAvanceLoteAccion, devolverAlBancoAccion, marcarCumplidaParcialAccion, registrarAvanceLoteActividadAccion, registrarAvanceObservacionAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion } from './acciones'
+import { registrarAccion, agregarActividadRealizadaAccion, marcarEstadoAccion, desmarcarAccion, registrarAvanceLoteAccion, devolverAlBancoAccion, marcarCumplidaParcialAccion, registrarAvanceLoteActividadAccion, registrarAvanceObservacionAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion, setLotesActividadAccion } from './acciones'
 import { FormActividadRealizada } from './form-actividad-realizada'
 import { FormAvanceLote } from './form-avance-lote'
 import { InfoLotes } from '../_componentes/info-lotes'
@@ -402,6 +402,7 @@ export default async function CumplimientoPage({
                             marcarCumplida={marcarCumplidaActividadAccion}
                             registrarNovedad={registrarNovedadActividadAccion}
                             devolverAlBanco={devolverAlBancoAccion}
+                            editarPotreros={setLotesActividadAccion}
                           />
                         )
                       )}

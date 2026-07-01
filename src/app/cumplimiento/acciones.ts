@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { marcarEstado, reprogramarActividad, registrarCumplimiento, crearActividadRealizada, reabrirActividad, registrarAvanceLote, devolverAlBanco, marcarCumplidaDesdeParcial, semanaDeActividad, registrarAvanceLoteGrupo, registrarAvanceObservacionGrupo, marcarCumplidaGrupo, registrarNovedadGrupo, reabrirGrupo } from '@/datos/repositorio'
+import { marcarEstado, reprogramarActividad, registrarCumplimiento, crearActividadRealizada, reabrirActividad, registrarAvanceLote, devolverAlBanco, marcarCumplidaDesdeParcial, semanaDeActividad, registrarAvanceLoteGrupo, registrarAvanceObservacionGrupo, marcarCumplidaGrupo, registrarNovedadGrupo, reabrirGrupo, setLotesGrupo } from '@/datos/repositorio'
 import { siguienteSemana, plazoCumplimientoVencido, semanaActual } from '@/dominio/semana'
 import { usuarioActual } from '@/auth/sesion'
 
@@ -184,6 +184,16 @@ export async function marcarCumplidaActividadAccion(form: FormData) {
   if (!id) return
   if (await bloqueadoPorPlazoActividad(id)) return
   await marcarCumplidaGrupo(id)
+  revalidatePath('/cumplimiento')
+}
+
+export async function setLotesActividadAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (!id) return
+  if (await bloqueadoPorPlazoActividad(id)) return
+  const loteIds = form.getAll('loteId').map((v) => String(v))
+  if (loteIds.length === 0) return
+  await setLotesGrupo(id, loteIds)
   revalidatePath('/cumplimiento')
 }
 

@@ -643,6 +643,24 @@ export async function marcarCumplidaGrupo(id: string) {
   return true
 }
 
+// Fija los potreros (lotes) de TODA la actividad (grupo tareaId): reemplaza el conjunto
+// en cada fila-hermana y ajusta la finca a la del primer potrero. Debe quedar ≥1 potrero.
+export async function setLotesGrupo(id: string, loteIds: string[]) {
+  const g = await filasHermanas(id)
+  if (!g || loteIds.length === 0) return null
+  const primer = await prisma.lote.findUnique({ where: { id: loteIds[0] } })
+  if (!primer) return null
+  await prisma.$transaction(
+    g.filas.map((f) =>
+      prisma.actividad.update({
+        where: { id: f.id },
+        data: { fincaId: primer.fincaId, lotes: { set: loteIds.map((lid) => ({ id: lid })) } },
+      }),
+    ),
+  )
+  return true
+}
+
 // Novedad de la actividad completa: aplica estado (NO_CUMPLIDA/PARCIAL/REPROGRAMADA) +
 // motivo/nota a todas las filas. Para No cumplida/Reprogramada devuelve la tarea al banco
 // (toda la actividad es una sola novedad). Cambio de actividad: crea UNA actividad de
