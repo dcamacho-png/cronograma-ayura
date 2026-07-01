@@ -31,7 +31,7 @@ describe('actividadesConCambio', () => {
     const acts = [
       act({ id: '1', estado: 'CUMPLIDA' }),
       act({ id: '2', estado: 'PENDIENTE' }),
-      act({ id: '3', estado: 'PARCIAL', vecesReprogramada: 0, dia: 5 }),
+      act({ id: '3', estado: 'PARCIAL', vecesReprogramada: 0, dia: 5, motivoId: 'm1' }),
       act({ id: '4', estado: 'NO_CUMPLIDA', vecesReprogramada: 2, dia: 1 }),
       act({ id: '5', estado: 'REPROGRAMADA', vecesReprogramada: 1, dia: 3 }),
     ]
@@ -55,6 +55,15 @@ describe('actividadesConCambio', () => {
     const r = actividadesConCambio(acts)
     expect(r.length).toBe(1)
     expect(r[0].tareaId).toBe('T1')
+  })
+
+  it('PARCIAL sin motivo NO aparece; con motivo sí', () => {
+    const acts = [
+      act({ id: 'p0', tareaId: 'P0', estado: 'PARCIAL', motivoId: null }),
+      act({ id: 'p1', tareaId: 'P1', estado: 'PARCIAL', motivoId: 'm1' }),
+    ]
+    const r = actividadesConCambio(acts)
+    expect(r.map((a) => a.tareaId)).toEqual(['P1'])
   })
 })
 

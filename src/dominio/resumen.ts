@@ -12,15 +12,19 @@ export function colorPorcentaje(pct: number | null): ColorPorcentaje {
   return 'rojo'
 }
 
-const ESTADOS_CON_CAMBIO = ['PARCIAL', 'NO_CUMPLIDA', 'REPROGRAMADA']
+const ESTADOS_CAMBIO_SIEMPRE = ['NO_CUMPLIDA', 'REPROGRAMADA']
 
-// Actividades que "cambiaron" en la semana (no cumplidas del todo o reprogramadas),
-// ordenadas por veces reprogramada (desc) y luego por día (asc). No muta la entrada.
+// Actividades que "cambiaron" en la semana. NO_CUMPLIDA/REPROGRAMADA siempre; PARCIAL
+// solo si tuvo una novedad (alguna fila con motivo) — no por un avance normal.
+// Ordenadas por veces reprogramada (desc) y luego por día (asc). No muta la entrada.
 export function actividadesConCambio(actividades: Actividad[]): Actividad[] {
   const reps: Actividad[] = []
   for (const filas of agruparPorActividad(actividades).values()) {
-    if (!ESTADOS_CON_CAMBIO.includes(estadoActividad(filas))) continue
-    // Fila representativa: la de menor día (conserva descripción, responsable, motivo, nota).
+    const estado = estadoActividad(filas)
+    const esCambio =
+      ESTADOS_CAMBIO_SIEMPRE.includes(estado) ||
+      (estado === 'PARCIAL' && filas.some((f) => f.motivoId))
+    if (!esCambio) continue
     const base = [...filas].sort((a, b) => a.dia - b.dia)[0]
     reps.push(base)
   }
