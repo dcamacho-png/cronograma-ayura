@@ -99,6 +99,7 @@ model Actividad {
   hectareas  Float?
   haFaltante  Float?
   haRealizada  Float?
+  unidadRealizada String?
   planB        String?
   noProgramada Boolean @default(false)
   bultosPorLote Json?
