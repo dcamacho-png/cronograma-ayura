@@ -661,6 +661,52 @@ export async function setLotesGrupo(id: string, loteIds: string[]) {
   return true
 }
 
+// Fija la unidad de medida (texto libre) en todas las filas del grupo.
+export async function setUnidadRealizadaGrupo(id: string, unidad: string) {
+  const g = await filasHermanas(id)
+  if (!g) return null
+  await prisma.$transaction(
+    g.filas.map((f) =>
+      prisma.actividad.update({ where: { id: f.id }, data: { unidadRealizada: unidad } }),
+    ),
+  )
+  return true
+}
+
+// Conecta (sin quitar) esos lotes a todas las filas del grupo. Para "anexar" al registrar
+// un avance de un potrero que aún no estaba asignado.
+export async function anexarLotesGrupo(id: string, loteIds: string[]) {
+  const g = await filasHermanas(id)
+  if (!g || loteIds.length === 0) return null
+  await prisma.$transaction(
+    g.filas.map((f) =>
+      prisma.actividad.update({
+        where: { id: f.id },
+        data: { lotes: { connect: loteIds.map((lid) => ({ id: lid })) } },
+      }),
+    ),
+  )
+  return true
+}
+
+// Actividad general (sin lotes): fija unidad + medida (haRealizada) + nota, y deja las
+// filas abiertas en PARCIAL (igual que la observación actual).
+export async function registrarMedidaGeneralGrupo(id: string, unidad: string, cantidad: number, nota: string | null) {
+  const g = await filasHermanas(id)
+  if (!g) return null
+  await prisma.$transaction(
+    g.filas
+      .filter((f) => f.estado === 'PENDIENTE' || f.estado === 'PARCIAL')
+      .map((f) =>
+        prisma.actividad.update({
+          where: { id: f.id },
+          data: { unidadRealizada: unidad, haRealizada: cantidad, nota, estado: 'PARCIAL' },
+        }),
+      ),
+  )
+  return true
+}
+
 // Novedad de la actividad completa: aplica estado (NO_CUMPLIDA/PARCIAL/REPROGRAMADA) +
 // motivo/nota a todas las filas. Para No cumplida/Reprogramada devuelve la tarea al banco
 // (toda la actividad es una sola novedad). Cambio de actividad: crea UNA actividad de
