@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { marcarEstado, reprogramarActividad, registrarCumplimiento, crearActividadRealizada, reabrirActividad, registrarAvanceLote, devolverAlBanco, marcarCumplidaDesdeParcial, semanaDeActividad, registrarAvanceLoteGrupo, registrarAvanceObservacionGrupo, marcarCumplidaGrupo, registrarNovedadGrupo, reabrirGrupo, setLotesGrupo } from '@/datos/repositorio'
+import { marcarEstado, reprogramarActividad, registrarCumplimiento, crearActividadRealizada, reabrirActividad, registrarAvanceLote, devolverAlBanco, marcarCumplidaDesdeParcial, semanaDeActividad, registrarAvanceLoteGrupo, registrarAvanceObservacionGrupo, marcarCumplidaGrupo, registrarNovedadGrupo, reabrirGrupo, setLotesGrupo, setUnidadRealizadaGrupo, anexarLotesGrupo, registrarMedidaGeneralGrupo } from '@/datos/repositorio'
 import { siguienteSemana, plazoCumplimientoVencido, semanaActual } from '@/dominio/semana'
 import { usuarioActual } from '@/auth/sesion'
 
@@ -194,6 +194,36 @@ export async function setLotesActividadAccion(form: FormData) {
   const loteIds = form.getAll('loteId').map((v) => String(v))
   if (loteIds.length === 0) return
   await setLotesGrupo(id, loteIds)
+  revalidatePath('/cumplimiento')
+}
+
+// Resuelve la unidad elegida: si es "otro", usa el texto libre; si no, el valor del select.
+function unidadElegida(form: FormData): string {
+  const u = texto(form, 'unidad')
+  if (u === 'otro') return texto(form, 'unidadOtra') || 'otro'
+  return u || 'cantidad'
+}
+
+export async function registrarAvanceEstandarAccion(form: FormData) {
+  const id = texto(form, 'id')
+  const dia = Number(texto(form, 'dia'))
+  const loteId = texto(form, 'loteId')
+  const cantidad = numeroOpcional(form, 'cantidad') ?? 0
+  if (!id || !loteId || !(dia >= 1 && dia <= 7) || cantidad <= 0) return
+  if (await bloqueadoPorPlazoActividad(id)) return
+  await anexarLotesGrupo(id, [loteId])
+  await setUnidadRealizadaGrupo(id, unidadElegida(form))
+  await registrarAvanceLoteGrupo(id, dia, null, [{ loteId, cantidad }])
+  revalidatePath('/cumplimiento')
+}
+
+export async function registrarMedidaGeneralAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (!id) return
+  if (await bloqueadoPorPlazoActividad(id)) return
+  const cantidad = numeroOpcional(form, 'cantidad') ?? 0
+  const nota = textoOpcional(form, 'nota')
+  await registrarMedidaGeneralGrupo(id, unidadElegida(form), cantidad, nota)
   revalidatePath('/cumplimiento')
 }
 
