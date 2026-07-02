@@ -10,7 +10,7 @@ import { textoLotesHechos } from '@/dominio/lotes-hechos'
 import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, responsablesDistintos, conteoEstadoActividades, tieneDiaPendiente, estadoActividad } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
 import { lotesPendientes, textoAvanceConFecha, normalizarAvancePorLote, totalAvanceLotes, type AvanceEntrada } from '@/dominio/avance-lote'
-import { registrarAccion, agregarActividadRealizadaAccion, marcarEstadoAccion, desmarcarAccion, registrarAvanceLoteAccion, devolverAlBancoAccion, marcarCumplidaParcialAccion, registrarAvanceLoteActividadAccion, registrarAvanceObservacionAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion, setLotesActividadAccion } from './acciones'
+import { registrarAccion, agregarActividadRealizadaAccion, marcarEstadoAccion, desmarcarAccion, registrarAvanceLoteAccion, devolverAlBancoAccion, marcarCumplidaParcialAccion, registrarAvanceEstandarAccion, registrarMedidaGeneralAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion, setLotesActividadAccion } from './acciones'
 import { FormActividadRealizada } from './form-actividad-realizada'
 import { FormAvanceLote } from './form-avance-lote'
 import { InfoLotes } from '../_componentes/info-lotes'
@@ -351,8 +351,9 @@ export default async function CumplimientoPage({
                   const tieneAvances = Object.values(avances).some((es) => es.length > 0)
                   const etiquetaDia = (d: number) =>
                     `${DIAS[d] ?? ''} ${fechas[d - 1] ? fmtFecha(fechas[d - 1]) : ''}`.trim()
-                  const resumenAvances = textoAvanceConFecha(cab.lotes, avances, unidadAbreviada(unidad), etiquetaDia)
                   const tieneLotes = cab.lotes.length > 0
+                  const unidadStd = cab.unidadRealizada ?? unidadAbreviada(unidad)
+                  const resumenAvances = textoAvanceConFecha(cab.lotes, avances, unidadStd, etiquetaDia)
                   const interactivo = estadoGrupo === 'PENDIENTE' || estadoGrupo === 'PARCIAL'
                   return (
                     <div className="flex flex-col gap-2">
@@ -361,7 +362,7 @@ export default async function CumplimientoPage({
                         <div className="flex flex-wrap items-center gap-2 text-sm">
                           <span className="font-semibold">{ESTADOS.find((e) => e.valor === estadoGrupo)?.etiqueta ?? estadoGrupo}</span>
                           {(tieneAvances || cab.haRealizada != null) && (
-                            <span className="text-tierra">· {tieneAvances ? totalAvanceLotes(cab.lotes, avances) : cab.haRealizada} {unidadAbreviada(unidad)}</span>
+                            <span className="text-tierra">· {tieneAvances ? totalAvanceLotes(cab.lotes, avances) : cab.haRealizada} {unidadStd}</span>
                           )}
                           {cab.motivo && <span className="text-tierra">· {cab.motivo.nombre}</span>}
                           {cab.nota && <span className="text-tierra">· {cab.nota}</span>}
@@ -389,17 +390,17 @@ export default async function CumplimientoPage({
                           <ActividadEstandar
                             actividadId={cab.id}
                             estado={estadoGrupo}
-                            unidad={unidad}
                             dia={cab.dia}
                             tieneLotes={tieneLotes}
                             lotesActividad={cab.lotes}
                             lotesCatalogo={lotes}
+                            unidadRealizada={cab.unidadRealizada}
                             estipuladas={estipuladas}
                             motivos={motivos}
                             motivoCambioId={motivoCambioId}
                             nota={cab.nota}
-                            registrarAvanceLote={registrarAvanceLoteActividadAccion}
-                            registrarObservacion={registrarAvanceObservacionAccion}
+                            registrarAvanceEstandar={registrarAvanceEstandarAccion}
+                            registrarMedidaGeneral={registrarMedidaGeneralAccion}
                             marcarCumplida={marcarCumplidaActividadAccion}
                             registrarNovedad={registrarNovedadActividadAccion}
                             devolverAlBanco={devolverAlBancoAccion}
