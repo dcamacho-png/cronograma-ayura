@@ -253,6 +253,7 @@ export default async function CumplimientoPage({
                                   dia={a.dia}
                                   accionRegistrar={registrarAccion}
                                   accionAvance={registrarAvanceLoteAccion}
+                                  marcarCumplido={marcarEstadoAccion}
                                 />
                               ) : (
                                 <DiaNoMaquinaria

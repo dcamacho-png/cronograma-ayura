@@ -53,8 +53,9 @@ export function ActividadEstandar({
   const [novedad, setNovedad] = useState(false)
   const [editandoPotreros, setEditandoPotreros] = useState(false)
   const esParcial = estado === 'PARCIAL'
-  // Cumplida visible: sin lotes siempre; con lotes solo cuando ya hay avance (PARCIAL).
-  const mostrarCumplida = !tieneLotes || esParcial
+  // La actividad solo se renderiza si está abierta (PENDIENTE/PARCIAL); "Cumplida" siempre
+  // disponible para poder cerrarla directo, sin exigir un avance previo.
+  const mostrarCumplida = true
 
   if (novedad) {
     return (

@@ -26,6 +26,7 @@ export function DiaMaquinaria({
   dia,
   accionRegistrar,
   accionAvance,
+  marcarCumplido,
 }: {
   actividadId: string
   unidad: Unidad
@@ -39,6 +40,7 @@ export function DiaMaquinaria({
   dia: number
   accionRegistrar: (formData: FormData) => void | Promise<void>
   accionAvance: (formData: FormData) => void | Promise<void>
+  marcarCumplido: (formData: FormData) => void | Promise<void>
 }) {
   const [novedad, setNovedad] = useState(false)
   const [centro, setCentro] = useState('')
@@ -111,6 +113,13 @@ export function DiaMaquinaria({
         <button className="rounded-lg bg-bosque px-3 py-1 text-sm font-semibold text-white">✓ Registrar cumplimiento</button>
         <button type="button" onClick={() => setNovedad(true)} className="text-xs text-tierra underline">
           registrar novedad
+        </button>
+      </form>
+      <form action={marcarCumplido}>
+        <input type="hidden" name="id" value={actividadId} />
+        <input type="hidden" name="estado" value="CUMPLIDA" />
+        <button className="rounded-lg border border-bosque px-3 py-1 text-sm font-semibold text-bosque hover:bg-arena/40">
+          ✓ Cumplida
         </button>
       </form>
       {lotesActividad.length > 0 && (
