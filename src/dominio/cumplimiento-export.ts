@@ -6,7 +6,7 @@ import { estadoActividad } from './metricas'
 import type { Estado } from './tipos'
 
 export const COLUMNAS_CUMPLIMIENTO = [
-  'Día', 'Fecha', 'Responsable', 'Actividad', 'Máquina', 'Lote(s)', 'Estado', 'Medida realizada', 'Unidad', 'Bultos por lote', 'Centro de costo', 'Potreros realizados', 'Ejecutada por',
+  'Día', 'Fecha', 'Responsable', 'Actividad', 'Máquina', 'Lote(s)', 'Finca', 'Estado', 'Medida realizada', 'Unidad', 'Bultos por lote', 'Centro de costo', 'Potreros realizados', 'Ejecutada por', 'Observación',
 ] as const
 
 const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
@@ -31,6 +31,8 @@ export type ActividadExport = {
   centroCosto: string | null
   lotesHechos: string[] | null
   avancePorLote: Record<string, AvanceEntrada | AvanceEntrada[]> | null
+  finca: { nombre: string } | null
+  nota: string | null
 }
 
 // Filas del Excel para una actividad, en el orden de COLUMNAS_CUMPLIMIENTO.
@@ -67,6 +69,7 @@ export function filasCumplimiento(
         a.descripcion,
         ctx.nombreMaquina(e.maquinaId) || (a.maquina?.nombre ?? ''),
         l.nombre,
+        a.finca?.nombre ?? '',
         estado,
         e.cantidad,
         unidadAbrev,
@@ -74,6 +77,7 @@ export function filasCumplimiento(
         centro,
         potreros,
         ejecutadaPor,
+        a.nota ?? '',
       ])
     }
   }
@@ -87,6 +91,7 @@ export function filasCumplimiento(
     a.descripcion,
     a.maquina?.nombre ?? '',
     a.lotes.map((l) => l.nombre).join(', '),
+    a.finca?.nombre ?? '',
     estado,
     a.haRealizada ?? '',
     a.haRealizada == null ? '' : unidadAbrev,
@@ -94,6 +99,7 @@ export function filasCumplimiento(
     centro,
     potreros,
     ejecutadaPor,
+    a.nota ?? '',
   ]]
 }
 
