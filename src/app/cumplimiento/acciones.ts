@@ -164,6 +164,21 @@ export async function registrarAvanceEstandarAccion(form: FormData) {
   revalidatePath('/cumplimiento')
 }
 
+export async function registrarAvanceAccion(form: FormData) {
+  const id = texto(form, 'id')
+  const dia = Number(texto(form, 'dia'))
+  const loteId = texto(form, 'loteId')
+  const cantidad = numeroOpcional(form, 'cantidad') ?? 0
+  if (!id || !loteId || !(dia >= 1 && dia <= 7) || cantidad <= 0) return
+  if (await bloqueadoPorPlazoActividad(id)) return
+  const responsableId = textoOpcional(form, 'responsableId')
+  const maquinaId = textoOpcional(form, 'maquinaId')
+  const centroCosto = textoOpcional(form, 'centroCosto')
+  await anexarLotesGrupo(id, [loteId])
+  await registrarAvanceLoteGrupo(id, dia, maquinaId, [{ loteId, cantidad }], centroCosto, responsableId)
+  revalidatePath('/cumplimiento')
+}
+
 export async function registrarMedidaGeneralAccion(form: FormData) {
   const id = texto(form, 'id')
   if (!id) return
