@@ -296,6 +296,7 @@ export default async function CumplimientoPage({
                             responsableActividadId={cab.responsableId}
                             fincaActividad={cab.finca?.nombre ?? ''}
                             registrarAvance={registrarAvanceAccion}
+                            setUnidadRealizada={setUnidadRealizadaAccion}
                             registrarMedidaGeneral={registrarMedidaGeneralAccion}
                             marcarCumplida={marcarCumplidaActividadAccion}
                             registrarNovedad={registrarNovedadActividadAccion}
