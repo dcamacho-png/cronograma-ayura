@@ -129,6 +129,8 @@ model Tarea {
   lote        Lote?       @relation("TareaLoteUnico", fields: [loteId], references: [id])
   lotes       Lote[]      @relation("TareaLotesMulti")
   bultosPorLote Json?
+  medidaPorLote Json?
+  unidad        String?
   detalle String?
   observacionDevolucion String?
   diasSugeridos String?
@@ -143,6 +145,7 @@ model ActividadEstipulada {
   id     String @id @default(cuid())
   nombre String @unique
   unidad String @default("ha")
+  maquinaria Boolean @default(true)
 }
 
 model Lote {

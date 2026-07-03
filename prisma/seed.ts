@@ -139,8 +139,23 @@ async function main() {
   for (const a of ACTIVIDADES_ESTIPULADAS) {
     await prisma.actividadEstipulada.upsert({
       where: { nombre: a.nombre },
-      update: { unidad: a.unidad },
-      create: { nombre: a.nombre, unidad: a.unidad },
+      update: { unidad: a.unidad, maquinaria: true },
+      create: { nombre: a.nombre, unidad: a.unidad, maquinaria: true },
+    })
+  }
+
+  // Catálogo estándar (actividades de no-maquinaria).
+  const ACTIVIDADES_ESTANDAR: string[] = [
+    'Apoyo fertilizacion', 'Fumigacion malezas', 'Fumigacion espartillo', 'Decepada de espartillo',
+    'Limpieza de cerca', 'Arreglo de cerca', 'Acarreo sal y concentrados', 'Acarreo sal',
+    'Orden y aseo', 'Arreglo fuga de agua', 'Mantenimiento bebederos', 'Limpieza bebederos',
+    'Limpieza arborizacion', 'Fumigacion arborizacion', 'Guadaña', 'Mantenimiento jardin',
+  ]
+  for (const nombre of ACTIVIDADES_ESTANDAR) {
+    await prisma.actividadEstipulada.upsert({
+      where: { nombre },
+      update: { maquinaria: false },
+      create: { nombre, unidad: 'jornales', maquinaria: false },
     })
   }
 
