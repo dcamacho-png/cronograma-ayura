@@ -74,7 +74,7 @@ export function filasCumplimiento(
         e.cantidad,
         unidadAbrev,
         bultos,
-        centro,
+        e.centroCosto ?? centro,
         potreros,
         ejecutadaPor,
         a.nota ?? '',

@@ -142,6 +142,24 @@ describe('filasCumplimiento — con avances extra', () => {
   })
 })
 
+describe('filasCumplimiento — centro de costo por avance', () => {
+  it('usa el centroCosto de la entrada; si no, el de la actividad', () => {
+    const a = act({
+      centroCosto: 'ActNivel',
+      avancePorLote: {
+        l1: [
+          { dia: 1, maquinaId: null, cantidad: 2, centroCosto: 'Ceba' },
+          { dia: 2, maquinaId: null, cantidad: 3 },
+        ],
+      },
+    })
+    const filas = filasCumplimiento(a, '15 jun', mapa, ctx)
+    // Columna "Centro de costo" = índice 11
+    expect(filas[0][11]).toBe('Ceba')
+    expect(filas[1][11]).toBe('ActNivel')
+  })
+})
+
 describe('filasCumplimiento — Finca y Observación (columnas nuevas)', () => {
   it('incluye la finca de la actividad y la nota (novedad) en la fila', () => {
     expect(
