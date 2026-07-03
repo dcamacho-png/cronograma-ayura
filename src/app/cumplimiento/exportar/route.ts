@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import ExcelJS from 'exceljs'
 import { usuarioActual } from '@/auth/sesion'
-import { listarAreas, listarActividades, listarActividadesSolicitadas, listarActividadesEstipuladas, listarMaquinas } from '@/datos/repositorio'
+import { listarAreas, listarActividades, listarActividadesSolicitadas, listarActividadesEstipuladas, listarMaquinas, listarResponsablesTodos } from '@/datos/repositorio'
 import { fechasDeSemana } from '@/dominio/semana'
 import { COLUMNAS_CUMPLIMIENTO, filasCumplimientoGrupo } from '@/dominio/cumplimiento-export'
 import { agruparPorActividad, estadoActividad } from '@/dominio/metricas'
@@ -32,16 +32,17 @@ export async function GET(req: NextRequest) {
     return new NextResponse('Parámetros inválidos', { status: 400 })
   }
 
-  const [actividades, solicitadas, estipuladas, maquinas] = await Promise.all([
+  const [actividades, solicitadas, estipuladas, maquinas, responsablesTodos] = await Promise.all([
     listarActividades(area.id, anio, semana),
     listarActividadesSolicitadas(area.id, anio, semana),
     listarActividadesEstipuladas(),
     listarMaquinas(),
+    listarResponsablesTodos(),
   ])
   const nombrePorMaquina = new Map(maquinas.map((m) => [m.id, m.nombre]))
   const nombreMaquina = (id: string | null) => (id ? nombrePorMaquina.get(id) ?? '' : '')
   const nombrePorResponsable = new Map<string, string>()
-  for (const a of [...actividades, ...solicitadas]) nombrePorResponsable.set(a.responsableId, a.responsable.nombre)
+  for (const r of responsablesTodos) nombrePorResponsable.set(r.id, r.nombre)
   const nombreResponsable = (id: string | null) => (id ? nombrePorResponsable.get(id) ?? '' : '')
   const unidadPorNombre = Object.fromEntries(estipuladas.map((e) => [e.nombre, e.unidad]))
   const fechas = fechasDeSemana(anio, semana)
