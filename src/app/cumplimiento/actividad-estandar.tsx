@@ -38,6 +38,9 @@ export function ActividadEstandar({
   registrarNovedad,
   devolverAlBanco,
   editarPotreros,
+  motivoActualId,
+  puedeContinuar,
+  continuar,
 }: {
   actividadId: string
   estado: Estado
@@ -61,6 +64,9 @@ export function ActividadEstandar({
   registrarNovedad: (f: FormData) => void | Promise<void>
   devolverAlBanco: (f: FormData) => void | Promise<void>
   editarPotreros: (f: FormData) => void | Promise<void>
+  motivoActualId: string | null
+  puedeContinuar: boolean
+  continuar: (f: FormData) => void | Promise<void>
 }) {
   const esParcial = estado === 'PARCIAL'
   const conocida = UNIDADES.find((u) => u.toLowerCase() === (unidadRealizada ?? '').toLowerCase())
@@ -82,6 +88,9 @@ export function ActividadEstandar({
           haProgramada={0}
           lotesActividad={lotesActividad}
           unidadActual={unidadRealizada}
+          estadoInicial={estado}
+          motivoInicial={motivoActualId ?? ''}
+          notaInicial={nota ?? ''}
           accion={registrarNovedad}
         />
         <button type="button" onClick={() => setNovedad(false)} className="mt-1 text-xs text-tierra underline">
@@ -181,8 +190,14 @@ export function ActividadEstandar({
             <button className="rounded-lg border border-borde px-2 py-1 text-xs text-tierra hover:bg-arena/40">Devolver al banco</button>
           </form>
         )}
-        {!esParcial && (
-          <button type="button" onClick={() => setNovedad(true)} className="text-xs text-tierra underline">registrar novedad</button>
+        <button type="button" onClick={() => setNovedad(true)} className="text-xs text-tierra underline">
+          {esParcial ? 'registrar/editar novedad' : 'registrar novedad'}
+        </button>
+        {esParcial && puedeContinuar && (
+          <form action={continuar}>
+            <input type="hidden" name="id" value={actividadId} />
+            <button className="rounded-lg border border-bosque px-2 py-1 text-xs font-semibold text-bosque hover:bg-arena/40">Continuar la próxima semana</button>
+          </form>
         )}
       </div>
     </div>

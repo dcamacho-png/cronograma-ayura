@@ -9,8 +9,8 @@ import { unidadDe, unidadAbreviada } from '@/dominio/unidad'
 import { textoLotesHechos } from '@/dominio/lotes-hechos'
 import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, conteoEstadoActividades, tieneDiaPendiente, estadoActividad } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
-import { textoAvanceConFecha, normalizarAvancePorLote, totalAvanceLotes, type AvanceEntrada } from '@/dominio/avance-lote'
-import { agregarActividadRealizadaAccion, devolverAlBancoAccion, registrarMedidaGeneralAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion, setLotesActividadAccion, registrarAvanceAccion } from './acciones'
+import { textoAvanceConFecha, normalizarAvancePorLote, totalAvanceLotes, lotesPendientes, type AvanceEntrada } from '@/dominio/avance-lote'
+import { agregarActividadRealizadaAccion, devolverAlBancoAccion, registrarMedidaGeneralAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion, setLotesActividadAccion, registrarAvanceAccion, continuarParcialAccion } from './acciones'
 import { FormActividadRealizada } from './form-actividad-realizada'
 import { InfoLotes } from '../_componentes/info-lotes'
 import { ActividadEstandar } from './actividad-estandar'
@@ -224,6 +224,9 @@ export default async function CumplimientoPage({
                   const etiquetaDia = (d: number) =>
                     `${DIAS[d] ?? ''} ${fechas[d - 1] ? fmtFecha(fechas[d - 1]) : ''}`.trim()
                   const tieneLotes = cab.lotes.length > 0
+                  const puedeContinuar =
+                    estadoGrupo === 'PARCIAL' &&
+                    (cab.lotes.length === 0 || lotesPendientes(cab.lotes, avances).length > 0)
                   const unidadStd = cab.unidadRealizada ?? unidadAbreviada(unidad)
                   const resumenAvances = textoAvanceConFecha(cab.lotes, avances, unidadStd, etiquetaDia)
                   const interactivo = estadoGrupo === 'PENDIENTE' || estadoGrupo === 'PARCIAL'
@@ -277,10 +280,14 @@ export default async function CumplimientoPage({
                             unidadRealizada={cab.unidadRealizada}
                             bultosAsignados={cab.bultosPorLote as Record<string, number> | null}
                             descripcion={cab.descripcion}
+                            nota={cab.nota}
                             registrarAvance={registrarAvanceAccion}
                             marcarCumplida={marcarCumplidaActividadAccion}
                             registrarNovedad={registrarNovedadActividadAccion}
                             devolverAlBanco={devolverAlBancoAccion}
+                            motivoActualId={cab.motivo?.id ?? null}
+                            puedeContinuar={puedeContinuar}
+                            continuar={continuarParcialAccion}
                           />
                         ) : (
                           <ActividadEstandar
@@ -306,6 +313,9 @@ export default async function CumplimientoPage({
                             registrarNovedad={registrarNovedadActividadAccion}
                             devolverAlBanco={devolverAlBancoAccion}
                             editarPotreros={setLotesActividadAccion}
+                            motivoActualId={cab.motivo?.id ?? null}
+                            puedeContinuar={puedeContinuar}
+                            continuar={continuarParcialAccion}
                           />
                         )
                       )}
