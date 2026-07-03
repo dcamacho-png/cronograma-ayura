@@ -251,6 +251,8 @@ export async function crearTarea(
   loteIds: string[],
   bultosPorLote: Record<string, number> | null = null,
   detalle: string | null = null,
+  medidaPorLote: Record<string, number> | null = null,
+  unidad: string | null = null,
 ) {
   let fincaId: string | null = null
   if (loteIds.length > 0) {
@@ -265,6 +267,8 @@ export async function crearTarea(
       detalle,
       lotes: { connect: loteIds.map((id) => ({ id })) },
       ...(bultosPorLote ? { bultosPorLote } : {}),
+      ...(medidaPorLote ? { medidaPorLote } : {}),
+      ...(unidad ? { unidad } : {}),
     },
   })
 }
@@ -356,6 +360,7 @@ export async function asignarTarea(
             tareaId: tarea.id,
             lotes: { connect: loteIds.map((id) => ({ id })) },
             ...(tarea.bultosPorLote != null ? { bultosPorLote: tarea.bultosPorLote as Prisma.InputJsonValue } : {}),
+            ...(tarea.unidad ? { unidadRealizada: tarea.unidad } : {}),
           },
         })
         creadas += 1
@@ -372,8 +377,8 @@ export function listarActividadesEstipuladas() {
   return prisma.actividadEstipulada.findMany({ orderBy: { nombre: 'asc' } })
 }
 
-export function crearActividadEstipulada(nombre: string, unidad: string = 'ha') {
-  return prisma.actividadEstipulada.create({ data: { nombre, unidad } })
+export function crearActividadEstipulada(nombre: string, unidad: string = 'ha', maquinaria: boolean = true) {
+  return prisma.actividadEstipulada.create({ data: { nombre, unidad, maquinaria } })
 }
 
 export function eliminarActividadEstipulada(id: string) {
