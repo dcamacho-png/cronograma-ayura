@@ -8,7 +8,7 @@ En el registro de **novedad** (FormRegistrar), cuando la actividad tiene **vario
 - ☑️ casilla "se hizo" (por lote),
 - **Ha** por lote (precargada con el área asignada del lote; editable),
 - **Bultos** por lote (solo actividades de fertilización que usan bultos; precargado con los bultos asignados; editable),
-- **Anexar otro potrero** (finca→lote) con su ha + bultos.
+- **Anexar uno o varios potreros** (finca→lote) con su ha + bultos.
 
 No cambia el catálogo (el área del lote); solo registra lo hecho en esta actividad.
 
@@ -23,7 +23,7 @@ No cambia el catálogo (el área del lote); solo registra lo hecho en esta activ
 
 ### A. UI — tabla de potreros en `FormRegistrar`
 
-Cuando `requierePotreros`, por cada lote de `lotesActividad`: casilla `loteHecho` + input `ha_<loteId>` (number, `defaultValue` = `hectareas` del lote) + —si `usaBultos(descripcion)`— input `bultos_<loteId>` (number, `defaultValue` = bultos asignados del lote). Debajo, un bloque **"Anexar otro potrero"**: finca→lote (del catálogo, no asignados) + ha + bultos, que al elegirlo añade su `loteHecho` + `ha_`/`bultos_`.
+Cuando `requierePotreros`, por cada lote de `lotesActividad`: casilla `loteHecho` + input `ha_<loteId>` (number, `defaultValue` = `hectareas` del lote) + —si `usaBultos(descripcion)`— input `bultos_<loteId>` (number, `defaultValue` = bultos asignados del lote). Debajo, un bloque **"Anexar potrero"** que permite agregar **uno o varios** potreros no asignados: finca→lote (del catálogo) + ha + bultos; cada uno agregado se suma a la tabla (con su casilla `loteHecho` + `ha_`/`bultos_`), y se pueden añadir más (lista con estado en el cliente).
 - Props nuevas de `FormRegistrar`: `lotesActividad` gana `hectareas?: number | null`; nueva prop `bultosAsignados: Record<string, number> | null`; `descripcion: string` (para `usaBultos`). El catálogo (`lotes`) ya se recibe.
 
 ### B. Acción — `registrarNovedadActividadAccion`
