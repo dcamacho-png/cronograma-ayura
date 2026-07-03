@@ -40,6 +40,9 @@ export async function GET(req: NextRequest) {
   ])
   const nombrePorMaquina = new Map(maquinas.map((m) => [m.id, m.nombre]))
   const nombreMaquina = (id: string | null) => (id ? nombrePorMaquina.get(id) ?? '' : '')
+  const nombrePorResponsable = new Map<string, string>()
+  for (const a of [...actividades, ...solicitadas]) nombrePorResponsable.set(a.responsableId, a.responsable.nombre)
+  const nombreResponsable = (id: string | null) => (id ? nombrePorResponsable.get(id) ?? '' : '')
   const unidadPorNombre = Object.fromEntries(estipuladas.map((e) => [e.nombre, e.unidad]))
   const fechas = fechasDeSemana(anio, semana)
   const fmtFecha = (f: Date) =>
@@ -71,7 +74,7 @@ export async function GET(req: NextRequest) {
         grupo.map(aExport),
         fechaDeDia(grupo[0].dia),
         unidadPorNombre,
-        { fechaDeDia, nombreMaquina },
+        { fechaDeDia, nombreMaquina, nombreResponsable },
         ejecutadaPor(grupo),
       )) {
         ws.addRow(fila)
