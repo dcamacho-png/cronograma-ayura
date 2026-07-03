@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { etiquetaMedida, type Unidad } from '@/dominio/unidad'
+import { CENTROS_COSTO } from '@/dominio/centro-costo'
 
 const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
@@ -51,15 +52,26 @@ export function FormAvanceLote({
           </select>
         </label>
         {esMaquinaria && (
-          <label className="flex flex-col">
-            Máquina
-            <select name="maquinaId" className="rounded-lg border border-borde bg-marfil p-1 focus:outline-none focus:ring-2 focus:ring-bosque/40">
-              <option value="">— sin máquina —</option>
-              {maquinas.map((m) => (
-                <option key={m.id} value={m.id}>{m.nombre}</option>
-              ))}
-            </select>
-          </label>
+          <>
+            <label className="flex flex-col">
+              Máquina
+              <select name="maquinaId" className="rounded-lg border border-borde bg-marfil p-1 focus:outline-none focus:ring-2 focus:ring-bosque/40">
+                <option value="">— sin máquina —</option>
+                {maquinas.map((m) => (
+                  <option key={m.id} value={m.id}>{m.nombre}</option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col">
+              Centro de costo
+              <select name="centroCosto" className="rounded-lg border border-borde bg-marfil p-1 focus:outline-none focus:ring-2 focus:ring-bosque/40">
+                <option value="">— sin centro —</option>
+                {CENTROS_COSTO.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </label>
+          </>
         )}
       </div>
       <div className="flex flex-col gap-1">
