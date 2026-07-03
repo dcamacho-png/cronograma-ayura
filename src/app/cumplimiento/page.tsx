@@ -10,7 +10,7 @@ import { textoLotesHechos } from '@/dominio/lotes-hechos'
 import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, conteoEstadoActividades, tieneDiaPendiente, estadoActividad } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
 import { textoAvanceConFecha, normalizarAvancePorLote, totalAvanceLotes, type AvanceEntrada } from '@/dominio/avance-lote'
-import { agregarActividadRealizadaAccion, devolverAlBancoAccion, registrarAvanceEstandarAccion, registrarMedidaGeneralAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion, setLotesActividadAccion, registrarAvanceMaquinariaAccion } from './acciones'
+import { agregarActividadRealizadaAccion, devolverAlBancoAccion, registrarMedidaGeneralAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion, setLotesActividadAccion, registrarAvanceAccion, setUnidadRealizadaAccion } from './acciones'
 import { FormActividadRealizada } from './form-actividad-realizada'
 import { InfoLotes } from '../_componentes/info-lotes'
 import { ActividadEstandar } from './actividad-estandar'
@@ -269,7 +269,12 @@ export default async function CumplimientoPage({
                             motivos={motivos}
                             motivoCambioId={motivoCambioId}
                             haProgramada={cab.lotes.reduce((s, l) => s + (l.hectareas ?? 0), 0)}
-                            registrarAvance={registrarAvanceMaquinariaAccion}
+                            responsables={responsables}
+                            responsableActividadId={cab.responsableId}
+                            fincaActividad={cab.finca?.nombre ?? ''}
+                            unidadRealizada={cab.unidadRealizada}
+                            registrarAvance={registrarAvanceAccion}
+                            setUnidadRealizada={setUnidadRealizadaAccion}
                             marcarCumplida={marcarCumplidaActividadAccion}
                             registrarNovedad={registrarNovedadActividadAccion}
                             devolverAlBanco={devolverAlBancoAccion}
@@ -287,7 +292,10 @@ export default async function CumplimientoPage({
                             motivos={motivos}
                             motivoCambioId={motivoCambioId}
                             nota={cab.nota}
-                            registrarAvanceEstandar={registrarAvanceEstandarAccion}
+                            responsables={responsables}
+                            responsableActividadId={cab.responsableId}
+                            fincaActividad={cab.finca?.nombre ?? ''}
+                            registrarAvance={registrarAvanceAccion}
                             registrarMedidaGeneral={registrarMedidaGeneralAccion}
                             marcarCumplida={marcarCumplidaActividadAccion}
                             registrarNovedad={registrarNovedadActividadAccion}

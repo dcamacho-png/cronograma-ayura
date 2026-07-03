@@ -3,12 +3,13 @@
 import { useState } from 'react'
 import type { Estado } from '@/dominio/tipos'
 import { FormRegistrar } from './form-registrar'
+import { FormAvance } from './form-avance'
 
 type Motivo = { id: string; nombre: string }
 type Lote = { id: string; nombre: string; finca: { nombre: string } }
 type Estipulada = { id: string; nombre: string; unidad: string }
 
-const UNIDADES = ['Cantidad', 'Ha', 'Jornales'] // + "Otro" (texto libre)
+const UNIDADES = ['Ha', 'Hora', 'Kg', 'Cantidad', 'Bultos', 'Jornales'] // + "Otro" (texto libre)
 const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
 // Control de cumplimiento de UNA actividad estándar (no maquinaria), PENDIENTE o PARCIAL.
@@ -26,7 +27,10 @@ export function ActividadEstandar({
   motivos,
   motivoCambioId,
   nota,
-  registrarAvanceEstandar,
+  responsables,
+  responsableActividadId,
+  fincaActividad,
+  registrarAvance,
   registrarMedidaGeneral,
   marcarCumplida,
   registrarNovedad,
@@ -44,7 +48,10 @@ export function ActividadEstandar({
   motivos: Motivo[]
   motivoCambioId: string | null
   nota: string | null
-  registrarAvanceEstandar: (f: FormData) => void | Promise<void>
+  responsables: { id: string; nombre: string }[]
+  responsableActividadId: string
+  fincaActividad: string
+  registrarAvance: (f: FormData) => void | Promise<void>
   registrarMedidaGeneral: (f: FormData) => void | Promise<void>
   marcarCumplida: (f: FormData) => void | Promise<void>
   registrarNovedad: (f: FormData) => void | Promise<void>
@@ -55,8 +62,6 @@ export function ActividadEstandar({
   const conocida = UNIDADES.find((u) => u.toLowerCase() === (unidadRealizada ?? '').toLowerCase())
   const [novedad, setNovedad] = useState(false)
   const [unidadSel, setUnidadSel] = useState(conocida ?? (unidadRealizada ? 'Otro' : 'Cantidad'))
-  const fincas = [...new Set(lotesCatalogo.map((l) => l.finca.nombre))].sort()
-  const [finca, setFinca] = useState('')
 
   if (novedad) {
     return (
@@ -125,42 +130,17 @@ export function ActividadEstandar({
               ))}
             </div>
           )}
-          <form action={registrarAvanceEstandar} className="flex flex-wrap items-end gap-2 rounded-lg border border-borde bg-arena/40 p-2">
-            <input type="hidden" name="id" value={actividadId} />
-            {selectorUnidad}
-            {inputUnidadOtra}
-            <label className="flex flex-col text-xs">
-              Finca
-              <select value={finca} onChange={(e) => setFinca(e.target.value)} className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
-                <option value="">— finca —</option>
-                {fincas.map((f) => (
-                  <option key={f} value={f}>{f}</option>
-                ))}
-              </select>
-            </label>
-            <label className="flex flex-col text-xs">
-              Lote
-              <select name="loteId" className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
-                <option value="">— lote —</option>
-                {lotesCatalogo.filter((l) => l.finca.nombre === finca).map((l) => (
-                  <option key={l.id} value={l.id}>{l.nombre}</option>
-                ))}
-              </select>
-            </label>
-            <label className="flex flex-col text-xs">
-              Cantidad
-              <input name="cantidad" type="number" step="any" min="0" className="w-24 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
-            </label>
-            <label className="flex flex-col text-xs">
-              Día
-              <select name="dia" defaultValue={dia} className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
-                {[1, 2, 3, 4, 5, 6, 7].map((d) => (
-                  <option key={d} value={d}>{DIAS[d]}</option>
-                ))}
-              </select>
-            </label>
-            <button className="rounded-lg border border-bosque px-3 py-1 text-xs font-semibold text-bosque hover:bg-arena/40">Guardar avance</button>
-          </form>
+          <FormAvance
+            actividadId={actividadId}
+            diaActividad={dia}
+            esMaquinaria={false}
+            responsables={responsables}
+            responsableDefault={responsableActividadId}
+            maquinas={[]}
+            lotesCatalogo={lotesCatalogo}
+            fincaDefault={fincaActividad}
+            accion={registrarAvance}
+          />
         </>
       ) : (
         <form action={registrarMedidaGeneral} className="flex flex-wrap items-end gap-2">

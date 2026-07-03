@@ -214,3 +214,13 @@ export async function desmarcarActividadAccion(form: FormData) {
   await reabrirGrupo(id)
   revalidatePath('/cumplimiento')
 }
+
+export async function setUnidadRealizadaAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (!id) return
+  if (await bloqueadoPorPlazoActividad(id)) return
+  const u = texto(form, 'unidad')
+  const unidad = u === 'otro' ? texto(form, 'unidadOtra') || 'otro' : u || 'cantidad'
+  await setUnidadRealizadaGrupo(id, unidad)
+  revalidatePath('/cumplimiento')
+}
