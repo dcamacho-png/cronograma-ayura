@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { reprogramarActividad, crearActividadRealizada, devolverAlBanco, semanaDeActividad, registrarAvanceLoteGrupo, registrarAvanceObservacionGrupo, marcarCumplidaGrupo, registrarNovedadGrupo, reabrirGrupo, setLotesGrupo, setUnidadRealizadaGrupo, anexarLotesGrupo, registrarMedidaGeneralGrupo, continuarParcialSemanaSiguiente } from '@/datos/repositorio'
+import { reprogramarActividad, crearActividadRealizada, devolverAlBanco, semanaDeActividad, registrarAvanceLoteGrupo, registrarAvanceObservacionGrupo, marcarCumplidaGrupo, registrarNovedadGrupo, reabrirGrupo, setLotesGrupo, setUnidadRealizadaGrupo, anexarLotesGrupo, registrarMedidaGeneralGrupo, continuarParcialSemanaSiguiente, editarAvanceEntradaGrupo, eliminarAvanceEntradaGrupo } from '@/datos/repositorio'
 import { siguienteSemana, plazoCumplimientoVencido, semanaActual } from '@/dominio/semana'
 import { usuarioActual } from '@/auth/sesion'
 
@@ -140,6 +140,33 @@ export async function registrarAvanceAccion(form: FormData) {
   await anexarLotesGrupo(id, lotesHechos)
   await setUnidadRealizadaGrupo(id, unidadElegida(form))
   await registrarAvanceLoteGrupo(id, dia, maquinaId, avances, centroCosto, responsableId, observacion, Object.keys(bultosMap).length ? bultosMap : null)
+  revalidatePath('/cumplimiento')
+}
+
+export async function editarAvanceAccion(form: FormData) {
+  const id = texto(form, 'id')
+  const loteId = texto(form, 'loteId')
+  const index = Number(texto(form, 'index'))
+  if (!id || !loteId || !Number.isInteger(index) || index < 0) return
+  if (await bloqueadoPorPlazoActividad(id)) return
+  const cantidad = numeroOpcional(form, 'cantidad') ?? 0
+  const dia = Number(texto(form, 'dia'))
+  const observacion = textoOpcional(form, 'observacion')
+  await editarAvanceEntradaGrupo(id, loteId, index, {
+    cantidad,
+    ...(dia >= 1 && dia <= 7 ? { dia } : {}),
+    observacion,
+  })
+  revalidatePath('/cumplimiento')
+}
+
+export async function eliminarAvanceAccion(form: FormData) {
+  const id = texto(form, 'id')
+  const loteId = texto(form, 'loteId')
+  const index = Number(texto(form, 'index'))
+  if (!id || !loteId || !Number.isInteger(index) || index < 0) return
+  if (await bloqueadoPorPlazoActividad(id)) return
+  await eliminarAvanceEntradaGrupo(id, loteId, index)
   revalidatePath('/cumplimiento')
 }
 
