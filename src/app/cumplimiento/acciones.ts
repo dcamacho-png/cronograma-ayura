@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { marcarEstado, reprogramarActividad, registrarCumplimiento, crearActividadRealizada, reabrirActividad, registrarAvanceLote, devolverAlBanco, marcarCumplidaDesdeParcial, semanaDeActividad, registrarAvanceLoteGrupo, registrarAvanceObservacionGrupo, marcarCumplidaGrupo, registrarNovedadGrupo, reabrirGrupo, setLotesGrupo, setUnidadRealizadaGrupo, anexarLotesGrupo, registrarMedidaGeneralGrupo } from '@/datos/repositorio'
+import { reprogramarActividad, crearActividadRealizada, devolverAlBanco, semanaDeActividad, registrarAvanceLoteGrupo, registrarAvanceObservacionGrupo, marcarCumplidaGrupo, registrarNovedadGrupo, reabrirGrupo, setLotesGrupo, setUnidadRealizadaGrupo, anexarLotesGrupo, registrarMedidaGeneralGrupo } from '@/datos/repositorio'
 import { siguienteSemana, plazoCumplimientoVencido, semanaActual } from '@/dominio/semana'
 import { usuarioActual } from '@/auth/sesion'
 
@@ -36,23 +36,6 @@ async function bloqueadoPorPlazoActividad(id: string): Promise<boolean> {
   const a = await semanaDeActividad(id)
   if (!a) return true
   return bloqueadoPorPlazo(a.anio, a.semana)
-}
-
-export async function marcarEstadoAccion(form: FormData) {
-  const id = texto(form, 'id')
-  const estado = texto(form, 'estado')
-  if (!id || !ESTADOS_VALIDOS.includes(estado)) return
-  if (await bloqueadoPorPlazoActividad(id)) return
-  await marcarEstado(id, estado, textoOpcional(form, 'motivoId'), textoOpcional(form, 'nota'))
-  revalidatePath('/cumplimiento')
-}
-
-export async function desmarcarAccion(form: FormData) {
-  const id = texto(form, 'id')
-  if (!id) return
-  if (await bloqueadoPorPlazoActividad(id)) return
-  await reabrirActividad(id)
-  revalidatePath('/cumplimiento')
 }
 
 export async function reprogramarAccion(form: FormData) {
@@ -94,63 +77,11 @@ export async function agregarActividadRealizadaAccion(form: FormData) {
   revalidatePath('/cumplimiento')
 }
 
-export async function registrarAccion(form: FormData) {
-  const id = texto(form, 'id')
-  const estado = texto(form, 'estado')
-  if (!id || !ESTADOS_VALIDOS.includes(estado) || estado === 'PENDIENTE') return
-  const motivoId = textoOpcional(form, 'motivoId')
-  if (estado !== 'CUMPLIDA' && !motivoId) return
-  if (await bloqueadoPorPlazoActividad(id)) return
-  const nota = textoOpcional(form, 'nota')
-  const haRealizada = numeroOpcional(form, 'haRealizada')
-  const centroSelect = texto(form, 'centroCosto')
-  const centroCosto = centroSelect === '__otra__' ? textoOpcional(form, 'centroCostoOtra') : (centroSelect || null)
-  const lotesHechos = form.getAll('loteHecho').map((v) => String(v))
-  // La descripción del reemplazo (maquinaria) puede venir del catálogo o ser "__otra__" (texto libre).
-  const reemplazoSelect = texto(form, 'reemplazoDescripcion')
-  const reemplazoDescripcion = reemplazoSelect === '__otra__' ? textoOpcional(form, 'reemplazoDescripcionOtra') : (reemplazoSelect || null)
-  const reemplazo = reemplazoDescripcion
-    ? {
-        descripcion: reemplazoDescripcion,
-        loteId: textoOpcional(form, 'reemplazoLoteId'),
-        maquinaId: textoOpcional(form, 'reemplazoMaquinaId'),
-        medida: numeroOpcional(form, 'reemplazoMedida'),
-      }
-    : null
-  await registrarCumplimiento(id, estado, motivoId, nota, haRealizada, reemplazo, centroCosto, lotesHechos)
-  revalidatePath('/cumplimiento')
-}
-
-export async function registrarAvanceLoteAccion(form: FormData) {
-  const id = texto(form, 'id')
-  const dia = Number(texto(form, 'dia'))
-  if (!id || !(dia >= 1 && dia <= 7)) return
-  if (await bloqueadoPorPlazoActividad(id)) return
-  const maquinaId = textoOpcional(form, 'maquinaId')
-  const loteIds = form.getAll('loteAvance').map((v) => String(v))
-  // Solo cuentan los lotes con cantidad real (> 0). Un lote tildado pero sin cantidad
-  // no es un avance: la actividad debe quedar PENDIENTE, no pasar a PARCIAL.
-  const avances = loteIds
-    .map((loteId) => ({ loteId, cantidad: numeroOpcional(form, `cantidad_${loteId}`) ?? 0 }))
-    .filter((a) => a.cantidad > 0)
-  if (avances.length === 0) return
-  await registrarAvanceLote(id, dia, maquinaId, avances)
-  revalidatePath('/cumplimiento')
-}
-
 export async function devolverAlBancoAccion(form: FormData) {
   const id = texto(form, 'id')
   if (!id) return
   if (await bloqueadoPorPlazoActividad(id)) return
   await devolverAlBanco(id)
-  revalidatePath('/cumplimiento')
-}
-
-export async function marcarCumplidaParcialAccion(form: FormData) {
-  const id = texto(form, 'id')
-  if (!id) return
-  if (await bloqueadoPorPlazoActividad(id)) return
-  await marcarCumplidaDesdeParcial(id)
   revalidatePath('/cumplimiento')
 }
 
