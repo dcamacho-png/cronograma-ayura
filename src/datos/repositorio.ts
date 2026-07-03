@@ -5,7 +5,15 @@ import { duplicarActividades, datosReprogramacion, detectarConflictosAsignacion 
 import { turnoPorDia } from '@/dominio/turno'
 import type { BorradorActividad, Conflicto } from '@/dominio/programacion'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
-import { normalizarAvancePorLote, agregarAvances, totalAvanceLotes, lotesPendientes, type AvanceEntrada } from '@/dominio/avance-lote'
+import {
+  normalizarAvancePorLote,
+  agregarAvances,
+  totalAvanceLotes,
+  lotesPendientes,
+  editarAvanceEntrada,
+  eliminarAvanceEntrada,
+  type AvanceEntrada,
+} from '@/dominio/avance-lote'
 import { siguienteSemana } from '@/dominio/semana'
 
 export function listarAreas() {
@@ -679,6 +687,48 @@ export async function registrarAvanceLoteGrupo(
           },
         }),
       ),
+  )
+  return true
+}
+
+// Edita una entrada de avance (loteId, index) del grupo y reescribe el JSON en todas las
+// filas abiertas. No cambia estado ni haRealizada. null si el grupo no existe.
+export async function editarAvanceEntradaGrupo(
+  id: string,
+  loteId: string,
+  index: number,
+  cambios: { cantidad?: number; dia?: number; observacion?: string | null },
+) {
+  const g = await filasHermanas(id)
+  if (!g) return null
+  const actual = editarAvanceEntrada(
+    normalizarAvancePorLote(g.base.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null),
+    loteId,
+    index,
+    cambios,
+  )
+  await prisma.$transaction(
+    g.filas
+      .filter((f) => f.estado === 'PENDIENTE' || f.estado === 'PARCIAL')
+      .map((f) => prisma.actividad.update({ where: { id: f.id }, data: { avancePorLote: actual as Prisma.InputJsonValue } })),
+  )
+  return true
+}
+
+// Elimina una entrada de avance (loteId, index) del grupo y reescribe el JSON en todas las
+// filas abiertas. No cambia estado. null si el grupo no existe.
+export async function eliminarAvanceEntradaGrupo(id: string, loteId: string, index: number) {
+  const g = await filasHermanas(id)
+  if (!g) return null
+  const actual = eliminarAvanceEntrada(
+    normalizarAvancePorLote(g.base.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null),
+    loteId,
+    index,
+  )
+  await prisma.$transaction(
+    g.filas
+      .filter((f) => f.estado === 'PENDIENTE' || f.estado === 'PARCIAL')
+      .map((f) => prisma.actividad.update({ where: { id: f.id }, data: { avancePorLote: actual as Prisma.InputJsonValue } })),
   )
   return true
 }
