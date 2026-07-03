@@ -1,12 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { SelectFincaLote } from '../_componentes/select-finca-lote'
+import { PickerReemplazoPotreros } from './picker-reemplazo-potreros'
 import { etiquetaMedida, normalizarUnidad, type Unidad } from '@/dominio/unidad'
+import { usaBultos } from '@/dominio/bultos'
 import { CENTROS_COSTO } from '@/dominio/centro-costo'
 
 type Motivo = { id: string; nombre: string }
-type Lote = { id: string; nombre: string; finca: { nombre: string } }
+type Lote = { id: string; nombre: string; hectareas?: number | null; finca: { nombre: string } }
 type Estipulada = { id: string; nombre: string; unidad: string }
 
 export function FormRegistrar({
@@ -39,6 +40,7 @@ export function FormRegistrar({
   const [estado, setEstado] = useState('')
   const [motivoId, setMotivoId] = useState('')
   const [reemplazoDesc, setReemplazoDesc] = useState('')
+  const [reemplazoUnidadSel, setReemplazoUnidadSel] = useState('Jornales')
   const [centroCosto, setCentroCosto] = useState('')
   const [anexados, setAnexados] = useState<{ id: string; nombre: string; hectareas?: number | null }[]>([])
   const [fincaAnexar, setFincaAnexar] = useState('')
@@ -209,19 +211,6 @@ export function FormRegistrar({
                   <input name="reemplazoDescripcionOtra" required className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
                 </label>
               )}
-            </>
-          ) : (
-            <label className="flex flex-1 flex-col text-xs">
-              Descripción *
-              <input name="reemplazoDescripcion" required className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
-            </label>
-          )}
-          <label className="flex flex-col text-xs">
-            Finca y lote
-            <SelectFincaLote lotes={lotes} name="reemplazoLoteId" />
-          </label>
-          {esMaquinaria && (
-            <>
               <label className="flex flex-col text-xs">
                 Máquina
                 <select name="reemplazoMaquinaId" className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
@@ -231,12 +220,45 @@ export function FormRegistrar({
                   ))}
                 </select>
               </label>
-              <label className="flex flex-col text-xs">
-                {etiquetaMedida(reemplazoUnidad)} (opcional)
-                <input name="reemplazoMedida" type="number" step="any" min="0" className="w-28 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
+              <span className="flex flex-col text-xs text-tierra">
+                Medida: {etiquetaMedida(reemplazoUnidad)}
+                <input type="hidden" name="reemplazoUnidad" value={reemplazoUnidad} />
+              </span>
+            </>
+          ) : (
+            <>
+              <label className="flex flex-1 flex-col text-xs">
+                Descripción *
+                <input name="reemplazoDescripcion" required value={reemplazoDesc} onChange={(e) => setReemplazoDesc(e.target.value)} className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
               </label>
+              <label className="flex flex-col text-xs">
+                Unidad
+                <select
+                  name="reemplazoUnidad"
+                  value={reemplazoUnidadSel === 'Otro' ? 'otro' : reemplazoUnidadSel.toLowerCase()}
+                  onChange={(e) => setReemplazoUnidadSel(e.target.value === 'otro' ? 'Otro' : e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1))}
+                  className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
+                >
+                  {UNIDADES.map((u) => (<option key={u} value={u.toLowerCase()}>{u}</option>))}
+                  <option value="otro">Otro…</option>
+                </select>
+              </label>
+              {reemplazoUnidadSel === 'Otro' && (
+                <label className="flex flex-col text-xs">
+                  Unidad (texto)
+                  <input name="reemplazoUnidadOtra" placeholder="ej. jornales" className="w-28 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
+                </label>
+              )}
             </>
           )}
+          <label className="flex w-full flex-col text-xs">
+            Potreros (marca y pon medida{usaBultos(reemplazoDesc) ? ' + bultos' : ''})
+            <PickerReemplazoPotreros
+              lotes={lotes}
+              conBultos={usaBultos(reemplazoDesc)}
+              unidadLabel={esMaquinaria ? etiquetaMedida(reemplazoUnidad) : reemplazoUnidadSel === 'Otro' ? 'medida' : reemplazoUnidadSel}
+            />
+          </label>
         </div>
       )}
       <button className="rounded-lg bg-bosque px-3 py-1 text-sm font-semibold text-white">Registrar</button>

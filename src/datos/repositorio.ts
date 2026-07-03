@@ -793,15 +793,15 @@ export async function registrarNovedadGrupo(
   estado: string,
   motivoId: string | null,
   nota: string | null,
-  reemplazo?: { descripcion: string; loteId: string | null } | null,
+  reemplazo?: { descripcion: string; unidad?: string | null; loteIds?: string[]; medida?: Record<string, number>; bultos?: Record<string, number> } | null,
   lotesHechos: string[] = [],
 ) {
   const g = await filasHermanas(id)
   if (!g) return null
   const notaFinal = reemplazo ? `Cambiada por: ${reemplazo.descripcion}` : nota
   let fincaId: string | null = null
-  if (reemplazo?.loteId) {
-    const lote = await prisma.lote.findUnique({ where: { id: reemplazo.loteId } })
+  if (reemplazo?.loteIds?.[0]) {
+    const lote = await prisma.lote.findUnique({ where: { id: reemplazo.loteIds[0] } })
     fincaId = lote?.fincaId ?? null
   }
   await prisma.$transaction(async (tx) => {
@@ -846,7 +846,10 @@ export async function registrarNovedadGrupo(
           fincaId,
           responsableId: g.base.responsableId,
           nota: `En reemplazo de: ${g.base.descripcion}`,
-          lotes: reemplazo.loteId ? { connect: [{ id: reemplazo.loteId }] } : undefined,
+          lotes: reemplazo.loteIds?.length ? { connect: reemplazo.loteIds.map((lid) => ({ id: lid })) } : undefined,
+          ...(reemplazo.medida && Object.keys(reemplazo.medida).length ? { haRealizada: Object.values(reemplazo.medida).reduce((s, n) => s + n, 0) } : {}),
+          ...(reemplazo.unidad ? { unidadRealizada: reemplazo.unidad } : {}),
+          ...(reemplazo.bultos && Object.keys(reemplazo.bultos).length ? { bultosPorLote: reemplazo.bultos as Prisma.InputJsonValue } : {}),
         },
       })
     }

@@ -162,10 +162,23 @@ export async function registrarNovedadActividadAccion(form: FormData) {
   if (await bloqueadoPorPlazoActividad(id)) return
   const nota = textoOpcional(form, 'nota')
   const lotesHechos = form.getAll('loteHecho').map((v) => String(v))
-  // Cambio de actividad (estándar): descripción + lote, sin máquina/medida.
-  const reemplazoDesc = texto(form, 'reemplazoDescripcion')
-  const reemplazo = reemplazoDesc
-    ? { descripcion: reemplazoDesc, loteId: textoOpcional(form, 'reemplazoLoteId') }
+  // Cambio de actividad: descripción + multiselección de potreros con medida (y bultos en
+  // fertilización). La unidad es automática en maquinaria y elegible en estándar.
+  const reemplazoSel = texto(form, 'reemplazoDescripcion')
+  const reemplazoDescripcion = reemplazoSel === '__otra__' ? texto(form, 'reemplazoDescripcionOtra') : reemplazoSel
+  const reemplazoUnidadSel = texto(form, 'reemplazoUnidad')
+  const reemplazoUnidad = reemplazoUnidadSel === 'otro' ? texto(form, 'reemplazoUnidadOtra') || 'otro' : reemplazoUnidadSel || 'ha'
+  const reemplazoLoteIds = form.getAll('reemplazoLoteId').map(String).filter(Boolean)
+  const reemplazoMedida: Record<string, number> = {}
+  const reemplazoBultos: Record<string, number> = {}
+  for (const lid of reemplazoLoteIds) {
+    const m = numeroOpcional(form, `reemplazoMedida_${lid}`)
+    if (m != null) reemplazoMedida[lid] = m
+    const b = numeroOpcional(form, `reemplazoBultos_${lid}`)
+    if (b != null) reemplazoBultos[lid] = b
+  }
+  const reemplazo = reemplazoDescripcion
+    ? { descripcion: reemplazoDescripcion, unidad: reemplazoUnidad, loteIds: reemplazoLoteIds, medida: reemplazoMedida, bultos: reemplazoBultos }
     : null
   await setUnidadRealizadaGrupo(id, unidadElegida(form))
   await registrarNovedadGrupo(id, estado, motivoId, nota, reemplazo, lotesHechos)

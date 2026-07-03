@@ -6,7 +6,7 @@ import { FormRegistrar } from './form-registrar'
 import { FormAvance } from './form-avance'
 
 type Motivo = { id: string; nombre: string }
-type Lote = { id: string; nombre: string; finca: { nombre: string } }
+type Lote = { id: string; nombre: string; hectareas?: number | null; finca: { nombre: string } }
 type Estipulada = { id: string; nombre: string; unidad: string }
 
 const UNIDADES = ['Ha', 'Hora', 'Kg', 'Cantidad', 'Bultos', 'Jornales'] // + "Otro" (texto libre)
