@@ -584,6 +584,7 @@ export async function registrarAvanceLoteGrupo(
   maquinaId: string | null,
   avances: { loteId: string; cantidad: number }[],
   centroCosto?: string | null,
+  responsableId?: string | null,
 ) {
   const g = await filasHermanas(id)
   if (!g) return null
@@ -593,6 +594,7 @@ export async function registrarAvanceLoteGrupo(
     maquinaId,
     avances,
     centroCosto,
+    responsableId,
   )
   await prisma.$transaction(
     g.filas

@@ -88,3 +88,14 @@ describe('agregarAvances — centro de costo', () => {
     expect(out.l1[0].centroCosto ?? null).toBeNull()
   })
 })
+
+describe('agregarAvances — responsable', () => {
+  it('guarda responsableId en la entrada', () => {
+    const out = agregarAvances({}, 3, 'M1', [{ loteId: 'l1', cantidad: 4 }], 'Ceba', 'R9')
+    expect(out.l1).toEqual([{ dia: 3, maquinaId: 'M1', cantidad: 4, centroCosto: 'Ceba', responsableId: 'R9' }])
+  })
+  it('sin responsableId → entrada sin ese campo', () => {
+    const out = agregarAvances({}, 1, null, [{ loteId: 'l1', cantidad: 2 }])
+    expect(out.l1[0].responsableId ?? null).toBeNull()
+  })
+})
