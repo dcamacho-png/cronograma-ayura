@@ -68,11 +68,13 @@ export async function GET(req: NextRequest) {
   ) => {
     for (const grupo of agruparPorActividad(items).values()) {
       const e = estadoActividad(grupo.map((a) => ({ estado: a.estado as Estado })))
-      if (e === 'PENDIENTE') continue // solo se omite lo pendiente (sin evento)
+      // Solo "lo que se hizo": cumplidas + parciales/avances (y nuevas, que son CUMPLIDA).
+      // Se omiten PENDIENTE, NO_CUMPLIDA y REPROGRAMADA (no se hicieron).
+      if (e !== 'CUMPLIDA' && e !== 'PARCIAL') continue
       if (esMaq(grupo)) {
         // Maquinaria: una fila por FILA (día·responsable), sin agrupar (cada día su medida).
         for (const f of grupo) {
-          if (f.estado === 'PENDIENTE') continue
+          if (f.estado !== 'CUMPLIDA' && f.estado !== 'PARCIAL') continue
           for (const fila of filasCumplimiento(
             aExport(f),
             fechaDeDia(f.dia),
