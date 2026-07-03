@@ -76,3 +76,15 @@ describe('agregarAvances', () => {
     expect(base).toEqual({ a: [{ dia: 1, maquinaId: null, cantidad: 3 }] }) // intacto
   })
 })
+
+describe('agregarAvances — centro de costo', () => {
+  it('guarda el centroCosto en cada entrada nueva', () => {
+    const out = agregarAvances({}, 2, 'M1', [{ loteId: 'l1', cantidad: 3 }], 'Ceba')
+    expect(out.l1).toEqual([{ dia: 2, maquinaId: 'M1', cantidad: 3, centroCosto: 'Ceba' }])
+  })
+  it('sin centroCosto → entrada sin ese campo (o null)', () => {
+    const out = agregarAvances({}, 1, null, [{ loteId: 'l1', cantidad: 2 }])
+    expect(out.l1[0]).toMatchObject({ dia: 1, maquinaId: null, cantidad: 2 })
+    expect(out.l1[0].centroCosto ?? null).toBeNull()
+  })
+})
