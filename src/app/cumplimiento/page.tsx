@@ -7,16 +7,14 @@ import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, plazoCum
 import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
 import { unidadDe, unidadAbreviada } from '@/dominio/unidad'
 import { textoLotesHechos } from '@/dominio/lotes-hechos'
-import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, responsablesDistintos, conteoEstadoActividades, tieneDiaPendiente, estadoActividad } from '@/dominio/metricas'
+import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, conteoEstadoActividades, tieneDiaPendiente, estadoActividad } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
-import { lotesPendientes, textoAvanceConFecha, normalizarAvancePorLote, totalAvanceLotes, type AvanceEntrada } from '@/dominio/avance-lote'
-import { registrarAccion, agregarActividadRealizadaAccion, marcarEstadoAccion, desmarcarAccion, registrarAvanceLoteAccion, devolverAlBancoAccion, marcarCumplidaParcialAccion, registrarAvanceEstandarAccion, registrarMedidaGeneralAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion, setLotesActividadAccion } from './acciones'
+import { textoAvanceConFecha, normalizarAvancePorLote, totalAvanceLotes, type AvanceEntrada } from '@/dominio/avance-lote'
+import { agregarActividadRealizadaAccion, devolverAlBancoAccion, registrarAvanceEstandarAccion, registrarMedidaGeneralAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion, setLotesActividadAccion, registrarAvanceMaquinariaAccion } from './acciones'
 import { FormActividadRealizada } from './form-actividad-realizada'
-import { FormAvanceLote } from './form-avance-lote'
 import { InfoLotes } from '../_componentes/info-lotes'
-import { DiaNoMaquinaria } from './dia-no-maquinaria'
-import { DiaMaquinaria } from './dia-maquinaria'
 import { ActividadEstandar } from './actividad-estandar'
+import { ActividadMaquinaria } from './actividad-maquinaria'
 
 const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
@@ -192,17 +190,8 @@ export default async function CumplimientoPage({
             const estadoGrupo = estadoActividad(dias as unknown as { estado: Estado }[])
             const pctAct = porcentajeCumplimiento(dias as unknown as ActividadDominio[])
             const nDias = diasDistintos(dias)
-            const multiResp = responsablesDistintos(dias) > 1
             // nombres de responsables distintos, en orden de aparición
             const nombresResp = [...new Map(dias.map((a) => [a.responsableId, a.responsable.nombre])).values()]
-            // agrupar las filas del grupo por día (cada día una vez)
-            const porDia = new Map<number, typeof dias>()
-            for (const a of dias) {
-              const lista = porDia.get(a.dia) ?? []
-              lista.push(a)
-              porDia.set(a.dia, lista)
-            }
-            const diasOrdenados = [...porDia.entries()].sort((x, y) => x[0] - y[0])
             const unidad = unidadDe(unidadPorNombre, cab.descripcion)
             return (
               <li key={cab.tareaId ?? cab.id} className="tarjeta p-3">
@@ -225,126 +214,7 @@ export default async function CumplimientoPage({
                 </div>
                 <InfoLotes lotes={cab.lotes} bultosPorLote={cab.bultosPorLote as Record<string, number> | null} className="mb-2" />
 
-                {esMaquinaria && (
-                <ul className="space-y-2">
-                  {diasOrdenados.map(([dia, filas]) => (
-                    <li key={dia} className="rounded-lg border border-borde bg-arena/40 p-2">
-                      <div className="mb-1 text-xs font-semibold text-tierra">
-                        {DIAS[dia] ?? ''} {fechas[dia - 1] ? fmtFecha(fechas[dia - 1]) : ''}
-                      </div>
-                      <ul className="space-y-2">
-                        {filas.map((a) => (
-                          <li key={a.id} className="flex flex-col gap-1">
-                            {multiResp && <span className="text-xs text-tierra">{a.responsable.nombre}</span>}
-                            {a.estado === 'PENDIENTE' ? (
-                              bloqueado ? (
-                                <span className="text-sm text-tierra">Pendiente (plazo vencido)</span>
-                              ) : esMaquinaria ? (
-                                <DiaMaquinaria
-                                  actividadId={a.id}
-                                  unidad={unidad}
-                                  motivos={motivos}
-                                  motivoCambioId={motivoCambioId}
-                                  lotes={lotes}
-                                  maquinas={maquinas}
-                                  estipuladas={estipuladas}
-                                  lotesActividad={a.lotes}
-                                  haProgramada={a.lotes.reduce((s, l) => s + (l.hectareas ?? 0), 0)}
-                                  dia={a.dia}
-                                  accionRegistrar={registrarAccion}
-                                  accionAvance={registrarAvanceLoteAccion}
-                                  marcarCumplido={marcarEstadoAccion}
-                                />
-                              ) : (
-                                <DiaNoMaquinaria
-                                  actividadId={a.id}
-                                  motivos={motivos}
-                                  motivoCambioId={motivoCambioId}
-                                  lotes={lotes}
-                                  maquinas={maquinas}
-                                  estipuladas={estipuladas}
-                                  lotesActividad={a.lotes}
-                                  unidad={unidad}
-                                  dia={a.dia}
-                                  marcarCumplido={marcarEstadoAccion}
-                                  accionRegistrar={registrarAccion}
-                                  accionAvance={registrarAvanceLoteAccion}
-                                />
-                              )
-                            ) : (() => {
-                              const avances = normalizarAvancePorLote(
-                                a.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null,
-                              )
-                              const tieneAvances = Object.values(avances).some((es) => es.length > 0)
-                              const etiquetaDia = (dia: number) =>
-                                `${DIAS[dia] ?? ''} ${fechas[dia - 1] ? fmtFecha(fechas[dia - 1]) : ''}`.trim()
-                              const resumenAvances = textoAvanceConFecha(a.lotes, avances, unidadAbreviada(unidad), etiquetaDia)
-                              return (
-                              <>
-                              <div className="flex flex-wrap items-center gap-2 text-sm">
-                                <span className="font-semibold">{ESTADOS.find((e) => e.valor === a.estado)?.etiqueta ?? a.estado}</span>
-                                {(tieneAvances || a.haRealizada != null) && (
-                                  <span className="text-tierra">· {tieneAvances ? totalAvanceLotes(a.lotes, avances) : a.haRealizada} {unidadAbreviada(unidad)}</span>
-                                )}
-                                {a.motivo && <span className="text-tierra">· {a.motivo.nombre}</span>}
-                                {a.nota && <span className="text-tierra">· {a.nota}</span>}
-                                {a.centroCosto && <span className="text-tierra">· 🏷️ {a.centroCosto}</span>}
-                                {textoLotesHechos(a.lotes, a.lotesHechos as string[] | null) && (
-                                  <span className="text-tierra">· ✅ Realizados: {textoLotesHechos(a.lotes, a.lotesHechos as string[] | null)}</span>
-                                )}
-                                {!bloqueado && (
-                                  <form action={desmarcarAccion} className="ml-auto">
-                                    <input type="hidden" name="id" value={a.id} />
-                                    <button className="text-xs text-tierra underline hover:text-tinta">↩ desmarcar</button>
-                                  </form>
-                                )}
-                              </div>
-                              {/* Resumen de avances (solo lectura): visible en cualquier estado no-pendiente con avances. */}
-                              {resumenAvances && (
-                                <span className="mt-1 text-sm text-tierra">Avances: {resumenAvances}</span>
-                              )}
-                              {a.estado === 'PARCIAL' && !bloqueado && (
-                                <div className="mt-1 flex w-full flex-col gap-1 text-sm">
-                                  {a.lotes.length > 0 && (
-                                    <span className="text-tierra">
-                                      Progreso: {a.lotes.length - lotesPendientes(a.lotes, avances).length} de {a.lotes.length} lotes
-                                    </span>
-                                  )}
-                                  <div className="flex flex-wrap items-center gap-2">
-                                    {a.lotes.length > 0 && (
-                                      <FormAvanceLote
-                                        actividadId={a.id}
-                                        diaActividad={a.dia}
-                                        esMaquinaria={esMaquinaria}
-                                        maquinas={maquinas}
-                                        unidad={unidad}
-                                        lotes={a.lotes}
-                                        accion={registrarAvanceLoteAccion}
-                                      />
-                                    )}
-                                    <form action={marcarCumplidaParcialAccion}>
-                                      <input type="hidden" name="id" value={a.id} />
-                                      <button className="rounded-lg border border-bosque px-2 py-1 text-xs font-semibold text-bosque hover:bg-arena/40">✓ Marcar cumplida</button>
-                                    </form>
-                                    <form action={devolverAlBancoAccion}>
-                                      <input type="hidden" name="id" value={a.id} />
-                                      <button className="rounded-lg border border-borde px-2 py-1 text-xs text-tierra hover:bg-arena/40">Devolver al banco</button>
-                                    </form>
-                                  </div>
-                                </div>
-                              )}
-                              </>
-                              )
-                            })()}
-                          </li>
-                        ))}
-                      </ul>
-                    </li>
-                  ))}
-                </ul>
-                )}
-
-                {!esMaquinaria && (() => {
+                {(() => {
                   const avances = normalizarAvancePorLote(
                     cab.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null,
                   )
@@ -386,6 +256,24 @@ export default async function CumplimientoPage({
                           estadoGrupo === 'PENDIENTE' && (
                             <span className="text-sm text-tierra">Pendiente (plazo vencido)</span>
                           )
+                        ) : esMaquinaria ? (
+                          <ActividadMaquinaria
+                            actividadId={cab.id}
+                            estado={estadoGrupo}
+                            unidad={unidad}
+                            dia={cab.dia}
+                            lotesActividad={cab.lotes}
+                            lotesCatalogo={lotes}
+                            maquinas={maquinas}
+                            estipuladas={estipuladas}
+                            motivos={motivos}
+                            motivoCambioId={motivoCambioId}
+                            haProgramada={cab.lotes.reduce((s, l) => s + (l.hectareas ?? 0), 0)}
+                            registrarAvance={registrarAvanceMaquinariaAccion}
+                            marcarCumplida={marcarCumplidaActividadAccion}
+                            registrarNovedad={registrarNovedadActividadAccion}
+                            devolverAlBanco={devolverAlBancoAccion}
+                          />
                         ) : (
                           <ActividadEstandar
                             actividadId={cab.id}
