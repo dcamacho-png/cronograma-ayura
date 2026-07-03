@@ -111,3 +111,26 @@ describe('agregarAvances — observación', () => {
     expect(out.l1[0].observacion ?? null).toBeNull()
   })
 })
+
+describe('lotesPendientes (brief)', () => {
+  const lotes = [{ id: 'a' }, { id: 'b' }, { id: 'c' }]
+
+  it('sin avances: todos pendientes', () => {
+    expect(lotesPendientes(lotes, null).map((l) => l.id)).toEqual(['a', 'b', 'c'])
+  })
+
+  it('un lote con cantidad > 0 deja de ser pendiente', () => {
+    const av = { a: [{ dia: 1, maquinaId: null, cantidad: 5 }] }
+    expect(lotesPendientes(lotes, av).map((l) => l.id)).toEqual(['b', 'c'])
+  })
+
+  it('entrada con cantidad 0 sigue pendiente', () => {
+    const av = { a: [{ dia: 1, maquinaId: null, cantidad: 0 }] }
+    expect(lotesPendientes(lotes, av).map((l) => l.id)).toEqual(['a', 'b', 'c'])
+  })
+
+  it('acepta la forma vieja (objeto por lote)', () => {
+    const av = { b: { dia: 2, maquinaId: null, cantidad: 3 } }
+    expect(lotesPendientes(lotes, av).map((l) => l.id)).toEqual(['a', 'c'])
+  })
+})

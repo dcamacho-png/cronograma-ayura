@@ -17,13 +17,13 @@ export function normalizarAvancePorLote(
   return out
 }
 
-// Lotes de la actividad que aún no tienen ninguna entrada de avance.
+// Lotes "pendientes": los que no tienen ninguna entrada de avance con cantidad > 0.
 export function lotesPendientes<T extends { id: string }>(
   lotes: T[],
-  avance: AvancePorLote | null | undefined,
+  avance: Record<string, AvanceEntrada | AvanceEntrada[]> | null | undefined,
 ): T[] {
-  if (!avance) return lotes
-  return lotes.filter((l) => !(l.id in avance) || avance[l.id].length === 0)
+  const av = normalizarAvancePorLote(avance)
+  return lotes.filter((l) => !(av[l.id] ?? []).some((e) => e.cantidad > 0))
 }
 
 // Texto "L-A: 5, L-B: 2" con la SUMA por lote, en el orden dado.
