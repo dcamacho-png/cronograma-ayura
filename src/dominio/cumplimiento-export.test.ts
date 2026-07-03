@@ -92,6 +92,21 @@ describe('filasCumplimiento — con avances (una fila por avance)', () => {
   })
 })
 
+describe('filasCumplimiento — parcial sin avances no se emite', () => {
+  it('PARCIAL sin avances → ninguna fila (p. ej. la actividad inicial que se cambió)', () => {
+    expect(filasCumplimiento(act({ estado: 'PARCIAL', avancePorLote: null }), '15 jun', mapa, ctx)).toEqual([])
+  })
+  it('CUMPLIDA sin avances → una fila (como antes)', () => {
+    expect(filasCumplimiento(act({ estado: 'CUMPLIDA', avancePorLote: null }), '15 jun', mapa, ctx)).toEqual([
+      ['Lun', '15 jun', 'Ana', 'ENCALADORA', '6603', 'L1', '', 'Cumplida', 3, 'ha', '', '', '', '', ''],
+    ])
+  })
+  it('PARCIAL con avances → sí emite las filas de avance', () => {
+    const a = act({ estado: 'PARCIAL', avancePorLote: { l1: [{ dia: 1, maquinaId: null, cantidad: 2 }] } })
+    expect(filasCumplimiento(a, '15 jun', mapa, ctx)).toHaveLength(1)
+  })
+})
+
 describe('filasCumplimientoGrupo — una sola fila por actividad aunque tenga varios responsables', () => {
   it('grupo de 2 responsables sin avances → UNA fila, nombres unidos, medida NO duplicada', () => {
     // Las acciones de grupo consolidan la misma medida en cada hermana: aquí ambas
@@ -112,9 +127,9 @@ describe('filasCumplimientoGrupo — una sola fila por actividad aunque tenga va
     )
   })
 
-  it('estados mezclados entre hermanas → la actividad es Parcial', () => {
+  it('estados mezclados entre hermanas → la actividad es Parcial (con avance, para que emita fila)', () => {
     const grupo = [
-      act({ responsable: { nombre: 'Ana' }, estado: 'CUMPLIDA' }),
+      act({ responsable: { nombre: 'Ana' }, estado: 'CUMPLIDA', avancePorLote: { l1: [{ dia: 1, maquinaId: null, cantidad: 2 }] } }),
       act({ responsable: { nombre: 'Beto' }, estado: 'PENDIENTE' }),
     ]
     const filas = filasCumplimientoGrupo(grupo, '15 jun', mapa, ctx)

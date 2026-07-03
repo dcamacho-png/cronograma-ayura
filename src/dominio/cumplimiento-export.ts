@@ -85,7 +85,12 @@ export function filasCumplimiento(
   }
   if (filas.length > 0) return filas
 
-  // Sin avances: una sola fila con la medida total (como antes).
+  // Una actividad PARCIAL sin avances (p. ej. la actividad inicial que se cambió) no
+  // aporta día a día real: no se emite fila. Solo las CUMPLIDAS (incluidas las de
+  // reemplazo) generan la fila-resumen sin avances.
+  if (a.estado === 'PARCIAL') return []
+
+  // Sin avances (cumplida): una sola fila con la medida total (como antes).
   return [[
     DIAS[a.dia] ?? '',
     fecha,
