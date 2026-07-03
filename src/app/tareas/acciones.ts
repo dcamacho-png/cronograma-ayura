@@ -28,6 +28,14 @@ function numeroOpcional(form: FormData, clave: string): number | null {
   return Number.isFinite(n) ? n : null
 }
 
+// Resuelve la unidad elegida en el formulario estándar: "otro"→texto libre; vacío→null.
+function unidadElegida(form: FormData): string | null {
+  const u = texto(form, 'unidad')
+  if (!u) return null
+  if (u === 'otro') return texto(form, 'unidadOtra') || 'otro'
+  return u
+}
+
 export async function crearTareaAccion(form: FormData) {
   const areaId = texto(form, 'areaId')
   const est = textoOpcional(form, 'estipulada')
@@ -37,12 +45,24 @@ export async function crearTareaAccion(form: FormData) {
   if (!areaId || !descripcion) return
   const loteIds = form.getAll('loteId').map((v) => String(v).trim()).filter(Boolean)
   const bultos: Record<string, number> = {}
+  const medida: Record<string, number> = {}
   for (const id of loteIds) {
     const b = numeroOpcional(form, `bultos_${id}`)
     if (b != null) bultos[id] = b
+    const m = numeroOpcional(form, `medida_${id}`)
+    if (m != null) medida[id] = m
   }
   const detalle = textoOpcional(form, 'detalle')
-  await crearTarea(areaId, descripcion, loteIds, Object.keys(bultos).length > 0 ? bultos : null, detalle)
+  const unidad = unidadElegida(form)
+  await crearTarea(
+    areaId,
+    descripcion,
+    loteIds,
+    Object.keys(bultos).length > 0 ? bultos : null,
+    detalle,
+    Object.keys(medida).length > 0 ? medida : null,
+    unidad,
+  )
   revalidatePath('/tareas')
 }
 

@@ -5,11 +5,15 @@ type LoteInfo = { id: string; nombre: string; hectareas: number | null }
 export function InfoLotes({
   lotes,
   bultosPorLote,
+  medidaPorLote,
+  unidad,
   className = '',
   tamano = 'text-xs',
 }: {
   lotes: LoteInfo[]
   bultosPorLote?: BultosPorLote | null
+  medidaPorLote?: Record<string, number> | null
+  unidad?: string | null
   className?: string
   tamano?: string
 }) {
@@ -17,7 +21,10 @@ export function InfoLotes({
   const ha = lotes.reduce((s, l) => s + (l.hectareas ?? 0), 0)
   const etiqueta = (l: LoteInfo) => {
     const b = bultosPorLote?.[l.id]
-    return typeof b === 'number' ? `${l.nombre} (${b} bultos)` : l.nombre
+    if (typeof b === 'number') return `${l.nombre} (${b} bultos)`
+    const m = medidaPorLote?.[l.id]
+    if (typeof m === 'number') return `${l.nombre} (${m}${unidad ? ` ${unidad}` : ''})`
+    return l.nombre
   }
   const nombres = lotes.map(etiqueta).join(', ')
   return (

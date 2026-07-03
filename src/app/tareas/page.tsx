@@ -13,8 +13,8 @@ import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
 import { usuarioActual } from '@/auth/sesion'
 import { puedeVer } from '@/auth/permisos'
 import { InfoLotes } from '../_componentes/info-lotes'
-import { SelectFincaLote } from '../_componentes/select-finca-lote'
 import { FormNuevaTareaMaquinaria } from './form-nueva-tarea-maquinaria'
+import { FormNuevaTareaEstandar } from './form-nueva-tarea-estandar'
 import { FormSolicitar } from './form-solicitar'
 import { crearTareaAccion, eliminarTareaAccion, programarTareaAccion, crearSolicitudAccion, devolverAlSolicitanteAccion, reenviarSolicitudAccion, editarSolicitudAccion } from './acciones'
 import { FormEditarSolicitud } from './form-editar-solicitud'
@@ -65,6 +65,9 @@ export default async function TareasPage({
     w = siguienteSemana(w.anio, w.semana)
   }
 
+  const estipuladasMaq = estipuladas.filter((e) => e.maquinaria)
+  const estipuladasEst = estipuladas.filter((e) => !e.maquinaria)
+
   const url = (a: string) => `/tareas?area=${a}`
 
   return (
@@ -91,26 +94,15 @@ export default async function TareasPage({
         <div className="tarjeta p-4">
           <h2 className="mb-2 font-semibold text-tinta">➕ Agregar al banco</h2>
           {esMaquinaria ? (
-            <FormNuevaTareaMaquinaria areaId={areaId} estipuladas={estipuladas} lotes={lotes} accion={crearTareaAccion} />
+            <FormNuevaTareaMaquinaria areaId={areaId} estipuladas={estipuladasMaq} lotes={lotes} accion={crearTareaAccion} />
           ) : (
-            <form action={crearTareaAccion} className="flex flex-wrap items-end gap-2">
-              <input type="hidden" name="areaId" value={areaId} />
-              <label className="flex flex-1 flex-col text-sm">
-                Nueva tarea
-                <input name="descripcion" required placeholder="Ej: Arreglo de saladero" className="rounded-lg border border-borde bg-marfil p-2 focus:outline-none focus:ring-2 focus:ring-bosque/40" />
-              </label>
-              <label className="flex flex-col text-sm">
-                Finca y lote (opcional)
-                <SelectFincaLote lotes={lotes} name="loteId" />
-              </label>
-              <button className="rounded-lg bg-bosque px-4 py-2 text-sm font-semibold text-white">+ Agregar al banco</button>
-            </form>
+            <FormNuevaTareaEstandar areaId={areaId} estipuladas={estipuladasEst} lotes={lotes} accion={crearTareaAccion} />
           )}
         </div>
         <FormSolicitar
           solicitanteAreaId={areaId}
           areas={areas.map((a) => ({ id: a.id, nombre: a.nombre, maqTareas: a.maqTareas }))}
-          estipuladas={estipuladas}
+          estipuladas={estipuladasMaq}
           lotes={lotes}
           accion={crearSolicitudAccion}
           responsablesPorArea={responsablesPorArea}
@@ -140,7 +132,7 @@ export default async function TareasPage({
                         </span>
                       )}
                     </div>
-                    <InfoLotes lotes={t.lotes} bultosPorLote={t.bultosPorLote as Record<string, number> | null} />
+                    <InfoLotes lotes={t.lotes} bultosPorLote={t.bultosPorLote as Record<string, number> | null} medidaPorLote={t.medidaPorLote as Record<string, number> | null} unidad={t.unidad} />
                     {t.detalle && (
                       <div className="mt-1 whitespace-pre-line text-xs text-tierra">📝 {t.detalle}</div>
                     )}

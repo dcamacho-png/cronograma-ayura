@@ -7,7 +7,7 @@ type Lote = { id: string; nombre: string; finca: { nombre: string } }
 // Selector de varios lotes con cantidad de bultos por lote. Envía un <input name="loteId">
 // por lote marcado y, si tiene cantidad, <input name="bultos_<id>">. La selección persiste
 // aunque se cambie de finca (estado por id de lote).
-export function PickerLotesBultos({ lotes, seleccionInicial = {} }: { lotes: Lote[]; seleccionInicial?: Record<string, string> }) {
+export function PickerLotesBultos({ lotes, seleccionInicial = {}, campo = 'bultos', placeholder = 'bultos' }: { lotes: Lote[]; seleccionInicial?: Record<string, string>; campo?: string; placeholder?: string }) {
   const [finca, setFinca] = useState('')
   const [sel, setSel] = useState<Record<string, string>>(seleccionInicial) // loteId -> bultos (texto); presencia = marcado
 
@@ -47,7 +47,7 @@ export function PickerLotesBultos({ lotes, seleccionInicial = {} }: { lotes: Lot
                     type="number"
                     step="any"
                     min="0"
-                    placeholder="bultos"
+                    placeholder={placeholder}
                     value={sel[l.id]}
                     onChange={(e) => setBultos(l.id, e.target.value)}
                     className="w-24 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
@@ -61,7 +61,7 @@ export function PickerLotesBultos({ lotes, seleccionInicial = {} }: { lotes: Lot
       {seleccionados.map((l) => (
         <span key={l.id}>
           <input type="hidden" name="loteId" value={l.id} />
-          {sel[l.id] !== '' && <input type="hidden" name={`bultos_${l.id}`} value={sel[l.id]} />}
+          {sel[l.id] !== '' && <input type="hidden" name={`${campo}_${l.id}`} value={sel[l.id]} />}
         </span>
       ))}
       {seleccionados.length > 0 && (
