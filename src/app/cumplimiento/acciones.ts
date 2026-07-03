@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { reprogramarActividad, crearActividadRealizada, devolverAlBanco, semanaDeActividad, registrarAvanceLoteGrupo, registrarAvanceObservacionGrupo, marcarCumplidaGrupo, registrarNovedadGrupo, reabrirGrupo, setLotesGrupo, setUnidadRealizadaGrupo, anexarLotesGrupo, registrarMedidaGeneralGrupo } from '@/datos/repositorio'
+import { reprogramarActividad, crearActividadRealizada, devolverAlBanco, semanaDeActividad, registrarAvanceLoteGrupo, registrarAvanceObservacionGrupo, marcarCumplidaGrupo, registrarNovedadGrupo, reabrirGrupo, setLotesGrupo, setUnidadRealizadaGrupo, anexarLotesGrupo, registrarMedidaGeneralGrupo, continuarParcialSemanaSiguiente } from '@/datos/repositorio'
 import { siguienteSemana, plazoCumplimientoVencido, semanaActual } from '@/dominio/semana'
 import { usuarioActual } from '@/auth/sesion'
 
@@ -190,5 +190,13 @@ export async function desmarcarActividadAccion(form: FormData) {
   if (!id) return
   if (await bloqueadoPorPlazoActividad(id)) return
   await reabrirGrupo(id)
+  revalidatePath('/cumplimiento')
+}
+
+export async function continuarParcialAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (!id) return
+  if (await bloqueadoPorPlazoActividad(id)) return
+  await continuarParcialSemanaSiguiente(id)
   revalidatePath('/cumplimiento')
 }
