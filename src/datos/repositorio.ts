@@ -585,6 +585,8 @@ export async function registrarAvanceLoteGrupo(
   avances: { loteId: string; cantidad: number }[],
   centroCosto?: string | null,
   responsableId?: string | null,
+  observacion?: string | null,
+  bultosPorLote?: Record<string, number> | null,
 ) {
   const g = await filasHermanas(id)
   if (!g) return null
@@ -595,14 +597,22 @@ export async function registrarAvanceLoteGrupo(
     avances,
     centroCosto,
     responsableId,
+    observacion,
   )
+  const bultosMerge = bultosPorLote
+    ? { ...((g.base.bultosPorLote ?? {}) as Record<string, number>), ...bultosPorLote }
+    : null
   await prisma.$transaction(
     g.filas
       .filter((f) => f.estado === 'PENDIENTE' || f.estado === 'PARCIAL')
       .map((f) =>
         prisma.actividad.update({
           where: { id: f.id },
-          data: { avancePorLote: actual as Prisma.InputJsonValue, estado: 'PARCIAL' },
+          data: {
+            avancePorLote: actual as Prisma.InputJsonValue,
+            estado: 'PARCIAL',
+            ...(bultosMerge ? { bultosPorLote: bultosMerge as Prisma.InputJsonValue } : {}),
+          },
         }),
       ),
   )
