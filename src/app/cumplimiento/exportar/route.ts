@@ -3,9 +3,8 @@ import ExcelJS from 'exceljs'
 import { usuarioActual } from '@/auth/sesion'
 import { listarAreas, listarActividades, listarActividadesSolicitadas, listarActividadesEstipuladas, listarMaquinas } from '@/datos/repositorio'
 import { fechasDeSemana } from '@/dominio/semana'
-import { COLUMNAS_CUMPLIMIENTO, filasCumplimiento, filasCumplimientoGrupo } from '@/dominio/cumplimiento-export'
+import { COLUMNAS_CUMPLIMIENTO, filasCumplimientoGrupo } from '@/dominio/cumplimiento-export'
 import { agruparPorActividad, estadoActividad } from '@/dominio/metricas'
-import { esMaquinaria } from '@/dominio/variante'
 import type { Estado } from '@/dominio/tipos'
 import type { AvanceEntrada } from '@/dominio/avance-lote'
 import type { BultosPorLote } from '@/dominio/bultos'
@@ -64,50 +63,26 @@ export async function GET(req: NextRequest) {
   const agregarGrupos = (
     items: ((typeof actividades)[number] | (typeof solicitadas)[number])[],
     ejecutadaPor: (grupo: typeof items) => string,
-    esMaq: (grupo: typeof items) => boolean,
   ) => {
     for (const grupo of agruparPorActividad(items).values()) {
       const e = estadoActividad(grupo.map((a) => ({ estado: a.estado as Estado })))
-      // Solo "lo que se hizo": cumplidas + parciales/avances (y nuevas, que son CUMPLIDA).
-      // Se omiten PENDIENTE, NO_CUMPLIDA y REPROGRAMADA (no se hicieron).
-      if (e !== 'CUMPLIDA' && e !== 'PARCIAL') continue
-      if (esMaq(grupo)) {
-        // Maquinaria: una fila por FILA (día·responsable), sin agrupar (cada día su medida).
-        for (const f of grupo) {
-          if (f.estado !== 'CUMPLIDA' && f.estado !== 'PARCIAL') continue
-          for (const fila of filasCumplimiento(
-            aExport(f),
-            fechaDeDia(f.dia),
-            unidadPorNombre,
-            { fechaDeDia, nombreMaquina },
-            ejecutadaPor(grupo),
-          )) {
-            ws.addRow(fila)
-          }
-        }
-      } else {
-        // Estándar: una fila por avance, agrupada (misma medida en las hermanas).
-        for (const fila of filasCumplimientoGrupo(
-          grupo.map(aExport),
-          fechaDeDia(grupo[0].dia),
-          unidadPorNombre,
-          { fechaDeDia, nombreMaquina },
-          ejecutadaPor(grupo),
-        )) {
-          ws.addRow(fila)
-        }
+      if (e !== 'CUMPLIDA' && e !== 'PARCIAL') continue // solo lo que se hizo
+      for (const fila of filasCumplimientoGrupo(
+        grupo.map(aExport),
+        fechaDeDia(grupo[0].dia),
+        unidadPorNombre,
+        { fechaDeDia, nombreMaquina },
+        ejecutadaPor(grupo),
+      )) {
+        ws.addRow(fila)
       }
     }
   }
 
   // Actividades propias del área.
-  agregarGrupos(actividades, () => '', () => esMaquinaria(area, 'cumplimiento'))
+  agregarGrupos(actividades, () => '')
   // Actividades que esta área solicitó a otra (ejecutadas por la otra área).
-  agregarGrupos(
-    solicitadas,
-    (grupo) => (grupo[0] as (typeof solicitadas)[number]).area.nombre,
-    (grupo) => esMaquinaria((grupo[0] as (typeof solicitadas)[number]).area, 'cumplimiento'),
-  )
+  agregarGrupos(solicitadas, (grupo) => (grupo[0] as (typeof solicitadas)[number]).area.nombre)
 
   const buffer = await wb.xlsx.writeBuffer()
   const safe = area.nombre.replace(/[^\p{L}\p{N}]+/gu, '-')
