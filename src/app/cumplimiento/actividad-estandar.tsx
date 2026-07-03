@@ -33,7 +33,6 @@ export function ActividadEstandar({
   bultosAsignados,
   descripcion,
   registrarAvance,
-  setUnidadRealizada,
   registrarMedidaGeneral,
   marcarCumplida,
   registrarNovedad,
@@ -57,7 +56,6 @@ export function ActividadEstandar({
   bultosAsignados?: Record<string, number> | null
   descripcion?: string
   registrarAvance: (f: FormData) => void | Promise<void>
-  setUnidadRealizada: (f: FormData) => void | Promise<void>
   registrarMedidaGeneral: (f: FormData) => void | Promise<void>
   marcarCumplida: (f: FormData) => void | Promise<void>
   registrarNovedad: (f: FormData) => void | Promise<void>
@@ -145,16 +143,14 @@ export function ActividadEstandar({
             responsables={responsables}
             responsableDefault={responsableActividadId}
             maquinas={[]}
+            lotesActividad={lotesActividad}
             lotesCatalogo={lotesCatalogo}
             fincaDefault={fincaActividad}
+            bultosAsignados={bultosAsignados}
+            descripcion={descripcion}
+            unidadActual={unidadRealizada}
             accion={registrarAvance}
           />
-          <form action={setUnidadRealizada} className="flex flex-wrap items-end gap-2">
-            <input type="hidden" name="id" value={actividadId} />
-            {selectorUnidad}
-            {inputUnidadOtra}
-            <button className="rounded-lg border border-bosque px-3 py-1 text-xs font-semibold text-bosque hover:bg-arena/40">Guardar unidad</button>
-          </form>
         </>
       ) : (
         <form action={registrarMedidaGeneral} className="flex flex-wrap items-end gap-2">

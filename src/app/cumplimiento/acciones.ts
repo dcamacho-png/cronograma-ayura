@@ -122,15 +122,24 @@ function unidadElegida(form: FormData): string {
 export async function registrarAvanceAccion(form: FormData) {
   const id = texto(form, 'id')
   const dia = Number(texto(form, 'dia'))
-  const loteId = texto(form, 'loteId')
-  const cantidad = numeroOpcional(form, 'cantidad') ?? 0
-  if (!id || !loteId || !(dia >= 1 && dia <= 7) || cantidad <= 0) return
+  if (!id || !(dia >= 1 && dia <= 7)) return
   if (await bloqueadoPorPlazoActividad(id)) return
+  const lotesHechos = form.getAll('loteHecho').map((v) => String(v))
+  if (lotesHechos.length === 0) return
   const responsableId = textoOpcional(form, 'responsableId')
   const maquinaId = textoOpcional(form, 'maquinaId')
-  const centroCosto = textoOpcional(form, 'centroCosto')
-  await anexarLotesGrupo(id, [loteId])
-  await registrarAvanceLoteGrupo(id, dia, maquinaId, [{ loteId, cantidad }], centroCosto, responsableId)
+  const centroSelect = texto(form, 'centroCosto')
+  const centroCosto = centroSelect === '__otra__' ? textoOpcional(form, 'centroCostoOtra') : (centroSelect || null)
+  const observacion = textoOpcional(form, 'observacion')
+  const avances = lotesHechos.map((loteId) => ({ loteId, cantidad: numeroOpcional(form, `ha_${loteId}`) ?? 0 }))
+  const bultosMap: Record<string, number> = {}
+  for (const loteId of lotesHechos) {
+    const b = numeroOpcional(form, `bultos_${loteId}`)
+    if (b != null) bultosMap[loteId] = b
+  }
+  await anexarLotesGrupo(id, lotesHechos)
+  await setUnidadRealizadaGrupo(id, unidadElegida(form))
+  await registrarAvanceLoteGrupo(id, dia, maquinaId, avances, centroCosto, responsableId, observacion, Object.keys(bultosMap).length ? bultosMap : null)
   revalidatePath('/cumplimiento')
 }
 
@@ -172,15 +181,5 @@ export async function desmarcarActividadAccion(form: FormData) {
   if (!id) return
   if (await bloqueadoPorPlazoActividad(id)) return
   await reabrirGrupo(id)
-  revalidatePath('/cumplimiento')
-}
-
-export async function setUnidadRealizadaAccion(form: FormData) {
-  const id = texto(form, 'id')
-  if (!id) return
-  if (await bloqueadoPorPlazoActividad(id)) return
-  const u = texto(form, 'unidad')
-  const unidad = u === 'otro' ? texto(form, 'unidadOtra') || 'otro' : u || 'cantidad'
-  await setUnidadRealizadaGrupo(id, unidad)
   revalidatePath('/cumplimiento')
 }
