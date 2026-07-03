@@ -22,6 +22,9 @@ export function FormRegistrar({
   haProgramada,
   lotesActividad,
   unidadActual,
+  estadoInicial = '',
+  motivoInicial = '',
+  notaInicial = '',
   accion,
 }: {
   actividadId: string
@@ -35,10 +38,13 @@ export function FormRegistrar({
   haProgramada: number
   lotesActividad: { id: string; nombre: string; hectareas?: number | null }[]
   unidadActual?: string | null
+  estadoInicial?: string
+  motivoInicial?: string
+  notaInicial?: string
   accion: (formData: FormData) => void | Promise<void>
 }) {
-  const [estado, setEstado] = useState('')
-  const [motivoId, setMotivoId] = useState('')
+  const [estado, setEstado] = useState(estadoInicial)
+  const [motivoId, setMotivoId] = useState(motivoInicial)
   const [reemplazoDesc, setReemplazoDesc] = useState('')
   const [reemplazoUnidadSel, setReemplazoUnidadSel] = useState('Jornales')
   const [centroCosto, setCentroCosto] = useState('')
@@ -94,7 +100,7 @@ export function FormRegistrar({
       </label>
       <label className="flex flex-1 flex-col text-xs">
         Observación / lo que faltó
-        <input name="nota" placeholder="(para parcial o reprogramada)" className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
+        <input name="nota" defaultValue={notaInicial} placeholder="(para parcial o reprogramada)" className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
       </label>
       <label className="flex flex-col text-xs">
         Unidad
