@@ -5,6 +5,7 @@ const mapa: Record<string, string> = { ESTERCOLERO: 'hora', GRANEL: 'kg', ENCALA
 const ctx = {
   fechaDeDia: (d: number) => `D${d}`,
   nombreMaquina: (id: string | null) => (id ? `MAQ-${id}` : ''),
+  nombreResponsable: (id: string | null) => (id ? `RESP-${id}` : ''),
 }
 
 function act(p: Partial<ActividadExport>): ActividadExport {
@@ -22,6 +23,7 @@ function act(p: Partial<ActividadExport>): ActividadExport {
     avancePorLote: null,
     finca: null,
     nota: null,
+    unidadRealizada: null,
     ...p,
   }
 }
@@ -176,5 +178,22 @@ describe('filasCumplimiento — Finca y Observación (columnas nuevas)', () => {
     const filas = filasCumplimiento(a, '15 jun', mapa, ctx)
     expect(filas[0][6]).toBe('La Esperanza')
     expect(filas[0][14]).toBe('') // Observación vacía (nota null)
+  })
+})
+
+describe('filasCumplimiento — responsable del avance + unidad de actividad', () => {
+  it('usa el responsable de la entrada (fallback al de la actividad) y la unidad de la actividad', () => {
+    const a = act({
+      unidadRealizada: 'jornales',
+      avancePorLote: { l1: [
+        { dia: 1, maquinaId: null, cantidad: 2, responsableId: 'R2' },
+        { dia: 2, maquinaId: null, cantidad: 3 },
+      ] },
+    })
+    const filas = filasCumplimiento(a, '15 jun', mapa, ctx)
+    // Responsable = índice 2, Unidad = índice 9
+    expect(filas[0][2]).toBe('RESP-R2')
+    expect(filas[1][2]).toBe('Ana')       // fallback al responsable de la actividad
+    expect(filas[0][9]).toBe('jornales')  // unidad de la actividad (verbatim)
   })
 })

@@ -33,6 +33,7 @@ export type ActividadExport = {
   avancePorLote: Record<string, AvanceEntrada | AvanceEntrada[]> | null
   finca: { nombre: string } | null
   nota: string | null
+  unidadRealizada?: string | null
 }
 
 // Filas del Excel para una actividad, en el orden de COLUMNAS_CUMPLIMIENTO.
@@ -48,11 +49,12 @@ export function filasCumplimiento(
   a: ActividadExport,
   fecha: string,
   unidadPorNombre: Record<string, string>,
-  ctx: { fechaDeDia: (dia: number) => string; nombreMaquina: (maquinaId: string | null) => string },
+  ctx: { fechaDeDia: (dia: number) => string; nombreMaquina: (maquinaId: string | null) => string; nombreResponsable?: (id: string | null) => string },
   ejecutadaPor = '',
 ): (string | number)[][] {
   const unidad: Unidad = normalizarUnidad(unidadPorNombre[a.descripcion])
   const unidadAbrev = unidadAbreviada(unidad)
+  const unidadDisplay = a.unidadRealizada ?? unidadAbrev
   const estado = ESTADO_TXT[a.estado] ?? a.estado
   const bultos = textoBultosPorLote(a.lotes, a.bultosPorLote)
   const centro = a.centroCosto ?? ''
@@ -65,14 +67,14 @@ export function filasCumplimiento(
       filas.push([
         DIAS[e.dia] ?? '',
         ctx.fechaDeDia(e.dia),
-        a.responsable.nombre,
+        (ctx.nombreResponsable?.(e.responsableId ?? null)) || a.responsable.nombre,
         a.descripcion,
         ctx.nombreMaquina(e.maquinaId) || (a.maquina?.nombre ?? ''),
         l.nombre,
         a.finca?.nombre ?? '',
         estado,
         e.cantidad,
-        unidadAbrev,
+        unidadDisplay,
         bultos,
         e.centroCosto ?? centro,
         potreros,
@@ -94,7 +96,7 @@ export function filasCumplimiento(
     a.finca?.nombre ?? '',
     estado,
     a.haRealizada ?? '',
-    a.haRealizada == null ? '' : unidadAbrev,
+    a.haRealizada == null ? '' : unidadDisplay,
     bultos,
     centro,
     potreros,
@@ -113,7 +115,7 @@ export function filasCumplimientoGrupo(
   grupo: ActividadExport[],
   fecha: string,
   unidadPorNombre: Record<string, string>,
-  ctx: { fechaDeDia: (dia: number) => string; nombreMaquina: (maquinaId: string | null) => string },
+  ctx: { fechaDeDia: (dia: number) => string; nombreMaquina: (maquinaId: string | null) => string; nombreResponsable?: (id: string | null) => string },
   ejecutadaPor = '',
 ): (string | number)[][] {
   if (grupo.length === 0) return []
