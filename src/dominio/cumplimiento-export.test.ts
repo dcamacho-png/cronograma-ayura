@@ -80,6 +80,16 @@ describe('filasCumplimiento — con avances (una fila por avance)', () => {
     const filas = filasCumplimiento(a, '15 jun', mapa, ctx)
     expect(filas.map((f) => [f[5], f[8]])).toEqual([['L1', 2], ['L2', 1]])
   })
+  it('la observación de la entrada va a la última columna; sin ella cae a la nota de la actividad', () => {
+    const a = act({
+      nota: 'nota actividad',
+      lotes: [{ id: 'l1', nombre: 'L1' }],
+      avancePorLote: { l1: [{ dia: 1, maquinaId: null, cantidad: 2, observacion: 'obs avance' }, { dia: 2, maquinaId: null, cantidad: 3 }] },
+    })
+    const filas = filasCumplimiento(a, '15 jun', mapa, ctx)
+    expect(filas[0][14]).toBe('obs avance')
+    expect(filas[1][14]).toBe('nota actividad')
+  })
 })
 
 describe('filasCumplimientoGrupo — una sola fila por actividad aunque tenga varios responsables', () => {

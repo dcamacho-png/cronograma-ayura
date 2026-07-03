@@ -79,7 +79,7 @@ export function filasCumplimiento(
         e.centroCosto ?? centro,
         potreros,
         ejecutadaPor,
-        a.nota ?? '',
+        e.observacion ?? a.nota ?? '',
       ])
     }
   }
