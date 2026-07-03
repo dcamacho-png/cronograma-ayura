@@ -208,7 +208,7 @@ export default async function TareasPage({
                       diasSeleccion={parseCsv(s.diasSugeridos)}
                       responsablesSeleccion={parseCsv(s.responsablesSugeridosIds)}
                       responsablesB={responsablesPorArea[s.areaId] ?? []}
-                      estipuladas={estipuladas}
+                      estipuladas={estipuladasMaq}
                       lotes={lotes}
                       lotesActuales={s.lotes}
                       bultosActuales={s.bultosPorLote as Record<string, number> | null}

@@ -78,6 +78,8 @@ export default async function CumplimientoPage({
   const responsables = responsablesTodos.filter((r) => r.activo)
   const motivoCambioId = motivos.find((m) => m.nombre === 'Cambio de actividad')?.id ?? null
   const unidadPorNombre = Object.fromEntries(estipuladas.map((e) => [e.nombre, e.unidad]))
+  // Los desplegables (reemplazo/actividad realizada) son de maquinaria: solo actividades de esa categoría.
+  const estipuladasMaq = estipuladas.filter((e) => e.maquinaria)
 
   // Agrupar las filas-día en actividades (misma tarea = una tarjeta).
   // Cada grupo se ordena por día; las tarjetas, por el primer día de la actividad.
@@ -174,7 +176,7 @@ export default async function CumplimientoPage({
           responsables={responsables}
           lotes={lotes}
           maquinas={maquinas}
-          estipuladas={estipuladas}
+          estipuladas={estipuladasMaq}
           accion={agregarActividadRealizadaAccion}
         />
       )}
@@ -265,7 +267,7 @@ export default async function CumplimientoPage({
                             lotesActividad={cab.lotes}
                             lotesCatalogo={lotes}
                             maquinas={maquinas}
-                            estipuladas={estipuladas}
+                            estipuladas={estipuladasMaq}
                             motivos={motivos}
                             motivoCambioId={motivoCambioId}
                             haProgramada={cab.lotes.reduce((s, l) => s + (l.hectareas ?? 0), 0)}
@@ -289,7 +291,7 @@ export default async function CumplimientoPage({
                             lotesActividad={cab.lotes}
                             lotesCatalogo={lotes}
                             unidadRealizada={cab.unidadRealizada}
-                            estipuladas={estipuladas}
+                            estipuladas={estipuladasMaq}
                             motivos={motivos}
                             motivoCambioId={motivoCambioId}
                             nota={cab.nota}
