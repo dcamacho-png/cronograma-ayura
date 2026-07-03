@@ -174,8 +174,8 @@ export default async function ConfiguracionPage({
 
         {/* Actividades de maquinaria (estipuladas) */}
         <section className="tarjeta p-4">
-          <h3 className="mb-2 font-semibold text-tinta">Actividades de maquinaria ({estipuladas.length})</h3>
-          <p className="mb-3 text-xs text-tierra">Aparecen en el desplegable de Tareas cuando el área es Maquinaria.</p>
+          <h3 className="mb-2 font-semibold text-tinta">Actividades (catálogo) ({estipuladas.length})</h3>
+          <p className="mb-3 text-xs text-tierra">Estándar y maquinaria; cada área ve su categoría en el desplegable de Tareas.</p>
           <ul className="mb-3 space-y-1">
             {estipuladas.map((e) => (
               <li key={e.id} className="flex items-center gap-2">
@@ -184,6 +184,9 @@ export default async function ConfiguracionPage({
                   <input name="nombre" defaultValue={e.nombre} className="flex-1 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
                   <button className="text-xs font-semibold text-bosque hover:underline">guardar</button>
                 </form>
+                <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${e.maquinaria ? 'bg-arena text-arcilla' : 'bg-bosque/15 text-bosque'}`}>
+                  {e.maquinaria ? 'Maquinaria' : 'Estándar'}
+                </span>
                 <form action={setUnidadActividadEstipuladaAccion} className="flex items-center gap-1">
                   <input type="hidden" name="id" value={e.id} />
                   <select name="unidad" defaultValue={e.unidad} className="rounded-lg border border-borde bg-marfil p-1 text-xs focus:outline-none focus:ring-2 focus:ring-bosque/40">
@@ -205,6 +208,10 @@ export default async function ConfiguracionPage({
               <option value="hora">Hora</option>
               <option value="kg">Kg</option>
               <option value="cantidad">Cantidad</option>
+            </select>
+            <select name="categoria" defaultValue="maquinaria" className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
+              <option value="maquinaria">Maquinaria</option>
+              <option value="estandar">Estándar</option>
             </select>
             <button className="rounded-lg bg-bosque px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
           </form>

@@ -118,7 +118,8 @@ export async function crearActividadEstipuladaAccion(form: FormData) {
   const nombre = texto(form, 'nombre')
   if (!nombre) faltanDatos()
   const unidad = normalizarUnidad(texto(form, 'unidad'))
-  await correr(() => crearActividadEstipulada(nombre, unidad), 'Actividad agregada.')
+  const maquinaria = texto(form, 'categoria') !== 'estandar' // por defecto maquinaria
+  await correr(() => crearActividadEstipulada(nombre, unidad, maquinaria), 'Actividad agregada.')
 }
 
 export async function eliminarActividadEstipuladaAccion(form: FormData) {
