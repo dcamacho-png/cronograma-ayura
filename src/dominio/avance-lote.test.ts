@@ -145,3 +145,51 @@ describe('agregarAvances — observación', () => {
     expect(out.l1[0].observacion ?? null).toBeNull()
   })
 })
+
+import { editarAvanceEntrada, eliminarAvanceEntrada } from './avance-lote'
+
+describe('editarAvanceEntrada', () => {
+  const base = () => ({ a: [{ dia: 1, maquinaId: null, cantidad: 5 }, { dia: 2, maquinaId: null, cantidad: 3, observacion: 'x' }] })
+
+  it('cambia solo los campos dados de la entrada indicada', () => {
+    const out = editarAvanceEntrada(base(), 'a', 0, { cantidad: 8, dia: 4 })
+    expect(out.a[0]).toEqual({ dia: 4, maquinaId: null, cantidad: 8 })
+    expect(out.a[1]).toEqual({ dia: 2, maquinaId: null, cantidad: 3, observacion: 'x' })
+  })
+
+  it('observación vacía elimina el campo', () => {
+    const out = editarAvanceEntrada(base(), 'a', 1, { observacion: '' })
+    expect('observacion' in out.a[1]).toBe(false)
+  })
+
+  it('no muta el original', () => {
+    const orig = base()
+    editarAvanceEntrada(orig, 'a', 0, { cantidad: 99 })
+    expect(orig.a[0].cantidad).toBe(5)
+  })
+
+  it('índice fuera de rango o lote inexistente: sin cambios', () => {
+    const orig = base()
+    expect(editarAvanceEntrada(orig, 'a', 9, { cantidad: 1 })).toBe(orig)
+    expect(editarAvanceEntrada(orig, 'z', 0, { cantidad: 1 })).toBe(orig)
+  })
+})
+
+describe('eliminarAvanceEntrada', () => {
+  const base = () => ({ a: [{ dia: 1, maquinaId: null, cantidad: 5 }, { dia: 2, maquinaId: null, cantidad: 3 }], b: [{ dia: 1, maquinaId: null, cantidad: 2 }] })
+
+  it('quita la entrada indicada', () => {
+    const out = eliminarAvanceEntrada(base(), 'a', 0)
+    expect(out.a).toEqual([{ dia: 2, maquinaId: null, cantidad: 3 }])
+  })
+
+  it('si el lote queda vacío, borra la clave', () => {
+    const out = eliminarAvanceEntrada(base(), 'b', 0)
+    expect('b' in out).toBe(false)
+  })
+
+  it('índice fuera de rango: sin cambios', () => {
+    const orig = base()
+    expect(eliminarAvanceEntrada(orig, 'a', 9)).toBe(orig)
+  })
+})

@@ -92,3 +92,35 @@ export function agregarAvances(
   }
   return out
 }
+
+// Devuelve una copia de `avance` con la entrada (loteId, index) modificada en los campos
+// dados. `observacion` vacía elimina el campo. Fuera de rango ⇒ devuelve el mismo objeto.
+export function editarAvanceEntrada(
+  avance: AvancePorLote,
+  loteId: string,
+  index: number,
+  cambios: { cantidad?: number; dia?: number; observacion?: string | null },
+): AvancePorLote {
+  const lista = avance[loteId]
+  if (!lista || index < 0 || index >= lista.length) return avance
+  const siguiente: AvanceEntrada = { ...lista[index] }
+  if (cambios.cantidad !== undefined) siguiente.cantidad = cambios.cantidad
+  if (cambios.dia !== undefined) siguiente.dia = cambios.dia
+  if (cambios.observacion !== undefined) {
+    if (cambios.observacion) siguiente.observacion = cambios.observacion
+    else delete siguiente.observacion
+  }
+  return { ...avance, [loteId]: lista.map((e, i) => (i === index ? siguiente : e)) }
+}
+
+// Devuelve una copia de `avance` sin la entrada (loteId, index). Si el lote queda sin
+// entradas, se elimina la clave. Fuera de rango ⇒ devuelve el mismo objeto.
+export function eliminarAvanceEntrada(avance: AvancePorLote, loteId: string, index: number): AvancePorLote {
+  const lista = avance[loteId]
+  if (!lista || index < 0 || index >= lista.length) return avance
+  const restante = lista.filter((_, i) => i !== index)
+  const out = { ...avance }
+  if (restante.length) out[loteId] = restante
+  else delete out[loteId]
+  return out
+}
