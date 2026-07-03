@@ -732,7 +732,6 @@ export async function registrarNovedadGrupo(
   nota: string | null,
   reemplazo?: { descripcion: string; loteId: string | null } | null,
   lotesHechos: string[] = [],
-  medidas: { loteId: string; ha: number | null; bultos: number | null }[] = [],
 ) {
   const g = await filasHermanas(id)
   if (!g) return null
@@ -742,10 +741,6 @@ export async function registrarNovedadGrupo(
     const lote = await prisma.lote.findUnique({ where: { id: reemplazo.loteId } })
     fincaId = lote?.fincaId ?? null
   }
-  const bultosMerge = { ...((g.base.bultosPorLote ?? {}) as Record<string, number>) }
-  for (const m of medidas) if (m.bultos != null) bultosMerge[m.loteId] = m.bultos
-  const haRealizada = medidas.reduce((s, m) => s + (m.ha ?? 0), 0)
-  const conMedidas = medidas.length > 0
   await prisma.$transaction(async (tx) => {
     for (const f of g.filas) {
       if (f.estado === 'CUMPLIDA') continue
@@ -755,11 +750,9 @@ export async function registrarNovedadGrupo(
           estado,
           motivoId,
           nota: notaFinal,
-          ...(lotesHechos.length ? { lotesHechos: lotesHechos as Prisma.InputJsonValue } : {}),
-          ...(conMedidas
+          ...(lotesHechos.length
             ? {
-                bultosPorLote: bultosMerge as Prisma.InputJsonValue,
-                haRealizada,
+                lotesHechos: lotesHechos as Prisma.InputJsonValue,
                 lotes: { connect: lotesHechos.map((lid) => ({ id: lid })) },
               }
             : {}),

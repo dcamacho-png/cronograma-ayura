@@ -75,8 +75,7 @@ export function ActividadMaquinaria({
           estipuladas={estipuladas}
           haProgramada={haProgramada}
           lotesActividad={lotesActividad}
-          bultosAsignados={bultosAsignados}
-          descripcion={descripcion}
+          unidadActual={unidadRealizada}
           accion={registrarNovedad}
         />
         <button type="button" onClick={() => setNovedad(false)} className="mt-1 text-xs text-tierra underline">

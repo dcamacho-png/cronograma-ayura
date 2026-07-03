@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { SelectFincaLote } from '../_componentes/select-finca-lote'
 import { etiquetaMedida, normalizarUnidad, type Unidad } from '@/dominio/unidad'
 import { CENTROS_COSTO } from '@/dominio/centro-costo'
-import { usaBultos } from '@/dominio/bultos'
 
 type Motivo = { id: string; nombre: string }
 type Lote = { id: string; nombre: string; finca: { nombre: string } }
@@ -21,8 +20,7 @@ export function FormRegistrar({
   estipuladas,
   haProgramada,
   lotesActividad,
-  bultosAsignados,
-  descripcion,
+  unidadActual,
   accion,
 }: {
   actividadId: string
@@ -35,8 +33,7 @@ export function FormRegistrar({
   estipuladas: Estipulada[]
   haProgramada: number
   lotesActividad: { id: string; nombre: string; hectareas?: number | null }[]
-  bultosAsignados?: Record<string, number> | null
-  descripcion?: string
+  unidadActual?: string | null
   accion: (formData: FormData) => void | Promise<void>
 }) {
   const [estado, setEstado] = useState('')
@@ -49,7 +46,9 @@ export function FormRegistrar({
   const requiereMotivo = estado !== ''
   const requierePotreros = (estado === 'PARCIAL' || estado === 'REPROGRAMADA') && lotesActividad.length > 1
   const esCambio = estado !== '' && motivoId !== '' && motivoId === motivoCambioId
-  const conBultos = descripcion ? usaBultos(descripcion) : false
+  const UNIDADES = ['Ha', 'Hora', 'Kg', 'Cantidad', 'Bultos', 'Jornales'] // + "Otro"
+  const conocidaU = UNIDADES.find((u) => u.toLowerCase() === (unidadActual ?? '').toLowerCase())
+  const [unidadSel, setUnidadSel] = useState(conocidaU ?? (unidadActual ? 'Otro' : (esMaquinaria ? 'Ha' : 'Cantidad')))
   const filasPotreros = [...lotesActividad, ...anexados]
   const fincasAnexar = [...new Set(lotes.map((l) => l.finca.nombre))].sort()
 
@@ -95,6 +94,24 @@ export function FormRegistrar({
         Observación / lo que faltó
         <input name="nota" placeholder="(para parcial o reprogramada)" className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
       </label>
+      <label className="flex flex-col text-xs">
+        Unidad
+        <select
+          name="unidad"
+          value={unidadSel === 'Otro' ? 'otro' : unidadSel.toLowerCase()}
+          onChange={(e) => setUnidadSel(e.target.value === 'otro' ? 'Otro' : e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1))}
+          className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
+        >
+          {UNIDADES.map((u) => (<option key={u} value={u.toLowerCase()}>{u}</option>))}
+          <option value="otro">Otro…</option>
+        </select>
+      </label>
+      {unidadSel === 'Otro' && (
+        <label className="flex flex-col text-xs">
+          Unidad (texto)
+          <input name="unidadOtra" defaultValue={conocidaU ? '' : unidadActual ?? ''} placeholder="ej. bultos" className="w-28 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
+        </label>
+      )}
       {esMaquinaria && (
         <label className="flex flex-col text-xs">
           {etiquetaMedida(unidad)} (opcional)
@@ -134,22 +151,12 @@ export function FormRegistrar({
       {requierePotreros && (
         <div className="flex w-full flex-col gap-2 rounded-lg border border-borde bg-arena p-2 text-xs">
           <span className="font-semibold text-tinta">Potreros realizados</span>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-wrap gap-2">
             {filasPotreros.map((l) => (
-              <div key={l.id} className="flex flex-wrap items-center gap-2">
-                <label className="flex items-center gap-1">
-                  <input type="checkbox" name="loteHecho" value={l.id} defaultChecked={anexados.some((a) => a.id === l.id)} className="accent-bosque" />
-                  {l.nombre}
-                </label>
-                <label className="flex items-center gap-1">ha
-                  <input name={`ha_${l.id}`} type="number" step="any" min="0" defaultValue={l.hectareas ?? ''} className="w-20 rounded-lg border border-borde bg-marfil p-0.5" />
-                </label>
-                {conBultos && (
-                  <label className="flex items-center gap-1">bultos
-                    <input name={`bultos_${l.id}`} type="number" step="any" min="0" defaultValue={bultosAsignados?.[l.id] ?? ''} className="w-20 rounded-lg border border-borde bg-marfil p-0.5" />
-                  </label>
-                )}
-              </div>
+              <label key={l.id} className="flex items-center gap-1">
+                <input type="checkbox" name="loteHecho" value={l.id} defaultChecked={anexados.some((a) => a.id === l.id)} className="accent-bosque" />
+                {l.nombre}
+              </label>
             ))}
           </div>
           <div className="flex flex-wrap items-end gap-2 border-t border-borde pt-2">

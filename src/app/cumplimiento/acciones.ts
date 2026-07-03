@@ -162,17 +162,13 @@ export async function registrarNovedadActividadAccion(form: FormData) {
   if (await bloqueadoPorPlazoActividad(id)) return
   const nota = textoOpcional(form, 'nota')
   const lotesHechos = form.getAll('loteHecho').map((v) => String(v))
-  const medidas = lotesHechos.map((loteId) => ({
-    loteId,
-    ha: numeroOpcional(form, `ha_${loteId}`) ?? null,
-    bultos: numeroOpcional(form, `bultos_${loteId}`) ?? null,
-  }))
   // Cambio de actividad (estándar): descripción + lote, sin máquina/medida.
   const reemplazoDesc = texto(form, 'reemplazoDescripcion')
   const reemplazo = reemplazoDesc
     ? { descripcion: reemplazoDesc, loteId: textoOpcional(form, 'reemplazoLoteId') }
     : null
-  await registrarNovedadGrupo(id, estado, motivoId, nota, reemplazo, lotesHechos, medidas)
+  await setUnidadRealizadaGrupo(id, unidadElegida(form))
+  await registrarNovedadGrupo(id, estado, motivoId, nota, reemplazo, lotesHechos)
   revalidatePath('/cumplimiento')
 }
 
