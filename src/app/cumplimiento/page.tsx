@@ -273,6 +273,8 @@ export default async function CumplimientoPage({
                             responsableActividadId={cab.responsableId}
                             fincaActividad={cab.finca?.nombre ?? ''}
                             unidadRealizada={cab.unidadRealizada}
+                            bultosAsignados={cab.bultosPorLote as Record<string, number> | null}
+                            descripcion={cab.descripcion}
                             registrarAvance={registrarAvanceAccion}
                             setUnidadRealizada={setUnidadRealizadaAccion}
                             marcarCumplida={marcarCumplidaActividadAccion}
@@ -295,6 +297,8 @@ export default async function CumplimientoPage({
                             responsables={responsables}
                             responsableActividadId={cab.responsableId}
                             fincaActividad={cab.finca?.nombre ?? ''}
+                            bultosAsignados={cab.bultosPorLote as Record<string, number> | null}
+                            descripcion={cab.descripcion}
                             registrarAvance={registrarAvanceAccion}
                             setUnidadRealizada={setUnidadRealizadaAccion}
                             registrarMedidaGeneral={registrarMedidaGeneralAccion}

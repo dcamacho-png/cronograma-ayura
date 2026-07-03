@@ -30,6 +30,8 @@ export function ActividadEstandar({
   responsables,
   responsableActividadId,
   fincaActividad,
+  bultosAsignados,
+  descripcion,
   registrarAvance,
   setUnidadRealizada,
   registrarMedidaGeneral,
@@ -42,7 +44,7 @@ export function ActividadEstandar({
   estado: Estado
   dia: number
   tieneLotes: boolean
-  lotesActividad: { id: string; nombre: string }[]
+  lotesActividad: { id: string; nombre: string; hectareas?: number | null }[]
   lotesCatalogo: Lote[]
   unidadRealizada: string | null
   estipuladas: Estipulada[]
@@ -52,6 +54,8 @@ export function ActividadEstandar({
   responsables: { id: string; nombre: string }[]
   responsableActividadId: string
   fincaActividad: string
+  bultosAsignados?: Record<string, number> | null
+  descripcion?: string
   registrarAvance: (f: FormData) => void | Promise<void>
   setUnidadRealizada: (f: FormData) => void | Promise<void>
   registrarMedidaGeneral: (f: FormData) => void | Promise<void>
@@ -79,6 +83,8 @@ export function ActividadEstandar({
           estipuladas={estipuladas}
           haProgramada={0}
           lotesActividad={lotesActividad}
+          bultosAsignados={bultosAsignados}
+          descripcion={descripcion}
           accion={registrarNovedad}
         />
         <button type="button" onClick={() => setNovedad(false)} className="mt-1 text-xs text-tierra underline">

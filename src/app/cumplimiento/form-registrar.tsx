@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { SelectFincaLote } from '../_componentes/select-finca-lote'
 import { etiquetaMedida, normalizarUnidad, type Unidad } from '@/dominio/unidad'
 import { CENTROS_COSTO } from '@/dominio/centro-costo'
+import { usaBultos } from '@/dominio/bultos'
 
 type Motivo = { id: string; nombre: string }
 type Lote = { id: string; nombre: string; finca: { nombre: string } }
@@ -20,6 +21,8 @@ export function FormRegistrar({
   estipuladas,
   haProgramada,
   lotesActividad,
+  bultosAsignados,
+  descripcion,
   accion,
 }: {
   actividadId: string
@@ -31,16 +34,24 @@ export function FormRegistrar({
   maquinas: { id: string; nombre: string }[]
   estipuladas: Estipulada[]
   haProgramada: number
-  lotesActividad: { id: string; nombre: string }[]
+  lotesActividad: { id: string; nombre: string; hectareas?: number | null }[]
+  bultosAsignados?: Record<string, number> | null
+  descripcion?: string
   accion: (formData: FormData) => void | Promise<void>
 }) {
   const [estado, setEstado] = useState('')
   const [motivoId, setMotivoId] = useState('')
   const [reemplazoDesc, setReemplazoDesc] = useState('')
   const [centroCosto, setCentroCosto] = useState('')
+  const [anexados, setAnexados] = useState<{ id: string; nombre: string; hectareas?: number | null }[]>([])
+  const [fincaAnexar, setFincaAnexar] = useState('')
+  const [loteAnexar, setLoteAnexar] = useState('')
   const requiereMotivo = estado !== ''
   const requierePotreros = (estado === 'PARCIAL' || estado === 'REPROGRAMADA') && lotesActividad.length > 1
   const esCambio = estado !== '' && motivoId !== '' && motivoId === motivoCambioId
+  const conBultos = descripcion ? usaBultos(descripcion) : false
+  const filasPotreros = [...lotesActividad, ...anexados]
+  const fincasAnexar = [...new Set(lotes.map((l) => l.finca.nombre))].sort()
 
   // Unidad de la actividad de reemplazo elegida ("Otra"/vacío ⇒ ha).
   const unidadPorNombre = new Map(estipuladas.map((e) => [e.nombre, normalizarUnidad(e.unidad)]))
@@ -121,15 +132,46 @@ export function FormRegistrar({
         </label>
       )}
       {requierePotreros && (
-        <div className="flex w-full flex-col gap-1 rounded-lg border border-borde bg-arena p-2 text-xs">
-          <span className="font-semibold text-tinta">¿En cuáles potreros se realizó? (opcional)</span>
-          <div className="flex flex-wrap gap-3">
-            {lotesActividad.map((l) => (
-              <label key={l.id} className="flex items-center gap-1">
-                <input type="checkbox" name="loteHecho" value={l.id} className="accent-bosque" />
-                {l.nombre}
-              </label>
+        <div className="flex w-full flex-col gap-2 rounded-lg border border-borde bg-arena p-2 text-xs">
+          <span className="font-semibold text-tinta">Potreros realizados</span>
+          <div className="flex flex-col gap-1">
+            {filasPotreros.map((l) => (
+              <div key={l.id} className="flex flex-wrap items-center gap-2">
+                <label className="flex items-center gap-1">
+                  <input type="checkbox" name="loteHecho" value={l.id} defaultChecked={anexados.some((a) => a.id === l.id)} className="accent-bosque" />
+                  {l.nombre}
+                </label>
+                <label className="flex items-center gap-1">ha
+                  <input name={`ha_${l.id}`} type="number" step="any" min="0" defaultValue={l.hectareas ?? ''} className="w-20 rounded-lg border border-borde bg-marfil p-0.5" />
+                </label>
+                {conBultos && (
+                  <label className="flex items-center gap-1">bultos
+                    <input name={`bultos_${l.id}`} type="number" step="any" min="0" defaultValue={bultosAsignados?.[l.id] ?? ''} className="w-20 rounded-lg border border-borde bg-marfil p-0.5" />
+                  </label>
+                )}
+              </div>
             ))}
+          </div>
+          <div className="flex flex-wrap items-end gap-2 border-t border-borde pt-2">
+            <span className="w-full text-tierra">Anexar potrero(s):</span>
+            <select value={fincaAnexar} onChange={(e) => { setFincaAnexar(e.target.value); setLoteAnexar('') }} className="rounded-lg border border-borde bg-marfil p-1">
+              <option value="">— finca —</option>
+              {fincasAnexar.map((f) => (<option key={f} value={f}>{f}</option>))}
+            </select>
+            <select value={loteAnexar} onChange={(e) => setLoteAnexar(e.target.value)} className="rounded-lg border border-borde bg-marfil p-1">
+              <option value="">— lote —</option>
+              {lotes.filter((l) => l.finca.nombre === fincaAnexar && !filasPotreros.some((x) => x.id === l.id)).map((l) => (<option key={l.id} value={l.id}>{l.nombre}</option>))}
+            </select>
+            <button
+              type="button"
+              onClick={() => {
+                const l = lotes.find((x) => x.id === loteAnexar)
+                if (l) { setAnexados((prev) => [...prev, { id: l.id, nombre: l.nombre }]); setLoteAnexar('') }
+              }}
+              className="rounded-lg border border-bosque px-2 py-1 font-semibold text-bosque hover:bg-arena/40"
+            >
+              + agregar
+            </button>
           </div>
         </div>
       )}

@@ -31,6 +31,8 @@ export function ActividadMaquinaria({
   responsableActividadId,
   fincaActividad,
   unidadRealizada,
+  bultosAsignados,
+  descripcion,
   registrarAvance,
   setUnidadRealizada,
   marcarCumplida,
@@ -41,7 +43,7 @@ export function ActividadMaquinaria({
   estado: Estado
   unidad: Unidad
   dia: number
-  lotesActividad: { id: string; nombre: string }[]
+  lotesActividad: { id: string; nombre: string; hectareas?: number | null }[]
   lotesCatalogo: Lote[]
   maquinas: { id: string; nombre: string }[]
   estipuladas: Estipulada[]
@@ -52,6 +54,8 @@ export function ActividadMaquinaria({
   responsableActividadId: string
   fincaActividad: string
   unidadRealizada: string | null
+  bultosAsignados?: Record<string, number> | null
+  descripcion?: string
   registrarAvance: (f: FormData) => void | Promise<void>
   setUnidadRealizada: (f: FormData) => void | Promise<void>
   marcarCumplida: (f: FormData) => void | Promise<void>
@@ -77,6 +81,8 @@ export function ActividadMaquinaria({
           estipuladas={estipuladas}
           haProgramada={haProgramada}
           lotesActividad={lotesActividad}
+          bultosAsignados={bultosAsignados}
+          descripcion={descripcion}
           accion={registrarNovedad}
         />
         <button type="button" onClick={() => setNovedad(false)} className="mt-1 text-xs text-tierra underline">
