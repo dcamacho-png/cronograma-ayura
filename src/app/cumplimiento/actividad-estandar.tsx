@@ -9,6 +9,7 @@ type Lote = { id: string; nombre: string; finca: { nombre: string } }
 type Estipulada = { id: string; nombre: string; unidad: string }
 
 const UNIDADES = ['Cantidad', 'Ha', 'Jornales'] // + "Otro" (texto libre)
+const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
 // Control de cumplimiento de UNA actividad estándar (no maquinaria), PENDIENTE o PARCIAL.
 // Unidad elegible (una por actividad); con potreros: Finca→Lote→cantidad (anexa lote nuevo);
@@ -154,7 +155,7 @@ export function ActividadEstandar({
               Día
               <select name="dia" defaultValue={dia} className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
                 {[1, 2, 3, 4, 5, 6, 7].map((d) => (
-                  <option key={d} value={d}>{d}</option>
+                  <option key={d} value={d}>{DIAS[d]}</option>
                 ))}
               </select>
             </label>
