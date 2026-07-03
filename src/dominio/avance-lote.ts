@@ -1,5 +1,5 @@
 // Un avance puntual de un lote en un día (cantidad incremental de ese día).
-export type AvanceEntrada = { dia: number; maquinaId: string | null; cantidad: number; centroCosto?: string | null; responsableId?: string | null }
+export type AvanceEntrada = { dia: number; maquinaId: string | null; cantidad: number; centroCosto?: string | null; responsableId?: string | null; observacion?: string | null }
 // Historial de avances por lote: una lista de entradas por cada loteId.
 export type AvancePorLote = Record<string, AvanceEntrada[]>
 
@@ -81,10 +81,11 @@ export function agregarAvances(
   entradas: { loteId: string; cantidad: number }[],
   centroCosto?: string | null,
   responsableId?: string | null,
+  observacion?: string | null,
 ): AvancePorLote {
   const out: AvancePorLote = { ...avance }
   for (const { loteId, cantidad } of entradas) {
-    out[loteId] = [...(out[loteId] ?? []), { dia, maquinaId, cantidad, ...(centroCosto ? { centroCosto } : {}), ...(responsableId ? { responsableId } : {}) }]
+    out[loteId] = [...(out[loteId] ?? []), { dia, maquinaId, cantidad, ...(centroCosto ? { centroCosto } : {}), ...(responsableId ? { responsableId } : {}), ...(observacion ? { observacion } : {}) }]
   }
   return out
 }

@@ -99,3 +99,15 @@ describe('agregarAvances — responsable', () => {
     expect(out.l1[0].responsableId ?? null).toBeNull()
   })
 })
+
+describe('agregarAvances — observación', () => {
+  it('guarda la observación en cada entrada nueva', () => {
+    const out = agregarAvances({}, 2, 'M1', [{ loteId: 'l1', cantidad: 3 }, { loteId: 'l2', cantidad: 1 }], 'Ceba', 'R9', 'llovió a media mañana')
+    expect(out.l1[0]).toMatchObject({ dia: 2, maquinaId: 'M1', cantidad: 3, centroCosto: 'Ceba', responsableId: 'R9', observacion: 'llovió a media mañana' })
+    expect(out.l2[0].observacion).toBe('llovió a media mañana')
+  })
+  it('sin observación → entrada sin ese campo', () => {
+    const out = agregarAvances({}, 1, null, [{ loteId: 'l1', cantidad: 2 }])
+    expect(out.l1[0].observacion ?? null).toBeNull()
+  })
+})
