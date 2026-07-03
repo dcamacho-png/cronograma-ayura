@@ -85,38 +85,6 @@ export async function devolverAlBancoAccion(form: FormData) {
   revalidatePath('/cumplimiento')
 }
 
-// ---- Acciones a nivel de ACTIVIDAD (estándar). El `id` es una fila representativa. ----
-
-export async function registrarAvanceLoteActividadAccion(form: FormData) {
-  const id = texto(form, 'id')
-  const dia = Number(texto(form, 'dia'))
-  if (!id || !(dia >= 1 && dia <= 7)) return
-  if (await bloqueadoPorPlazoActividad(id)) return
-  const loteIds = form.getAll('loteAvance').map((v) => String(v))
-  const avances = loteIds
-    .map((loteId) => ({ loteId, cantidad: numeroOpcional(form, `cantidad_${loteId}`) ?? 0 }))
-    .filter((a) => a.cantidad > 0)
-  if (avances.length === 0) return
-  await registrarAvanceLoteGrupo(id, dia, null, avances)
-  revalidatePath('/cumplimiento')
-}
-
-export async function registrarAvanceMaquinariaAccion(form: FormData) {
-  const id = texto(form, 'id')
-  const dia = Number(texto(form, 'dia'))
-  if (!id || !(dia >= 1 && dia <= 7)) return
-  if (await bloqueadoPorPlazoActividad(id)) return
-  const maquinaId = textoOpcional(form, 'maquinaId')
-  const centroCosto = textoOpcional(form, 'centroCosto')
-  const loteIds = form.getAll('loteAvance').map((v) => String(v))
-  const avances = loteIds
-    .map((loteId) => ({ loteId, cantidad: numeroOpcional(form, `cantidad_${loteId}`) ?? 0 }))
-    .filter((a) => a.cantidad > 0)
-  if (avances.length === 0) return
-  await registrarAvanceLoteGrupo(id, dia, maquinaId, avances, centroCosto)
-  revalidatePath('/cumplimiento')
-}
-
 export async function registrarAvanceObservacionAccion(form: FormData) {
   const id = texto(form, 'id')
   const nota = texto(form, 'nota')
@@ -149,19 +117,6 @@ function unidadElegida(form: FormData): string {
   const u = texto(form, 'unidad')
   if (u === 'otro') return texto(form, 'unidadOtra') || 'otro'
   return u || 'cantidad'
-}
-
-export async function registrarAvanceEstandarAccion(form: FormData) {
-  const id = texto(form, 'id')
-  const dia = Number(texto(form, 'dia'))
-  const loteId = texto(form, 'loteId')
-  const cantidad = numeroOpcional(form, 'cantidad') ?? 0
-  if (!id || !loteId || !(dia >= 1 && dia <= 7) || cantidad <= 0) return
-  if (await bloqueadoPorPlazoActividad(id)) return
-  await anexarLotesGrupo(id, [loteId])
-  await setUnidadRealizadaGrupo(id, unidadElegida(form))
-  await registrarAvanceLoteGrupo(id, dia, null, [{ loteId, cantidad }])
-  revalidatePath('/cumplimiento')
 }
 
 export async function registrarAvanceAccion(form: FormData) {
