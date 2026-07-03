@@ -17,13 +17,16 @@ export function normalizarAvancePorLote(
   return out
 }
 
-// Lotes "pendientes": los que no tienen ninguna entrada de avance con cantidad > 0.
+// Lotes "pendientes": los que no tienen ninguna entrada de avance con cantidad > 0
+// y tampoco están marcados como hechos en la novedad "Potreros realizados".
 export function lotesPendientes<T extends { id: string }>(
   lotes: T[],
   avance: Record<string, AvanceEntrada | AvanceEntrada[]> | null | undefined,
+  lotesHechos?: string[] | null,
 ): T[] {
   const av = normalizarAvancePorLote(avance)
-  return lotes.filter((l) => !(av[l.id] ?? []).some((e) => e.cantidad > 0))
+  const hechos = new Set(lotesHechos ?? [])
+  return lotes.filter((l) => !hechos.has(l.id) && !(av[l.id] ?? []).some((e) => e.cantidad > 0))
 }
 
 // Texto "L-A: 5, L-B: 2" con la SUMA por lote, en el orden dado.

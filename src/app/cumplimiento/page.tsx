@@ -226,7 +226,8 @@ export default async function CumplimientoPage({
                   const tieneLotes = cab.lotes.length > 0
                   const puedeContinuar =
                     estadoGrupo === 'PARCIAL' &&
-                    (cab.lotes.length === 0 || lotesPendientes(cab.lotes, avances).length > 0)
+                    (cab.lotes.length === 0 ||
+                      lotesPendientes(cab.lotes, avances, cab.lotesHechos as string[] | null).length > 0)
                   const unidadStd = cab.unidadRealizada ?? unidadAbreviada(unidad)
                   const resumenAvances = textoAvanceConFecha(cab.lotes, avances, unidadStd, etiquetaDia)
                   const interactivo = estadoGrupo === 'PENDIENTE' || estadoGrupo === 'PARCIAL'

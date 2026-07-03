@@ -584,6 +584,7 @@ export async function continuarParcialSemanaSiguiente(actividadId: string) {
   const pendientes = lotesPendientes(
     base.lotes,
     base.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null,
+    base.lotesHechos as string[] | null,
   )
   // Si maneja potreros y no queda ninguno pendiente, no hay qué continuar.
   if (base.lotes.length > 0 && pendientes.length === 0) return null
