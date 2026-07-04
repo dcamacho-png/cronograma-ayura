@@ -740,18 +740,23 @@ export async function eliminarAvanceEntradaGrupo(id: string, loteId: string, ind
 export async function agregarNovedadGrupo(
   id: string,
   entrada: { dia: number; motivoId: string | null; observacion: string | null },
+  reemplazo?: Reemplazo | null,
 ) {
   const g = await filasHermanas(id)
   if (!g) return null
   const lista = agregarNovedad(normalizarNovedades(g.base.novedades), entrada)
-  await prisma.$transaction(
-    g.filas
-      .filter((f) => f.estado === 'PENDIENTE' || f.estado === 'PARCIAL')
-      .map((f) => prisma.actividad.update({
+  await prisma.$transaction(async (tx) => {
+    for (const f of g.filas) {
+      if (f.estado !== 'PENDIENTE' && f.estado !== 'PARCIAL') continue
+      await tx.actividad.update({
         where: { id: f.id },
         data: { novedades: lista as unknown as Prisma.InputJsonValue },
-      })),
-  )
+      })
+    }
+    if (reemplazo?.descripcion) {
+      await crearActividadReemplazo(tx, g.base, reemplazo)
+    }
+  })
   return true
 }
 
@@ -912,6 +917,41 @@ export async function registrarMedidaGeneralGrupo(id: string, unidad: string, ca
   return true
 }
 
+type Reemplazo = { descripcion: string; unidad?: string | null; loteIds?: string[]; medida?: Record<string, number>; bultos?: Record<string, number>; dia?: number | null }
+
+// Crea UNA actividad de reemplazo ("En reemplazo de: <base.descripcion>", CUMPLIDA) dentro de
+// una transacción. Reutilizado por registrarNovedadGrupo (al cerrar por cambio) y por
+// agregarNovedadGrupo (al registrar una novedad de cambio, sin cerrar la original).
+async function crearActividadReemplazo(
+  tx: Prisma.TransactionClient,
+  base: { anio: number; semana: number; dia: number; turno: string; areaId: string; responsableId: string; descripcion: string },
+  reemplazo: Reemplazo,
+) {
+  let fincaId: string | null = null
+  if (reemplazo.loteIds?.[0]) {
+    const lote = await tx.lote.findUnique({ where: { id: reemplazo.loteIds[0] } })
+    fincaId = lote?.fincaId ?? null
+  }
+  await tx.actividad.create({
+    data: {
+      anio: base.anio,
+      semana: base.semana,
+      dia: reemplazo.dia ?? base.dia,
+      descripcion: reemplazo.descripcion,
+      turno: base.turno,
+      estado: 'CUMPLIDA',
+      areaId: base.areaId,
+      fincaId,
+      responsableId: base.responsableId,
+      nota: `En reemplazo de: ${base.descripcion}`,
+      lotes: reemplazo.loteIds?.length ? { connect: reemplazo.loteIds.map((lid) => ({ id: lid })) } : undefined,
+      ...(reemplazo.medida && Object.keys(reemplazo.medida).length ? { haRealizada: Object.values(reemplazo.medida).reduce((s, n) => s + n, 0) } : {}),
+      ...(reemplazo.unidad ? { unidadRealizada: reemplazo.unidad } : {}),
+      ...(reemplazo.bultos && Object.keys(reemplazo.bultos).length ? { bultosPorLote: reemplazo.bultos as Prisma.InputJsonValue } : {}),
+    },
+  })
+}
+
 // Novedad de la actividad completa: aplica estado (NO_CUMPLIDA/PARCIAL/REPROGRAMADA) +
 // motivo/nota a todas las filas. Para No cumplida/Reprogramada devuelve la tarea al banco
 // (toda la actividad es una sola novedad). Cambio de actividad: crea UNA actividad de
@@ -927,11 +967,6 @@ export async function registrarNovedadGrupo(
   const g = await filasHermanas(id)
   if (!g) return null
   const notaFinal = reemplazo ? `Cambiada por: ${reemplazo.descripcion}` : nota
-  let fincaId: string | null = null
-  if (reemplazo?.loteIds?.[0]) {
-    const lote = await prisma.lote.findUnique({ where: { id: reemplazo.loteIds[0] } })
-    fincaId = lote?.fincaId ?? null
-  }
   await prisma.$transaction(async (tx) => {
     for (const f of g.filas) {
       if (f.estado === 'CUMPLIDA') continue
@@ -963,24 +998,7 @@ export async function registrarNovedadGrupo(
       })
     }
     if (reemplazo?.descripcion) {
-      await tx.actividad.create({
-        data: {
-          anio: g.base.anio,
-          semana: g.base.semana,
-          dia: reemplazo.dia ?? g.base.dia,
-          descripcion: reemplazo.descripcion,
-          turno: g.base.turno,
-          estado: 'CUMPLIDA',
-          areaId: g.base.areaId,
-          fincaId,
-          responsableId: g.base.responsableId,
-          nota: `En reemplazo de: ${g.base.descripcion}`,
-          lotes: reemplazo.loteIds?.length ? { connect: reemplazo.loteIds.map((lid) => ({ id: lid })) } : undefined,
-          ...(reemplazo.medida && Object.keys(reemplazo.medida).length ? { haRealizada: Object.values(reemplazo.medida).reduce((s, n) => s + n, 0) } : {}),
-          ...(reemplazo.unidad ? { unidadRealizada: reemplazo.unidad } : {}),
-          ...(reemplazo.bultos && Object.keys(reemplazo.bultos).length ? { bultosPorLote: reemplazo.bultos as Prisma.InputJsonValue } : {}),
-        },
-      })
+      await crearActividadReemplazo(tx, g.base, reemplazo)
     }
   })
   return true
