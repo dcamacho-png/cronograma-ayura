@@ -63,6 +63,7 @@ export async function GET(req: NextRequest) {
     bultosPorLote: a.bultosPorLote as BultosPorLote | null,
     lotesHechos: a.lotesHechos as string[] | null,
     avancePorLote: a.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null,
+    detalle: a.tarea?.detalle ?? null,
   })
   const agregarGrupos = (
     items: ((typeof actividades)[number] | (typeof solicitadas)[number])[],
