@@ -165,3 +165,50 @@ describe('finalizadasPorLabor', () => {
     expect(r[0].responsable).toEqual({ id: 'R1', conteo: 1 })
   })
 })
+
+import { bultosAplicados, medidasPorTractor } from './resumen'
+import type { Unidad } from './unidad'
+
+describe('bultosAplicados', () => {
+  it('suma los bultos por lote de las actividades no pendientes', () => {
+    expect(bultosAplicados([
+      { estado: 'CUMPLIDA', bultosPorLote: { l1: 3, l2: 2 } },
+      { estado: 'PARCIAL', bultosPorLote: { l1: 5 } },
+    ])).toBe(10)
+  })
+  it('ignora PENDIENTE y bultosPorLote nulo', () => {
+    expect(bultosAplicados([
+      { estado: 'PENDIENTE', bultosPorLote: { l1: 9 } },
+      { estado: 'CUMPLIDA', bultosPorLote: null },
+    ])).toBe(0)
+  })
+})
+
+describe('medidasPorTractor', () => {
+  const fila = (over: Partial<Parameters<typeof medidasPorTractor>[0][number]>) => ({
+    estado: 'CUMPLIDA', unidad: 'ha' as Unidad, haProgramada: 0, haRealizada: null, maquinaId: null, avances: [], ...over,
+  })
+  it('atribuye cada avance a su tractor y unidad', () => {
+    const m = medidasPorTractor([
+      fila({ unidad: 'ha', avances: [{ maquinaId: 'A', cantidad: 3 }, { maquinaId: 'B', cantidad: 2 }] }),
+    ])
+    expect(m.get('A')).toEqual({ ha: 3, hora: 0, kg: 0, cantidad: 0 })
+    expect(m.get('B')).toEqual({ ha: 2, hora: 0, kg: 0, cantidad: 0 })
+  })
+  it('sin avances usa haRealizada y el tractor de la actividad', () => {
+    const m = medidasPorTractor([fila({ unidad: 'hora', haRealizada: 5, maquinaId: 'A' })])
+    expect(m.get('A')).toEqual({ ha: 0, hora: 5, kg: 0, cantidad: 0 })
+  })
+  it('sin avances, unidad ha CUMPLIDA sin haRealizada usa haProgramada', () => {
+    const m = medidasPorTractor([fila({ unidad: 'ha', haProgramada: 4, haRealizada: null, maquinaId: 'A' })])
+    expect(m.get('A')).toEqual({ ha: 4, hora: 0, kg: 0, cantidad: 0 })
+  })
+  it('tractor nulo cae en la clave vacía', () => {
+    const m = medidasPorTractor([fila({ unidad: 'kg', haRealizada: 7, maquinaId: null })])
+    expect(m.get('')).toEqual({ ha: 0, hora: 0, kg: 7, cantidad: 0 })
+  })
+  it('ignora PENDIENTE', () => {
+    const m = medidasPorTractor([fila({ estado: 'PENDIENTE', haRealizada: 9, maquinaId: 'A' })])
+    expect(m.size).toBe(0)
+  })
+})

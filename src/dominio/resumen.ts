@@ -117,3 +117,55 @@ export function finalizadasPorLabor(actividades: Actividad[]): FilaLabor[] {
     .map(([descripcion, l]) => ({ descripcion, total: l.total, tractor: top(l.tractores), responsable: top(l.responsables) }))
     .sort((a, b) => b.total - a.total || a.descripcion.localeCompare(b.descripcion))
 }
+
+// Total de bultos aplicados del área: suma bultosPorLote de las actividades no pendientes.
+// Recibe UNA fila por actividad-grupo (los bultos se comparten entre filas-hermanas).
+export function bultosAplicados(
+  filas: { estado: string; bultosPorLote: Record<string, number> | null }[],
+): number {
+  let total = 0
+  for (const f of filas) {
+    if (f.estado === 'PENDIENTE') continue
+    if (!f.bultosPorLote) continue
+    for (const n of Object.values(f.bultosPorLote)) total += n
+  }
+  return r1(total)
+}
+
+// Medida realizada por tractor y unidad. Recibe UNA fila por actividad-grupo. Si la
+// actividad tiene avances, cada avance se atribuye a su `maquinaId` (o al de la actividad);
+// si no, la medida (haRealizada, o haProgramada para ha CUMPLIDA) va al tractor de la
+// actividad. Clave '' = "sin tractor".
+export function medidasPorTractor(
+  filas: {
+    estado: string
+    unidad: Unidad
+    haProgramada: number
+    haRealizada: number | null
+    maquinaId: string | null
+    avances: { maquinaId: string | null; cantidad: number }[]
+  }[],
+): Map<string, Record<Unidad, number>> {
+  const out = new Map<string, Record<Unidad, number>>()
+  const bucket = (id: string): Record<Unidad, number> => {
+    let r = out.get(id)
+    if (!r) { r = { ha: 0, hora: 0, kg: 0, cantidad: 0 }; out.set(id, r) }
+    return r
+  }
+  for (const f of filas) {
+    if (f.estado === 'PENDIENTE') continue
+    if (f.avances.length > 0) {
+      for (const av of f.avances) {
+        if (!av.cantidad) continue
+        bucket(av.maquinaId ?? f.maquinaId ?? '')[f.unidad] += av.cantidad
+      }
+    } else {
+      const medida = f.haRealizada ?? (f.unidad === 'ha' && f.estado === 'CUMPLIDA' ? f.haProgramada : 0)
+      if (medida) bucket(f.maquinaId ?? '')[f.unidad] += medida
+    }
+  }
+  for (const r of out.values()) {
+    for (const u of Object.keys(r) as Unidad[]) r[u] = r1(r[u])
+  }
+  return out
+}
