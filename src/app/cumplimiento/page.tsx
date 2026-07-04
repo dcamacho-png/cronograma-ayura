@@ -11,7 +11,7 @@ import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistint
 import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
 import { textoAvanceConFecha, normalizarAvancePorLote, totalAvanceLotes, lotesPendientes, type AvanceEntrada } from '@/dominio/avance-lote'
 import { normalizarNovedades } from '@/dominio/novedades'
-import { agregarActividadRealizadaAccion, devolverAlBancoAccion, registrarMedidaGeneralAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion, setLotesActividadAccion, registrarAvanceAccion, continuarParcialAccion, editarAvanceAccion, eliminarAvanceAccion, agregarNovedadAccion, eliminarNovedadAccion } from './acciones'
+import { agregarActividadRealizadaAccion, devolverAlBancoAccion, registrarMedidaGeneralAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion, setLotesActividadAccion, registrarAvanceAccion, continuarParcialAccion, editarAvanceAccion, eliminarAvanceAccion, agregarNovedadAccion, editarNovedadAccion, eliminarNovedadAccion } from './acciones'
 import { FormActividadRealizada } from './form-actividad-realizada'
 import { InfoLotes } from '../_componentes/info-lotes'
 import { ActividadEstandar } from './actividad-estandar'
@@ -243,6 +243,7 @@ export default async function CumplimientoPage({
                   const entradasNovedad = normalizarNovedades(cab.novedades).map((n, index) => ({
                     index,
                     dia: n.dia,
+                    motivoId: n.motivoId ?? '',
                     motivo: n.motivoId ? (mapaMotivos.get(n.motivoId) ?? '') : '',
                     observacion: n.observacion ?? '',
                   }))
@@ -288,6 +289,7 @@ export default async function CumplimientoPage({
                         motivos={motivos}
                         diaLabels={DIAS}
                         agregar={agregarNovedadAccion}
+                        editar={editarNovedadAccion}
                         eliminar={eliminarNovedadAccion}
                       />
                       {/* Controles interactivos (PENDIENTE/PARCIAL) */}
