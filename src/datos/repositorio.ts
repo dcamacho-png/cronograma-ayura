@@ -1,9 +1,9 @@
 import { prisma } from './prisma'
 import { Prisma } from '@prisma/client'
 import { hashPassword } from '@/auth/password'
-import { duplicarActividades, datosReprogramacion, detectarConflictosAsignacion } from '@/dominio/programacion'
+import { duplicarActividades, datosReprogramacion, detectarConflictosAsignacion, conflictosMaquinaEntreResponsables } from '@/dominio/programacion'
 import { turnoPorDia } from '@/dominio/turno'
-import type { BorradorActividad, Conflicto } from '@/dominio/programacion'
+import type { BorradorActividad, Conflicto, Asignacion } from '@/dominio/programacion'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
 import {
   normalizarAvancePorLote,
@@ -308,11 +308,8 @@ export function tareasPorAsignar(areaId: string, anio: number, semana: number) {
 // (mismo responsable, lote y turno) y marca la tarea como PROGRAMADA.
 export async function asignarTarea(
   tareaId: string,
-  responsableIds: string[],
-  dias: number[],
+  asignaciones: Asignacion[],
   loteIdFallback: string | null,
-  turno: string,
-  maquinaPorDia: Record<number, string | null> = {},
   esMaquinaria = true,
 ): Promise<
   | { ok: false; motivo: 'tarea' }
@@ -321,8 +318,12 @@ export async function asignarTarea(
 > {
   const tarea = await prisma.tarea.findUnique({ where: { id: tareaId }, include: { lotes: true } })
   if (!tarea || tarea.anioSel === null || tarea.semanaSel === null) return { ok: false, motivo: 'tarea' }
-  const diasUnicos = [...new Set(dias)].filter((d) => Number.isInteger(d) && d >= 1 && d <= 7)
-  if (diasUnicos.length === 0) return { ok: false, motivo: 'tarea' }
+  // Normaliza días de cada asignación (enteros 1-7, únicos) y descarta responsables sin días.
+  const asigs = asignaciones
+    .map((a) => ({ ...a, dias: [...new Set(a.dias)].filter((d) => Number.isInteger(d) && d >= 1 && d <= 7) }))
+    .filter((a) => a.responsableId && a.dias.length > 0)
+  const diasTodos = [...new Set(asigs.flatMap((a) => a.dias))]
+  if (asigs.length === 0 || diasTodos.length === 0) return { ok: false, motivo: 'tarea' }
   const anio = tarea.anioSel
   const semana = tarea.semanaSel
   const loteIds =
@@ -334,17 +335,17 @@ export async function asignarTarea(
     fincaId = primer.fincaId
   }
   return prisma.$transaction(async (tx) => {
-    // Guardia contra choques (a prueba de carreras: dentro de la transacción).
     const existentes = await tx.actividad.findMany({
-      where: { anio, semana, dia: { in: diasUnicos } },
+      where: { anio, semana, dia: { in: diasTodos } },
       select: { dia: true, turno: true, maquinaId: true, responsableId: true },
     })
-    const conflictosRaw = responsableIds.flatMap((rid) =>
-      detectarConflictosAsignacion(existentes, diasUnicos, rid, maquinaPorDia, turno),
-    )
+    const conflictosRaw = [
+      ...asigs.flatMap((a) => detectarConflictosAsignacion(existentes, a.dias, a.responsableId, a.maquinaPorDia, a.turno)),
+      ...conflictosMaquinaEntreResponsables(asigs),
+    ]
     const vistos = new Set<string>()
     const conflictos = conflictosRaw.filter((c) => {
-      const k = `${c.dia}-${c.tipo}`
+      const k = `${c.dia}-${c.tipo}-${c.responsableId ?? ''}`
       if (vistos.has(k)) return false
       vistos.add(k)
       return true
@@ -353,20 +354,20 @@ export async function asignarTarea(
       return { ok: false as const, motivo: 'conflicto' as const, conflictos }
     }
     let creadas = 0
-    for (const rid of responsableIds) {
-      for (const dia of diasUnicos) {
+    for (const a of asigs) {
+      for (const dia of a.dias) {
         await tx.actividad.create({
           data: {
             anio,
             semana,
             dia,
             descripcion: tarea.descripcion,
-            turno: esMaquinaria ? (turno.trim() || turnoPorDia(dia)) : '',
+            turno: esMaquinaria ? (a.turno.trim() || turnoPorDia(dia)) : '',
             vecesReprogramada: tarea.vecesReprogramada,
             areaId: tarea.areaId,
             fincaId,
-            responsableId: rid,
-            maquinaId: maquinaPorDia[dia] ?? null,
+            responsableId: a.responsableId,
+            maquinaId: a.maquinaPorDia[dia] ?? null,
             tareaId: tarea.id,
             lotes: { connect: loteIds.map((id) => ({ id })) },
             ...(tarea.bultosPorLote != null ? { bultosPorLote: tarea.bultosPorLote as Prisma.InputJsonValue } : {}),
