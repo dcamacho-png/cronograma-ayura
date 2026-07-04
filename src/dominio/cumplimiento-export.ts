@@ -6,7 +6,7 @@ import { estadoActividad } from './metricas'
 import type { Estado } from './tipos'
 
 export const COLUMNAS_CUMPLIMIENTO = [
-  'Día', 'Fecha', 'Responsable', 'Actividad', 'Máquina', 'Lote(s)', 'Finca', 'Estado', 'Medida realizada', 'Unidad', 'Bultos por lote', 'Centro de costo', 'Potreros realizados', 'Ejecutada por', 'Observación',
+  'Día', 'Fecha', 'Responsable', 'Actividad', 'Máquina', 'Lote(s)', 'Finca', 'Estado', 'Medida realizada', 'Unidad', 'Bultos por lote', 'Centro de costo', 'Potreros realizados', 'Ejecutada por', 'Observación', 'Detalle (banco)',
 ] as const
 
 const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
@@ -34,6 +34,7 @@ export type ActividadExport = {
   finca: { nombre: string } | null
   nota: string | null
   unidadRealizada?: string | null
+  detalle?: string | null
 }
 
 // Filas del Excel para una actividad, en el orden de COLUMNAS_CUMPLIMIENTO.
@@ -58,6 +59,7 @@ export function filasCumplimiento(
   const estado = ESTADO_TXT[a.estado] ?? a.estado
   const bultos = textoBultosPorLote(a.lotes, a.bultosPorLote)
   const centro = a.centroCosto ?? ''
+  const detalle = a.detalle ?? ''
   const potreros = textoLotesHechos(a.lotes, a.lotesHechos)
   const avances = normalizarAvancePorLote(a.avancePorLote)
 
@@ -80,6 +82,7 @@ export function filasCumplimiento(
         potreros,
         ejecutadaPor,
         e.observacion ?? a.nota ?? '',
+        detalle,
       ])
     }
   }
@@ -107,6 +110,7 @@ export function filasCumplimiento(
     potreros,
     ejecutadaPor,
     a.nota ?? '',
+    detalle,
   ]]
 }
 

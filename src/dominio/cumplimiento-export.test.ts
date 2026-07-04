@@ -24,14 +24,15 @@ function act(p: Partial<ActividadExport>): ActividadExport {
     finca: null,
     nota: null,
     unidadRealizada: null,
+    detalle: null,
     ...p,
   }
 }
 
 describe('COLUMNAS_CUMPLIMIENTO', () => {
-  it('tiene las 15 columnas en el orden acordado (Finca tras Lote(s), Observación al final)', () => {
+  it('tiene las 16 columnas en el orden acordado (Finca tras Lote(s), Observación, Detalle (banco) al final)', () => {
     expect([...COLUMNAS_CUMPLIMIENTO]).toEqual([
-      'Día', 'Fecha', 'Responsable', 'Actividad', 'Máquina', 'Lote(s)', 'Finca', 'Estado', 'Medida realizada', 'Unidad', 'Bultos por lote', 'Centro de costo', 'Potreros realizados', 'Ejecutada por', 'Observación',
+      'Día', 'Fecha', 'Responsable', 'Actividad', 'Máquina', 'Lote(s)', 'Finca', 'Estado', 'Medida realizada', 'Unidad', 'Bultos por lote', 'Centro de costo', 'Potreros realizados', 'Ejecutada por', 'Observación', 'Detalle (banco)',
     ])
   })
 })
@@ -39,22 +40,22 @@ describe('COLUMNAS_CUMPLIMIENTO', () => {
 describe('filasCumplimiento — sin avances (una fila, como antes)', () => {
   it('actividad de ha con medida; "Ejecutada por" vacía cuando es propia', () => {
     expect(filasCumplimiento(act({}), '15 jun', mapa, ctx)).toEqual([
-      ['Lun', '15 jun', 'Ana', 'ENCALADORA', '6603', 'L1', '', 'Cumplida', 3, 'ha', '', '', '', '', ''],
+      ['Lun', '15 jun', 'Ana', 'ENCALADORA', '6603', 'L1', '', 'Cumplida', 3, 'ha', '', '', '', '', '', ''],
     ])
   })
   it('sin medida deja medida y unidad vacías; traduce el estado', () => {
     expect(filasCumplimiento(act({ haRealizada: null, estado: 'NO_CUMPLIDA' }), '', mapa, ctx)).toEqual([
-      ['Lun', '', 'Ana', 'ENCALADORA', '6603', 'L1', '', 'No cumplida', '', '', '', '', '', '', ''],
+      ['Lun', '', 'Ana', 'ENCALADORA', '6603', 'L1', '', 'No cumplida', '', '', '', '', '', '', '', ''],
     ])
   })
   it('descripción fuera del catálogo → ha; máquina y lotes vacíos; día 3 = Mié', () => {
     expect(filasCumplimiento(act({ descripcion: 'Algo libre', haRealizada: 2, maquina: null, lotes: [], dia: 3 }), '', mapa, ctx)).toEqual([
-      ['Mié', '', 'Ana', 'Algo libre', '', '', '', 'Cumplida', 2, 'ha', '', '', '', '', ''],
+      ['Mié', '', 'Ana', 'Algo libre', '', '', '', 'Cumplida', 2, 'ha', '', '', '', '', '', ''],
     ])
   })
   it('rellena "Ejecutada por" con el área ejecutora cuando se pasa (actividad solicitada a otra área)', () => {
     expect(filasCumplimiento(act({}), '15 jun', mapa, ctx, 'Maquinaria')).toEqual([
-      ['Lun', '15 jun', 'Ana', 'ENCALADORA', '6603', 'L1', '', 'Cumplida', 3, 'ha', '', '', '', 'Maquinaria', ''],
+      ['Lun', '15 jun', 'Ana', 'ENCALADORA', '6603', 'L1', '', 'Cumplida', 3, 'ha', '', '', '', 'Maquinaria', '', ''],
     ])
   })
 })
@@ -67,9 +68,9 @@ describe('filasCumplimiento — con avances (una fila por avance)', () => {
     })
     expect(filasCumplimiento(a, '15 jun', mapa, ctx)).toEqual([
       // máquina null → cae a la máquina de la actividad (6603)
-      ['Lun', 'D1', 'Ana', 'ENCALADORA', '6603', 'L1', '', 'Cumplida', 2, 'ha', '', '', '', '', ''],
+      ['Lun', 'D1', 'Ana', 'ENCALADORA', '6603', 'L1', '', 'Cumplida', 2, 'ha', '', '', '', '', '', ''],
       // máquina del avance → MAQ-m9
-      ['Mar', 'D2', 'Ana', 'ENCALADORA', 'MAQ-m9', 'L1', '', 'Cumplida', 3, 'ha', '', '', '', '', ''],
+      ['Mar', 'D2', 'Ana', 'ENCALADORA', 'MAQ-m9', 'L1', '', 'Cumplida', 3, 'ha', '', '', '', '', '', ''],
     ])
   })
   it('avances en dos lotes → filas en orden lote→día (según a.lotes), no según las claves del JSON', () => {
@@ -80,7 +81,7 @@ describe('filasCumplimiento — con avances (una fila por avance)', () => {
     const filas = filasCumplimiento(a, '15 jun', mapa, ctx)
     expect(filas.map((f) => [f[5], f[8]])).toEqual([['L1', 2], ['L2', 1]])
   })
-  it('la observación de la entrada va a la última columna; sin ella cae a la nota de la actividad', () => {
+  it('la observación de la entrada va a la columna 14; sin ella cae a la nota de la actividad; detalle va a la columna 15', () => {
     const a = act({
       nota: 'nota actividad',
       lotes: [{ id: 'l1', nombre: 'L1' }],
@@ -89,6 +90,8 @@ describe('filasCumplimiento — con avances (una fila por avance)', () => {
     const filas = filasCumplimiento(a, '15 jun', mapa, ctx)
     expect(filas[0][14]).toBe('obs avance')
     expect(filas[1][14]).toBe('nota actividad')
+    expect(filas[0][15]).toBe('')
+    expect(filas[1][15]).toBe('')
   })
 })
 
@@ -98,7 +101,7 @@ describe('filasCumplimiento — parcial sin avances no se emite', () => {
   })
   it('CUMPLIDA sin avances → una fila (como antes)', () => {
     expect(filasCumplimiento(act({ estado: 'CUMPLIDA', avancePorLote: null }), '15 jun', mapa, ctx)).toEqual([
-      ['Lun', '15 jun', 'Ana', 'ENCALADORA', '6603', 'L1', '', 'Cumplida', 3, 'ha', '', '', '', '', ''],
+      ['Lun', '15 jun', 'Ana', 'ENCALADORA', '6603', 'L1', '', 'Cumplida', 3, 'ha', '', '', '', '', '', ''],
     ])
   })
   it('PARCIAL con avances → sí emite las filas de avance', () => {
@@ -116,7 +119,7 @@ describe('filasCumplimientoGrupo — una sola fila por actividad aunque tenga va
       act({ responsable: { nombre: 'Beto' }, haRealizada: 3 }),
     ]
     expect(filasCumplimientoGrupo(grupo, '15 jun', mapa, ctx)).toEqual([
-      ['Lun', '15 jun', 'Ana, Beto', 'ENCALADORA', '6603', 'L1', '', 'Cumplida', 3, 'ha', '', '', '', '', ''],
+      ['Lun', '15 jun', 'Ana, Beto', 'ENCALADORA', '6603', 'L1', '', 'Cumplida', 3, 'ha', '', '', '', '', '', ''],
     ])
   })
 
@@ -192,7 +195,7 @@ describe('filasCumplimiento — Finca y Observación (columnas nuevas)', () => {
     expect(
       filasCumplimiento(act({ estado: 'NO_CUMPLIDA', haRealizada: null, finca: { nombre: 'La Esperanza' }, nota: 'Cambiada por: Riego' }), '', mapa, ctx),
     ).toEqual([
-      ['Lun', '', 'Ana', 'ENCALADORA', '6603', 'L1', 'La Esperanza', 'No cumplida', '', '', '', '', '', '', 'Cambiada por: Riego'],
+      ['Lun', '', 'Ana', 'ENCALADORA', '6603', 'L1', 'La Esperanza', 'No cumplida', '', '', '', '', '', '', 'Cambiada por: Riego', ''],
     ])
   })
   it('finca en cada fila de avance', () => {
@@ -203,6 +206,7 @@ describe('filasCumplimiento — Finca y Observación (columnas nuevas)', () => {
     const filas = filasCumplimiento(a, '15 jun', mapa, ctx)
     expect(filas[0][6]).toBe('La Esperanza')
     expect(filas[0][14]).toBe('') // Observación vacía (nota null)
+    expect(filas[0][15]).toBe('') // Detalle vacío (detalle null)
   })
 })
 
@@ -220,5 +224,21 @@ describe('filasCumplimiento — responsable del avance + unidad de actividad', (
     expect(filas[0][2]).toBe('RESP-R2')
     expect(filas[1][2]).toBe('Ana')       // fallback al responsable de la actividad
     expect(filas[0][9]).toBe('jornales')  // unidad de la actividad (verbatim)
+  })
+})
+
+describe('filasCumplimiento — Detalle (banco)', () => {
+  it('incluye el detalle del banco como última columna', () => {
+    const base = {
+      dia: 1, descripcion: 'Fertilización', estado: 'CUMPLIDA', haRealizada: 5,
+      responsable: { nombre: 'Ana' }, maquina: null, lotes: [{ id: 'l1', nombre: 'L1' }],
+      bultosPorLote: null, centroCosto: null, lotesHechos: null, avancePorLote: null,
+      finca: null, nota: 'obs', unidadRealizada: null, detalle: null,
+    }
+    const ctx2 = { fechaDeDia: () => '01/07', nombreMaquina: () => '' }
+    const conDetalle = filasCumplimiento({ ...base, detalle: 'aplicar urea' }, '01/07', {}, ctx2)
+    expect(conDetalle[0][conDetalle[0].length - 1]).toBe('aplicar urea')
+    const sinDetalle = filasCumplimiento(base, '01/07', {}, ctx2)
+    expect(sinDetalle[0][sinDetalle[0].length - 1]).toBe('')
   })
 })
