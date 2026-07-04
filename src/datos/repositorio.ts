@@ -77,6 +77,33 @@ export function listarActividadesSolicitadas(areaId: string, anio: number, seman
   })
 }
 
+// Actividades CUMPLIDA del área para la pantalla de Consulta (solo lectura): propias
+// (areaId) o solicitadas por el área a otras (tarea.solicitadaPorAreaId). Filtros opcionales.
+export function consultarCulminadas(
+  areaId: string,
+  filtros: { responsableId?: string | null; fincaId?: string | null; centroCosto?: string | null; loteId?: string | null } = {},
+) {
+  return prisma.actividad.findMany({
+    where: {
+      estado: 'CUMPLIDA',
+      OR: [{ areaId }, { tarea: { solicitadaPorAreaId: areaId } }],
+      ...(filtros.responsableId ? { responsableId: filtros.responsableId } : {}),
+      ...(filtros.fincaId ? { fincaId: filtros.fincaId } : {}),
+      ...(filtros.centroCosto ? { centroCosto: filtros.centroCosto } : {}),
+      ...(filtros.loteId ? { lotes: { some: { id: filtros.loteId } } } : {}),
+    },
+    include: {
+      responsable: true,
+      finca: true,
+      maquina: true,
+      lotes: true,
+      area: true,
+      tarea: { select: { solicitadaPorAreaId: true } },
+    },
+    orderBy: [{ anio: 'desc' }, { semana: 'desc' }, { dia: 'asc' }],
+  })
+}
+
 export function crearActividad(datos: BorradorActividad) {
   return prisma.actividad.create({ data: datos })
 }
@@ -1059,7 +1086,11 @@ export function editarSolicitud(
 export function listarSolicitudesDeArea(areaId: string) {
   return prisma.tarea.findMany({
     where: { solicitadaPorAreaId: areaId },
-    include: { area: true, lotes: true },
+    include: {
+      area: true,
+      lotes: true,
+      _count: { select: { actividades: { where: { estado: 'CUMPLIDA' } } } },
+    },
     orderBy: { descripcion: 'asc' },
   })
 }
