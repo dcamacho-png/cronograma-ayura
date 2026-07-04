@@ -305,6 +305,12 @@ export default async function CumplimientoPage({
                         editable={interactivo && !bloqueado}
                         motivos={motivos}
                         diaLabels={DIAS}
+                        esMaquinaria={esMaquinaria}
+                        motivoCambioId={motivoCambioId}
+                        estipuladas={estipuladasMaq}
+                        lotes={lotes}
+                        maquinas={maquinas}
+                        diaActividad={cab.dia}
                         agregar={agregarNovedadAccion}
                         editar={editarNovedadAccion}
                         eliminar={eliminarNovedadAccion}
