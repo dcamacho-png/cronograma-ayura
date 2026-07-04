@@ -215,6 +215,9 @@ export default async function CumplimientoPage({
                   )}
                 </div>
                 <InfoLotes lotes={cab.lotes} bultosPorLote={cab.bultosPorLote as Record<string, number> | null} className="mb-2" />
+                {cab.tarea?.detalle && (
+                  <div className="mb-2 whitespace-pre-line text-xs text-tierra">📝 {cab.tarea.detalle}</div>
+                )}
 
                 {(() => {
                   const avances = normalizarAvancePorLote(
