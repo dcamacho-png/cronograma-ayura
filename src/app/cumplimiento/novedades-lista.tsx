@@ -1,8 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import { BloqueReemplazo } from './bloque-reemplazo'
 
 type Entrada = { index: number; dia: number; motivoId: string; motivo: string; observacion: string }
+type Lote = { id: string; nombre: string; hectareas?: number | null; finca: { nombre: string } }
+type Estipulada = { id: string; nombre: string; unidad: string }
 
 // Log de novedades (razones) de una actividad. Muestra la lista con ✏️ para editar y × para
 // borrar y, si es editable, un "+ Novedad" que abre un mini-form (día + motivo + observación).
@@ -13,6 +16,12 @@ export function NovedadesLista({
   editable,
   motivos,
   diaLabels,
+  esMaquinaria,
+  motivoCambioId,
+  estipuladas,
+  lotes,
+  maquinas,
+  diaActividad,
   agregar,
   editar,
   eliminar,
@@ -22,12 +31,19 @@ export function NovedadesLista({
   editable: boolean
   motivos: { id: string; nombre: string }[]
   diaLabels: string[]
+  esMaquinaria: boolean
+  motivoCambioId: string | null
+  estipuladas: Estipulada[]
+  lotes: Lote[]
+  maquinas: { id: string; nombre: string }[]
+  diaActividad: number
   agregar: (f: FormData) => void | Promise<void>
   editar: (f: FormData) => void | Promise<void>
   eliminar: (f: FormData) => void | Promise<void>
 }) {
   const [abierto, setAbierto] = useState(false)
   const [editando, setEditando] = useState<number | null>(null)
+  const [motivoNuevo, setMotivoNuevo] = useState('')
   if (entradas.length === 0 && !editable) return null
 
   return (
@@ -75,17 +91,17 @@ export function NovedadesLista({
       ))}
       {editable && (
         abierto ? (
-          <form action={agregar} onSubmit={() => setAbierto(false)} className="flex flex-wrap items-end gap-2">
+          <form action={agregar} onSubmit={() => { setAbierto(false); setMotivoNuevo('') }} className="flex flex-wrap items-end gap-2">
             <input type="hidden" name="id" value={actividadId} />
             <label className="flex flex-col">
               Día
-              <select name="dia" className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
+              <select name="dia" defaultValue={diaActividad} className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
                 {[1, 2, 3, 4, 5, 6, 7].map((d) => (<option key={d} value={d}>{diaLabels[d]}</option>))}
               </select>
             </label>
             <label className="flex flex-col">
               Motivo
-              <select name="motivoId" className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
+              <select name="motivoId" value={motivoNuevo} onChange={(e) => setMotivoNuevo(e.target.value)} className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
                 <option value="">—</option>
                 {motivos.map((m) => (<option key={m.id} value={m.id}>{m.nombre}</option>))}
               </select>
@@ -94,8 +110,18 @@ export function NovedadesLista({
               Observación
               <input name="observacion" className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
             </label>
+            {motivoNuevo !== '' && motivoNuevo === motivoCambioId && (
+              <BloqueReemplazo
+                esMaquinaria={esMaquinaria}
+                estipuladas={estipuladas}
+                lotes={lotes}
+                maquinas={maquinas}
+                diaActividad={diaActividad}
+                mostrarDia={false}
+              />
+            )}
             <button className="rounded-lg border border-bosque px-2 py-1 font-semibold text-bosque hover:bg-arena/40">Agregar</button>
-            <button type="button" onClick={() => setAbierto(false)} className="text-tierra underline">cancelar</button>
+            <button type="button" onClick={() => { setAbierto(false); setMotivoNuevo('') }} className="text-tierra underline">cancelar</button>
           </form>
         ) : (
           <button type="button" onClick={() => setAbierto(true)} className="self-start text-tierra underline">+ Novedad</button>
