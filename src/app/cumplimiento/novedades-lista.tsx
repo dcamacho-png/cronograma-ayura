@@ -32,7 +32,7 @@ export function NovedadesLista({
       {entradas.length > 0 && <span className="text-tierra">Novedades:</span>}
       {entradas.map((e) => (
         <div key={e.index} className="flex flex-wrap items-center gap-2">
-          <span>{diaLabels[e.dia] ?? ''} · {e.motivo}{e.observacion ? ` — ${e.observacion}` : ''}</span>
+          <span>{[diaLabels[e.dia] ?? '', e.motivo].filter(Boolean).join(' · ')}{e.observacion ? ` — ${e.observacion}` : ''}</span>
           {editable && (
             <form action={eliminar} className="inline">
               <input type="hidden" name="id" value={actividadId} />
