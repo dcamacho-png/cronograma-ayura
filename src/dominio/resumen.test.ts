@@ -212,3 +212,37 @@ describe('medidasPorTractor', () => {
     expect(m.size).toBe(0)
   })
 })
+
+import { actividadesRecurrentes } from './resumen'
+
+describe('actividadesRecurrentes', () => {
+  it('dedup por (descripción+área) tomando el mayor nº de arrastres', () => {
+    expect(actividadesRecurrentes([
+      { descripcion: 'Fumigar', areaNombre: 'Nelore', vecesReprogramada: 1 },
+      { descripcion: 'Fumigar', areaNombre: 'Nelore', vecesReprogramada: 3 },
+    ])).toEqual([{ descripcion: 'Fumigar', areaNombre: 'Nelore', veces: 3 }])
+  })
+  it('ignora las que nunca se arrastraron (veces=0)', () => {
+    expect(actividadesRecurrentes([
+      { descripcion: 'Regar', areaNombre: 'Maiz', vecesReprogramada: 0 },
+    ])).toEqual([])
+  })
+  it('misma descripción en distinta área son filas separadas', () => {
+    const r = actividadesRecurrentes([
+      { descripcion: 'Fumigar', areaNombre: 'Nelore', vecesReprogramada: 2 },
+      { descripcion: 'Fumigar', areaNombre: 'Maiz', vecesReprogramada: 1 },
+    ])
+    expect(r).toEqual([
+      { descripcion: 'Fumigar', areaNombre: 'Nelore', veces: 2 },
+      { descripcion: 'Fumigar', areaNombre: 'Maiz', veces: 1 },
+    ])
+  })
+  it('ordena por veces desc y luego descripción asc', () => {
+    const r = actividadesRecurrentes([
+      { descripcion: 'Bbb', areaNombre: 'A', vecesReprogramada: 2 },
+      { descripcion: 'Aaa', areaNombre: 'A', vecesReprogramada: 2 },
+      { descripcion: 'Ccc', areaNombre: 'A', vecesReprogramada: 5 },
+    ])
+    expect(r.map((x) => x.descripcion)).toEqual(['Ccc', 'Aaa', 'Bbb'])
+  })
+})

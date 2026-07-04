@@ -169,3 +169,22 @@ export function medidasPorTractor(
   }
   return out
 }
+
+// Escala de actividades que se han arrastrado (reprogramadas/parciales devueltas al banco).
+// Recibe filas (una por instancia semanal); deduplica por (descripción + área) tomando el
+// MAYOR vecesReprogramada, descarta las que nunca se arrastraron (veces=0) y ordena de más
+// a menos arrastrada.
+export function actividadesRecurrentes(
+  filas: { descripcion: string; areaNombre: string; vecesReprogramada: number }[],
+): { descripcion: string; areaNombre: string; veces: number }[] {
+  const max = new Map<string, { descripcion: string; areaNombre: string; veces: number }>()
+  for (const f of filas) {
+    if (f.vecesReprogramada <= 0) continue
+    const clave = `${f.descripcion}|${f.areaNombre}`
+    const prev = max.get(clave)
+    if (!prev || f.vecesReprogramada > prev.veces) {
+      max.set(clave, { descripcion: f.descripcion, areaNombre: f.areaNombre, veces: f.vecesReprogramada })
+    }
+  }
+  return [...max.values()].sort((a, b) => b.veces - a.veces || a.descripcion.localeCompare(b.descripcion))
+}
