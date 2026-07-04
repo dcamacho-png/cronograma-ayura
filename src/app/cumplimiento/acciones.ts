@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { reprogramarActividad, crearActividadRealizada, devolverAlBanco, semanaDeActividad, registrarAvanceLoteGrupo, registrarAvanceObservacionGrupo, marcarCumplidaGrupo, registrarNovedadGrupo, reabrirGrupo, setLotesGrupo, setUnidadRealizadaGrupo, anexarLotesGrupo, registrarMedidaGeneralGrupo, continuarParcialSemanaSiguiente, editarAvanceEntradaGrupo, eliminarAvanceEntradaGrupo } from '@/datos/repositorio'
+import { reprogramarActividad, crearActividadRealizada, devolverAlBanco, semanaDeActividad, registrarAvanceLoteGrupo, registrarAvanceObservacionGrupo, marcarCumplidaGrupo, registrarNovedadGrupo, reabrirGrupo, setLotesGrupo, setUnidadRealizadaGrupo, anexarLotesGrupo, registrarMedidaGeneralGrupo, continuarParcialSemanaSiguiente, editarAvanceEntradaGrupo, eliminarAvanceEntradaGrupo, agregarNovedadGrupo, eliminarNovedadGrupo } from '@/datos/repositorio'
 import { siguienteSemana, plazoCumplimientoVencido, semanaActual } from '@/dominio/semana'
 import { usuarioActual } from '@/auth/sesion'
 
@@ -167,6 +167,27 @@ export async function eliminarAvanceAccion(form: FormData) {
   if (!id || !loteId || !Number.isInteger(index) || index < 0) return
   if (await bloqueadoPorPlazoActividad(id)) return
   await eliminarAvanceEntradaGrupo(id, loteId, index)
+  revalidatePath('/cumplimiento')
+}
+
+export async function agregarNovedadAccion(form: FormData) {
+  const id = texto(form, 'id')
+  const dia = Number(texto(form, 'dia'))
+  if (!id || !(dia >= 1 && dia <= 7)) return
+  if (await bloqueadoPorPlazoActividad(id)) return
+  const motivoId = textoOpcional(form, 'motivoId')
+  const observacion = textoOpcional(form, 'observacion')
+  if (!motivoId && !observacion) return
+  await agregarNovedadGrupo(id, { dia, motivoId, observacion })
+  revalidatePath('/cumplimiento')
+}
+
+export async function eliminarNovedadAccion(form: FormData) {
+  const id = texto(form, 'id')
+  const index = Number(texto(form, 'index'))
+  if (!id || !Number.isInteger(index) || index < 0) return
+  if (await bloqueadoPorPlazoActividad(id)) return
+  await eliminarNovedadGrupo(id, index)
   revalidatePath('/cumplimiento')
 }
 
