@@ -10,11 +10,12 @@ import { textoLotesHechos } from '@/dominio/lotes-hechos'
 import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, conteoEstadoActividades, tieneDiaPendiente, estadoActividad } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
 import { textoAvanceConFecha, normalizarAvancePorLote, totalAvanceLotes, lotesPendientes, type AvanceEntrada } from '@/dominio/avance-lote'
-import { agregarActividadRealizadaAccion, devolverAlBancoAccion, registrarMedidaGeneralAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion, setLotesActividadAccion, registrarAvanceAccion, continuarParcialAccion } from './acciones'
+import { agregarActividadRealizadaAccion, devolverAlBancoAccion, registrarMedidaGeneralAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion, setLotesActividadAccion, registrarAvanceAccion, continuarParcialAccion, editarAvanceAccion, eliminarAvanceAccion } from './acciones'
 import { FormActividadRealizada } from './form-actividad-realizada'
 import { InfoLotes } from '../_componentes/info-lotes'
 import { ActividadEstandar } from './actividad-estandar'
 import { ActividadMaquinaria } from './actividad-maquinaria'
+import { AvancesEditables } from './avances-editables'
 
 const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
@@ -190,7 +191,6 @@ export default async function CumplimientoPage({
           {gruposActividad.map((dias) => {
             const cab = dias[0]
             const estadoGrupo = estadoActividad(dias as unknown as { estado: Estado }[])
-            const pctAct = porcentajeCumplimiento(dias as unknown as ActividadDominio[])
             const nDias = diasDistintos(dias)
             // nombres de responsables distintos, en orden de aparición
             const nombresResp = [...new Map(dias.map((a) => [a.responsableId, a.responsable.nombre])).values()]
@@ -210,9 +210,9 @@ export default async function CumplimientoPage({
                       reprogramada {cab.vecesReprogramada}×
                     </span>
                   )}
-                  <span className="ml-auto rounded-lg bg-arena px-2 py-0.5 text-xs">
-                    {nDias > 1 ? `${nDias} días · ` : ''}Cumplido: <b>{pctAct === null ? '—' : `${pctAct}%`}</b>
-                  </span>
+                  {nDias > 1 && (
+                    <span className="ml-auto rounded-lg bg-arena px-2 py-0.5 text-xs">{nDias} días</span>
+                  )}
                 </div>
                 <InfoLotes lotes={cab.lotes} bultosPorLote={cab.bultosPorLote as Record<string, number> | null} className="mb-2" />
 
@@ -231,6 +231,17 @@ export default async function CumplimientoPage({
                   const unidadStd = cab.unidadRealizada ?? unidadAbreviada(unidad)
                   const resumenAvances = textoAvanceConFecha(cab.lotes, avances, unidadStd, etiquetaDia)
                   const interactivo = estadoGrupo === 'PENDIENTE' || estadoGrupo === 'PARCIAL'
+                  const etiquetaPorDia = [0, 1, 2, 3, 4, 5, 6, 7].map((d) => (d === 0 ? '' : etiquetaDia(d)))
+                  const entradasAvance = cab.lotes.flatMap((l) =>
+                    (avances[l.id] ?? []).map((e, index) => ({
+                      loteId: l.id,
+                      loteNombre: l.nombre,
+                      index,
+                      dia: e.dia,
+                      cantidad: e.cantidad,
+                      observacion: e.observacion ?? '',
+                    })),
+                  )
                   return (
                     <div className="flex flex-col gap-2">
                       {/* Estado/resumen (no PENDIENTE): solo lectura */}
@@ -253,8 +264,18 @@ export default async function CumplimientoPage({
                           )}
                         </div>
                       )}
-                      {resumenAvances && (
-                        <span className="text-sm text-tierra">Avances: {resumenAvances}</span>
+                      {interactivo && !bloqueado ? (
+                        <AvancesEditables
+                          actividadId={cab.id}
+                          entradas={entradasAvance}
+                          unidad={unidadStd}
+                          etiquetaPorDia={etiquetaPorDia}
+                          diaLabels={DIAS}
+                          editar={editarAvanceAccion}
+                          eliminar={eliminarAvanceAccion}
+                        />
+                      ) : (
+                        resumenAvances && <span className="text-sm text-tierra">Avances: {resumenAvances}</span>
                       )}
                       {/* Controles interactivos (PENDIENTE/PARCIAL) */}
                       {interactivo && (
