@@ -40,8 +40,6 @@ export function ActividadEstandar({
   hayPotrerosPendientes,
   devolverAlBanco,
   editarPotreros,
-  puedeContinuar,
-  continuar,
 }: {
   actividadId: string
   estado: Estado
@@ -67,8 +65,6 @@ export function ActividadEstandar({
   hayPotrerosPendientes: boolean
   devolverAlBanco: (f: FormData) => void | Promise<void>
   editarPotreros: (f: FormData) => void | Promise<void>
-  puedeContinuar: boolean
-  continuar: (f: FormData) => void | Promise<void>
 }) {
   const esParcial = estado === 'PARCIAL'
   const conocida = UNIDADES.find((u) => u.toLowerCase() === (unidadRealizada ?? '').toLowerCase())
@@ -171,12 +167,6 @@ export function ActividadEstandar({
             <form action={devolverAlBanco}>
               <input type="hidden" name="id" value={actividadId} />
               <button className="rounded-lg border border-borde px-2 py-1 text-xs text-tierra hover:bg-arena/40">Devolver al banco</button>
-            </form>
-          )}
-          {esParcial && puedeContinuar && (
-            <form action={continuar}>
-              <input type="hidden" name="id" value={actividadId} />
-              <button className="rounded-lg border border-bosque px-2 py-1 text-xs font-semibold text-bosque hover:bg-arena/40">Continuar la próxima semana</button>
             </form>
           )}
         </div>

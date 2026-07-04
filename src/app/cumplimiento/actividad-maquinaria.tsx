@@ -37,8 +37,6 @@ export function ActividadMaquinaria({
   hayPotrerosPendientes,
   devolverAlBanco,
   nota,
-  puedeContinuar,
-  continuar,
 }: {
   actividadId: string
   estado: Estado
@@ -64,8 +62,6 @@ export function ActividadMaquinaria({
   hayPotrerosPendientes: boolean
   devolverAlBanco: (f: FormData) => void | Promise<void>
   nota: string | null
-  puedeContinuar: boolean
-  continuar: (f: FormData) => void | Promise<void>
 }) {
   const esParcial = estado === 'PARCIAL'
 
@@ -106,12 +102,6 @@ export function ActividadMaquinaria({
             <form action={devolverAlBanco}>
               <input type="hidden" name="id" value={actividadId} />
               <button className="rounded-lg border border-borde px-2 py-1 text-xs text-tierra hover:bg-arena/40">Devolver al banco</button>
-            </form>
-          )}
-          {esParcial && puedeContinuar && (
-            <form action={continuar}>
-              <input type="hidden" name="id" value={actividadId} />
-              <button className="rounded-lg border border-bosque px-2 py-1 text-xs font-semibold text-bosque hover:bg-arena/40">Continuar la próxima semana</button>
             </form>
           )}
         </div>

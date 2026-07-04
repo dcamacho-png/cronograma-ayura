@@ -9,12 +9,10 @@ import {
   normalizarAvancePorLote,
   agregarAvances,
   totalAvanceLotes,
-  lotesPendientes,
   editarAvanceEntrada,
   eliminarAvanceEntrada,
   type AvanceEntrada,
 } from '@/dominio/avance-lote'
-import { siguienteSemana } from '@/dominio/semana'
 import { normalizarNovedades, agregarNovedad, eliminarNovedad, editarNovedad } from '@/dominio/novedades'
 
 export function listarAreas() {
@@ -575,64 +573,6 @@ export async function devolverAlBanco(actividadId: string) {
   return prisma.tarea.update({
     where: { id: act.tareaId },
     data: { estado: 'PENDIENTE', anioSel: null, semanaSel: null, vecesReprogramada: act.vecesReprogramada + 1 },
-  })
-}
-
-// Continúa una actividad PARCIAL en la semana siguiente: crea una actividad nueva
-// (PENDIENTE) con SOLO los potreros pendientes (sin avance). No toca la parcial
-// original (queda como histórico). No se enlaza al banco (sin tareaId), como la
-// reprogramación. Idempotente: si ya se continuó (origenId), devuelve esa.
-export async function continuarParcialSemanaSiguiente(actividadId: string) {
-  const base = await prisma.actividad.findUnique({
-    where: { id: actividadId },
-    include: { lotes: true },
-  })
-  if (!base || base.estado !== 'PARCIAL') return null
-
-  const ya = await prisma.actividad.findFirst({ where: { origenId: base.id } })
-  if (ya) return ya
-
-  const pendientes = lotesPendientes(
-    base.lotes,
-    base.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null,
-    base.lotesHechos as string[] | null,
-  )
-  // Si maneja potreros y no queda ninguno pendiente, no hay qué continuar.
-  if (base.lotes.length > 0 && pendientes.length === 0) return null
-
-  let fincaId = base.fincaId
-  if (pendientes.length > 0) {
-    const primer = await prisma.lote.findUnique({ where: { id: pendientes[0].id } })
-    fincaId = primer?.fincaId ?? base.fincaId
-  }
-
-  const sig = siguienteSemana(base.anio, base.semana)
-
-  const bultos = base.bultosPorLote as Record<string, number> | null
-  const bultosPend = bultos
-    ? Object.fromEntries(pendientes.filter((l) => l.id in bultos).map((l) => [l.id, bultos[l.id]]))
-    : null
-
-  return prisma.actividad.create({
-    data: {
-      anio: sig.anio,
-      semana: sig.semana,
-      dia: base.dia,
-      descripcion: base.descripcion,
-      turno: base.turno,
-      estado: 'PENDIENTE',
-      areaId: base.areaId,
-      fincaId,
-      responsableId: base.responsableId,
-      maquinaId: base.maquinaId,
-      areaTareaId: base.areaTareaId,
-      horas: base.horas,
-      origenId: base.id,
-      vecesReprogramada: base.vecesReprogramada + 1,
-      ...(base.unidadRealizada ? { unidadRealizada: base.unidadRealizada } : {}),
-      ...(pendientes.length ? { lotes: { connect: pendientes.map((l) => ({ id: l.id })) } } : {}),
-      ...(bultosPend && Object.keys(bultosPend).length ? { bultosPorLote: bultosPend as Prisma.InputJsonValue } : {}),
-    },
   })
 }
 

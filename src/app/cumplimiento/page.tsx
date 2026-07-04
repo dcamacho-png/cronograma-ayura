@@ -11,7 +11,7 @@ import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistint
 import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
 import { textoAvanceConFecha, normalizarAvancePorLote, totalAvanceLotes, lotesPendientes, type AvanceEntrada } from '@/dominio/avance-lote'
 import { normalizarNovedades } from '@/dominio/novedades'
-import { agregarActividadRealizadaAccion, devolverAlBancoAccion, registrarMedidaGeneralAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion, setLotesActividadAccion, registrarAvanceAccion, continuarParcialAccion, cerrarParcialAccion, reabrirCierreAccion, editarAvanceAccion, eliminarAvanceAccion, agregarNovedadAccion, editarNovedadAccion, eliminarNovedadAccion } from './acciones'
+import { agregarActividadRealizadaAccion, devolverAlBancoAccion, registrarMedidaGeneralAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion, setLotesActividadAccion, registrarAvanceAccion, cerrarParcialAccion, reabrirCierreAccion, editarAvanceAccion, eliminarAvanceAccion, agregarNovedadAccion, editarNovedadAccion, eliminarNovedadAccion } from './acciones'
 import { FormActividadRealizada } from './form-actividad-realizada'
 import { InfoLotes } from '../_componentes/info-lotes'
 import { ActividadEstandar } from './actividad-estandar'
@@ -221,10 +221,6 @@ export default async function CumplimientoPage({
                   const etiquetaDia = (d: number) =>
                     `${DIAS[d] ?? ''} ${fechas[d - 1] ? fmtFecha(fechas[d - 1]) : ''}`.trim()
                   const tieneLotes = cab.lotes.length > 0
-                  const puedeContinuar =
-                    estadoGrupo === 'PARCIAL' &&
-                    (cab.lotes.length === 0 ||
-                      lotesPendientes(cab.lotes, avances, cab.lotesHechos as string[] | null).length > 0)
                   const unidadStd = cab.unidadRealizada ?? unidadAbreviada(unidad)
                   const resumenAvances = textoAvanceConFecha(cab.lotes, avances, unidadStd, etiquetaDia)
                   const interactivo = !cab.cerrada && (estadoGrupo === 'PENDIENTE' || estadoGrupo === 'PARCIAL')
@@ -271,10 +267,10 @@ export default async function CumplimientoPage({
                                 <button className="rounded-lg border border-bosque px-2 py-1 text-xs font-semibold text-bosque hover:bg-arena/40">Reabrir</button>
                               </form>
                             )}
-                            {cab.cerrada && estadoGrupo === 'PARCIAL' && puedeContinuar && !bloqueado && (
-                              <form action={continuarParcialAccion}>
+                            {cab.cerrada && estadoGrupo === 'PARCIAL' && !bloqueado && (
+                              <form action={devolverAlBancoAccion}>
                                 <input type="hidden" name="id" value={cab.id} />
-                                <button className="rounded-lg border border-bosque px-2 py-1 text-xs font-semibold text-bosque hover:bg-arena/40">Continuar la próxima semana</button>
+                                <button className="rounded-lg border border-borde px-2 py-1 text-xs text-tierra hover:bg-arena/40">Devolver al banco</button>
                               </form>
                             )}
                             {estadoGrupo !== 'PARCIAL' && !bloqueado && (
@@ -347,8 +343,6 @@ export default async function CumplimientoPage({
                             noSeHizo={registrarNovedadActividadAccion}
                             hayPotrerosPendientes={hayPotrerosPendientes}
                             devolverAlBanco={devolverAlBancoAccion}
-                            puedeContinuar={puedeContinuar}
-                            continuar={continuarParcialAccion}
                           />
                         ) : (
                           <ActividadEstandar
@@ -376,8 +370,6 @@ export default async function CumplimientoPage({
                             hayPotrerosPendientes={hayPotrerosPendientes}
                             devolverAlBanco={devolverAlBancoAccion}
                             editarPotreros={setLotesActividadAccion}
-                            puedeContinuar={puedeContinuar}
-                            continuar={continuarParcialAccion}
                           />
                         )
                       )}
