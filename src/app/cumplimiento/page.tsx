@@ -10,12 +10,14 @@ import { textoLotesHechos } from '@/dominio/lotes-hechos'
 import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, conteoEstadoActividades, tieneDiaPendiente, estadoActividad } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
 import { textoAvanceConFecha, normalizarAvancePorLote, totalAvanceLotes, lotesPendientes, type AvanceEntrada } from '@/dominio/avance-lote'
-import { agregarActividadRealizadaAccion, devolverAlBancoAccion, registrarMedidaGeneralAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion, setLotesActividadAccion, registrarAvanceAccion, continuarParcialAccion, editarAvanceAccion, eliminarAvanceAccion } from './acciones'
+import { normalizarNovedades } from '@/dominio/novedades'
+import { agregarActividadRealizadaAccion, devolverAlBancoAccion, registrarMedidaGeneralAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion, setLotesActividadAccion, registrarAvanceAccion, continuarParcialAccion, editarAvanceAccion, eliminarAvanceAccion, agregarNovedadAccion, eliminarNovedadAccion } from './acciones'
 import { FormActividadRealizada } from './form-actividad-realizada'
 import { InfoLotes } from '../_componentes/info-lotes'
 import { ActividadEstandar } from './actividad-estandar'
 import { ActividadMaquinaria } from './actividad-maquinaria'
 import { AvancesEditables } from './avances-editables'
+import { NovedadesLista } from './novedades-lista'
 
 const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
@@ -245,6 +247,13 @@ export default async function CumplimientoPage({
                       observacion: e.observacion ?? '',
                     })),
                   )
+                  const mapaMotivos = new Map(motivos.map((m) => [m.id, m.nombre]))
+                  const entradasNovedad = normalizarNovedades(cab.novedades).map((n, index) => ({
+                    index,
+                    dia: n.dia,
+                    motivo: n.motivoId ? (mapaMotivos.get(n.motivoId) ?? '') : '',
+                    observacion: n.observacion ?? '',
+                  }))
                   return (
                     <div className="flex flex-col gap-2">
                       {/* Estado/resumen (no PENDIENTE): solo lectura */}
@@ -280,6 +289,15 @@ export default async function CumplimientoPage({
                       ) : (
                         resumenAvances && <span className="text-sm text-tierra">Avances: {resumenAvances}</span>
                       )}
+                      <NovedadesLista
+                        actividadId={cab.id}
+                        entradas={entradasNovedad}
+                        editable={interactivo && !bloqueado}
+                        motivos={motivos}
+                        diaLabels={DIAS}
+                        agregar={agregarNovedadAccion}
+                        eliminar={eliminarNovedadAccion}
+                      />
                       {/* Controles interactivos (PENDIENTE/PARCIAL) */}
                       {interactivo && (
                         bloqueado ? (
