@@ -105,6 +105,7 @@ model Actividad {
   bultosPorLote Json?
   lotesHechos  Json?
   avancePorLote Json?
+  novedades    Json?
   lotes        Lote[]
 
   @@index([anio, semana, areaId])
