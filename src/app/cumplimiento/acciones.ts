@@ -119,6 +119,28 @@ function unidadElegida(form: FormData): string {
   return u || 'cantidad'
 }
 
+// Lee el bloque de "cambio" (reemplazo) del form con los name-s del contrato. Devuelve null si
+// no hay descripción. El día sale de `reemplazoDia`; si no viene válido (1-7), usa `diaFallback`.
+function leerReemplazo(form: FormData, diaFallback?: number) {
+  const sel = texto(form, 'reemplazoDescripcion')
+  const descripcion = sel === '__otra__' ? texto(form, 'reemplazoDescripcionOtra') : sel
+  if (!descripcion) return null
+  const unidadSel = texto(form, 'reemplazoUnidad')
+  const unidad = unidadSel === 'otro' ? texto(form, 'reemplazoUnidadOtra') || 'otro' : unidadSel || 'ha'
+  const loteIds = form.getAll('reemplazoLoteId').map(String).filter(Boolean)
+  const medida: Record<string, number> = {}
+  const bultos: Record<string, number> = {}
+  for (const lid of loteIds) {
+    const m = numeroOpcional(form, `reemplazoMedida_${lid}`)
+    if (m != null) medida[lid] = m
+    const b = numeroOpcional(form, `reemplazoBultos_${lid}`)
+    if (b != null) bultos[lid] = b
+  }
+  const diaNum = Number(texto(form, 'reemplazoDia'))
+  const dia = diaNum >= 1 && diaNum <= 7 ? diaNum : diaFallback
+  return { descripcion, unidad, loteIds, medida, bultos, dia }
+}
+
 export async function registrarAvanceAccion(form: FormData) {
   const id = texto(form, 'id')
   const dia = Number(texto(form, 'dia'))
@@ -177,8 +199,11 @@ export async function agregarNovedadAccion(form: FormData) {
   if (await bloqueadoPorPlazoActividad(id)) return
   const motivoId = textoOpcional(form, 'motivoId')
   const observacion = textoOpcional(form, 'observacion')
-  if (!motivoId && !observacion) return
-  await agregarNovedadGrupo(id, { dia, motivoId, observacion })
+  // Bloque de cambio (opcional): el día del reemplazo es el de la novedad (este formulario no
+  // envía reemplazoDia, así que leerReemplazo usa el diaFallback).
+  const reemplazo = leerReemplazo(form, dia)
+  if (!motivoId && !observacion && !reemplazo) return
+  await agregarNovedadGrupo(id, { dia, motivoId, observacion }, reemplazo)
   revalidatePath('/cumplimiento')
 }
 
@@ -210,26 +235,7 @@ export async function registrarNovedadActividadAccion(form: FormData) {
   if (await bloqueadoPorPlazoActividad(id)) return
   const nota = textoOpcional(form, 'nota')
   const lotesHechos = form.getAll('loteHecho').map((v) => String(v))
-  // Cambio de actividad: descripción + multiselección de potreros con medida (y bultos en
-  // fertilización). La unidad es automática en maquinaria y elegible en estándar.
-  const reemplazoSel = texto(form, 'reemplazoDescripcion')
-  const reemplazoDescripcion = reemplazoSel === '__otra__' ? texto(form, 'reemplazoDescripcionOtra') : reemplazoSel
-  const reemplazoUnidadSel = texto(form, 'reemplazoUnidad')
-  const reemplazoUnidad = reemplazoUnidadSel === 'otro' ? texto(form, 'reemplazoUnidadOtra') || 'otro' : reemplazoUnidadSel || 'ha'
-  const reemplazoLoteIds = form.getAll('reemplazoLoteId').map(String).filter(Boolean)
-  const reemplazoMedida: Record<string, number> = {}
-  const reemplazoBultos: Record<string, number> = {}
-  for (const lid of reemplazoLoteIds) {
-    const m = numeroOpcional(form, `reemplazoMedida_${lid}`)
-    if (m != null) reemplazoMedida[lid] = m
-    const b = numeroOpcional(form, `reemplazoBultos_${lid}`)
-    if (b != null) reemplazoBultos[lid] = b
-  }
-  const reemplazoDiaNum = Number(texto(form, 'reemplazoDia'))
-  const reemplazoDia = reemplazoDiaNum >= 1 && reemplazoDiaNum <= 7 ? reemplazoDiaNum : undefined
-  const reemplazo = reemplazoDescripcion
-    ? { descripcion: reemplazoDescripcion, unidad: reemplazoUnidad, loteIds: reemplazoLoteIds, medida: reemplazoMedida, bultos: reemplazoBultos, dia: reemplazoDia }
-    : null
+  const reemplazo = leerReemplazo(form)
   await setUnidadRealizadaGrupo(id, unidadElegida(form))
   await registrarNovedadGrupo(id, estado, motivoId, nota, reemplazo, lotesHechos)
   revalidatePath('/cumplimiento')
