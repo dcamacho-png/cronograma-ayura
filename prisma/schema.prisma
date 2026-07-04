@@ -102,6 +102,7 @@ model Actividad {
   unidadRealizada String?
   planB        String?
   noProgramada Boolean @default(false)
+  cerrada      Boolean @default(false)
   bultosPorLote Json?
   lotesHechos  Json?
   avancePorLote Json?
