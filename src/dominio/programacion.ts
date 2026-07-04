@@ -19,6 +19,7 @@ export type TipoConflicto = 'maquina' | 'responsable'
 export interface Conflicto {
   dia: number
   tipo: TipoConflicto
+  responsableId?: string
 }
 
 // Detecta choques al asignar: una máquina no puede repetirse en el mismo
@@ -36,11 +37,39 @@ export function detectarConflictosAsignacion(
     const turno_ = turnoEfectivo(turno, dia)
     const enCasilla = existentes.filter((e) => e.dia === dia && e.turno === turno_)
     if (enCasilla.some((e) => e.responsableId === responsableId)) {
-      conflictos.push({ dia, tipo: 'responsable' })
+      conflictos.push({ dia, tipo: 'responsable', responsableId })
     }
     const maqId = maquinaPorDia[dia] ?? null
     if (maqId && enCasilla.some((e) => e.maquinaId === maqId)) {
-      conflictos.push({ dia, tipo: 'maquina' })
+      conflictos.push({ dia, tipo: 'maquina', responsableId })
+    }
+  }
+  return conflictos
+}
+
+// Una asignación por responsable: sus días, su turno y su máquina por día.
+export interface Asignacion {
+  responsableId: string
+  dias: number[]
+  turno: string
+  maquinaPorDia: Record<number, string | null>
+}
+
+// Conflicto de máquina ENTRE responsables del mismo envío: si dos asignaciones
+// usan la misma máquina (no nula) en el mismo día + turno efectivo.
+export function conflictosMaquinaEntreResponsables(asignaciones: Asignacion[]): Conflicto[] {
+  const conflictos: Conflicto[] = []
+  const vistas = new Set<string>()
+  for (const a of asignaciones) {
+    for (const dia of a.dias) {
+      const maqId = a.maquinaPorDia[dia] ?? null
+      if (!maqId) continue
+      const key = `${dia}-${turnoEfectivo(a.turno, dia)}-${maqId}`
+      if (vistas.has(key)) {
+        conflictos.push({ dia, tipo: 'maquina', responsableId: a.responsableId })
+      } else {
+        vistas.add(key)
+      }
     }
   }
   return conflictos
