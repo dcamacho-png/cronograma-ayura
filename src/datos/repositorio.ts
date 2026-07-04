@@ -1003,6 +1003,7 @@ export async function reabrirGrupo(id: string) {
           nota: null,
           lotesHechos: Prisma.DbNull,
           avancePorLote: Prisma.DbNull,
+          cerrada: false,
         },
       }),
     ),
