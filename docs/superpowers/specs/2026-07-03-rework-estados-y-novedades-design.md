@@ -17,8 +17,9 @@ Reemplaza el modelo actual donde "Parcial" es una opción manual de novedad, "No
 - **Parcial solo desde avances.** Se quita "Parcial" como opción del formulario de novedad.
 - **No cumplida + Reprogramada se unifican en "No se hizo"** con casilla "¿reprogramar?": sí → vuelve al banco (neutra en %); no → cerrada (0%, ya NO vuelve al banco). Internamente se conservan los estados `REPROGRAMADA` (reprogramar) y `NO_CUMPLIDA` (cerrada) para no migrar datos ni romper el %; en **pantalla y reportes** ambos se muestran como un solo bucket **"No se hizo"**.
 - **Novedades = razones**, independientes del estado: "+ Novedad" (motivo + observación + día) se agrega en actividades abiertas y **no** cambia el estado. Se acumulan (log). La acción "No se hizo" y el "Cambio" también registran su razón en el log.
-- **Cerrar con elección:** Cumplida / Parcial / No se hizo; **Cumplida no se ofrece si hay potreros pendientes** (lotes sin avance).
-- **Sin migración de datos ni cambio de estados existentes.** Los 5 valores de `Estado` se conservan; no se reescribe data vieja. El único cambio de esquema es el campo **aditivo y nullable** `novedades Json?` en `Actividad` (Prisma genera una migración aditiva, sin backfill). El cierre-como-Parcial mantiene la actividad en `PARCIAL` (sigue siendo continuable la próxima semana). Solo `CUMPLIDA`/`NO_CUMPLIDA`/`REPROGRAMADA` son terminales-bloqueados (como hoy).
+- **Cerrar con elección que BLOQUEA:** Cumplida / Parcial / No se hizo. Al cerrar, la actividad queda **bloqueada** (solo lectura: no admite más avances/novedades/edición), vía un nuevo campo `cerrada`. **Cumplida siempre disponible** (el usuario decide); si hay potreros pendientes al elegirla, se pide una **confirmación suave** (aviso "quedan N potreros sin avance, ¿marcar Cumplida igual?"), no un bloqueo. `haRealizada` al cerrar Cumplida = suma de lo avanzado.
+- **Sin migración de datos ni cambio de estados existentes.** Los 5 valores de `Estado` se conservan; no se reescribe data vieja. Cambios de esquema: dos campos **aditivos** en `Actividad` — `novedades Json?` (log) y `cerrada Boolean @default(false)` (bloqueo de cierre). Prisma genera una migración aditiva sin backfill (los `PARCIAL` viejos quedan `cerrada=false`, editables como hoy; los terminales viejos ya eran no-interactivos por su estado).
+- **Conteo del "cambio de actividad": sin cambios en esta entrega.** Un cambio seguirá generando la original como "No se hizo" (0 medida) + el reemplazo como Cumplida (su **medida sí suma** en el avance, cuenta como +1 actividad). La política de si un cambio debe penalizar el cumplimiento se decidirá junto al rework del % en /resumen (fuera de alcance).
 
 ## Contexto (verificado en código)
 
@@ -41,20 +42,22 @@ Reemplaza el modelo actual donde "Parcial" es una opción manual de novedad, "No
 - Acciones: `agregarNovedadAccion`, `eliminarNovedadAccion` (con guardia de plazo + revalidate).
 - UI: en la tarjeta, la sección de estado muestra la **lista** de novedades ("día · motivo · observación") con **×** para borrar cada una (solo si la actividad está abierta y sin plazo vencido). Un botón/enlace **"+ Novedad"** abre un mini-form (día + motivo [catálogo] + observación) que agrega al log sin cambiar el estado.
 
-### B. Cierre con elección
+### B. Cierre con elección (bloquea)
 
-- Reemplaza los botones "✓ Marcar cumplida" y el formulario de novedad-estado por **una acción "Cerrar actividad"** que ofrece elegir el resultado:
-  - **Cumplida:** solo se ofrece si `lotesPendientes(...)` está vacío (todos los potreros con avance) o la actividad no maneja potreros. → `marcarCumplidaGrupo` (CUMPLIDA).
-  - **Parcial:** fija/confirma `PARCIAL` (queda con sus avances y novedades; sigue siendo continuable la próxima semana). Nueva `cerrarParcialGrupo(id)` que setea `estado='PARCIAL'` en filas abiertas sin tocar avances.
-  - **No se hizo:** casilla "¿reprogramar la próxima semana?" → marcada = `REPROGRAMADA` (devuelve al banco, como hoy); desmarcada = `NO_CUMPLIDA` (**ya NO devuelve al banco** — cambio real). Captura opcional de razón (novedad) en el mismo paso.
-- El **Cambio de actividad** (reemplazo multi-potrero) pasa a ser una sub-opción del cierre "No se hizo" (motivo = cambio, con reprogramar típicamente desmarcado): el original queda `NO_CUMPLIDA` con su razón y se crea la actividad "En reemplazo de…" (toda la lógica del reemplazo multipotrero ya existente se conserva).
-- Repo: dividir `registrarNovedadGrupo` de modo que "No se hizo" use `estado` NO_CUMPLIDA/REPROGRAMADA y **solo REPROGRAMADA** devuelva la tarea al banco (quitar `NO_CUMPLIDA` de la condición de devolución en ≈l.767).
+- Reemplaza los botones "✓ Marcar cumplida" y el formulario de novedad-estado por **una acción "Cerrar actividad"** que ofrece elegir el resultado y, en todos los casos, fija **`cerrada=true`** en las filas abiertas del grupo:
+  - **Cumplida:** siempre disponible. Si `lotesPendientes(...)` NO está vacío (hay potreros sin avance) y la actividad maneja potreros, el botón pide **confirmación** en el navegador antes de enviar ("quedan N potreros sin avance, ¿marcar Cumplida?"). → `marcarCumplidaGrupo` (CUMPLIDA, `haRealizada`=suma de avances) + `cerrada=true`.
+  - **Parcial:** deja `estado='PARCIAL'` y `cerrada=true` (queda con sus avances y novedades, **bloqueada**). Nueva `cerrarParcialGrupo(id)`.
+  - **No se hizo:** casilla "¿reprogramar la próxima semana?" → marcada = `REPROGRAMADA` (devuelve al banco, como hoy) + `cerrada=true`; desmarcada = `NO_CUMPLIDA` (**ya NO devuelve al banco** — cambio real) + `cerrada=true`. Captura opcional de razón (novedad) en el mismo paso.
+- El **Cambio de actividad** (reemplazo multi-potrero) pasa a ser una sub-opción del cierre "No se hizo" (motivo = cambio, reprogramar típicamente desmarcado): el original queda `NO_CUMPLIDA` + `cerrada=true` con su razón y se crea la actividad "En reemplazo de…" (toda la lógica del reemplazo multipotrero existente se conserva).
+- Repo: la lógica de "No se hizo" usa `estado` NO_CUMPLIDA/REPROGRAMADA y **solo REPROGRAMADA** devuelve la tarea al banco (quitar `NO_CUMPLIDA` de la condición de devolución en ≈l.767). Todas las vías de cierre setean `cerrada=true`.
+- **Reabrir** (`reabrirGrupo`, ampliado): pone `cerrada=false` **conservando** avances/novedades/estado (para corregir un cierre por error). — Nota: el `reabrirGrupo` de hoy limpia todo; se ajusta para que el "reabrir de un cierre" solo quite el bloqueo sin borrar el trabajo. (El "↩ desmarcar" que sí resetea a PENDIENTE se conserva aparte para actividades terminales sin avances.)
+- **Continuar la próxima semana:** disponible en una **Parcial cerrada** (crea la actividad de la próxima semana con los potreros pendientes; no modifica la cerrada). `continuarParcialSemanaSiguiente` ya existe; solo cambia dónde se ofrece el botón (en la Parcial cerrada).
 
 ### C. Estados intermedios y edición
 
 - **Parcial** solo se alcanza por avances (o por "Cerrar → Parcial"). Se quita `PARCIAL` de las opciones del formulario de novedad.
-- Se conservan: registrar avance (→Parcial), editar/borrar avances, "Continuar la próxima semana" (en Parcial), "Devolver al banco".
-- `interactivo`/`bloqueado` sin cambios: editable en PENDIENTE/PARCIAL; terminal en CUMPLIDA/NO_CUMPLIDA/REPROGRAMADA.
+- Se conservan: registrar avance (→Parcial), editar/borrar avances, "Devolver al banco".
+- `interactivo` pasa a ser `!cerrada && (estado === 'PENDIENTE' || estado === 'PARCIAL')`. Una vez `cerrada=true`, la tarjeta es solo lectura (sin avances/novedades/edición); muestra los avances y el log de novedades, más "Continuar la próxima semana" (si Parcial cerrada) y "Reabrir". `bloqueado` (plazo) sin cambios.
 
 ### D. Reportes: un solo bucket "No se hizo"
 
@@ -72,17 +75,17 @@ Reemplaza el modelo actual donde "Parcial" es una opción manual de novedad, "No
 - **UI:** typecheck + `next build` + verificación en vivo (preview).
 - **Manual (preview):**
   1. "+ Novedad" agrega razones a una Pendiente/Parcial sin cambiar el estado; se listan; se borran con ×.
-  2. "Cerrar actividad" ofrece Cumplida solo si no hay potreros pendientes; Parcial deja la actividad en Parcial (continuable); "No se hizo" con reprogramar=sí vuelve al banco, reprogramar=no queda cerrada y NO vuelve.
-  3. Contador y /resumen muestran un solo "No se hizo".
-  4. El Cambio (reemplazo) sigue creando la actividad "En reemplazo de…".
+  2. "Cerrar actividad": Cumplida siempre elegible (con confirmación si hay potreros pendientes); al cerrar (cualquier resultado) la tarjeta queda **bloqueada** (solo lectura); "No se hizo" con reprogramar=sí vuelve al banco, reprogramar=no queda cerrada y NO vuelve.
+  3. "Reabrir" una actividad cerrada quita el bloqueo conservando avances/novedades; "Continuar la próxima semana" aparece en la Parcial cerrada y crea la de la semana siguiente con los pendientes.
+  4. Contador y /resumen muestran un solo "No se hizo".
+  5. El Cambio (reemplazo) sigue creando la actividad "En reemplazo de…".
 
 ## Fuera de alcance
 
-- Rehacer el cálculo del % (sigue pendiente para /resumen).
-- Bloquear/lockear una Parcial cerrada (sigue editable/continuable, por diseño).
+- Rehacer el cálculo del % y la política de conteo del "cambio" (van con el rework de /resumen).
 - Log de novedades en el Excel (solo en la tarjeta por ahora).
-- Migración de datos (no hay cambio de esquema salvo el campo JSON `novedades`, que es aditivo y opcional).
+- Backfill de datos viejos (no se reescribe nada).
 
 ## Nota de esquema
 
-`novedades Json?` es el único campo nuevo en `Actividad` (aditivo, nullable). `prisma migrate` genera una migración aditiva; sin backfill (las actividades viejas quedan sin log, con su `motivoId`/`nota` actuales intactos).
+Dos campos nuevos en `Actividad`, ambos aditivos: `novedades Json?` (log de razones) y `cerrada Boolean @default(false)` (bloqueo de cierre). `prisma migrate` genera una migración aditiva; sin backfill — las actividades viejas quedan `cerrada=false` y sin log, con su `motivoId`/`nota`/estado intactos. Los estados terminales viejos (CUMPLIDA/NO_CUMPLIDA/REPROGRAMADA) ya eran no-interactivos por su estado, así que `cerrada=false` en ellos no los "reabre".
