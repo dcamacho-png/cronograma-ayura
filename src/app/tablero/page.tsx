@@ -10,8 +10,9 @@ import {
   cumplimientoPorArea,
   tendenciaSemanal,
   motivosFrecuentes,
+  colorSemaforo,
 } from '@/dominio/metricas'
-import { colorPorcentaje } from '@/dominio/resumen'
+import { colorPorcentaje, actividadesRecurrentes } from '@/dominio/resumen'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
 
 const MESES = [
@@ -55,6 +56,9 @@ export default async function TableroPage({
   const porArea = cumplimientoPorArea(dominio)
   const tendencia = tendenciaSemanal(dominio)
   const motivosTop = motivosFrecuentes(dominio)
+  const recurrentes = actividadesRecurrentes(
+    actividades.map((a) => ({ descripcion: a.descripcion, areaNombre: a.area.nombre, vecesReprogramada: a.vecesReprogramada })),
+  )
 
   const pctPorAreaId = new Map(porArea.map((f) => [f.areaId, f.porcentaje]))
   const nombreMotivo = new Map(motivos.map((m) => [m.id, m.nombre]))
@@ -126,6 +130,25 @@ export default async function TableroPage({
             </div>
           ))}
         </div>
+      )}
+
+      <h2 className="mb-3 text-lg font-semibold text-tinta">🔁 Actividades recurrentes del mes</h2>
+      {recurrentes.length === 0 ? (
+        <p className="mb-8 text-sm text-tierra">Ninguna actividad se arrastró este mes. 🎉</p>
+      ) : (
+        <ul className="mb-8 space-y-2">
+          {recurrentes.map((r, i) => (
+            <li key={i} className="flex items-center gap-3 tarjeta p-3 text-sm">
+              <span className="flex-1">
+                {r.descripcion}
+                <span className="text-tierra"> · {r.areaNombre}</span>
+              </span>
+              <span className="rounded px-2 py-0.5 text-xs font-semibold text-white" style={{ backgroundColor: COLOR_HEX[colorSemaforo(r.veces)] }}>
+                ×{r.veces}
+              </span>
+            </li>
+          ))}
+        </ul>
       )}
 
       <h2 className="mb-3 text-lg font-semibold text-tinta">⚠️ Motivos más frecuentes</h2>

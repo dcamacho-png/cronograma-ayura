@@ -206,7 +206,10 @@ export function setResponsableActivo(id: string, activo: boolean) {
 // Actividades de un conjunto de semanas (todas las áreas), para el tablero mensual.
 export function listarActividadesDeSemanas(semanas: { anio: number; semana: number }[]) {
   if (semanas.length === 0) {
-    return prisma.actividad.findMany({ where: { id: '' } }) // lista vacía
+    return prisma.actividad.findMany({
+      where: { id: '' }, // lista vacía
+      include: { area: true, motivo: true, lotes: { select: { id: true } } },
+    })
   }
   return prisma.actividad.findMany({
     where: { OR: semanas.map((s) => ({ anio: s.anio, semana: s.semana })) },
