@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { reprogramarActividad, crearActividadRealizada, devolverAlBanco, semanaDeActividad, registrarAvanceLoteGrupo, registrarAvanceObservacionGrupo, marcarCumplidaGrupo, registrarNovedadGrupo, reabrirGrupo, setLotesGrupo, setUnidadRealizadaGrupo, anexarLotesGrupo, registrarMedidaGeneralGrupo, continuarParcialSemanaSiguiente, editarAvanceEntradaGrupo, eliminarAvanceEntradaGrupo, agregarNovedadGrupo, eliminarNovedadGrupo } from '@/datos/repositorio'
+import { reprogramarActividad, crearActividadRealizada, devolverAlBanco, semanaDeActividad, registrarAvanceLoteGrupo, registrarAvanceObservacionGrupo, marcarCumplidaGrupo, registrarNovedadGrupo, reabrirGrupo, setLotesGrupo, setUnidadRealizadaGrupo, anexarLotesGrupo, registrarMedidaGeneralGrupo, continuarParcialSemanaSiguiente, editarAvanceEntradaGrupo, eliminarAvanceEntradaGrupo, agregarNovedadGrupo, eliminarNovedadGrupo, cerrarParcialGrupo, reabrirCierreGrupo, editarNovedadGrupo } from '@/datos/repositorio'
 import { siguienteSemana, plazoCumplimientoVencido, semanaActual } from '@/dominio/semana'
 import { usuarioActual } from '@/auth/sesion'
 
@@ -248,5 +248,35 @@ export async function continuarParcialAccion(form: FormData) {
   if (!id) return
   if (await bloqueadoPorPlazoActividad(id)) return
   await continuarParcialSemanaSiguiente(id)
+  revalidatePath('/cumplimiento')
+}
+
+export async function cerrarParcialAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (!id) return
+  if (await bloqueadoPorPlazoActividad(id)) return
+  await cerrarParcialGrupo(id)
+  revalidatePath('/cumplimiento')
+}
+
+export async function reabrirCierreAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (!id) return
+  if (await bloqueadoPorPlazoActividad(id)) return
+  await reabrirCierreGrupo(id)
+  revalidatePath('/cumplimiento')
+}
+
+export async function editarNovedadAccion(form: FormData) {
+  const id = texto(form, 'id')
+  const index = Number(texto(form, 'index'))
+  if (!id || !Number.isInteger(index) || index < 0) return
+  if (await bloqueadoPorPlazoActividad(id)) return
+  const dia = Number(texto(form, 'dia'))
+  await editarNovedadGrupo(id, index, {
+    ...(dia >= 1 && dia <= 7 ? { dia } : {}),
+    motivoId: textoOpcional(form, 'motivoId'),
+    observacion: textoOpcional(form, 'observacion'),
+  })
   revalidatePath('/cumplimiento')
 }
