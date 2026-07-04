@@ -78,19 +78,13 @@ export function listarActividadesSolicitadas(areaId: string, anio: number, seman
 }
 
 // Actividades CUMPLIDA del área para la pantalla de Consulta (solo lectura): propias
-// (areaId) o solicitadas por el área a otras (tarea.solicitadaPorAreaId). Filtros opcionales.
-export function consultarCulminadas(
-  areaId: string,
-  filtros: { responsableId?: string | null; fincaId?: string | null; centroCosto?: string | null; loteId?: string | null } = {},
-) {
+// (areaId) o solicitadas por el área a otras (tarea.solicitadaPorAreaId). El filtrado y
+// el agrupado por actividad se hacen en la página (datos acotados).
+export function consultarCulminadas(areaId: string) {
   return prisma.actividad.findMany({
     where: {
       estado: 'CUMPLIDA',
       OR: [{ areaId }, { tarea: { solicitadaPorAreaId: areaId } }],
-      ...(filtros.responsableId ? { responsableId: filtros.responsableId } : {}),
-      ...(filtros.fincaId ? { fincaId: filtros.fincaId } : {}),
-      ...(filtros.centroCosto ? { centroCosto: filtros.centroCosto } : {}),
-      ...(filtros.loteId ? { lotes: { some: { id: filtros.loteId } } } : {}),
     },
     include: {
       responsable: true,
@@ -98,7 +92,7 @@ export function consultarCulminadas(
       maquina: true,
       lotes: true,
       area: true,
-      tarea: { select: { solicitadaPorAreaId: true } },
+      tarea: { select: { solicitadaPorAreaId: true, detalle: true } },
     },
     orderBy: [{ anio: 'desc' }, { semana: 'desc' }, { dia: 'asc' }],
   })

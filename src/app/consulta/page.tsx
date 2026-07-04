@@ -2,11 +2,16 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { usuarioActual } from '@/auth/sesion'
 import { puedeVer } from '@/auth/permisos'
-import { listarAreas, listarResponsablesPorArea, listarFincas, listarLotes, consultarCulminadas } from '@/datos/repositorio'
-import { normalizarAvancePorLote, type AvanceEntrada } from '@/dominio/avance-lote'
+import { listarAreas, listarActividadesEstipuladas, listarMaquinas, listarResponsablesTodos, consultarCulminadas } from '@/datos/repositorio'
+import { fechasDeSemana } from '@/dominio/semana'
+import { agruparPorActividad, estadoActividad } from '@/dominio/metricas'
+import { COLUMNAS_CUMPLIMIENTO, filasCumplimientoGrupo, type ActividadExport } from '@/dominio/cumplimiento-export'
+import type { Estado } from '@/dominio/tipos'
+import type { AvanceEntrada } from '@/dominio/avance-lote'
+import type { BultosPorLote } from '@/dominio/bultos'
 import { FiltrosConsulta } from './filtros-consulta'
 
-const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+const ESTADO_IDX = COLUMNAS_CUMPLIMIENTO.indexOf('Estado')
 
 export default async function ConsultaPage({
   searchParams,
@@ -27,28 +32,83 @@ export default async function ConsultaPage({
     : (u.areaId && areas.some((a) => a.id === u.areaId) ? u.areaId : areas[0].id)
   const areaActual = areas.find((a) => a.id === areaId)!
 
-  const filtros = {
-    responsableId: sp.responsable || null,
-    fincaId: sp.finca || null,
-    centroCosto: sp.centro || null,
-    loteId: sp.lote || null,
-  }
-  const [responsables, fincas, lotes, resultados, todasDelArea] = await Promise.all([
-    listarResponsablesPorArea(areaId),
-    listarFincas(),
-    listarLotes(),
-    consultarCulminadas(areaId, filtros),
-    consultarCulminadas(areaId, {}),
+  const [resultados, estipuladas, maquinas, responsablesTodos] = await Promise.all([
+    consultarCulminadas(areaId),
+    listarActividadesEstipuladas(),
+    listarMaquinas(),
+    listarResponsablesTodos(),
   ])
-  const centros = [...new Set(todasDelArea.map((a) => a.centroCosto).filter((c): c is string => !!c))].sort()
 
-  const potrerosConMedida = (a: (typeof resultados)[number]) => {
-    const av = normalizarAvancePorLote(a.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null)
-    return a.lotes.map((l) => {
-      const total = (av[l.id] ?? []).reduce((s, e) => s + e.cantidad, 0)
-      return total > 0 ? `${l.nombre}: ${total}` : l.nombre
-    })
+  const nombrePorMaquina = new Map(maquinas.map((m) => [m.id, m.nombre]))
+  const nombreMaquina = (id: string | null) => (id ? nombrePorMaquina.get(id) ?? '' : '')
+  const nombrePorResponsable = new Map(responsablesTodos.map((r) => [r.id, r.nombre]))
+  const nombreResponsable = (id: string | null) => (id ? nombrePorResponsable.get(id) ?? '' : '')
+  const unidadPorNombre = Object.fromEntries(estipuladas.map((e) => [e.nombre, e.unidad]))
+  const fmtFecha = (f: Date) => new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(f)
+
+  const fResp = sp.responsable || ''
+  const fFinca = sp.finca || ''
+  const fCentro = sp.centro || ''
+  const fLote = sp.lote || ''
+
+  type Fila = (typeof resultados)[number]
+  const aExport = (a: Fila): ActividadExport => ({
+    ...a,
+    bultosPorLote: a.bultosPorLote as BultosPorLote | null,
+    lotesHechos: a.lotesHechos as string[] | null,
+    avancePorLote: a.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null,
+    detalle: a.tarea?.detalle ?? null,
+  })
+
+  const pasaFiltros = (grupo: Fila[]) =>
+    (!fResp || grupo.some((a) => a.responsableId === fResp)) &&
+    (!fFinca || grupo[0].fincaId === fFinca) &&
+    (!fCentro || grupo.some((a) => a.centroCosto === fCentro)) &&
+    (!fLote || grupo[0].lotes.some((l) => l.id === fLote))
+
+  const filas: (string | number)[][] = []
+  const agregar = (items: Fila[], ejecutadaPor: (grupo: Fila[]) => string) => {
+    // Agrupar por (semana, actividad): primero se separa por semana para no mezclar
+    // filas-hermanas de un mismo tareaId entre semanas distintas.
+    const porSemana = new Map<string, Fila[]>()
+    for (const a of items) {
+      const k = `${a.anio}-${a.semana}`
+      const arr = porSemana.get(k)
+      if (arr) arr.push(a)
+      else porSemana.set(k, [a])
+    }
+    for (const semItems of porSemana.values()) {
+      for (const grupo of agruparPorActividad(semItems).values()) {
+        if (estadoActividad(grupo.map((a) => ({ estado: a.estado as Estado }))) !== 'CUMPLIDA') continue
+        if (!pasaFiltros(grupo)) continue
+        const base = grupo[0]
+        const fechas = fechasDeSemana(base.anio, base.semana)
+        const fechaDeDia = (dia: number) => { const f = fechas[dia - 1]; return f ? fmtFecha(f) : '' }
+        const grupoFilas = filasCumplimientoGrupo(
+          grupo.map(aExport),
+          fechaDeDia(base.dia),
+          unidadPorNombre,
+          { fechaDeDia, nombreMaquina, nombreResponsable },
+          ejecutadaPor(grupo),
+        )
+        for (const fila of grupoFilas) {
+          filas.push([`${base.anio}-S${base.semana}`, ...fila.filter((_, i) => i !== ESTADO_IDX)])
+        }
+      }
+    }
   }
+  agregar(resultados.filter((a) => a.areaId === areaId), () => '')
+  agregar(resultados.filter((a) => a.areaId !== areaId), (grupo) => grupo[0].area?.nombre ?? '')
+
+  const headers = ['Semana', ...COLUMNAS_CUMPLIMIENTO.filter((_, i) => i !== ESTADO_IDX)]
+
+  // Opciones de filtros derivadas de los datos (solo valores presentes).
+  const dedupe = <T extends { id: string; nombre: string }>(xs: T[]) =>
+    [...new Map(xs.map((x) => [x.id, { id: x.id, nombre: x.nombre }])).values()].sort((a, b) => a.nombre.localeCompare(b.nombre))
+  const responsables = dedupe(resultados.map((a) => a.responsable))
+  const fincas = dedupe(resultados.map((a) => a.finca).filter((f): f is NonNullable<typeof f> => !!f))
+  const lotes = dedupe(resultados.flatMap((a) => a.lotes))
+  const centros = [...new Set(resultados.map((a) => a.centroCosto).filter((c): c is string => !!c))].sort((a, b) => a.localeCompare(b))
 
   return (
     <main className="mx-auto max-w-6xl p-6">
@@ -72,47 +132,25 @@ export default async function ConsultaPage({
         fincas={fincas}
         lotes={lotes}
         centros={centros}
-        sel={{ responsable: filtros.responsableId ?? '', finca: filtros.fincaId ?? '', centro: filtros.centroCosto ?? '', lote: filtros.loteId ?? '' }}
+        sel={{ responsable: fResp, finca: fFinca, centro: fCentro, lote: fLote }}
       />
 
-      {resultados.length === 0 ? (
+      {filas.length === 0 ? (
         <p className="mt-4 text-sm text-tierra">No hay actividades culminadas con esos filtros.</p>
       ) : (
         <div className="mt-4 overflow-x-auto">
-          <table className="w-full min-w-[900px] border-collapse text-sm">
+          <table className="w-full min-w-[1100px] border-collapse text-sm">
             <thead>
               <tr className="border-b border-borde text-left text-tierra">
-                <th className="p-2">Semana</th>
-                <th className="p-2">Día</th>
-                <th className="p-2">Descripción</th>
-                <th className="p-2">Responsable</th>
-                <th className="p-2">Área ejec.</th>
-                <th className="p-2">Finca</th>
-                <th className="p-2">Potreros (medida)</th>
-                <th className="p-2">Medida total</th>
-                <th className="p-2">Centro de costo</th>
-                <th className="p-2">Máquina</th>
+                {headers.map((h) => (<th key={h} scope="col" className="p-2 whitespace-nowrap">{h}</th>))}
               </tr>
             </thead>
             <tbody>
-              {resultados.map((a) => {
-                const ejecutadaPorOtra = a.tarea?.solicitadaPorAreaId === areaId && a.areaId !== areaId
-                const potreros = potrerosConMedida(a)
-                return (
-                  <tr key={a.id} className="border-b border-borde/60 align-top">
-                    <td className="p-2 whitespace-nowrap">{a.anio}-S{a.semana}</td>
-                    <td className="p-2">{DIAS[a.dia] ?? a.dia}</td>
-                    <td className="p-2">{a.descripcion}</td>
-                    <td className="p-2">{a.responsable?.nombre ?? '—'}</td>
-                    <td className="p-2">{ejecutadaPorOtra ? (a.area?.nombre ?? '—') : '—'}</td>
-                    <td className="p-2">{a.finca?.nombre ?? '—'}</td>
-                    <td className="p-2">{potreros.length > 0 ? potreros.join(', ') : '—'}</td>
-                    <td className="p-2 whitespace-nowrap">{a.haRealizada != null ? `${a.haRealizada} ${a.unidadRealizada ?? ''}`.trim() : '—'}</td>
-                    <td className="p-2">{a.centroCosto ?? '—'}</td>
-                    <td className="p-2">{a.maquina?.nombre ?? '—'}</td>
-                  </tr>
-                )
-              })}
+              {filas.map((fila, i) => (
+                <tr key={i} className="border-b border-borde/60 align-top">
+                  {fila.map((c, j) => (<td key={j} className="p-2">{c === '' ? '—' : c}</td>))}
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
