@@ -189,4 +189,16 @@ describe('conflictosMaquinaEntreResponsables', () => {
     const a = [base({ responsableId: 'r1', dias: [1], maquinaPorDia: { 1: null } }), base({ responsableId: 'r2', dias: [1], maquinaPorDia: { 1: null } })]
     expect(conflictosMaquinaEntreResponsables(a)).toEqual([])
   })
+
+  it('con 3 responsables en la misma máquina/día/turno marca al 2º y al 3º (el 1º queda libre)', () => {
+    const a = [
+      base({ responsableId: 'r1', dias: [1], maquinaPorDia: { 1: 'm1' } }),
+      base({ responsableId: 'r2', dias: [1], maquinaPorDia: { 1: 'm1' } }),
+      base({ responsableId: 'r3', dias: [1], maquinaPorDia: { 1: 'm1' } }),
+    ]
+    expect(conflictosMaquinaEntreResponsables(a)).toEqual([
+      { dia: 1, tipo: 'maquina', responsableId: 'r2' },
+      { dia: 1, tipo: 'maquina', responsableId: 'r3' },
+    ])
+  })
 })

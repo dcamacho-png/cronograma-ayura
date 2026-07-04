@@ -304,8 +304,8 @@ export function tareasPorAsignar(areaId: string, anio: number, semana: number) {
 }
 
 // Asigna una tarea: crea la actividad (vinculada) y marca la tarea como PROGRAMADA.
-// Asigna una tarea a uno o varios días de su semana: crea una actividad por día
-// (mismo responsable, lote y turno) y marca la tarea como PROGRAMADA.
+// Asigna una tarea a la grilla: por cada responsable, crea una actividad por cada
+// uno de SUS días, con su propio turno y máquina por día. Marca la tarea PROGRAMADA.
 export async function asignarTarea(
   tareaId: string,
   asignaciones: Asignacion[],
@@ -335,6 +335,7 @@ export async function asignarTarea(
     fincaId = primer.fincaId
   }
   return prisma.$transaction(async (tx) => {
+    // Guardia contra choques (a prueba de carreras: la consulta va dentro de la transacción).
     const existentes = await tx.actividad.findMany({
       where: { anio, semana, dia: { in: diasTodos } },
       select: { dia: true, turno: true, maquinaId: true, responsableId: true },
