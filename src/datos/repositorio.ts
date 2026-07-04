@@ -15,6 +15,7 @@ import {
   type AvanceEntrada,
 } from '@/dominio/avance-lote'
 import { siguienteSemana } from '@/dominio/semana'
+import { normalizarNovedades, agregarNovedad, eliminarNovedad } from '@/dominio/novedades'
 
 export function listarAreas() {
   return prisma.area.findMany({ orderBy: { nombre: 'asc' } })
@@ -731,6 +732,52 @@ export async function eliminarAvanceEntradaGrupo(id: string, loteId: string, ind
     g.filas
       .filter((f) => f.estado === 'PENDIENTE' || f.estado === 'PARCIAL')
       .map((f) => prisma.actividad.update({ where: { id: f.id }, data: { avancePorLote: actual as Prisma.InputJsonValue } })),
+  )
+  return true
+}
+
+// Agrega una novedad (razón) al log del grupo y la espeja como última en motivoId/nota
+// (para que /resumen y el Excel sigan reflejando la novedad vigente). No cambia el estado.
+export async function agregarNovedadGrupo(
+  id: string,
+  entrada: { dia: number; motivoId: string | null; observacion: string | null },
+) {
+  const g = await filasHermanas(id)
+  if (!g) return null
+  const lista = agregarNovedad(normalizarNovedades(g.base.novedades), entrada)
+  await prisma.$transaction(
+    g.filas
+      .filter((f) => f.estado === 'PENDIENTE' || f.estado === 'PARCIAL')
+      .map((f) => prisma.actividad.update({
+        where: { id: f.id },
+        data: {
+          novedades: lista as unknown as Prisma.InputJsonValue,
+          motivoId: entrada.motivoId,
+          nota: entrada.observacion,
+        },
+      })),
+  )
+  return true
+}
+
+// Elimina una novedad del log por índice y re-espeja la última restante en motivoId/nota
+// (o las limpia si el log queda vacío).
+export async function eliminarNovedadGrupo(id: string, index: number) {
+  const g = await filasHermanas(id)
+  if (!g) return null
+  const lista = eliminarNovedad(normalizarNovedades(g.base.novedades), index)
+  const ultima = lista[lista.length - 1] ?? null
+  await prisma.$transaction(
+    g.filas
+      .filter((f) => f.estado === 'PENDIENTE' || f.estado === 'PARCIAL')
+      .map((f) => prisma.actividad.update({
+        where: { id: f.id },
+        data: {
+          novedades: lista as unknown as Prisma.InputJsonValue,
+          motivoId: ultima?.motivoId ?? null,
+          nota: ultima?.observacion ?? null,
+        },
+      })),
   )
   return true
 }
