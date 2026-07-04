@@ -1,5 +1,7 @@
 'use client'
 
+import { DEFAULT_AREA } from '@/auth/permisos'
+
 const PANTALLAS: { clave: string; etiqueta: string }[] = [
   { clave: 'tareas', etiqueta: 'Tareas' },
   { clave: 'programar', etiqueta: 'Programar' },
@@ -9,9 +11,9 @@ const PANTALLAS: { clave: string; etiqueta: string }[] = [
   { clave: 'consulta', etiqueta: 'Consulta' },
 ]
 
-// pantallas: CSV guardado (null = set por defecto de área: las 4 menos Tablero)
+// pantallas: CSV guardado (null = set por defecto de área, ver DEFAULT_AREA)
 function setActual(pantallas: string | null): Set<string> {
-  if (pantallas == null) return new Set(['tareas', 'programar', 'cumplimiento', 'resumen'])
+  if (pantallas == null) return new Set<string>(DEFAULT_AREA)
   return new Set(pantallas.split(',').map((c) => c.trim()).filter(Boolean))
 }
 

@@ -2,9 +2,9 @@ import { describe, it, expect } from 'vitest'
 import { seccionesVisibles } from './secciones'
 
 describe('seccionesVisibles', () => {
-  it('AREA por defecto ve 4 (sin tablero ni configuracion)', () => {
+  it('AREA por defecto ve 5 (sin tablero ni configuracion)', () => {
     const claves = seccionesVisibles({ rol: 'AREA', pantallas: null }).map((s) => s.clave)
-    expect(claves.sort()).toEqual(['cumplimiento', 'programar', 'resumen', 'tareas'])
+    expect(claves.sort()).toEqual(['consulta', 'cumplimiento', 'programar', 'resumen', 'tareas'])
   })
 
   it('ADMIN ve también tablero y configuracion', () => {

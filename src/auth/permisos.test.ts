@@ -11,7 +11,7 @@ describe('pantallasDe', () => {
 
   it('AREA sin pantallas usa el set por defecto (sin tablero)', () => {
     const s = pantallasDe({ rol: 'AREA', pantallas: null })
-    expect([...s].sort()).toEqual(['cumplimiento', 'programar', 'resumen', 'tareas'])
+    expect([...s].sort()).toEqual(['consulta', 'cumplimiento', 'programar', 'resumen', 'tareas'])
     expect(s.has('tablero')).toBe(false)
     expect(s.has('configuracion')).toBe(false)
   })
