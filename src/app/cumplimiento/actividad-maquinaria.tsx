@@ -1,10 +1,9 @@
 'use client'
 
-import { useState } from 'react'
 import type { Unidad } from '@/dominio/unidad'
 import type { Estado } from '@/dominio/tipos'
 import { FormAvance } from './form-avance'
-import { FormRegistrar } from './form-registrar'
+import { FormCerrar } from './form-cerrar'
 
 type Motivo = { id: string; nombre: string }
 type Lote = { id: string; nombre: string; hectareas?: number | null; finca: { nombre: string } }
@@ -33,10 +32,11 @@ export function ActividadMaquinaria({
   descripcion,
   registrarAvance,
   marcarCumplida,
-  registrarNovedad,
+  cerrarParcial,
+  noSeHizo,
+  hayPotrerosPendientes,
   devolverAlBanco,
   nota,
-  motivoActualId,
   puedeContinuar,
   continuar,
 }: {
@@ -59,43 +59,15 @@ export function ActividadMaquinaria({
   descripcion?: string
   registrarAvance: (f: FormData) => void | Promise<void>
   marcarCumplida: (f: FormData) => void | Promise<void>
-  registrarNovedad: (f: FormData) => void | Promise<void>
+  cerrarParcial: (f: FormData) => void | Promise<void>
+  noSeHizo: (f: FormData) => void | Promise<void>
+  hayPotrerosPendientes: boolean
   devolverAlBanco: (f: FormData) => void | Promise<void>
   nota: string | null
-  motivoActualId: string | null
   puedeContinuar: boolean
   continuar: (f: FormData) => void | Promise<void>
 }) {
-  const [novedad, setNovedad] = useState(false)
   const esParcial = estado === 'PARCIAL'
-
-  if (novedad) {
-    return (
-      <div>
-        <FormRegistrar
-          actividadId={actividadId}
-          esMaquinaria={true}
-          unidad={unidad}
-          motivos={motivos}
-          motivoCambioId={motivoCambioId}
-          lotes={lotesCatalogo}
-          maquinas={maquinas}
-          estipuladas={estipuladas}
-          haProgramada={haProgramada}
-          lotesActividad={lotesActividad}
-          unidadActual={unidadRealizada}
-          diaActividad={dia}
-          estadoInicial={estado}
-          motivoInicial={motivoActualId ?? ''}
-          notaInicial={nota ?? ''}
-          accion={registrarNovedad}
-        />
-        <button type="button" onClick={() => setNovedad(false)} className="mt-1 text-xs text-tierra underline">
-          cancelar novedad
-        </button>
-      </div>
-    )
-  }
 
   return (
     <div className="flex w-full flex-col gap-3 text-sm">
@@ -114,28 +86,35 @@ export function ActividadMaquinaria({
         unidadActual={unidadRealizada}
         accion={registrarAvance}
       />
-      <div className="flex flex-wrap items-center gap-3">
-        <form action={marcarCumplida}>
-          <input type="hidden" name="id" value={actividadId} />
-          <button className="rounded-lg bg-bosque px-3 py-1 text-sm font-semibold text-white">
-            ✓ {esParcial ? 'Marcar cumplida' : 'Cumplida'}
-          </button>
-        </form>
-        {esParcial && (
-          <form action={devolverAlBanco}>
-            <input type="hidden" name="id" value={actividadId} />
-            <button className="rounded-lg border border-borde px-2 py-1 text-xs text-tierra hover:bg-arena/40">Devolver al banco</button>
-          </form>
-        )}
-        <button type="button" onClick={() => setNovedad(true)} className="text-xs text-tierra underline">
-          {esParcial ? 'registrar/editar novedad' : 'registrar novedad'}
-        </button>
-        {esParcial && puedeContinuar && (
-          <form action={continuar}>
-            <input type="hidden" name="id" value={actividadId} />
-            <button className="rounded-lg border border-bosque px-2 py-1 text-xs font-semibold text-bosque hover:bg-arena/40">Continuar la próxima semana</button>
-          </form>
-        )}
+      <div className="flex flex-col gap-2">
+        <FormCerrar
+          actividadId={actividadId}
+          diaActividad={dia}
+          hayPotrerosPendientes={hayPotrerosPendientes}
+          esMaquinaria={true}
+          motivos={motivos}
+          motivoCambioId={motivoCambioId}
+          estipuladas={estipuladas}
+          lotes={lotesCatalogo}
+          maquinas={maquinas}
+          cumplida={marcarCumplida}
+          cerrarParcial={cerrarParcial}
+          noSeHizo={noSeHizo}
+        />
+        <div className="flex flex-wrap items-center gap-3">
+          {esParcial && (
+            <form action={devolverAlBanco}>
+              <input type="hidden" name="id" value={actividadId} />
+              <button className="rounded-lg border border-borde px-2 py-1 text-xs text-tierra hover:bg-arena/40">Devolver al banco</button>
+            </form>
+          )}
+          {esParcial && puedeContinuar && (
+            <form action={continuar}>
+              <input type="hidden" name="id" value={actividadId} />
+              <button className="rounded-lg border border-bosque px-2 py-1 text-xs font-semibold text-bosque hover:bg-arena/40">Continuar la próxima semana</button>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   )
