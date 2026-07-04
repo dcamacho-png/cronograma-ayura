@@ -6,6 +6,7 @@ const PANTALLAS: { clave: string; etiqueta: string }[] = [
   { clave: 'cumplimiento', etiqueta: 'Cumplimiento' },
   { clave: 'resumen', etiqueta: 'Resumen' },
   { clave: 'tablero', etiqueta: 'Tablero' },
+  { clave: 'consulta', etiqueta: 'Consulta' },
 ]
 
 // pantallas: CSV guardado (null = set por defecto de área: las 4 menos Tablero)

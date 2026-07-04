@@ -14,6 +14,7 @@ export const SECCIONES: Seccion[] = [
   { clave: 'cumplimiento', href: '/cumplimiento', texto: 'Cumplimiento', icono: '✅', descripcion: 'Registrar lo cumplido' },
   { clave: 'resumen', href: '/resumen', texto: 'Resumen', icono: '📊', descripcion: 'Indicadores de la semana' },
   { clave: 'tablero', href: '/tablero', texto: 'Tablero', icono: '📈', descripcion: 'Vista mensual' },
+  { clave: 'consulta', href: '/consulta', texto: 'Consulta', icono: '🔎', descripcion: 'Actividades culminadas del área' },
   { clave: 'configuracion', href: '/configuracion', texto: 'Configuración', icono: '⚙️', descripcion: 'Catálogos y usuarios (solo admin)' },
 ]
 
