@@ -15,8 +15,8 @@ const ESTADO_TXT: Record<string, string> = {
   PENDIENTE: 'Pendiente',
   CUMPLIDA: 'Cumplida',
   PARCIAL: 'Parcial',
-  NO_CUMPLIDA: 'No cumplida',
-  REPROGRAMADA: 'Reprogramada',
+  NO_CUMPLIDA: 'No se hizo',
+  REPROGRAMADA: 'No se hizo',
 }
 
 export type ActividadExport = {

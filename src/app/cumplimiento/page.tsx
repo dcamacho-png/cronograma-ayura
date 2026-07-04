@@ -7,7 +7,7 @@ import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, plazoCum
 import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
 import { unidadDe, unidadAbreviada } from '@/dominio/unidad'
 import { textoLotesHechos } from '@/dominio/lotes-hechos'
-import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, conteoEstadoActividades, tieneDiaPendiente, estadoActividad } from '@/dominio/metricas'
+import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, conteoEstadoActividades, tieneDiaPendiente, estadoActividad, etiquetaEstado } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
 import { textoAvanceConFecha, normalizarAvancePorLote, totalAvanceLotes, lotesPendientes, type AvanceEntrada } from '@/dominio/avance-lote'
 import { normalizarNovedades } from '@/dominio/novedades'
@@ -20,14 +20,6 @@ import { AvancesEditables } from './avances-editables'
 import { NovedadesLista } from './novedades-lista'
 
 const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
-
-const ESTADOS = [
-  { valor: 'PENDIENTE', etiqueta: 'Pendiente' },
-  { valor: 'CUMPLIDA', etiqueta: '✅ Cumplida' },
-  { valor: 'PARCIAL', etiqueta: '🟡 Parcial' },
-  { valor: 'NO_CUMPLIDA', etiqueta: '🔴 No cumplida' },
-  { valor: 'REPROGRAMADA', etiqueta: '🔄 Reprogramada' },
-]
 
 const COLOR_HEX: Record<string, string> = {
   ninguno: 'transparent',
@@ -153,7 +145,7 @@ export default async function CumplimientoPage({
           Cumplido: <b>{pct === null ? '—' : `${pct}%`}</b>
         </span>
         <span className="rounded-lg bg-arena px-3 py-1 text-sm">
-          ✅ <b>{conteoEstado.CUMPLIDA}</b> · 🟡 <b>{conteoEstado.PARCIAL}</b> · 🔴 <b>{conteoEstado.NO_CUMPLIDA}</b> · 🔄 <b>{conteoEstado.REPROGRAMADA}</b>{' '}
+          ✅ <b>{conteoEstado.CUMPLIDA}</b> · 🟡 <b>{conteoEstado.PARCIAL}</b> · 🔴 <b>{conteoEstado.NO_CUMPLIDA + conteoEstado.REPROGRAMADA}</b> No se hizo{' '}
           <span className="text-tierra">de {totalActividades}</span>
         </span>
       </div>
@@ -235,7 +227,7 @@ export default async function CumplimientoPage({
                       lotesPendientes(cab.lotes, avances, cab.lotesHechos as string[] | null).length > 0)
                   const unidadStd = cab.unidadRealizada ?? unidadAbreviada(unidad)
                   const resumenAvances = textoAvanceConFecha(cab.lotes, avances, unidadStd, etiquetaDia)
-                  const interactivo = estadoGrupo === 'PENDIENTE' || estadoGrupo === 'PARCIAL'
+                  const interactivo = !cab.cerrada && (estadoGrupo === 'PENDIENTE' || estadoGrupo === 'PARCIAL')
                   const etiquetaPorDia = [0, 1, 2, 3, 4, 5, 6, 7].map((d) => (d === 0 ? '' : etiquetaDia(d)))
                   const entradasAvance = cab.lotes.flatMap((l) =>
                     (avances[l.id] ?? []).map((e, index) => ({
@@ -259,7 +251,7 @@ export default async function CumplimientoPage({
                       {/* Estado/resumen (no PENDIENTE): solo lectura */}
                       {estadoGrupo !== 'PENDIENTE' && (
                         <div className="flex flex-wrap items-center gap-2 text-sm">
-                          <span className="font-semibold">{ESTADOS.find((e) => e.valor === estadoGrupo)?.etiqueta ?? estadoGrupo}</span>
+                          <span className="font-semibold">{etiquetaEstado(estadoGrupo)}</span>
                           {(tieneAvances || cab.haRealizada != null) && (
                             <span className="text-tierra">· {tieneAvances ? totalAvanceLotes(cab.lotes, avances) : cab.haRealizada} {unidadStd}</span>
                           )}

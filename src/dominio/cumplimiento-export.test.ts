@@ -45,7 +45,7 @@ describe('filasCumplimiento — sin avances (una fila, como antes)', () => {
   })
   it('sin medida deja medida y unidad vacías; traduce el estado', () => {
     expect(filasCumplimiento(act({ haRealizada: null, estado: 'NO_CUMPLIDA' }), '', mapa, ctx)).toEqual([
-      ['Lun', '', 'Ana', 'ENCALADORA', '6603', 'L1', '', 'No cumplida', '', '', '', '', '', '', '', ''],
+      ['Lun', '', 'Ana', 'ENCALADORA', '6603', 'L1', '', 'No se hizo', '', '', '', '', '', '', '', ''],
     ])
   })
   it('descripción fuera del catálogo → ha; máquina y lotes vacíos; día 3 = Mié', () => {
@@ -195,7 +195,7 @@ describe('filasCumplimiento — Finca y Observación (columnas nuevas)', () => {
     expect(
       filasCumplimiento(act({ estado: 'NO_CUMPLIDA', haRealizada: null, finca: { nombre: 'La Esperanza' }, nota: 'Cambiada por: Riego' }), '', mapa, ctx),
     ).toEqual([
-      ['Lun', '', 'Ana', 'ENCALADORA', '6603', 'L1', 'La Esperanza', 'No cumplida', '', '', '', '', '', '', 'Cambiada por: Riego', ''],
+      ['Lun', '', 'Ana', 'ENCALADORA', '6603', 'L1', 'La Esperanza', 'No se hizo', '', '', '', '', '', '', 'Cambiada por: Riego', ''],
     ])
   })
   it('finca en cada fila de avance', () => {

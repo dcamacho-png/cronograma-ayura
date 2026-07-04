@@ -9,11 +9,10 @@ import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
 import { unidadDe, unidadAbreviada, type Unidad } from '@/dominio/unidad'
 
 const ESTADOS_ORDEN = [
-  { v: 'CUMPLIDA', etq: '✅ Cumplidas' },
-  { v: 'PARCIAL', etq: '🟡 Parciales' },
-  { v: 'NO_CUMPLIDA', etq: '🔴 No cumplidas' },
-  { v: 'REPROGRAMADA', etq: '🔄 Reprogramadas' },
-  { v: 'PENDIENTE', etq: '⏳ Pendientes' },
+  { v: ['CUMPLIDA'], etq: '✅ Cumplidas' },
+  { v: ['PARCIAL'], etq: '🟡 Parciales' },
+  { v: ['NO_CUMPLIDA', 'REPROGRAMADA'], etq: '🔴 No se hizo' },
+  { v: ['PENDIENTE'], etq: '⏳ Pendientes' },
 ]
 
 const COLOR_HEX: Record<string, string> = {
@@ -167,14 +166,13 @@ export function ResumenArea({
       <div className="mb-8 flex flex-wrap gap-3 text-sm">
         <span className="chip-estado chip-cumplida">✅ Cumplidas: <b>{conteo.CUMPLIDA}</b></span>
         <span className="chip-estado chip-parcial">🟡 Parciales: <b>{conteo.PARCIAL}</b></span>
-        <span className="chip-estado chip-nocumplida">🔴 No cumplidas: <b>{conteo.NO_CUMPLIDA}</b></span>
-        <span className="chip-estado chip-reprogramada">🔄 Reprogramadas: <b>{conteo.REPROGRAMADA}</b></span>
+        <span className="chip-estado chip-nocumplida">🔴 No se hizo: <b>{conteo.NO_CUMPLIDA + conteo.REPROGRAMADA}</b></span>
         <span className="chip-estado chip-pendiente">⏳ Pendientes: <b>{conteo.PENDIENTE}</b></span>
       </div>
 
       <div className="mb-8 space-y-3">
         {ESTADOS_ORDEN.map(({ v, etq }) => {
-          const acts = actividadesUnicas.filter((a) => a.estado === v)
+          const acts = actividadesUnicas.filter((a) => v.includes(a.estado))
           if (acts.length === 0) return null
           const grupos = new Map<string, { descripcion: string; lotes: string[]; maquinas: Set<string>; conteo: number }>()
           for (const a of acts) {
@@ -187,7 +185,7 @@ export function ResumenArea({
           }
           const items = [...grupos.values()]
           return (
-            <div key={v}>
+            <div key={v.join(',')}>
               <div className="text-sm font-semibold text-tinta">{etq} ({acts.length})</div>
               <ul className="ml-4 list-disc text-sm text-tierra">
                 {items.map((g, i) => (
