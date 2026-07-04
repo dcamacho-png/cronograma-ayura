@@ -11,7 +11,7 @@ import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistint
 import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
 import { textoAvanceConFecha, normalizarAvancePorLote, totalAvanceLotes, lotesPendientes, type AvanceEntrada } from '@/dominio/avance-lote'
 import { normalizarNovedades } from '@/dominio/novedades'
-import { agregarActividadRealizadaAccion, devolverAlBancoAccion, registrarMedidaGeneralAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion, setLotesActividadAccion, registrarAvanceAccion, continuarParcialAccion, editarAvanceAccion, eliminarAvanceAccion, agregarNovedadAccion, editarNovedadAccion, eliminarNovedadAccion } from './acciones'
+import { agregarActividadRealizadaAccion, devolverAlBancoAccion, registrarMedidaGeneralAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion, setLotesActividadAccion, registrarAvanceAccion, continuarParcialAccion, cerrarParcialAccion, reabrirCierreAccion, editarAvanceAccion, eliminarAvanceAccion, agregarNovedadAccion, editarNovedadAccion, eliminarNovedadAccion } from './acciones'
 import { FormActividadRealizada } from './form-actividad-realizada'
 import { InfoLotes } from '../_componentes/info-lotes'
 import { ActividadEstandar } from './actividad-estandar'
@@ -228,6 +228,9 @@ export default async function CumplimientoPage({
                   const unidadStd = cab.unidadRealizada ?? unidadAbreviada(unidad)
                   const resumenAvances = textoAvanceConFecha(cab.lotes, avances, unidadStd, etiquetaDia)
                   const interactivo = !cab.cerrada && (estadoGrupo === 'PENDIENTE' || estadoGrupo === 'PARCIAL')
+                  const hayPotrerosPendientes =
+                    cab.lotes.length > 0 &&
+                    lotesPendientes(cab.lotes, avances, cab.lotesHechos as string[] | null).length > 0
                   const etiquetaPorDia = [0, 1, 2, 3, 4, 5, 6, 7].map((d) => (d === 0 ? '' : etiquetaDia(d)))
                   const entradasAvance = cab.lotes.flatMap((l) =>
                     (avances[l.id] ?? []).map((e, index) => ({
@@ -261,12 +264,26 @@ export default async function CumplimientoPage({
                           {textoLotesHechos(cab.lotes, cab.lotesHechos as string[] | null) && (
                             <span className="text-tierra">· ✅ Realizados: {textoLotesHechos(cab.lotes, cab.lotesHechos as string[] | null)}</span>
                           )}
-                          {estadoGrupo !== 'PARCIAL' && !bloqueado && (
-                            <form action={desmarcarActividadAccion} className="ml-auto">
-                              <input type="hidden" name="id" value={cab.id} />
-                              <button className="text-xs text-tierra underline hover:text-tinta">↩ desmarcar</button>
-                            </form>
-                          )}
+                          <div className="ml-auto flex flex-wrap items-center gap-2">
+                            {cab.cerrada && !bloqueado && (
+                              <form action={reabrirCierreAccion}>
+                                <input type="hidden" name="id" value={cab.id} />
+                                <button className="rounded-lg border border-bosque px-2 py-1 text-xs font-semibold text-bosque hover:bg-arena/40">Reabrir</button>
+                              </form>
+                            )}
+                            {cab.cerrada && estadoGrupo === 'PARCIAL' && puedeContinuar && !bloqueado && (
+                              <form action={continuarParcialAccion}>
+                                <input type="hidden" name="id" value={cab.id} />
+                                <button className="rounded-lg border border-bosque px-2 py-1 text-xs font-semibold text-bosque hover:bg-arena/40">Continuar la próxima semana</button>
+                              </form>
+                            )}
+                            {estadoGrupo !== 'PARCIAL' && !bloqueado && (
+                              <form action={desmarcarActividadAccion}>
+                                <input type="hidden" name="id" value={cab.id} />
+                                <button className="text-xs text-tierra underline hover:text-tinta">↩ desmarcar</button>
+                              </form>
+                            )}
+                          </div>
                         </div>
                       )}
                       {interactivo && !bloqueado ? (
@@ -320,9 +337,10 @@ export default async function CumplimientoPage({
                             nota={cab.nota}
                             registrarAvance={registrarAvanceAccion}
                             marcarCumplida={marcarCumplidaActividadAccion}
-                            registrarNovedad={registrarNovedadActividadAccion}
+                            cerrarParcial={cerrarParcialAccion}
+                            noSeHizo={registrarNovedadActividadAccion}
+                            hayPotrerosPendientes={hayPotrerosPendientes}
                             devolverAlBanco={devolverAlBancoAccion}
-                            motivoActualId={cab.motivo?.id ?? null}
                             puedeContinuar={puedeContinuar}
                             continuar={continuarParcialAccion}
                           />
@@ -347,10 +365,11 @@ export default async function CumplimientoPage({
                             registrarAvance={registrarAvanceAccion}
                             registrarMedidaGeneral={registrarMedidaGeneralAccion}
                             marcarCumplida={marcarCumplidaActividadAccion}
-                            registrarNovedad={registrarNovedadActividadAccion}
+                            cerrarParcial={cerrarParcialAccion}
+                            noSeHizo={registrarNovedadActividadAccion}
+                            hayPotrerosPendientes={hayPotrerosPendientes}
                             devolverAlBanco={devolverAlBancoAccion}
                             editarPotreros={setLotesActividadAccion}
-                            motivoActualId={cab.motivo?.id ?? null}
                             puedeContinuar={puedeContinuar}
                             continuar={continuarParcialAccion}
                           />
