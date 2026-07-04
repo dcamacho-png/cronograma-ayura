@@ -389,15 +389,56 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
 
 ---
 
-### Task 3: `agregarNovedadAccion` — leer campos de reemplazo y pasarlos
+### Task 3: `leerReemplazo` compartido + `agregarNovedadAccion`
 
 **Files:**
 - Modify: `src/app/cumplimiento/acciones.ts`
 
 **Interfaces:**
 - Consumes: `agregarNovedadGrupo(id, entrada, reemplazo?)` (Task 2).
+- Produces: `leerReemplazo(form: FormData, diaFallback?: number)` → objeto reemplazo `{descripcion, unidad, loteIds, medida, bultos, dia}` o `null`. Reutilizado por `registrarNovedadActividadAccion` y `agregarNovedadAccion` (evita duplicar el parseo).
 
-- [ ] **Step 1: Reescribir `agregarNovedadAccion`**
+- [ ] **Step 1: Añadir el helper `leerReemplazo`**
+
+En `src/app/cumplimiento/acciones.ts`, después del helper `unidadElegida` (línea ~120), añadir:
+
+```ts
+// Lee el bloque de "cambio" (reemplazo) del form con los name-s del contrato. Devuelve null si
+// no hay descripción. El día sale de `reemplazoDia`; si no viene válido (1-7), usa `diaFallback`.
+function leerReemplazo(form: FormData, diaFallback?: number) {
+  const sel = texto(form, 'reemplazoDescripcion')
+  const descripcion = sel === '__otra__' ? texto(form, 'reemplazoDescripcionOtra') : sel
+  if (!descripcion) return null
+  const unidadSel = texto(form, 'reemplazoUnidad')
+  const unidad = unidadSel === 'otro' ? texto(form, 'reemplazoUnidadOtra') || 'otro' : unidadSel || 'ha'
+  const loteIds = form.getAll('reemplazoLoteId').map(String).filter(Boolean)
+  const medida: Record<string, number> = {}
+  const bultos: Record<string, number> = {}
+  for (const lid of loteIds) {
+    const m = numeroOpcional(form, `reemplazoMedida_${lid}`)
+    if (m != null) medida[lid] = m
+    const b = numeroOpcional(form, `reemplazoBultos_${lid}`)
+    if (b != null) bultos[lid] = b
+  }
+  const diaNum = Number(texto(form, 'reemplazoDia'))
+  const dia = diaNum >= 1 && diaNum <= 7 ? diaNum : diaFallback
+  return { descripcion, unidad, loteIds, medida, bultos, dia }
+}
+```
+
+- [ ] **Step 2: Refactorizar `registrarNovedadActividadAccion` para usar `leerReemplazo`**
+
+En `registrarNovedadActividadAccion`, reemplazar TODO el bloque de parseo del reemplazo (líneas ~213-232: desde el comentario `// Cambio de actividad: …` hasta la construcción de `const reemplazo = reemplazoDescripcion ? … : null`) por una sola línea:
+
+```ts
+  const reemplazo = leerReemplazo(form)
+```
+
+(Sin `diaFallback`: si no viene `reemplazoDia` válido, `dia` queda `undefined` y `crearActividadReemplazo` usa `base.dia` — comportamiento idéntico al actual.)
+
+El resto de `registrarNovedadActividadAccion` (guardas de `estado`/`motivoId`, `nota`, `lotesHechos`, `setUnidadRealizadaGrupo`, `registrarNovedadGrupo(...)`, `revalidatePath`) queda igual.
+
+- [ ] **Step 3: Reescribir `agregarNovedadAccion`**
 
 Reemplazar la función `agregarNovedadAccion` (líneas ~173-183) por:
 
@@ -409,41 +450,25 @@ export async function agregarNovedadAccion(form: FormData) {
   if (await bloqueadoPorPlazoActividad(id)) return
   const motivoId = textoOpcional(form, 'motivoId')
   const observacion = textoOpcional(form, 'observacion')
-  // Bloque de cambio (opcional): si llega una descripción de reemplazo, se crea la actividad
-  // "En reemplazo de…" con los mismos name-s que usa el cierre. El día del reemplazo es el de
-  // la novedad (este formulario no envía reemplazoDia).
-  const reemplazoSel = texto(form, 'reemplazoDescripcion')
-  const reemplazoDescripcion = reemplazoSel === '__otra__' ? texto(form, 'reemplazoDescripcionOtra') : reemplazoSel
-  const reemplazoUnidadSel = texto(form, 'reemplazoUnidad')
-  const reemplazoUnidad = reemplazoUnidadSel === 'otro' ? texto(form, 'reemplazoUnidadOtra') || 'otro' : reemplazoUnidadSel || 'ha'
-  const reemplazoLoteIds = form.getAll('reemplazoLoteId').map(String).filter(Boolean)
-  const reemplazoMedida: Record<string, number> = {}
-  const reemplazoBultos: Record<string, number> = {}
-  for (const lid of reemplazoLoteIds) {
-    const m = numeroOpcional(form, `reemplazoMedida_${lid}`)
-    if (m != null) reemplazoMedida[lid] = m
-    const b = numeroOpcional(form, `reemplazoBultos_${lid}`)
-    if (b != null) reemplazoBultos[lid] = b
-  }
-  const reemplazo = reemplazoDescripcion
-    ? { descripcion: reemplazoDescripcion, unidad: reemplazoUnidad, loteIds: reemplazoLoteIds, medida: reemplazoMedida, bultos: reemplazoBultos, dia }
-    : null
+  // Bloque de cambio (opcional): el día del reemplazo es el de la novedad (este formulario no
+  // envía reemplazoDia, así que leerReemplazo usa el diaFallback).
+  const reemplazo = leerReemplazo(form, dia)
   if (!motivoId && !observacion && !reemplazo) return
   await agregarNovedadGrupo(id, { dia, motivoId, observacion }, reemplazo)
   revalidatePath('/cumplimiento')
 }
 ```
 
-- [ ] **Step 2: Typecheck + build**
+- [ ] **Step 4: Typecheck + build**
 
 Run: `npx tsc --noEmit -p tsconfig.check.json` → sin errores.
 Run: `DB=$(grep -oE "postgresql://[^'\"]+" .claude/settings.local.json | head -1); DATABASE_URL="$DB" npx next build` → `✓ Compiled successfully`.
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 5: Commit**
 
 ```bash
 git add src/app/cumplimiento/acciones.ts
-git commit -m "feat(cumplimiento): agregarNovedadAccion lee el bloque de cambio y crea el reemplazo
+git commit -m "feat(cumplimiento): leerReemplazo compartido + agregarNovedadAccion crea el reemplazo
 
 Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
 ```
