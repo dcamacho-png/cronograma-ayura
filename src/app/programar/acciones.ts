@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearResponsable, actualizarActividad, asignarTarea, quitarSeleccionTarea, devolverAAsignacion, devolverGrillaAlBanco } from '@/datos/repositorio'
 import { semanaAnterior, esSemanaPasada, semanaActual, diaActual, esDiaPasado, esSemanaFutura } from '@/dominio/semana'
+import type { Asignacion } from '@/dominio/programacion'
 
 const DIAS_CORTOS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
@@ -92,27 +93,38 @@ export async function asignarTareaAccion(form: FormData) {
   const anioForm = Number(texto(form, 'anio'))
   const semanaForm = Number(texto(form, 'semana'))
   const hoy = { ...semanaActual(), dia: diaActual() }
-  const dias = form
-    .getAll('dia')
-    .map((v) => Number(String(v)))
-    .filter((d) => Number.isInteger(d) && d >= 1 && d <= 7)
-    .filter((d) => !esDiaPasado(anioForm, semanaForm, d, hoy))
   const loteId = textoOpcional(form, 'loteId')
-  const turno = texto(form, 'turno')
   const esMaquinaria = texto(form, 'esMaquinaria') === '1'
-  const maquinaPorDia: Record<number, string | null> = {}
-  for (const dia of dias) {
-    const m = textoOpcional(form, `maquina_${dia}`)
-    maquinaPorDia[dia] = m || null
+
+  const nombres: Record<string, string> = {}
+  const asignaciones: Asignacion[] = []
+  for (const rid of responsableIds) {
+    nombres[rid] = texto(form, `respNombre_${rid}`)
+    const dias = form
+      .getAll(`dia_${rid}`)
+      .map((v) => Number(String(v)))
+      .filter((d) => Number.isInteger(d) && d >= 1 && d <= 7)
+      .filter((d) => !esDiaPasado(anioForm, semanaForm, d, hoy))
+    if (dias.length === 0) continue
+    const turno = texto(form, `turno_${rid}`)
+    const maquinaPorDia: Record<number, string | null> = {}
+    for (const dia of dias) {
+      maquinaPorDia[dia] = textoOpcional(form, `maquina_${rid}_${dia}`) || null
+    }
+    asignaciones.push({ responsableId: rid, dias, turno, maquinaPorDia })
   }
-  if (!tareaId || responsableIds.length === 0 || dias.length === 0) return
-  const res = await asignarTarea(tareaId, responsableIds, dias, loteId, turno, maquinaPorDia, esMaquinaria)
+
+  if (!tareaId || asignaciones.length === 0) return
+  const res = await asignarTarea(tareaId, asignaciones, loteId, esMaquinaria)
   if (res.ok === false && res.motivo === 'conflicto') {
-    const partes = res.conflictos.map((c) =>
-      c.tipo === 'responsable'
-        ? `${DIAS_CORTOS[c.dia]}: el responsable ya tiene una tarea en ese turno`
-        : `${DIAS_CORTOS[c.dia]}: la máquina ya está ocupada en ese turno`,
-    )
+    const partes = res.conflictos.map((c) => {
+      const nombre = (c.responsableId && nombres[c.responsableId]) || 'Responsable'
+      const detalle =
+        c.tipo === 'responsable'
+          ? 'ya tiene una tarea en ese turno'
+          : 'la máquina ya está ocupada en ese turno'
+      return `${nombre} — ${DIAS_CORTOS[c.dia]}: ${detalle}`
+    })
     const msg = `No se asignó. ${partes.join(' · ')}`
     const areaId = texto(form, 'areaId')
     const anio = texto(form, 'anio')
