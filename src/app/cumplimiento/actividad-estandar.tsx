@@ -88,6 +88,7 @@ export function ActividadEstandar({
           haProgramada={0}
           lotesActividad={lotesActividad}
           unidadActual={unidadRealizada}
+          diaActividad={dia}
           estadoInicial={estado}
           motivoInicial={motivoActualId ?? ''}
           notaInicial={nota ?? ''}

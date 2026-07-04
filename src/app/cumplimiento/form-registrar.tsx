@@ -22,6 +22,7 @@ export function FormRegistrar({
   haProgramada,
   lotesActividad,
   unidadActual,
+  diaActividad,
   estadoInicial = '',
   motivoInicial = '',
   notaInicial = '',
@@ -38,6 +39,7 @@ export function FormRegistrar({
   haProgramada: number
   lotesActividad: { id: string; nombre: string; hectareas?: number | null }[]
   unidadActual?: string | null
+  diaActividad: number
   estadoInicial?: string
   motivoInicial?: string
   notaInicial?: string
@@ -47,6 +49,7 @@ export function FormRegistrar({
   const [motivoId, setMotivoId] = useState(motivoInicial)
   const [reemplazoDesc, setReemplazoDesc] = useState('')
   const [reemplazoUnidadSel, setReemplazoUnidadSel] = useState('Jornales')
+  const [reemplazoDia, setReemplazoDia] = useState(String(diaActividad))
   const [centroCosto, setCentroCosto] = useState('')
   const [anexados, setAnexados] = useState<{ id: string; nombre: string; hectareas?: number | null }[]>([])
   const [fincaAnexar, setFincaAnexar] = useState('')
@@ -55,6 +58,7 @@ export function FormRegistrar({
   const requierePotreros = (estado === 'PARCIAL' || estado === 'REPROGRAMADA') && lotesActividad.length > 1
   const esCambio = estado !== '' && motivoId !== '' && motivoId === motivoCambioId
   const UNIDADES = ['Ha', 'Hora', 'Kg', 'Cantidad', 'Bultos', 'Jornales'] // + "Otro"
+  const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
   const conocidaU = UNIDADES.find((u) => u.toLowerCase() === (unidadActual ?? '').toLowerCase())
   const [unidadSel, setUnidadSel] = useState(conocidaU ?? (unidadActual ? 'Otro' : (esMaquinaria ? 'Ha' : 'Cantidad')))
   const filasPotreros = [...lotesActividad, ...anexados]
@@ -257,6 +261,12 @@ export function FormRegistrar({
               )}
             </>
           )}
+          <label className="flex flex-col text-xs">
+            Día *
+            <select name="reemplazoDia" value={reemplazoDia} onChange={(e) => setReemplazoDia(e.target.value)} className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
+              {[1, 2, 3, 4, 5, 6, 7].map((d) => (<option key={d} value={d}>{DIAS[d]}</option>))}
+            </select>
+          </label>
           <label className="flex w-full flex-col text-xs">
             Potreros (marca y pon medida{usaBultos(reemplazoDesc) ? ' + bultos' : ''})
             <PickerReemplazoPotreros

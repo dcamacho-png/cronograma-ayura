@@ -204,8 +204,10 @@ export async function registrarNovedadActividadAccion(form: FormData) {
     const b = numeroOpcional(form, `reemplazoBultos_${lid}`)
     if (b != null) reemplazoBultos[lid] = b
   }
+  const reemplazoDiaNum = Number(texto(form, 'reemplazoDia'))
+  const reemplazoDia = reemplazoDiaNum >= 1 && reemplazoDiaNum <= 7 ? reemplazoDiaNum : undefined
   const reemplazo = reemplazoDescripcion
-    ? { descripcion: reemplazoDescripcion, unidad: reemplazoUnidad, loteIds: reemplazoLoteIds, medida: reemplazoMedida, bultos: reemplazoBultos }
+    ? { descripcion: reemplazoDescripcion, unidad: reemplazoUnidad, loteIds: reemplazoLoteIds, medida: reemplazoMedida, bultos: reemplazoBultos, dia: reemplazoDia }
     : null
   await setUnidadRealizadaGrupo(id, unidadElegida(form))
   await registrarNovedadGrupo(id, estado, motivoId, nota, reemplazo, lotesHechos)

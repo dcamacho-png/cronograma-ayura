@@ -844,7 +844,7 @@ export async function registrarNovedadGrupo(
   estado: string,
   motivoId: string | null,
   nota: string | null,
-  reemplazo?: { descripcion: string; unidad?: string | null; loteIds?: string[]; medida?: Record<string, number>; bultos?: Record<string, number> } | null,
+  reemplazo?: { descripcion: string; unidad?: string | null; loteIds?: string[]; medida?: Record<string, number>; bultos?: Record<string, number>; dia?: number | null } | null,
   lotesHechos: string[] = [],
 ) {
   const g = await filasHermanas(id)
@@ -889,7 +889,7 @@ export async function registrarNovedadGrupo(
         data: {
           anio: g.base.anio,
           semana: g.base.semana,
-          dia: g.base.dia,
+          dia: reemplazo.dia ?? g.base.dia,
           descripcion: reemplazo.descripcion,
           turno: g.base.turno,
           estado: 'CUMPLIDA',

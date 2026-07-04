@@ -84,6 +84,7 @@ export function ActividadMaquinaria({
           haProgramada={haProgramada}
           lotesActividad={lotesActividad}
           unidadActual={unidadRealizada}
+          diaActividad={dia}
           estadoInicial={estado}
           motivoInicial={motivoActualId ?? ''}
           notaInicial={nota ?? ''}
