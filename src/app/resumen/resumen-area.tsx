@@ -145,7 +145,7 @@ export function ResumenArea({
       </div>
 
       {/* Cuadros-resumen */}
-      <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-5">
+      <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
         <div className="tarjeta p-5">
           <div className="mb-1 text-sm text-tierra">Cumplimiento</div>
           <div className="text-4xl font-extrabold" style={{ color: COLOR_HEX[colorPorcentaje(pct)] }}>{pct === null ? '—' : `${pct}%`}</div>
@@ -153,6 +153,10 @@ export function ResumenArea({
         <div className="tarjeta p-5">
           <div className="mb-1 text-sm text-tierra">Cumplidas</div>
           <div className="text-4xl font-extrabold">{conteo.CUMPLIDA}<span className="text-2xl font-semibold text-tierra">/{totalActividades}</span></div>
+        </div>
+        <div className="tarjeta p-5">
+          <div className="mb-1 text-sm text-tierra">Parciales</div>
+          <div className="text-4xl font-extrabold" style={{ color: COLOR_HEX[conteo.PARCIAL > 0 ? 'amarillo' : 'verde'] }}>{conteo.PARCIAL}</div>
         </div>
         <div className="tarjeta p-5">
           <div className="mb-1 text-sm text-tierra">No se hizo</div>
