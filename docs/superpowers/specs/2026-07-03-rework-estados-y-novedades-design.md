@@ -36,11 +36,12 @@ Reemplaza el modelo actual donde "Parcial" es una opción manual de novedad, "No
 
 ### A. Historial de novedades (log)
 
-- Nuevo campo JSON `novedades` en `Actividad`: lista de `{ dia: number; motivo: string | null; observacion: string | null }` (motivo como **nombre** snapshot, para render simple). Patrón como `avancePorLote`; se escribe en las filas abiertas del grupo.
-- Helpers puros (`dominio/novedades.ts`, con tests): `agregarNovedad(lista, entrada)`, `eliminarNovedad(lista, index)`, `normalizarNovedades(json)`.
-- Repo (grupo): `agregarNovedadGrupo(id, { dia, motivo, observacion })` (append en filas abiertas), `eliminarNovedadGrupo(id, index)`. Además, al fijar una novedad se **espeja la última** en `motivoId`/`nota` de la actividad (mantiene /resumen y export sin cambios). `motivoId` requiere resolver el id desde el nombre o recibirlo; el repo recibe `motivoId` + `motivoNombre` (el form envía ambos).
-- Acciones: `agregarNovedadAccion`, `eliminarNovedadAccion` (con guardia de plazo + revalidate).
-- UI: en la tarjeta, la sección de estado muestra la **lista** de novedades ("día · motivo · observación") con **×** para borrar cada una (solo si la actividad está abierta y sin plazo vencido). Un botón/enlace **"+ Novedad"** abre un mini-form (día + motivo [catálogo] + observación) que agrega al log sin cambiar el estado.
+**Ya construido (tanda 1, en `master`):** campo JSON `novedades` = lista de `{ dia; motivoId; observacion }` (patrón `avancePorLote`, escrito en filas abiertas); helpers `normalizarNovedades`/`agregarNovedad`/`eliminarNovedad`; repo `agregarNovedadGrupo`/`eliminarNovedadGrupo` (SIN espejo a `motivoId`/`nota` — se quitó por colisión con la nota del avance); acciones `agregarNovedadAccion`/`eliminarNovedadAccion`; componente `NovedadesLista` con "+ Novedad" (día + motivo + observación) y × borrar. Registrar una novedad NO cambia el estado. El motivo se resuelve a nombre en `page.tsx` (mapa de `motivos`).
+
+**Lo que agrega la tanda 2 (unificación + editar):**
+- **Unificar:** el "+ Novedad" es el **único** registro de novedades. Se **elimina** el viejo botón "registrar/editar novedad" (el `FormRegistrar` que cambiaba el estado). Su parte de cambio-de-estado y de reemplazo/cambio se mueve a "Cerrar actividad" (sección B).
+- **Editar una novedad:** además de borrar (×), cada entrada del log tiene **✏️ editar** (día + motivo + observación), como en los avances editables. Nuevo helper `editarNovedad(lista, index, cambios)`, repo `editarNovedadGrupo(id, index, { dia, motivoId, observacion })`, acción `editarNovedadAccion`, y edición en línea en `NovedadesLista`.
+- **Diseño más completo:** el mini-form de "+ Novedad" pasa a una presentación de formulario consistente con el resto (labels y estilo tipo `FormRegistrar`), no un mini-form pelado. Conserva su funcionamiento (agregar varias, cada una con su día).
 
 ### B. Cierre con elección (bloquea)
 
@@ -70,11 +71,11 @@ Reemplaza el modelo actual donde "Parcial" es una opción manual de novedad, "No
 
 ## Testing
 
-- **Dominio (Vitest):** `novedades.ts` (agregar/eliminar/normalizar); `etiquetaEstado` (NO_CUMPLIDA y REPROGRAMADA → "No se hizo"); ajustar tests existentes de `conteoEstado`/`resumen` que asuman las etiquetas separadas.
+- **Dominio (Vitest):** `novedades.ts` — nuevo `editarNovedad` (cambia solo los campos dados; fuera de rango sin cambios; inmutable); `etiquetaEstado` (NO_CUMPLIDA y REPROGRAMADA → "No se hizo"); ajustar tests existentes de `conteoEstado`/`resumen` que asuman las etiquetas separadas. (agregar/eliminar/normalizar ya están de tanda 1.)
 - **Repo:** typecheck fiable (`npx tsc --noEmit -p tsconfig.check.json`); verificación de que NO_CUMPLIDA ya no devuelve al banco (test de `registrarNovedadGrupo`/nueva función si es puro; si no, verificación en vivo).
 - **UI:** typecheck + `next build` + verificación en vivo (preview).
 - **Manual (preview):**
-  1. "+ Novedad" agrega razones a una Pendiente/Parcial sin cambiar el estado; se listan; se borran con ×.
+  1. "+ Novedad" (formulario completo) agrega razones a una Pendiente/Parcial sin cambiar el estado; se listan; cada una se **edita** (✏️) o **borra** (×). Ya no existe el viejo botón "registrar/editar novedad" que cambiaba el estado.
   2. "Cerrar actividad": Cumplida siempre elegible (con confirmación si hay potreros pendientes); al cerrar (cualquier resultado) la tarjeta queda **bloqueada** (solo lectura); "No se hizo" con reprogramar=sí vuelve al banco, reprogramar=no queda cerrada y NO vuelve.
   3. "Reabrir" una actividad cerrada quita el bloqueo conservando avances/novedades; "Continuar la próxima semana" aparece en la Parcial cerrada y crea la de la semana siguiente con los pendientes.
   4. Contador y /resumen muestran un solo "No se hizo".
