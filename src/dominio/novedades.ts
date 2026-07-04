@@ -27,3 +27,18 @@ export function eliminarNovedad(lista: NovedadEntrada[], index: number): Novedad
   if (index < 0 || index >= lista.length) return lista
   return lista.filter((_, i) => i !== index)
 }
+
+// Devuelve una copia de la lista con la entrada `index` modificada en los campos dados.
+// Fuera de rango ⇒ devuelve la misma lista.
+export function editarNovedad(
+  lista: NovedadEntrada[],
+  index: number,
+  cambios: { dia?: number; motivoId?: string | null; observacion?: string | null },
+): NovedadEntrada[] {
+  if (index < 0 || index >= lista.length) return lista
+  return lista.map((e, i) => (i === index ? {
+    dia: cambios.dia ?? e.dia,
+    motivoId: cambios.motivoId !== undefined ? cambios.motivoId : e.motivoId,
+    observacion: cambios.observacion !== undefined ? cambios.observacion : e.observacion,
+  } : e))
+}

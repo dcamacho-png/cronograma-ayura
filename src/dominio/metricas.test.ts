@@ -448,3 +448,17 @@ describe('conteoEstadoActividades', () => {
     })
   })
 })
+
+import { etiquetaEstado } from './metricas'
+
+describe('etiquetaEstado', () => {
+  it('une No cumplida y Reprogramada en "No se hizo"', () => {
+    expect(etiquetaEstado('NO_CUMPLIDA')).toBe('No se hizo')
+    expect(etiquetaEstado('REPROGRAMADA')).toBe('No se hizo')
+  })
+  it('el resto de estados', () => {
+    expect(etiquetaEstado('PENDIENTE')).toBe('Pendiente')
+    expect(etiquetaEstado('CUMPLIDA')).toBe('Cumplida')
+    expect(etiquetaEstado('PARCIAL')).toBe('Parcial')
+  })
+})

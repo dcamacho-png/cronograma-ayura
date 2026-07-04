@@ -34,6 +34,19 @@ export function pesoEstado(estado: Estado): number | null {
   }
 }
 
+// Etiqueta de display del estado. NO_CUMPLIDA y REPROGRAMADA se muestran juntas
+// como "No se hizo" (un solo bucket en pantalla y reportes).
+export function etiquetaEstado(estado: Estado): string {
+  switch (estado) {
+    case 'PENDIENTE': return 'Pendiente'
+    case 'CUMPLIDA': return 'Cumplida'
+    case 'PARCIAL': return 'Parcial'
+    case 'NO_CUMPLIDA':
+    case 'REPROGRAMADA':
+      return 'No se hizo'
+  }
+}
+
 // Agrupa filas-día en actividades: misma tareaId = una actividad;
 // sin tareaId, cada fila es su propia actividad (clave `solo:${id}`).
 // Genérico para reutilizarse también sobre filas de Prisma en la UI.
