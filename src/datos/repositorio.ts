@@ -15,7 +15,7 @@ import {
   type AvanceEntrada,
 } from '@/dominio/avance-lote'
 import { siguienteSemana } from '@/dominio/semana'
-import { normalizarNovedades, agregarNovedad, eliminarNovedad } from '@/dominio/novedades'
+import { normalizarNovedades, agregarNovedad, eliminarNovedad, editarNovedad } from '@/dominio/novedades'
 
 export function listarAreas() {
   return prisma.area.findMany({ orderBy: { nombre: 'asc' } })
@@ -771,6 +771,45 @@ export async function eliminarNovedadGrupo(id: string, index: number) {
   return true
 }
 
+// Cierra una actividad como PARCIAL (bloqueada) sin tocar avances/novedades.
+export async function cerrarParcialGrupo(id: string) {
+  const g = await filasHermanas(id)
+  if (!g) return null
+  await prisma.$transaction(
+    g.filas
+      .filter((f) => f.estado === 'PENDIENTE' || f.estado === 'PARCIAL')
+      .map((f) => prisma.actividad.update({ where: { id: f.id }, data: { estado: 'PARCIAL', cerrada: true } })),
+  )
+  return true
+}
+
+// Quita el bloqueo de cierre conservando estado/avances/novedades (para corregir un cierre).
+export async function reabrirCierreGrupo(id: string) {
+  const g = await filasHermanas(id)
+  if (!g) return null
+  await prisma.$transaction(
+    g.filas.map((f) => prisma.actividad.update({ where: { id: f.id }, data: { cerrada: false } })),
+  )
+  return true
+}
+
+// Edita una novedad del log por índice (día/motivo/observación) en las filas abiertas.
+export async function editarNovedadGrupo(
+  id: string,
+  index: number,
+  cambios: { dia?: number; motivoId?: string | null; observacion?: string | null },
+) {
+  const g = await filasHermanas(id)
+  if (!g) return null
+  const lista = editarNovedad(normalizarNovedades(g.base.novedades), index, cambios)
+  await prisma.$transaction(
+    g.filas
+      .filter((f) => f.estado === 'PENDIENTE' || f.estado === 'PARCIAL')
+      .map((f) => prisma.actividad.update({ where: { id: f.id }, data: { novedades: lista as unknown as Prisma.InputJsonValue } })),
+  )
+  return true
+}
+
 // Avance "genérico" (actividad SIN lotes): guarda la observación en nota de todas las
 // filas y las deja PARCIAL. Editable (sobrescribe la nota previa).
 export async function registrarAvanceObservacionGrupo(id: string, nota: string) {
@@ -802,7 +841,7 @@ export async function marcarCumplidaGrupo(id: string) {
       .map((f) =>
         prisma.actividad.update({
           where: { id: f.id },
-          data: { estado: 'CUMPLIDA', ...(tieneLotes ? { haRealizada: total } : {}) },
+          data: { estado: 'CUMPLIDA', cerrada: true, ...(tieneLotes ? { haRealizada: total } : {}) },
         }),
       ),
   )
@@ -902,6 +941,7 @@ export async function registrarNovedadGrupo(
           estado,
           motivoId,
           nota: notaFinal,
+          cerrada: true,
           ...(lotesHechos.length
             ? {
                 lotesHechos: lotesHechos as Prisma.InputJsonValue,
@@ -911,7 +951,7 @@ export async function registrarNovedadGrupo(
         },
       })
     }
-    if ((estado === 'NO_CUMPLIDA' || estado === 'REPROGRAMADA') && g.base.tareaId) {
+    if (estado === 'REPROGRAMADA' && g.base.tareaId) {
       await tx.tarea.update({
         where: { id: g.base.tareaId },
         data: {
