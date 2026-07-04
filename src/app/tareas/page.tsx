@@ -52,6 +52,9 @@ export default async function TareasPage({
     listarSolicitudesDeArea(areaId),
     listarResponsablesTodos(),
   ])
+  // Ocultar de "Mis solicitudes" las que ya tienen ≥1 actividad CUMPLIDA (viven en Consulta).
+  const solicitudesVisibles = solicitudes.filter((s) => s._count.actividades === 0)
+
   const responsablesPorArea: Record<string, { id: string; nombre: string }[]> = {}
   for (const r of responsablesTodos) {
     if (!r.activo) continue
@@ -173,11 +176,11 @@ export default async function TareasPage({
 
       <div className="mb-4 tarjeta p-4">
         <h2 className="mb-3 font-semibold text-tinta">📨 Mis solicitudes a otras áreas</h2>
-        {solicitudes.length === 0 ? (
+        {solicitudesVisibles.length === 0 ? (
           <p className="text-sm text-tierra">No has solicitado tareas a otras áreas.</p>
         ) : (
           <ul className="divide-y divide-borde text-sm">
-            {solicitudes.map((s) => (
+            {solicitudesVisibles.map((s) => (
               <li key={s.id} className="py-2">
                 <div className="flex items-center justify-between">
                   <span>
