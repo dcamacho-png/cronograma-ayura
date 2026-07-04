@@ -214,83 +214,77 @@ export function ResumenArea({
         <span className="chip-estado chip-pendiente">⏳ Pendientes: <b>{conteo.PENDIENTE}</b></span>
       </div>
 
-      {/* Detalle colapsable */}
-      <details className="mb-8">
-        <summary className="mb-4 cursor-pointer select-none text-sm font-semibold text-bosque hover:underline">Ver detalle</summary>
+      {/* Detalle: un colapsable por sección (colapsados por defecto) */}
+      <div className="mb-8 space-y-2">
+        {ESTADOS_ORDEN.map(({ v, etq }) => {
+          const acts = actividadesUnicas.filter((a) => v.includes(a.estado))
+          if (acts.length === 0) return null
+          const grupos = new Map<string, { descripcion: string; lotes: string[]; maquinas: Set<string>; conteo: number }>()
+          for (const a of acts) {
+            const lotesNombres = a.lotes.map((l) => l.nombre).sort()
+            const clave = `${a.descripcion}|${lotesNombres.join(',')}`
+            const g = grupos.get(clave) ?? { descripcion: a.descripcion, lotes: lotesNombres, maquinas: new Set<string>(), conteo: 0 }
+            g.conteo += 1
+            for (const m of a.maquinas) g.maquinas.add(m)
+            grupos.set(clave, g)
+          }
+          const items = [...grupos.values()]
+          return (
+            <details key={v.join(',')} className="tarjeta p-3">
+              <summary className="cursor-pointer select-none text-sm font-semibold text-tinta">{etq} ({acts.length})</summary>
+              <ul className="ml-4 mt-2 list-disc text-sm text-tierra">
+                {items.map((g, i) => (
+                  <li key={i}>
+                    {g.descripcion}
+                    {g.conteo > 1 ? ` ·×${g.conteo}` : ''}
+                    {g.maquinas.size > 0 ? ` · 🚜 ${[...g.maquinas].join(', ')}` : ''}
+                    {g.lotes.length > 0 ? ` · 📍 ${g.lotes.join(', ')}` : ''}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )
+        })}
 
-        <div className="mb-8 space-y-3">
-          {ESTADOS_ORDEN.map(({ v, etq }) => {
-            const acts = actividadesUnicas.filter((a) => v.includes(a.estado))
-            if (acts.length === 0) return null
-            const grupos = new Map<string, { descripcion: string; lotes: string[]; maquinas: Set<string>; conteo: number }>()
-            for (const a of acts) {
-              const lotesNombres = a.lotes.map((l) => l.nombre).sort()
-              const clave = `${a.descripcion}|${lotesNombres.join(',')}`
-              const g = grupos.get(clave) ?? { descripcion: a.descripcion, lotes: lotesNombres, maquinas: new Set<string>(), conteo: 0 }
-              g.conteo += 1
-              for (const m of a.maquinas) g.maquinas.add(m)
-              grupos.set(clave, g)
-            }
-            const items = [...grupos.values()]
-            return (
-              <div key={v.join(',')}>
-                <div className="text-sm font-semibold text-tinta">{etq} ({acts.length})</div>
-                <ul className="ml-4 list-disc text-sm text-tierra">
-                  {items.map((g, i) => (
-                    <li key={i}>
-                      {g.descripcion}
-                      {g.conteo > 1 ? ` ·×${g.conteo}` : ''}
-                      {g.maquinas.size > 0 ? ` · 🚜 ${[...g.maquinas].join(', ')}` : ''}
-                      {g.lotes.length > 0 ? ` · 📍 ${g.lotes.join(', ')}` : ''}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )
-          })}
-        </div>
-
-        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-          {esMaquinaria && (
-            <div className="tarjeta p-4">
-              <h2 className="mb-3 text-lg font-semibold text-tinta">🏁 Finalizadas por labor</h2>
-              {laboresFinalizadas.length === 0 ? (
-                <p className="text-sm text-tierra">Sin actividades finalizadas.</p>
-              ) : (
-                <ul className="space-y-1 text-sm">
-                  {laboresFinalizadas.map((l) => (
-                    <li key={l.descripcion} className="flex flex-wrap items-center gap-x-2">
-                      <span className="flex-1 font-medium">{l.descripcion}</span>
-                      {l.tractor && (<span className="text-tierra">🚜 {nombreMaquina.get(l.tractor.id) ?? 'Tractor'} ({l.tractor.conteo})</span>)}
-                      {l.responsable && (<span className="text-tierra">👤 {nombreResp(l.responsable.id)} ({l.responsable.conteo})</span>)}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
-
-          <div className="tarjeta p-4">
-            <h2 className="mb-3 text-lg font-semibold text-tinta">⚠️ Motivos más frecuentes</h2>
-            {motivosTop.length === 0 ? (
-              <p className="text-sm text-tierra">Sin motivos registrados.</p>
+        {esMaquinaria && (
+          <details className="tarjeta p-3">
+            <summary className="cursor-pointer select-none text-sm font-semibold text-tinta">🏁 Finalizadas por labor</summary>
+            {laboresFinalizadas.length === 0 ? (
+              <p className="mt-2 text-sm text-tierra">Sin actividades finalizadas.</p>
             ) : (
-              <ul className="space-y-1 text-sm">
-                {motivosTop.map((m) => (
-                  <li key={m.motivoId} className="flex justify-between">
-                    <span>{nombreMotivo.get(m.motivoId) ?? 'Motivo'}</span>
-                    <b>{m.conteo}</b>
+              <ul className="mt-2 space-y-1 text-sm">
+                {laboresFinalizadas.map((l) => (
+                  <li key={l.descripcion} className="flex flex-wrap items-center gap-x-2">
+                    <span className="flex-1 font-medium">{l.descripcion}</span>
+                    {l.tractor && (<span className="text-tierra">🚜 {nombreMaquina.get(l.tractor.id) ?? 'Tractor'} ({l.tractor.conteo})</span>)}
+                    {l.responsable && (<span className="text-tierra">👤 {nombreResp(l.responsable.id)} ({l.responsable.conteo})</span>)}
                   </li>
                 ))}
               </ul>
             )}
-          </div>
-        </div>
+          </details>
+        )}
+
+        <details className="tarjeta p-3">
+          <summary className="cursor-pointer select-none text-sm font-semibold text-tinta">⚠️ Motivos más frecuentes</summary>
+          {motivosTop.length === 0 ? (
+            <p className="mt-2 text-sm text-tierra">Sin motivos registrados.</p>
+          ) : (
+            <ul className="mt-2 space-y-1 text-sm">
+              {motivosTop.map((m) => (
+                <li key={m.motivoId} className="flex justify-between">
+                  <span>{nombreMotivo.get(m.motivoId) ?? 'Motivo'}</span>
+                  <b>{m.conteo}</b>
+                </li>
+              ))}
+            </ul>
+          )}
+        </details>
 
         {esMaquinaria && medidaActividadLista.length > 0 && (
-          <div className="mb-8">
-            <h2 className="mb-2 text-lg font-semibold text-tinta">🚜 Realizado por actividad</h2>
-            <ul className="space-y-1 text-sm">
+          <details className="tarjeta p-3">
+            <summary className="cursor-pointer select-none text-sm font-semibold text-tinta">🚜 Realizado por actividad</summary>
+            <ul className="mt-2 space-y-1 text-sm">
               {medidaActividadLista.map(([desc, { valor, unidad }]) => (
                 <li key={desc} className="flex justify-between rounded-lg border border-borde bg-marfil px-3 py-1">
                   <span>{desc}</span>
@@ -298,13 +292,13 @@ export function ResumenArea({
                 </li>
               ))}
             </ul>
-          </div>
+          </details>
         )}
 
         {nuevas.length > 0 && (
-          <div className="mb-8">
-            <h2 className="mb-2 text-lg font-semibold text-tinta">🆕 Actividades nuevas (no programadas) ({nuevas.length})</h2>
-            <ul className="space-y-1 text-sm">
+          <details className="tarjeta p-3">
+            <summary className="cursor-pointer select-none text-sm font-semibold text-tinta">🆕 Actividades nuevas (no programadas) ({nuevas.length})</summary>
+            <ul className="mt-2 space-y-1 text-sm">
               {nuevas.map((a) => (
                 <li key={a.id} className="rounded-lg border border-borde bg-marfil px-3 py-1">
                   {a.descripcion}
@@ -313,32 +307,34 @@ export function ResumenArea({
                 </li>
               ))}
             </ul>
-          </div>
+          </details>
         )}
 
-        <h2 className="mb-2 text-lg font-semibold text-tinta">🔄 Actividades cambiadas o reprogramadas</h2>
-        {cambios.length === 0 ? (
-          <p className="text-sm text-tierra">Ninguna actividad cambió esta semana. 🎉</p>
-        ) : (
-          <ul className="space-y-2">
-            {cambios.map((a) => (
-              <li key={a.id} className="flex items-center gap-3 tarjeta p-3 text-sm">
-                <span className="flex-1">
-                  {a.descripcion}
-                  <span className="text-tierra"> · {a.responsable.nombre}</span>
-                  {a.motivo && <span className="text-tierra"> · {a.motivo.nombre}</span>}
-                  {a.nota && <span className="text-xs text-tierra">· {a.nota}</span>}
-                </span>
-                {a.vecesReprogramada > 0 && (
-                  <span className="rounded px-2 py-0.5 text-xs font-semibold text-white" style={{ backgroundColor: COLOR_HEX[colorSemaforo(a.vecesReprogramada)] }}>
-                    {a.vecesReprogramada}×
+        <details className="tarjeta p-3">
+          <summary className="cursor-pointer select-none text-sm font-semibold text-tinta">🔄 Actividades cambiadas o reprogramadas ({cambios.length})</summary>
+          {cambios.length === 0 ? (
+            <p className="mt-2 text-sm text-tierra">Ninguna actividad cambió esta semana. 🎉</p>
+          ) : (
+            <ul className="mt-2 space-y-2">
+              {cambios.map((a) => (
+                <li key={a.id} className="flex items-center gap-3 rounded-lg border border-borde bg-marfil p-3 text-sm">
+                  <span className="flex-1">
+                    {a.descripcion}
+                    <span className="text-tierra"> · {a.responsable.nombre}</span>
+                    {a.motivo && <span className="text-tierra"> · {a.motivo.nombre}</span>}
+                    {a.nota && <span className="text-xs text-tierra">· {a.nota}</span>}
                   </span>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </details>
+                  {a.vecesReprogramada > 0 && (
+                    <span className="rounded px-2 py-0.5 text-xs font-semibold text-white" style={{ backgroundColor: COLOR_HEX[colorSemaforo(a.vecesReprogramada)] }}>
+                      {a.vecesReprogramada}×
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </details>
+      </div>
     </div>
   )
 }
