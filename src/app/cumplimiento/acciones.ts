@@ -127,6 +127,7 @@ function leerReemplazo(form: FormData, diaFallback?: number) {
   if (!descripcion) return null
   const unidadSel = texto(form, 'reemplazoUnidad')
   const unidad = unidadSel === 'otro' ? texto(form, 'reemplazoUnidadOtra') || 'otro' : unidadSel || 'ha'
+  const maquinaId = textoOpcional(form, 'reemplazoMaquinaId')
   const loteIds = form.getAll('reemplazoLoteId').map(String).filter(Boolean)
   const medida: Record<string, number> = {}
   const bultos: Record<string, number> = {}
@@ -138,7 +139,7 @@ function leerReemplazo(form: FormData, diaFallback?: number) {
   }
   const diaNum = Number(texto(form, 'reemplazoDia'))
   const dia = diaNum >= 1 && diaNum <= 7 ? diaNum : diaFallback
-  return { descripcion, unidad, loteIds, medida, bultos, dia }
+  return { descripcion, unidad, maquinaId, loteIds, medida, bultos, dia }
 }
 
 export async function registrarAvanceAccion(form: FormData) {

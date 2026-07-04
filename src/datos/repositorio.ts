@@ -917,7 +917,7 @@ export async function registrarMedidaGeneralGrupo(id: string, unidad: string, ca
   return true
 }
 
-type Reemplazo = { descripcion: string; unidad?: string | null; loteIds?: string[]; medida?: Record<string, number>; bultos?: Record<string, number>; dia?: number | null }
+type Reemplazo = { descripcion: string; unidad?: string | null; maquinaId?: string | null; loteIds?: string[]; medida?: Record<string, number>; bultos?: Record<string, number>; dia?: number | null }
 
 // Crea UNA actividad de reemplazo ("En reemplazo de: <base.descripcion>", CUMPLIDA) dentro de
 // una transacción. Reutilizado por registrarNovedadGrupo (al cerrar por cambio) y por
@@ -943,6 +943,7 @@ async function crearActividadReemplazo(
       areaId: base.areaId,
       fincaId,
       responsableId: base.responsableId,
+      maquinaId: reemplazo.maquinaId ?? null,
       nota: `En reemplazo de: ${base.descripcion}`,
       lotes: reemplazo.loteIds?.length ? { connect: reemplazo.loteIds.map((lid) => ({ id: lid })) } : undefined,
       ...(reemplazo.medida && Object.keys(reemplazo.medida).length ? { haRealizada: Object.values(reemplazo.medida).reduce((s, n) => s + n, 0) } : {}),
