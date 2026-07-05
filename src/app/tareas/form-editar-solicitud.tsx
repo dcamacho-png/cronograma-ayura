@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { SelectFincaLote } from '../_componentes/select-finca-lote'
 import { PickerLotesBultos } from './picker-lotes-bultos'
 import { CasillasDias, CasillasColaboradores } from './campos-sugerencia'
 
@@ -77,7 +76,7 @@ export function FormEditarSolicitud({
         )}
         {esMaquinaria
           ? <PickerLotesBultos lotes={lotes} seleccionInicial={seleccionBultos} />
-          : <SelectFincaLote lotes={lotes} name="loteId" valorInicial={lotesActuales[0]?.id ?? ''} />}
+          : <PickerLotesBultos lotes={lotes} sinCantidad seleccionInicial={seleccionBultos} />}
       </label>
       <div className="flex flex-col gap-1 text-xs">
         <span>Día sugerido</span>
