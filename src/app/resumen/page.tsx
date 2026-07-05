@@ -2,10 +2,11 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { usuarioActual } from '@/auth/sesion'
 import { puedeVer } from '@/auth/permisos'
-import { listarAreas, listarResponsablesPorArea, listarMotivos, listarActividades, listarActividadesEstipuladas } from '@/datos/repositorio'
-import { siguienteSemana, semanaAnterior, semanaActual } from '@/dominio/semana'
+import { listarAreas, listarResponsablesPorArea, listarMotivos, listarActividades, listarActividadesDeSemanas, listarActividadesEstipuladas } from '@/datos/repositorio'
+import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, semanasDelMes } from '@/dominio/semana'
 import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
 import { ResumenArea } from './resumen-area'
+import { actividadesRecurrentes } from '@/dominio/resumen'
 
 export default async function ResumenPage({
   searchParams,
@@ -38,13 +39,23 @@ export default async function ResumenPage({
   const anio = sp.anio && Number.isInteger(anioRaw) ? anioRaw : hoy.anio
   const semana = sp.semana && Number.isInteger(semanaRaw) ? semanaRaw : hoy.semana
 
-  const [responsables, motivos, actividades, estipuladas] = await Promise.all([
+  // Mes de la semana seleccionada (por el jueves ISO), para la escala mensual de recurrentes.
+  const jueves = fechasDeSemana(anio, semana)[3]
+  const semanasMes = semanasDelMes(jueves.getUTCFullYear(), jueves.getUTCMonth() + 1)
+
+  const [responsables, motivos, actividades, estipuladas, actividadesMes] = await Promise.all([
     listarResponsablesPorArea(areaId),
     listarMotivos(),
     listarActividades(areaId, anio, semana),
     listarActividadesEstipuladas(),
+    listarActividadesDeSemanas(semanasMes),
   ])
   const unidadPorNombre = Object.fromEntries(estipuladas.map((e) => [e.nombre, e.unidad]))
+  const recurrentesMes = actividadesRecurrentes(
+    actividadesMes
+      .filter((a) => a.areaId === areaId)
+      .map((a) => ({ descripcion: a.descripcion, areaNombre: areaActual.nombre, vecesReprogramada: a.vecesReprogramada })),
+  )
 
   const previa = semanaAnterior(anio, semana)
   const proxima = siguienteSemana(anio, semana)
@@ -103,6 +114,7 @@ export default async function ResumenPage({
         actividades={actividades}
         responsables={responsables}
         motivos={motivos}
+        recurrentesMes={recurrentesMes}
       />
     </main>
   )

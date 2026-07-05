@@ -55,6 +55,7 @@ export function ResumenArea({
   actividades,
   responsables,
   motivos,
+  recurrentesMes = [],
 }: {
   areaNombre: string
   semana: number
@@ -64,6 +65,7 @@ export function ResumenArea({
   actividades: ActividadResumen[]
   responsables: { id: string; nombre: string }[]
   motivos: { id: string; nombre: string }[]
+  recurrentesMes?: { descripcion: string; areaNombre: string; veces: number }[]
 }) {
   const dominio = actividades as unknown as ActividadDominio[]
   const pct = porcentajeCumplimiento(dominio)
@@ -313,6 +315,22 @@ export function ResumenArea({
             </ul>
           </details>
         )}
+
+        <details className="tarjeta p-3">
+          <summary className="cursor-pointer select-none text-sm font-semibold text-tinta">🔁 Actividades recurrentes del mes ({recurrentesMes.length})</summary>
+          {recurrentesMes.length === 0 ? (
+            <p className="mt-2 text-sm text-tierra">Ninguna actividad recurrente este mes.</p>
+          ) : (
+            <ul className="mt-2 space-y-2">
+              {recurrentesMes.map((r, i) => (
+                <li key={i} className="flex items-center gap-3 rounded-lg border border-borde bg-marfil p-3 text-sm">
+                  <span className="flex-1">{r.descripcion}</span>
+                  <span className="rounded px-2 py-0.5 text-xs font-semibold text-white" style={{ backgroundColor: COLOR_HEX[colorSemaforo(r.veces)] }}>×{r.veces}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </details>
 
         <details className="tarjeta p-3">
           <summary className="cursor-pointer select-none text-sm font-semibold text-tinta">🔄 Actividades cambiadas o reprogramadas ({cambios.length})</summary>
