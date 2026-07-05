@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, setResponsableActivo, crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, setUnidadActividadEstipulada, crearLote, eliminarLote, crearUsuario, cambiarContrasena, eliminarUsuario, BloqueoError, setPantallasUsuario, setVariantesArea } from '@/datos/repositorio'
+import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, setResponsableActivo, setResponsableFinca, crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, setUnidadActividadEstipulada, crearLote, eliminarLote, crearUsuario, cambiarContrasena, eliminarUsuario, BloqueoError, setPantallasUsuario, setVariantesArea } from '@/datos/repositorio'
 import { usuarioActual } from '@/auth/sesion'
 import { normalizarUnidad } from '@/dominio/unidad'
 
@@ -71,7 +71,8 @@ export async function crearResponsableAccion(form: FormData) {
   const nombre = texto(form, 'nombre')
   const areaId = texto(form, 'areaId')
   if (!nombre || !areaId) faltanDatos()
-  await correr(() => crearResponsable(nombre, areaId), 'Responsable agregado.')
+  const fincaId = textoOpcional(form, 'fincaId')
+  await correr(() => crearResponsable(nombre, areaId, fincaId), 'Responsable agregado.')
 }
 
 export async function eliminarAreaAccion(form: FormData) {
@@ -112,6 +113,13 @@ export async function cambiarEstadoResponsableAccion(form: FormData) {
     () => setResponsableActivo(id, activo),
     activo ? 'Responsable reactivado.' : 'Responsable dado de baja.',
   )
+}
+
+export async function cambiarFincaResponsableAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (!id) faltanDatos()
+  const fincaId = textoOpcional(form, 'fincaId')
+  await correr(() => setResponsableFinca(id, fincaId), 'Finca del responsable actualizada.')
 }
 
 export async function crearActividadEstipuladaAccion(form: FormData) {
