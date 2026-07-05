@@ -1,8 +1,8 @@
 export type UsuarioPermiso = { rol: string; pantallas: string | null }
 
-export const PANTALLAS_ASIGNABLES = ['tareas', 'programar', 'cumplimiento', 'resumen', 'tablero', 'consulta'] as const
-export const DEFAULT_AREA = ['tareas', 'programar', 'cumplimiento', 'resumen', 'consulta'] as const
-export const PANTALLAS_VISOR = ['resumen', 'programar', 'tablero'] as const
+export const PANTALLAS_ASIGNABLES = ['tareas', 'programar', 'cumplimiento', 'resumen', 'tablero', 'consulta', 'conservatorio'] as const
+export const DEFAULT_AREA = ['tareas', 'programar', 'cumplimiento', 'resumen', 'consulta', 'conservatorio'] as const
+export const PANTALLAS_VISOR = ['resumen', 'programar', 'tablero', 'conservatorio'] as const
 
 const ASIGNABLES = new Set<string>(PANTALLAS_ASIGNABLES)
 
@@ -24,4 +24,9 @@ export function puedeVer(u: UsuarioPermiso, clave: string): boolean {
 // El Visor es un usuario de solo consulta (todas las áreas, sin editar).
 export function esSoloLectura(u: UsuarioPermiso): boolean {
   return u.rol === 'VISOR'
+}
+
+// Marcar/reabrir temas del Conservatorio: solo gerencia (Visor) y admin.
+export function puedeMarcarConservatorio(u: UsuarioPermiso): boolean {
+  return u.rol === 'ADMIN' || u.rol === 'VISOR'
 }

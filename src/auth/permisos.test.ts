@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { pantallasDe, puedeVer, esSoloLectura } from './permisos'
+import { pantallasDe, puedeVer, esSoloLectura, puedeMarcarConservatorio } from './permisos'
 
 describe('pantallasDe', () => {
   it('ADMIN ve todo, incluida configuracion', () => {
@@ -11,9 +11,14 @@ describe('pantallasDe', () => {
 
   it('AREA sin pantallas usa el set por defecto (sin tablero)', () => {
     const s = pantallasDe({ rol: 'AREA', pantallas: null })
-    expect([...s].sort()).toEqual(['consulta', 'cumplimiento', 'programar', 'resumen', 'tareas'])
+    expect([...s].sort()).toEqual(['conservatorio', 'consulta', 'cumplimiento', 'programar', 'resumen', 'tareas'])
     expect(s.has('tablero')).toBe(false)
     expect(s.has('configuracion')).toBe(false)
+  })
+
+  it('AREA por defecto incluye conservatorio', () => {
+    const s = pantallasDe({ rol: 'AREA', pantallas: null })
+    expect(s.has('conservatorio')).toBe(true)
   })
 
   it('AREA con CSV parsea e intersecta con las asignables', () => {
@@ -37,9 +42,9 @@ describe('pantallasDe', () => {
     expect([...s].sort()).toEqual(['resumen', 'tareas'])
   })
 
-  it('VISOR ve exactamente las 3 pantallas de solo lectura (sin cumplimiento)', () => {
+  it('VISOR ve 4 pantallas de solo lectura (resumen/programar/tablero/conservatorio)', () => {
     const s = pantallasDe({ rol: 'VISOR', pantallas: null })
-    expect([...s].sort()).toEqual(['programar', 'resumen', 'tablero'])
+    expect([...s].sort()).toEqual(['conservatorio', 'programar', 'resumen', 'tablero'])
     expect(s.has('cumplimiento')).toBe(false)
     expect(s.has('tareas')).toBe(false)
     expect(s.has('consulta')).toBe(false)
@@ -48,7 +53,7 @@ describe('pantallasDe', () => {
 
   it('VISOR ignora el CSV de pantallas', () => {
     const s = pantallasDe({ rol: 'VISOR', pantallas: 'tareas,configuracion,cumplimiento' })
-    expect([...s].sort()).toEqual(['programar', 'resumen', 'tablero'])
+    expect([...s].sort()).toEqual(['conservatorio', 'programar', 'resumen', 'tablero'])
   })
 })
 
@@ -65,5 +70,13 @@ describe('esSoloLectura', () => {
     expect(esSoloLectura({ rol: 'VISOR', pantallas: null })).toBe(true)
     expect(esSoloLectura({ rol: 'ADMIN', pantallas: null })).toBe(false)
     expect(esSoloLectura({ rol: 'AREA', pantallas: null })).toBe(false)
+  })
+})
+
+describe('puedeMarcarConservatorio', () => {
+  it('solo ADMIN y VISOR marcan', () => {
+    expect(puedeMarcarConservatorio({ rol: 'ADMIN', pantallas: null })).toBe(true)
+    expect(puedeMarcarConservatorio({ rol: 'VISOR', pantallas: null })).toBe(true)
+    expect(puedeMarcarConservatorio({ rol: 'AREA', pantallas: null })).toBe(false)
   })
 })
