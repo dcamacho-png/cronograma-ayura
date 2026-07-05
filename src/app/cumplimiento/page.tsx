@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { usuarioActual } from '@/auth/sesion'
-import { puedeVer } from '@/auth/permisos'
+import { puedeVer, esSoloLectura } from '@/auth/permisos'
 import { listarAreas, listarMotivos, listarActividades, listarLotes, listarMaquinas, listarResponsablesPorArea, listarActividadesEstipuladas } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, plazoCumplimientoVencido } from '@/dominio/semana'
 import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
@@ -48,8 +48,10 @@ export default async function CumplimientoPage({
   if (!u) redirect('/login')
   if (!puedeVer(u, 'cumplimiento')) redirect('/')
   const esAdmin = u.rol === 'ADMIN'
+  const soloLectura = esSoloLectura(u)
+  const verTodas = esAdmin || soloLectura
 
-  const areaId = esAdmin
+  const areaId = verTodas
     ? (sp.area && areas.some((a) => a.id === sp.area) ? sp.area : areas[0].id)
     : (u.areaId && areas.some((a) => a.id === u.areaId) ? u.areaId : areas[0].id)
   const areaActual = areas.find((a) => a.id === areaId)!
@@ -60,7 +62,7 @@ export default async function CumplimientoPage({
   const anio = sp.anio && Number.isInteger(anioRaw) ? anioRaw : hoy.anio
   const semana = sp.semana && Number.isInteger(semanaRaw) ? semanaRaw : hoy.semana
   // Una semana queda en solo lectura para las áreas una vez vencido el plazo (fin del domingo).
-  const bloqueado = !esAdmin && plazoCumplimientoVencido(anio, semana, hoy)
+  const bloqueado = soloLectura || (!esAdmin && plazoCumplimientoVencido(anio, semana, hoy))
 
   const [motivos, actividades, lotes, maquinas, responsablesTodos, estipuladas] = await Promise.all([
     listarMotivos(),
@@ -107,7 +109,7 @@ export default async function CumplimientoPage({
     <main className="mx-auto max-w-6xl p-6">
       <h1 className="mb-4 text-2xl font-bold text-bosque">Registrar cumplimiento</h1>
 
-      {esAdmin ? (
+      {verTodas ? (
         <div className="mb-3 flex flex-wrap gap-2">
           {areas.map((a) => (
             <Link
@@ -161,7 +163,7 @@ export default async function CumplimientoPage({
         </div>
       )}
 
-      {bloqueado && (
+      {bloqueado && !soloLectura && (
         <div className="mb-5 rounded-lg border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-800">
           ⛔ Plazo vencido: el cumplimiento de esta semana ya no se puede modificar. Solo el administrador puede hacer cambios.
         </div>
