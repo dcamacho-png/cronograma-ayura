@@ -7,7 +7,7 @@ import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, plazoCum
 import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
 import { unidadDe, unidadAbreviada } from '@/dominio/unidad'
 import { textoLotesHechos } from '@/dominio/lotes-hechos'
-import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, conteoEstadoActividades, tieneDiaPendiente, estadoActividad, etiquetaEstado } from '@/dominio/metricas'
+import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, conteoEstadoActividades, tieneDiaPendiente, estadoActividad, etiquetaEstado, ordenEstadoCumplimiento } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
 import { textoAvanceConFecha, normalizarAvancePorLote, totalAvanceLotes, lotesPendientes, type AvanceEntrada } from '@/dominio/avance-lote'
 import { normalizarNovedades } from '@/dominio/novedades'
@@ -80,7 +80,12 @@ export default async function CumplimientoPage({
   // Cada grupo se ordena por día; las tarjetas, por el primer día de la actividad.
   const gruposActividad = [...agruparPorActividad(actividades).values()]
     .map((dias) => [...dias].sort((a, b) => a.dia - b.dia))
-    .sort((g1, g2) => g1[0].dia - g2[0].dia)
+    .sort((g1, g2) => {
+      const rango =
+        ordenEstadoCumplimiento(estadoActividad(g1 as unknown as { estado: Estado }[])) -
+        ordenEstadoCumplimiento(estadoActividad(g2 as unknown as { estado: Estado }[]))
+      return rango !== 0 ? rango : g1[0].dia - g2[0].dia
+    })
 
   const dominio = actividades as unknown as ActividadDominio[]
   const pct = porcentajeCumplimiento(dominio)

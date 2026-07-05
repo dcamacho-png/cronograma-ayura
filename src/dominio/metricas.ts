@@ -245,3 +245,20 @@ export function motivosFrecuentes(actividades: Actividad[]): ConteoMotivo[] {
     .map(([motivoId, c]) => ({ motivoId, conteo: c }))
     .sort((a, b) => b.conteo - a.conteo)
 }
+
+// Orden de las tarjetas en la hoja de cumplimiento: primero lo que requiere atención
+// (sin avance), luego parciales, luego lo ya resuelto (No se hizo/Reprogramada) y al final
+// las cumplidas. Menor número = más arriba.
+export function ordenEstadoCumplimiento(estado: Estado): number {
+  switch (estado) {
+    case 'PENDIENTE':
+      return 0
+    case 'PARCIAL':
+      return 1
+    case 'NO_CUMPLIDA':
+    case 'REPROGRAMADA':
+      return 2
+    case 'CUMPLIDA':
+      return 3
+  }
+}

@@ -462,3 +462,21 @@ describe('etiquetaEstado', () => {
     expect(etiquetaEstado('PARCIAL')).toBe('Parcial')
   })
 })
+
+import { ordenEstadoCumplimiento } from './metricas'
+
+describe('ordenEstadoCumplimiento', () => {
+  it('rango por estado: Pendiente<Parcial<(NoCumplida=Reprogramada)<Cumplida', () => {
+    expect(ordenEstadoCumplimiento('PENDIENTE')).toBe(0)
+    expect(ordenEstadoCumplimiento('PARCIAL')).toBe(1)
+    expect(ordenEstadoCumplimiento('NO_CUMPLIDA')).toBe(2)
+    expect(ordenEstadoCumplimiento('REPROGRAMADA')).toBe(2)
+    expect(ordenEstadoCumplimiento('CUMPLIDA')).toBe(3)
+  })
+
+  it('ordena una lista de estados de menos a más resuelto', () => {
+    const estados = ['CUMPLIDA', 'PENDIENTE', 'REPROGRAMADA', 'PARCIAL', 'NO_CUMPLIDA'] as const
+    const ordenados = [...estados].sort((a, b) => ordenEstadoCumplimiento(a) - ordenEstadoCumplimiento(b))
+    expect(ordenados).toEqual(['PENDIENTE', 'PARCIAL', 'REPROGRAMADA', 'NO_CUMPLIDA', 'CUMPLIDA'])
+  })
+})
