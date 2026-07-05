@@ -2,7 +2,7 @@ export type UsuarioPermiso = { rol: string; pantallas: string | null }
 
 export const PANTALLAS_ASIGNABLES = ['tareas', 'programar', 'cumplimiento', 'resumen', 'tablero', 'consulta'] as const
 export const DEFAULT_AREA = ['tareas', 'programar', 'cumplimiento', 'resumen', 'consulta'] as const
-export const PANTALLAS_VISOR = ['resumen', 'cumplimiento', 'programar', 'tablero'] as const
+export const PANTALLAS_VISOR = ['resumen', 'programar', 'tablero'] as const
 
 const ASIGNABLES = new Set<string>(PANTALLAS_ASIGNABLES)
 

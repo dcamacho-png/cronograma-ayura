@@ -37,17 +37,18 @@ describe('pantallasDe', () => {
     expect([...s].sort()).toEqual(['resumen', 'tareas'])
   })
 
-  it('VISOR ve exactamente las 4 pantallas de solo lectura', () => {
+  it('VISOR ve exactamente las 3 pantallas de solo lectura (sin cumplimiento)', () => {
     const s = pantallasDe({ rol: 'VISOR', pantallas: null })
-    expect([...s].sort()).toEqual(['cumplimiento', 'programar', 'resumen', 'tablero'])
+    expect([...s].sort()).toEqual(['programar', 'resumen', 'tablero'])
+    expect(s.has('cumplimiento')).toBe(false)
     expect(s.has('tareas')).toBe(false)
     expect(s.has('consulta')).toBe(false)
     expect(s.has('configuracion')).toBe(false)
   })
 
   it('VISOR ignora el CSV de pantallas', () => {
-    const s = pantallasDe({ rol: 'VISOR', pantallas: 'tareas,configuracion' })
-    expect([...s].sort()).toEqual(['cumplimiento', 'programar', 'resumen', 'tablero'])
+    const s = pantallasDe({ rol: 'VISOR', pantallas: 'tareas,configuracion,cumplimiento' })
+    expect([...s].sort()).toEqual(['programar', 'resumen', 'tablero'])
   })
 })
 
