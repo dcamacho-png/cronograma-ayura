@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { usuarioActual } from '@/auth/sesion'
-import { puedeVer } from '@/auth/permisos'
+import { puedeVer, esSoloLectura } from '@/auth/permisos'
 import {
   listarAreas,
   listarResponsablesPorArea,
@@ -38,8 +38,10 @@ export default async function ProgramarPage({
   if (!u) redirect('/login')
   if (!puedeVer(u, 'programar')) redirect('/')
   const esAdmin = u.rol === 'ADMIN'
+  const soloLectura = esSoloLectura(u)
+  const verTodas = esAdmin || soloLectura
 
-  const areaId = esAdmin
+  const areaId = verTodas
     ? (sp.area && areas.some((a) => a.id === sp.area) ? sp.area : areas[0].id)
     : (u.areaId && areas.some((a) => a.id === u.areaId) ? u.areaId : areas[0].id)
   const areaActual = areas.find((a) => a.id === areaId)!
@@ -95,7 +97,7 @@ export default async function ProgramarPage({
         </div>
       )}
 
-      {esAdmin ? (
+      {verTodas ? (
         <div className="mb-3 flex flex-wrap gap-2">
           {areas.map((a) => (
             <Link
@@ -127,7 +129,7 @@ export default async function ProgramarPage({
         </div>
       )}
 
-      {futura && porAsignar.length > 0 && (
+      {futura && !soloLectura && porAsignar.length > 0 && (
         <div className="mb-6 rounded-xl border border-borde bg-arena p-4">
           <h2 className="mb-3 font-semibold text-bosque">📌 Tareas por asignar — semana {semana}</h2>
           {responsablesActivos.length === 0 ? (
@@ -199,7 +201,7 @@ export default async function ProgramarPage({
           fechas={fechas}
           responsables={responsablesActivos}
           actividades={actividadesCronograma}
-          turnoEditable={futura}
+          turnoEditable={futura && !soloLectura}
           esMaquinaria={esMaquinaria}
         />
       </div>
@@ -210,7 +212,7 @@ export default async function ProgramarPage({
           maquinas={maquinas}
           dedicaciones={dedicaciones}
           areasParaDedicar={areasParaDedicar}
-          futura={futura}
+          futura={futura && !soloLectura}
           anio={anio}
           semana={semana}
           accion={dedicarTractorAccion}
