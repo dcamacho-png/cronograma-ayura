@@ -170,9 +170,9 @@ export async function crearUsuarioAccion(form: FormData) {
   const password = texto(form, 'password')
   const rol = texto(form, 'rol')
   const areaId = textoOpcional(form, 'areaId')
-  if (!usuario || !nombre || !password || (rol !== 'AREA' && rol !== 'ADMIN')) faltanDatos()
+  if (!usuario || !nombre || !password || (rol !== 'AREA' && rol !== 'ADMIN' && rol !== 'VISOR')) faltanDatos()
   await correr(
-    () => crearUsuario(usuario, nombre, password, rol as 'AREA' | 'ADMIN', rol === 'AREA' ? areaId : null),
+    () => crearUsuario(usuario, nombre, password, rol, rol === 'AREA' ? areaId : null),
     'Usuario creado.',
   )
 }

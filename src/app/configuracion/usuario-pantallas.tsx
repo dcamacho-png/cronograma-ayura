@@ -19,16 +19,16 @@ function setActual(pantallas: string | null): Set<string> {
 
 export function UsuarioPantallas({
   id,
-  esAdmin,
+  sinToggles,
   pantallas,
   accion,
 }: {
   id: string
-  esAdmin: boolean
+  sinToggles: boolean
   pantallas: string | null
   accion: (formData: FormData) => void | Promise<void>
 }) {
-  if (esAdmin) return <span className="text-xs text-tierra">ve todo (admin)</span>
+  if (sinToggles) return <span className="text-xs text-tierra">pantallas fijas</span>
   const activas = setActual(pantallas)
   return (
     <form action={accion} className="flex flex-wrap items-center gap-2">

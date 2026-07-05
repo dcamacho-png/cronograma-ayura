@@ -265,7 +265,7 @@ export default async function ConfiguracionPage({
                 </span>
                 <UsuarioPantallas
                   id={us.id}
-                  esAdmin={us.rol === 'ADMIN'}
+                  sinToggles={us.rol === 'ADMIN' || us.rol === 'VISOR'}
                   pantallas={us.pantallas}
                   accion={actualizarPantallasUsuarioAccion}
                 />
@@ -285,6 +285,7 @@ export default async function ConfiguracionPage({
             <select name="rol" required className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
               <option value="AREA">Área</option>
               <option value="ADMIN">Admin</option>
+              <option value="VISOR">Visor (solo consulta)</option>
             </select>
             <select name="areaId" className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
               <option value="">(área, si es de área)</option>
