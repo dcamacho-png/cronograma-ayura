@@ -1,38 +1,38 @@
+import { construirFilasTractor, type ActividadTractor } from '@/dominio/tractor'
+import { SelectDedicacion } from './select-dedicacion'
+
 const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
 
 function fmtFecha(f: Date) {
   return new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(f)
 }
 
-type ActividadTractor = {
-  id: string
-  dia: number
-  descripcion: string
-  turno: string
-  maquinaId: string | null
-  maquina: { nombre: string } | null
-  responsable: { nombre: string }
-}
-
-// Resumen de solo lectura: una fila por tractor usado esta semana, columnas Lun–Dom,
-// con la(s) actividad(es) y el responsable de cada tractor por día. Inverso del cronograma.
+// Resumen por tractor: TODAS las máquinas del catálogo (una fila cada una), columnas Lun–Dom,
+// con sus actividades por día. En semanas futuras, cada celda deja dedicar el tractor a un área
+// ese día (solo informativo). Inverso del cronograma.
 export function GrillaTractor({
   fechas,
   actividades,
+  maquinas,
+  dedicaciones,
+  areasParaDedicar,
+  futura,
+  anio,
+  semana,
+  accion,
 }: {
   fechas: Date[]
   actividades: ActividadTractor[]
+  maquinas: { id: string; nombre: string }[]
+  dedicaciones: { maquinaId: string; dia: number; areaId: string; areaNombre: string }[]
+  areasParaDedicar: { id: string; nombre: string }[]
+  futura: boolean
+  anio: number
+  semana: number
+  accion: (form: FormData) => void
 }) {
-  // Solo actividades con tractor; agrupar por maquinaId (mostrando el nombre).
-  const tractores = new Map<string, { maquinaId: string; nombre: string; actividades: ActividadTractor[] }>()
-  for (const a of actividades) {
-    if (!a.maquinaId || !a.maquina) continue
-    const g = tractores.get(a.maquinaId) ?? { maquinaId: a.maquinaId, nombre: a.maquina.nombre, actividades: [] }
-    g.actividades.push(a)
-    tractores.set(a.maquinaId, g)
-  }
-  if (tractores.size === 0) return null
-  const filas = [...tractores.values()].sort((a, b) => a.nombre.localeCompare(b.nombre))
+  const filas = construirFilasTractor(maquinas, actividades, dedicaciones)
+  if (filas.length === 0) return null
 
   return (
     <div className="mb-6">
@@ -56,16 +56,34 @@ export function GrillaTractor({
                 <td className="border border-borde p-2 font-medium">🚜 {t.nombre}</td>
                 {DIAS.map((_, i) => {
                   const dia = i + 1
+                  const ded = t.dedicadasPorDia[dia]
                   const celdas = t.actividades.filter((a) => a.dia === dia)
                   return (
                     <td key={dia} className="border border-borde p-2 align-top">
-                      {celdas.map((a) => (
-                        <div key={a.id} className="mb-1 rounded-lg bg-green-50 p-1">
-                          <div>{a.descripcion}</div>
-                          <div className="text-xs text-tierra">{a.responsable.nombre}</div>
-                          {a.turno && <div className="text-xs text-tierra">{a.turno}</div>}
+                      {ded ? (
+                        <div className="mb-1 rounded-lg bg-amber-50 p-1 text-xs font-medium text-amber-800">
+                          🔒 {ded.areaNombre}
                         </div>
-                      ))}
+                      ) : (
+                        celdas.map((a) => (
+                          <div key={a.id} className="mb-1 rounded-lg bg-green-50 p-1">
+                            <div>{a.descripcion}</div>
+                            <div className="text-xs text-tierra">{a.responsable.nombre}</div>
+                            {a.turno && <div className="text-xs text-tierra">{a.turno}</div>}
+                          </div>
+                        ))
+                      )}
+                      {futura && (
+                        <SelectDedicacion
+                          maquinaId={t.maquinaId}
+                          anio={anio}
+                          semana={semana}
+                          dia={dia}
+                          areaIdActual={ded?.areaId ?? ''}
+                          areas={areasParaDedicar}
+                          accion={accion}
+                        />
+                      )}
                     </td>
                   )
                 })}

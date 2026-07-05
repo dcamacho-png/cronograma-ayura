@@ -8,11 +8,12 @@ import {
   listarActividades,
   tareasPorAsignar,
   listarMaquinas,
+  listarDedicaciones,
 } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, esSemanaFutura, diaActual, esDiaPasado } from '@/dominio/semana'
 import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
 import { textoSugerencia } from '@/dominio/sugerencia'
-import { asignarTareaAccion, devolverAlBancoAccion } from './acciones'
+import { asignarTareaAccion, devolverAlBancoAccion, dedicarTractorAccion } from './acciones'
 import { AsignarTareaForm } from './asignar-tarea-form'
 import { GrillaSemana } from './grilla-semana'
 import { BotonDescargarImagen } from './boton-descargar-imagen'
@@ -53,13 +54,21 @@ export default async function ProgramarPage({
   const hoyRef = { ...hoy, dia: diaActual() }
   const diasPasados = [1, 2, 3, 4, 5, 6, 7].filter((d) => esDiaPasado(anio, semana, d, hoyRef))
 
-  const [responsables, actividades, porAsignar, maquinas] = await Promise.all([
+  const [responsables, actividades, porAsignar, maquinas, dedicacionesRaw] = await Promise.all([
     listarResponsablesPorArea(areaId),
     listarActividades(areaId, anio, semana),
     tareasPorAsignar(areaId, anio, semana),
     listarMaquinas(),
+    listarDedicaciones(anio, semana),
   ])
   const esMaquinaria = esMaquinariaVar(areaActual, 'programar')
+  const areasParaDedicar = areas.filter((a) => !esMaquinariaVar(a, 'programar'))
+  const dedicaciones = dedicacionesRaw.map((d) => ({
+    maquinaId: d.maquinaId,
+    dia: d.dia,
+    areaId: d.areaId,
+    areaNombre: d.area.nombre,
+  }))
   const responsablesActivos = responsables.filter((r) => r.activo)
   const nombrePorResp = new Map(responsables.map((r) => [r.id, r.nombre]))
   const actividadesCronograma = actividades.filter((a) => !a.noProgramada)
@@ -195,7 +204,17 @@ export default async function ProgramarPage({
         />
       </div>
       {esMaquinaria && (
-        <GrillaTractor fechas={fechas} actividades={actividadesCronograma} />
+        <GrillaTractor
+          fechas={fechas}
+          actividades={actividadesCronograma}
+          maquinas={maquinas}
+          dedicaciones={dedicaciones}
+          areasParaDedicar={areasParaDedicar}
+          futura={futura}
+          anio={anio}
+          semana={semana}
+          accion={dedicarTractorAccion}
+        />
       )}
       {/* Grilla SOLO para exportar como imagen: recortada (h-0 overflow-hidden) para no
           ocupar espacio ni afectar la pantalla. html2canvas (BotonDescargarImagen) clona

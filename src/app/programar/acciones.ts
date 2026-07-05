@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearResponsable, actualizarActividad, asignarTarea, quitarSeleccionTarea, devolverAAsignacion, devolverGrillaAlBanco } from '@/datos/repositorio'
+import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearResponsable, actualizarActividad, asignarTarea, quitarSeleccionTarea, devolverAAsignacion, devolverGrillaAlBanco, dedicarTractor } from '@/datos/repositorio'
 import { semanaAnterior, esSemanaPasada, semanaActual, diaActual, esDiaPasado, esSemanaFutura } from '@/dominio/semana'
 import type { Asignacion } from '@/dominio/programacion'
 
@@ -157,5 +157,17 @@ export async function devolverGrillaAlBancoAccion(form: FormData) {
   if (!tareaId || !Number.isInteger(anio) || !Number.isInteger(semana)) return
   if (!esSemanaFutura(anio, semana, semanaActual())) return
   await devolverGrillaAlBanco(tareaId, anio, semana)
+  revalidatePath('/programar')
+}
+
+export async function dedicarTractorAccion(form: FormData) {
+  const maquinaId = texto(form, 'maquinaId')
+  const areaId = textoOpcional(form, 'areaId') // '' → null = quitar dedicación
+  const anio = Number(texto(form, 'anio'))
+  const semana = Number(texto(form, 'semana'))
+  const dia = Number(texto(form, 'dia'))
+  if (!maquinaId || !Number.isInteger(anio) || !Number.isInteger(semana) || !Number.isInteger(dia)) return
+  if (!esSemanaFutura(anio, semana, semanaActual())) return
+  await dedicarTractor(maquinaId, areaId, anio, semana, dia)
   revalidatePath('/programar')
 }
