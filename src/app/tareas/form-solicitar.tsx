@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { SelectFincaLote } from '../_componentes/select-finca-lote'
 import { PickerLotesBultos } from './picker-lotes-bultos'
 import { usaBultos } from '@/dominio/bultos'
 import { CasillasDias, CasillasColaboradores } from './campos-sugerencia'
@@ -69,12 +68,8 @@ export function FormSolicitar({
             </label>
           )}
           <label className="flex flex-col text-sm">
-            {conBultos ? 'Lotes y bultos por lote' : 'Finca y lote'}
-            {conBultos ? (
-              <PickerLotesBultos lotes={lotes} />
-            ) : (
-              <SelectFincaLote lotes={lotes} name="loteId" />
-            )}
+            {conBultos ? 'Lotes y bultos por lote' : 'Lotes'}
+            <PickerLotesBultos lotes={lotes} sinCantidad={!conBultos} />
           </label>
           <label className="flex flex-col text-sm">
             Detalle / instrucciones (opcional)
@@ -90,6 +85,10 @@ export function FormSolicitar({
           <label className="flex flex-col text-sm">
             Actividad
             <input name="descripcion" placeholder="Ej: pasar renovador en lote X" className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
+          </label>
+          <label className="flex flex-col text-sm">
+            Lotes (opcional)
+            <PickerLotesBultos lotes={lotes} sinCantidad />
           </label>
           <label className="flex flex-col text-sm">
             Descripción (opcional)
