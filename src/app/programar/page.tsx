@@ -17,6 +17,7 @@ import { asignarTareaAccion, devolverAlBancoAccion, dedicarTractorAccion } from 
 import { AsignarTareaForm } from './asignar-tarea-form'
 import { GrillaSemana } from './grilla-semana'
 import { BotonDescargarImagen } from './boton-descargar-imagen'
+import { BotonCompartirWhatsapp } from './boton-compartir-whatsapp'
 import { GrillaTractor } from './grilla-tractor'
 
 export default async function ProgramarPage({
@@ -176,10 +177,17 @@ export default async function ProgramarPage({
       {(responsablesActivos.length > 0 || esAdmin) && (
         <div className="mb-2 flex flex-wrap items-center gap-2">
           {responsablesActivos.length > 0 && (
-            <BotonDescargarImagen
-              targetId="grilla-export"
-              nombreArchivo={`cronograma-${areaActual.nombre}-S${semana}-${anio}.png`}
-            />
+            <>
+              <BotonCompartirWhatsapp
+                targetId="grilla-export"
+                nombreArchivo={`cronograma-${areaActual.nombre}-S${semana}-${anio}.png`}
+                textoCompartir={`Cronograma — ${areaActual.nombre} — Semana ${semana}`}
+              />
+              <BotonDescargarImagen
+                targetId="grilla-export"
+                nombreArchivo={`cronograma-${areaActual.nombre}-S${semana}-${anio}.png`}
+              />
+            </>
           )}
           {esAdmin && (
             <a
