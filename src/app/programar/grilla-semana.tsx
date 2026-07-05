@@ -1,6 +1,6 @@
 import { Fragment } from 'react'
 import { InfoLotes } from '../_componentes/info-lotes'
-import { actualizarActividadAccion, devolverAAsignacionAccion, devolverGrillaAlBancoAccion } from './acciones'
+import { actualizarActividadAccion, devolverAAsignacionAccion, devolverGrillaAlBancoAccion, devolverActividadAlBancoAccion } from './acciones'
 
 const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
 
@@ -115,6 +115,17 @@ export function GrillaSemana({
                                     <button type="submit" className="text-xs text-tierra hover:underline">↩️ Devolver al banco</button>
                                   </form>
                                 </>
+                              )}
+                              {/* Actividad llegada por reprogramación (sin tarea de origen): no se
+                                  puede "devolver a asignar" porque no hay tarea; se devuelve al banco
+                                  general (la crea) para poder reprogramarla. */}
+                              {editable && !a.tareaId && (
+                                <form action={devolverActividadAlBancoAccion} className="mt-0.5">
+                                  <input type="hidden" name="id" value={a.id} />
+                                  <input type="hidden" name="anio" value={anio} />
+                                  <input type="hidden" name="semana" value={semana} />
+                                  <button type="submit" className="text-xs text-tierra hover:underline">↩️ Devolver al banco</button>
+                                </form>
                               )}
                             </div>
                           ))}

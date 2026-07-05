@@ -1064,6 +1064,31 @@ export async function devolverGrillaAlBanco(tareaId: string, anio: number, seman
   })
 }
 
+// Devuelve al banco general una actividad que llegó por reprogramación (no tiene
+// tarea de origen, sólo origenId). Crea una Tarea PENDIENTE sin semana con sus
+// datos y borra la actividad de la grilla. Preserva vecesReprogramada para no
+// perder el conteo de arrastres. Todo en una transacción.
+export async function devolverActividadReprogramadaAlBanco(id: string) {
+  const act = await prisma.actividad.findUnique({ where: { id }, include: { lotes: true } })
+  if (!act) return null
+  return prisma.$transaction(async (tx) => {
+    const tarea = await tx.tarea.create({
+      data: {
+        areaId: act.areaId,
+        descripcion: act.descripcion,
+        fincaId: act.fincaId,
+        estado: 'PENDIENTE',
+        vecesReprogramada: act.vecesReprogramada,
+        lotes: { connect: act.lotes.map((l) => ({ id: l.id })) },
+        ...(act.bultosPorLote != null ? { bultosPorLote: act.bultosPorLote as Prisma.InputJsonValue } : {}),
+        ...(act.unidadRealizada ? { unidad: act.unidadRealizada } : {}),
+      },
+    })
+    await tx.actividad.delete({ where: { id } })
+    return tarea
+  })
+}
+
 // Maquinaria devuelve una tarea solicitada al área que la pidió (no la elimina).
 export function devolverAlSolicitante(id: string, observacion: string | null) {
   return prisma.tarea.update({

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearResponsable, actualizarActividad, asignarTarea, quitarSeleccionTarea, devolverAAsignacion, devolverGrillaAlBanco, dedicarTractor } from '@/datos/repositorio'
+import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearResponsable, actualizarActividad, asignarTarea, quitarSeleccionTarea, devolverAAsignacion, devolverGrillaAlBanco, devolverActividadReprogramadaAlBanco, dedicarTractor } from '@/datos/repositorio'
 import { semanaAnterior, esSemanaPasada, semanaActual, diaActual, esDiaPasado, esSemanaFutura } from '@/dominio/semana'
 import type { Asignacion } from '@/dominio/programacion'
 import { usuarioActual } from '@/auth/sesion'
@@ -174,6 +174,19 @@ export async function devolverGrillaAlBancoAccion(form: FormData) {
   if (!tareaId || !Number.isInteger(anio) || !Number.isInteger(semana)) return
   if (!esSemanaFutura(anio, semana, semanaActual())) return
   await devolverGrillaAlBanco(tareaId, anio, semana)
+  revalidatePath('/programar')
+}
+
+// Devuelve al banco una actividad que llegó por reprogramación (sin tarea de
+// origen). No borra: la convierte en tarea PENDIENTE del banco para reasignarla.
+export async function devolverActividadAlBancoAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
+  const id = texto(form, 'id')
+  const anio = Number(texto(form, 'anio'))
+  const semana = Number(texto(form, 'semana'))
+  if (!id || !Number.isInteger(anio) || !Number.isInteger(semana)) return
+  if (!esSemanaFutura(anio, semana, semanaActual())) return
+  await devolverActividadReprogramadaAlBanco(id)
   revalidatePath('/programar')
 }
 
