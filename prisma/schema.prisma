@@ -21,6 +21,7 @@ model Area {
   tareas      Tarea[] @relation("TareaArea")
   solicitudes Tarea[] @relation("TareaSolicitante")
   usuarios    Usuario[]
+  notasConservatorio NotaConservatorio[]
 }
 
 model Usuario {
@@ -40,6 +41,7 @@ model Finca {
   actividades Actividad[]
   tareas      Tarea[]
   lotes       Lote[]
+  notasConservatorio NotaConservatorio[]
 }
 
 model Responsable {
@@ -175,6 +177,25 @@ model Lote {
   actividades Actividad[]
   tareas      Tarea[]     @relation("TareaLoteUnico")
   tareasMulti Tarea[]     @relation("TareaLotesMulti")
+  notasConservatorio NotaConservatorio[]
 
   @@index([fincaId])
+}
+
+model NotaConservatorio {
+  id        String    @id @default(cuid())
+  texto     String
+  hablado   Boolean   @default(false)
+  creadaEn  DateTime  @default(now())
+  habladaEn DateTime?
+
+  areaId String
+  area   Area   @relation(fields: [areaId], references: [id])
+
+  fincaId String?
+  finca   Finca?  @relation(fields: [fincaId], references: [id])
+  loteId  String?
+  lote    Lote?   @relation(fields: [loteId], references: [id])
+
+  @@index([areaId, hablado])
 }
