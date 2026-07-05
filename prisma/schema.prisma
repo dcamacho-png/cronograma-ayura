@@ -41,6 +41,7 @@ model Finca {
   actividades Actividad[]
   tareas      Tarea[]
   lotes       Lote[]
+  responsables Responsable[]
   notasConservatorio NotaConservatorio[]
 }
 
@@ -49,6 +50,8 @@ model Responsable {
   nombre      String
   areaId      String
   area        Area        @relation(fields: [areaId], references: [id])
+  fincaId     String?
+  finca       Finca?      @relation(fields: [fincaId], references: [id])
   actividades Actividad[]
   activo      Boolean     @default(true)
 }

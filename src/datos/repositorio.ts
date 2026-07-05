@@ -57,7 +57,11 @@ export async function dedicarTractor(
 }
 
 export function listarResponsablesPorArea(areaId: string) {
-  return prisma.responsable.findMany({ where: { areaId }, orderBy: { nombre: 'asc' } })
+  return prisma.responsable.findMany({
+    where: { areaId },
+    include: { finca: true },
+    orderBy: [{ finca: { nombre: 'asc' } }, { nombre: 'asc' }],
+  })
 }
 
 export function listarActividades(areaId: string, anio: number, semana: number) {
@@ -182,8 +186,8 @@ export function semanaDeActividad(id: string) {
 }
 
 // Crea un responsable nuevo en un área.
-export function crearResponsable(nombre: string, areaId: string) {
-  return prisma.responsable.create({ data: { nombre, areaId } })
+export function crearResponsable(nombre: string, areaId: string, fincaId?: string | null) {
+  return prisma.responsable.create({ data: { nombre, areaId, fincaId: fincaId ?? null } })
 }
 
 // Crea la copia reprogramada de una actividad en la semana destino.
@@ -219,9 +223,13 @@ export function crearMaquina(nombre: string) {
 
 export function listarResponsablesTodos() {
   return prisma.responsable.findMany({
-    include: { area: true, _count: { select: { actividades: true } } },
+    include: { area: true, finca: true, _count: { select: { actividades: true } } },
     orderBy: { nombre: 'asc' },
   })
+}
+
+export function setResponsableFinca(id: string, fincaId: string | null) {
+  return prisma.responsable.update({ where: { id }, data: { fincaId } })
 }
 
 export function setResponsableActivo(id: string, activo: boolean) {

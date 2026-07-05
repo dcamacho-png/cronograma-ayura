@@ -22,6 +22,7 @@ import {
   eliminarMaquinaAccion,
   eliminarResponsableAccion,
   cambiarEstadoResponsableAccion,
+  cambiarFincaResponsableAccion,
   crearActividadEstipuladaAccion,
   eliminarActividadEstipuladaAccion,
   renombrarActividadEstipuladaAccion,
@@ -223,13 +224,24 @@ export default async function ConfiguracionPage({
         {/* Responsables */}
         <section className="tarjeta p-4 md:col-span-2">
           <h3 className="mb-2 font-semibold text-tinta">Responsables ({responsables.length})</h3>
-          <ul className="mb-3 flex flex-wrap gap-2">
+          <ul className="mb-3 flex flex-col gap-2">
             {responsables.map((r) => (
-              <li key={r.id} className="flex items-center gap-2 rounded bg-arena px-2 py-1 text-sm">
+              <li key={r.id} className="flex flex-wrap items-center gap-2 rounded bg-arena px-2 py-1 text-sm">
                 <span className={r.activo ? '' : 'text-tierra/60'}>
                   {r.nombre} <span className="text-tierra">· {r.area.nombre}</span>
+                  <span className="text-tierra"> · 🏠 {r.finca?.nombre ?? 'sin finca'}</span>
                   {!r.activo && <span className="text-tierra/60"> · (inactivo)</span>}
                 </span>
+                <form action={cambiarFincaResponsableAccion} className="flex items-center gap-1">
+                  <input type="hidden" name="id" value={r.id} />
+                  <select name="fincaId" defaultValue={r.fincaId ?? ''} className="rounded-lg border border-borde bg-marfil p-1 text-xs focus:outline-none focus:ring-2 focus:ring-bosque/40">
+                    <option value="">— sin finca —</option>
+                    {fincas.map((f) => (
+                      <option key={f.id} value={f.id}>{f.nombre}</option>
+                    ))}
+                  </select>
+                  <button className="rounded-lg bg-bosque px-1.5 py-0.5 text-xs font-semibold text-white">✓</button>
+                </form>
                 <form action={cambiarEstadoResponsableAccion}>
                   <input type="hidden" name="id" value={r.id} />
                   <input type="hidden" name="activo" value={r.activo ? '0' : '1'} />
@@ -248,6 +260,12 @@ export default async function ConfiguracionPage({
             <select name="areaId" required className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
               {areas.map((a) => (
                 <option key={a.id} value={a.id}>{a.nombre}</option>
+              ))}
+            </select>
+            <select name="fincaId" className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
+              <option value="">— sin finca —</option>
+              {fincas.map((f) => (
+                <option key={f.id} value={f.id}>{f.nombre}</option>
               ))}
             </select>
             <button className="rounded-lg bg-bosque px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
