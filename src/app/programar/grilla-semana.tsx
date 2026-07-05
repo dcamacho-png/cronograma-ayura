@@ -140,9 +140,9 @@ export function GrillaSemana({
             <thead>{filaCabezado('head')}</thead>
             <tbody>
               {agrupar
-                ? grupos.map((g) => (
+                ? grupos.map((g, gi) => (
                     <Fragment key={`g-${g.finca ?? '__sin__'}`}>
-                      {paraExportar && filaCabezado(`head-${g.finca ?? '__sin__'}`)}
+                      {paraExportar && gi > 0 && filaCabezado(`head-${g.finca ?? '__sin__'}`)}
                       {filaFinca(g.finca)}
                       {g.responsables.map((r) => filaResponsable(r))}
                     </Fragment>
