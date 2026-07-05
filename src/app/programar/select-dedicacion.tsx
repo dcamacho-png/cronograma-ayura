@@ -26,6 +26,9 @@ export function SelectDedicacion({
       <input type="hidden" name="semana" value={semana} />
       <input type="hidden" name="dia" value={dia} />
       <select
+        // key = área dedicada actual: fuerza a React a re-montar la select tras dedicar/quitar
+        // para que la opción marcada refleje el valor guardado (defaultValue solo aplica al montar).
+        key={areaIdActual}
         name="areaId"
         defaultValue={areaIdActual}
         onChange={(e) => e.currentTarget.form?.requestSubmit()}
