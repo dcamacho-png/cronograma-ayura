@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { usuarioActual } from '@/auth/sesion'
-import { puedeVer } from '@/auth/permisos'
+import { puedeVer, esSoloLectura } from '@/auth/permisos'
 import { listarAreas, listarResponsablesPorArea, listarMotivos, listarActividades, listarActividadesDeSemanas, listarActividadesEstipuladas } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, semanasDelMes } from '@/dominio/semana'
 import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
@@ -27,8 +27,9 @@ export default async function ResumenPage({
   if (!u) redirect('/login')
   if (!puedeVer(u, 'resumen')) redirect('/')
   const esAdmin = u.rol === 'ADMIN'
+  const verTodas = esAdmin || esSoloLectura(u)
 
-  const areaId = esAdmin
+  const areaId = verTodas
     ? (sp.area && areas.some((a) => a.id === sp.area) ? sp.area : areas[0].id)
     : (u.areaId && areas.some((a) => a.id === u.areaId) ? u.areaId : areas[0].id)
   const areaActual = areas.find((a) => a.id === areaId)!
@@ -65,7 +66,7 @@ export default async function ResumenPage({
     <main className="mx-auto max-w-6xl p-6">
       <h1 className="mb-4 text-2xl font-bold text-bosque">Resumen semanal</h1>
 
-      {esAdmin ? (
+      {verTodas ? (
         <div className="mb-3 flex flex-wrap gap-2">
           {areas.map((a) => (
             <Link
