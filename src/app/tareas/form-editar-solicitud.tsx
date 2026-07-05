@@ -68,7 +68,7 @@ export function FormEditarSolicitud({
         <textarea name="detalle" rows={2} defaultValue={detalle ?? ''} className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
       </label>
       <label className="flex flex-col text-xs">
-        Finca y lote
+        {esMaquinaria ? 'Lotes y bultos por lote' : 'Lotes'}
         {lotesActuales.length > 0 && (
           <span className="text-xs text-tierra">
             Lotes actuales (ya seleccionados): {lotesActuales.map((l) => l.nombre).join(', ')}
