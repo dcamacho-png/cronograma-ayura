@@ -1194,3 +1194,54 @@ export async function crearActividadDesdeLotes(
     },
   })
 }
+
+// ————— Conservatorio —————
+
+export async function crearNotaConservatorio(input: {
+  areaId: string
+  texto: string
+  loteId: string | null
+}) {
+  // La finca se deriva del lote elegido (si hay), para poder mostrarla sin join extra.
+  let fincaId: string | null = null
+  if (input.loteId) {
+    const lote = await prisma.lote.findUnique({ where: { id: input.loteId } })
+    fincaId = lote?.fincaId ?? null
+  }
+  return prisma.notaConservatorio.create({
+    data: { areaId: input.areaId, texto: input.texto, loteId: input.loteId, fincaId },
+  })
+}
+
+export function listarNotasConservatorio(areaId: string | null) {
+  return prisma.notaConservatorio.findMany({
+    where: areaId ? { areaId } : undefined,
+    include: { area: true, finca: true, lote: { include: { finca: true } } },
+    orderBy: [{ hablado: 'asc' }, { creadaEn: 'desc' }],
+  })
+}
+
+export function notaConservatorioPorId(id: string) {
+  return prisma.notaConservatorio.findUnique({
+    where: { id },
+    select: { areaId: true, hablado: true },
+  })
+}
+
+export function marcarNotaHablada(id: string) {
+  return prisma.notaConservatorio.update({
+    where: { id },
+    data: { hablado: true, habladaEn: new Date() },
+  })
+}
+
+export function reabrirNotaConservatorio(id: string) {
+  return prisma.notaConservatorio.update({
+    where: { id },
+    data: { hablado: false, habladaEn: null },
+  })
+}
+
+export function borrarNotaConservatorio(id: string) {
+  return prisma.notaConservatorio.delete({ where: { id } })
+}
