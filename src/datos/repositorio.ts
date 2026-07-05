@@ -31,6 +31,31 @@ export function listarMaquinas() {
   return prisma.maquina.findMany({ orderBy: { nombre: 'asc' } })
 }
 
+export function listarDedicaciones(anio: number, semana: number) {
+  return prisma.dedicacionTractor.findMany({
+    where: { anio, semana },
+    include: { area: true },
+  })
+}
+
+export async function dedicarTractor(
+  maquinaId: string,
+  areaId: string | null,
+  anio: number,
+  semana: number,
+  dia: number,
+): Promise<void> {
+  if (!areaId) {
+    await prisma.dedicacionTractor.deleteMany({ where: { maquinaId, anio, semana, dia } })
+    return
+  }
+  await prisma.dedicacionTractor.upsert({
+    where: { maquinaId_anio_semana_dia: { maquinaId, anio, semana, dia } },
+    create: { maquinaId, areaId, anio, semana, dia },
+    update: { areaId },
+  })
+}
+
 export function listarResponsablesPorArea(areaId: string) {
   return prisma.responsable.findMany({ where: { areaId }, orderBy: { nombre: 'asc' } })
 }

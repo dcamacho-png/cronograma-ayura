@@ -17,6 +17,7 @@ model Area {
   actividades   Actividad[]   @relation("AreaDeActividad")
   tareasMaquina Actividad[]   @relation("AreaDeTarea")
   responsables  Responsable[]
+  dedicaciones  DedicacionTractor[]
   tareas      Tarea[] @relation("TareaArea")
   solicitudes Tarea[] @relation("TareaSolicitante")
   usuarios    Usuario[]
@@ -54,6 +55,20 @@ model Maquina {
   id          String      @id @default(cuid())
   nombre      String
   actividades Actividad[]
+  dedicaciones DedicacionTractor[]
+}
+
+model DedicacionTractor {
+  id        String  @id @default(cuid())
+  maquinaId String
+  maquina   Maquina @relation(fields: [maquinaId], references: [id])
+  areaId    String
+  area      Area    @relation(fields: [areaId], references: [id])
+  anio      Int
+  semana    Int
+  dia       Int
+
+  @@unique([maquinaId, anio, semana, dia])
 }
 
 model Motivo {
