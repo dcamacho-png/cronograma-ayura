@@ -5,6 +5,8 @@ import { redirect } from 'next/navigation'
 import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearResponsable, actualizarActividad, asignarTarea, quitarSeleccionTarea, devolverAAsignacion, devolverGrillaAlBanco, dedicarTractor } from '@/datos/repositorio'
 import { semanaAnterior, esSemanaPasada, semanaActual, diaActual, esDiaPasado, esSemanaFutura } from '@/dominio/semana'
 import type { Asignacion } from '@/dominio/programacion'
+import { usuarioActual } from '@/auth/sesion'
+import { esSoloLectura } from '@/auth/permisos'
 
 const DIAS_CORTOS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
@@ -23,7 +25,14 @@ function textoOpcional(form: FormData, clave: string): string | null {
   return v === '' ? null : v
 }
 
+// El Visor (solo consulta) nunca puede mutar. Doble candado con la UI.
+async function bloqueadoVisor(): Promise<boolean> {
+  const u = await usuarioActual()
+  return !!u && esSoloLectura(u)
+}
+
 export async function crearActividadAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const areaId = texto(form, 'areaId')
   const anio = Number(texto(form, 'anio'))
   const semana = Number(texto(form, 'semana'))
@@ -53,11 +62,13 @@ export async function crearActividadAccion(form: FormData) {
 }
 
 export async function eliminarActividadAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   await eliminarActividad(texto(form, 'id'))
   revalidatePath('/programar')
 }
 
 export async function duplicarSemanaAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const areaId = texto(form, 'areaId')
   const anio = Number(texto(form, 'anio'))
   const semana = Number(texto(form, 'semana'))
@@ -68,6 +79,7 @@ export async function duplicarSemanaAccion(form: FormData) {
 }
 
 export async function crearResponsableAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const nombre = texto(form, 'nombre')
   const areaId = texto(form, 'areaId')
   if (!nombre || !areaId) return
@@ -76,6 +88,7 @@ export async function crearResponsableAccion(form: FormData) {
 }
 
 export async function actualizarActividadAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   const descripcion = texto(form, 'descripcion')
   const turno = texto(form, 'turno')
@@ -88,6 +101,7 @@ export async function actualizarActividadAccion(form: FormData) {
 }
 
 export async function asignarTareaAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const tareaId = texto(form, 'tareaId')
   const responsableIds = form.getAll('responsableId').map((v) => String(v)).filter(Boolean)
   const anioForm = Number(texto(form, 'anio'))
@@ -135,12 +149,14 @@ export async function asignarTareaAccion(form: FormData) {
 }
 
 export async function devolverAlBancoAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const tareaId = texto(form, 'tareaId')
   if (tareaId) await quitarSeleccionTarea(tareaId)
   revalidatePath('/programar')
 }
 
 export async function devolverAAsignacionAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const tareaId = texto(form, 'tareaId')
   const anio = Number(texto(form, 'anio'))
   const semana = Number(texto(form, 'semana'))
@@ -151,6 +167,7 @@ export async function devolverAAsignacionAccion(form: FormData) {
 }
 
 export async function devolverGrillaAlBancoAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const tareaId = texto(form, 'tareaId')
   const anio = Number(texto(form, 'anio'))
   const semana = Number(texto(form, 'semana'))
@@ -161,6 +178,7 @@ export async function devolverGrillaAlBancoAccion(form: FormData) {
 }
 
 export async function dedicarTractorAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const maquinaId = texto(form, 'maquinaId')
   const areaId = textoOpcional(form, 'areaId') // '' → null = quitar dedicación
   const anio = Number(texto(form, 'anio'))

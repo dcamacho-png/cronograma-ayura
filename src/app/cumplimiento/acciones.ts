@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { reprogramarActividad, crearActividadRealizada, devolverAlBanco, semanaDeActividad, registrarAvanceLoteGrupo, registrarAvanceObservacionGrupo, marcarCumplidaGrupo, registrarNovedadGrupo, reabrirGrupo, setLotesGrupo, setUnidadRealizadaGrupo, anexarLotesGrupo, registrarMedidaGeneralGrupo, editarAvanceEntradaGrupo, eliminarAvanceEntradaGrupo, agregarNovedadGrupo, eliminarNovedadGrupo, cerrarParcialGrupo, reabrirCierreGrupo, editarNovedadGrupo } from '@/datos/repositorio'
 import { siguienteSemana, plazoCumplimientoVencido, semanaActual } from '@/dominio/semana'
 import { usuarioActual } from '@/auth/sesion'
+import { esSoloLectura } from '@/auth/permisos'
 
 const ESTADOS_VALIDOS = ['PENDIENTE', 'CUMPLIDA', 'PARCIAL', 'NO_CUMPLIDA', 'REPROGRAMADA']
 
@@ -38,7 +39,14 @@ async function bloqueadoPorPlazoActividad(id: string): Promise<boolean> {
   return bloqueadoPorPlazo(a.anio, a.semana)
 }
 
+// El Visor (solo consulta) nunca puede mutar. Doble candado con la UI.
+async function bloqueadoVisor(): Promise<boolean> {
+  const u = await usuarioActual()
+  return !!u && esSoloLectura(u)
+}
+
 export async function reprogramarAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   const anio = Number(texto(form, 'anio'))
   const semana = Number(texto(form, 'semana'))
@@ -50,6 +58,7 @@ export async function reprogramarAccion(form: FormData) {
 }
 
 export async function agregarActividadRealizadaAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const areaId = texto(form, 'areaId')
   const anio = Number(texto(form, 'anio'))
   const semana = Number(texto(form, 'semana'))
@@ -78,6 +87,7 @@ export async function agregarActividadRealizadaAccion(form: FormData) {
 }
 
 export async function devolverAlBancoAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   if (!id) return
   if (await bloqueadoPorPlazoActividad(id)) return
@@ -86,6 +96,7 @@ export async function devolverAlBancoAccion(form: FormData) {
 }
 
 export async function registrarAvanceObservacionAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   const nota = texto(form, 'nota')
   if (!id || nota === '') return
@@ -95,6 +106,7 @@ export async function registrarAvanceObservacionAccion(form: FormData) {
 }
 
 export async function marcarCumplidaActividadAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   if (!id) return
   if (await bloqueadoPorPlazoActividad(id)) return
@@ -103,6 +115,7 @@ export async function marcarCumplidaActividadAccion(form: FormData) {
 }
 
 export async function setLotesActividadAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   if (!id) return
   if (await bloqueadoPorPlazoActividad(id)) return
@@ -143,6 +156,7 @@ function leerReemplazo(form: FormData, diaFallback?: number) {
 }
 
 export async function registrarAvanceAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   const dia = Number(texto(form, 'dia'))
   if (!id || !(dia >= 1 && dia <= 7)) return
@@ -167,6 +181,7 @@ export async function registrarAvanceAccion(form: FormData) {
 }
 
 export async function editarAvanceAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   const loteId = texto(form, 'loteId')
   const index = Number(texto(form, 'index'))
@@ -184,6 +199,7 @@ export async function editarAvanceAccion(form: FormData) {
 }
 
 export async function eliminarAvanceAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   const loteId = texto(form, 'loteId')
   const index = Number(texto(form, 'index'))
@@ -194,6 +210,7 @@ export async function eliminarAvanceAccion(form: FormData) {
 }
 
 export async function agregarNovedadAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   const dia = Number(texto(form, 'dia'))
   if (!id || !(dia >= 1 && dia <= 7)) return
@@ -209,6 +226,7 @@ export async function agregarNovedadAccion(form: FormData) {
 }
 
 export async function eliminarNovedadAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   const index = Number(texto(form, 'index'))
   if (!id || !Number.isInteger(index) || index < 0) return
@@ -218,6 +236,7 @@ export async function eliminarNovedadAccion(form: FormData) {
 }
 
 export async function registrarMedidaGeneralAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   if (!id) return
   if (await bloqueadoPorPlazoActividad(id)) return
@@ -228,6 +247,7 @@ export async function registrarMedidaGeneralAccion(form: FormData) {
 }
 
 export async function registrarNovedadActividadAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   const estado = texto(form, 'estado')
   if (!id || !ESTADOS_VALIDOS.includes(estado) || estado === 'PENDIENTE' || estado === 'CUMPLIDA') return
@@ -243,6 +263,7 @@ export async function registrarNovedadActividadAccion(form: FormData) {
 }
 
 export async function desmarcarActividadAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   if (!id) return
   if (await bloqueadoPorPlazoActividad(id)) return
@@ -251,6 +272,7 @@ export async function desmarcarActividadAccion(form: FormData) {
 }
 
 export async function cerrarParcialAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   if (!id) return
   if (await bloqueadoPorPlazoActividad(id)) return
@@ -259,6 +281,7 @@ export async function cerrarParcialAccion(form: FormData) {
 }
 
 export async function reabrirCierreAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   if (!id) return
   if (await bloqueadoPorPlazoActividad(id)) return
@@ -267,6 +290,7 @@ export async function reabrirCierreAccion(form: FormData) {
 }
 
 export async function editarNovedadAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   const index = Number(texto(form, 'index'))
   if (!id || !Number.isInteger(index) || index < 0) return
