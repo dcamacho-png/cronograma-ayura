@@ -19,6 +19,7 @@ import { GrillaSemana } from './grilla-semana'
 import { BotonDescargarImagen } from './boton-descargar-imagen'
 import { BotonCompartirWhatsapp } from './boton-compartir-whatsapp'
 import { GrillaTractor } from './grilla-tractor'
+import { agruparResponsablesPorFinca } from '@/dominio/responsables-finca'
 
 export default async function ProgramarPage({
   searchParams,
@@ -75,6 +76,13 @@ export default async function ProgramarPage({
   const responsablesActivos = responsables.filter((r) => r.activo)
   const nombrePorResp = new Map(responsables.map((r) => [r.id, r.nombre]))
   const actividadesCronograma = actividades.filter((a) => !a.noProgramada)
+  // Para compartir/descargar: una foto por finca (grupo). Así cada imagen es más corta y
+  // nítida (WhatsApp comprime menos). Sin fincas asignadas → un solo grupo (una foto).
+  const partesExport = agruparResponsablesPorFinca(responsablesActivos)
+  const targetsExport = partesExport.map((_, i) => ({
+    id: `grilla-export-${i}`,
+    nombre: `cronograma-${areaActual.nombre}-S${semana}-${anio}${partesExport.length > 1 ? `-${i + 1}` : ''}.png`,
+  }))
   // Ocupación en la semana: máquina y responsable usados en cada día+turno.
   const ocupacion = actividadesCronograma.map((a) => ({
     dia: a.dia,
@@ -179,14 +187,10 @@ export default async function ProgramarPage({
           {responsablesActivos.length > 0 && (
             <>
               <BotonCompartirWhatsapp
-                targetId="grilla-export"
-                nombreArchivo={`cronograma-${areaActual.nombre}-S${semana}-${anio}.png`}
+                targets={targetsExport}
                 textoCompartir={`Cronograma — ${areaActual.nombre} — Semana ${semana}`}
               />
-              <BotonDescargarImagen
-                targetId="grilla-export"
-                nombreArchivo={`cronograma-${areaActual.nombre}-S${semana}-${anio}.png`}
-              />
+              <BotonDescargarImagen targets={targetsExport} />
             </>
           )}
           {esAdmin && (
@@ -226,22 +230,30 @@ export default async function ProgramarPage({
           accion={dedicarTractorAccion}
         />
       )}
-      {/* Grilla SOLO para exportar como imagen: recortada (h-0 overflow-hidden) para no
-          ocupar espacio ni afectar la pantalla. html2canvas (BotonDescargarImagen) clona
-          este #grilla-export y lo renderiza a tamaño completo igualmente. */}
+      {/* Grillas SOLO para exportar como imagen: una por finca (más cortas = más nítidas en
+          WhatsApp). Recortadas (h-0 overflow-hidden) para no ocupar espacio ni afectar la
+          pantalla; html2canvas clona cada #grilla-export-i y lo renderiza a tamaño completo. */}
       <div aria-hidden="true" className="h-0 overflow-hidden">
-        <div id="grilla-export">
-          <GrillaSemana
-            areaNombre={areaActual.nombre}
-            anio={anio}
-            semana={semana}
-            fechas={fechas}
-            responsables={responsablesActivos}
-            actividades={actividadesCronograma}
-            esMaquinaria={esMaquinaria}
-            paraExportar
-          />
-        </div>
+        {partesExport.map((g, i) => (
+          <div key={targetsExport[i].id} id={targetsExport[i].id} className="bg-white p-2">
+            {partesExport.length > 1 && (
+              <div className="mb-1 text-base font-semibold text-bosque">
+                Parte {i + 1} de {partesExport.length}
+                {g.finca ? ` · 🏠 ${g.finca}` : ''}
+              </div>
+            )}
+            <GrillaSemana
+              areaNombre={areaActual.nombre}
+              anio={anio}
+              semana={semana}
+              fechas={fechas}
+              responsables={g.responsables}
+              actividades={actividadesCronograma}
+              esMaquinaria={esMaquinaria}
+              paraExportar
+            />
+          </div>
+        ))}
       </div>
     </main>
   )

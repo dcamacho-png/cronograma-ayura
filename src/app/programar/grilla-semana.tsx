@@ -47,7 +47,7 @@ export function GrillaSemana({
   const rango = fechas.length === 7 ? `${fmtFecha(fechas[0])} – ${fmtFecha(fechas[6])}` : ''
   // En modo export nunca hay controles interactivos (turno como texto, sin "Devolver a asignar").
   const editable = turnoEditable && !paraExportar
-  // Fila de cabezado reutilizable: va en <thead> y, al exportar, se repite cada 5 responsables.
+  // Fila de cabezado reutilizable: va en <thead> y, al exportar agrupado, se repite al inicio de cada finca.
   const filaCabezado = (clave: string) => (
     <tr key={clave}>
       <th className="border border-borde bg-arena p-2 text-left">Responsable</th>
@@ -147,12 +147,7 @@ export function GrillaSemana({
                       {g.responsables.map((r) => filaResponsable(r))}
                     </Fragment>
                   ))
-                : responsables.map((r, idx) => (
-                    <Fragment key={r.id}>
-                      {paraExportar && idx > 0 && idx % 5 === 0 && filaCabezado(`rep-${idx}`)}
-                      {filaResponsable(r)}
-                    </Fragment>
-                  ))}
+                : responsables.map((r) => filaResponsable(r))}
             </tbody>
           </table>
         </div>

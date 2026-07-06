@@ -3,17 +3,18 @@
 import { generarImagenGrilla, descargarCanvas } from './generar-imagen-grilla'
 
 export function BotonDescargarImagen({
-  targetId,
-  nombreArchivo,
+  targets,
 }: {
-  targetId: string
-  nombreArchivo: string
+  targets: { id: string; nombre: string }[]
 }) {
   async function descargar() {
     try {
-      const canvas = await generarImagenGrilla(targetId)
-      if (!canvas) return
-      descargarCanvas(canvas, nombreArchivo)
+      // Secuencial: cada captura ajusta el ancho del elemento y lo restaura; hacerlas en
+      // paralelo se pisaría. Con varias fincas se descargan varias imágenes.
+      for (const t of targets) {
+        const canvas = await generarImagenGrilla(t.id)
+        if (canvas) descargarCanvas(canvas, t.nombre)
+      }
     } catch {
       alert('No se pudo generar la imagen.')
     }
@@ -25,7 +26,7 @@ export function BotonDescargarImagen({
       onClick={descargar}
       className="rounded-lg border border-arcilla px-3 py-1 text-sm font-semibold text-arcilla hover:bg-arena/40"
     >
-      📷 Descargar imagen
+      📷 Descargar imagen{targets.length > 1 ? `es (${targets.length})` : ''}
     </button>
   )
 }

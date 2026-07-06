@@ -2,51 +2,54 @@
 
 import { generarImagenGrilla, descargarCanvas } from './generar-imagen-grilla'
 
+function canvasABlob(canvas: HTMLCanvasElement): Promise<Blob | null> {
+  return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'))
+}
+
 export function BotonCompartirWhatsapp({
-  targetId,
-  nombreArchivo,
+  targets,
   textoCompartir,
 }: {
-  targetId: string
-  nombreArchivo: string
+  targets: { id: string; nombre: string }[]
   textoCompartir: string
 }) {
   async function compartir() {
-    let canvas: HTMLCanvasElement | null
+    // Genera un canvas por finca (secuencial: cada captura ajusta el ancho del elemento).
+    const canvases: { canvas: HTMLCanvasElement; nombre: string }[] = []
     try {
-      canvas = await generarImagenGrilla(targetId)
+      for (const t of targets) {
+        const canvas = await generarImagenGrilla(t.id)
+        if (canvas) canvases.push({ canvas, nombre: t.nombre })
+      }
     } catch {
-      alert('No se pudo generar la imagen.')
+      alert('No se pudieron generar las imágenes.')
       return
     }
-    if (!canvas) return
+    if (canvases.length === 0) return
 
-    const blob = await new Promise<Blob | null>((resolve) => canvas!.toBlob(resolve, 'image/png'))
-    if (!blob) {
-      descargarCanvas(canvas, nombreArchivo)
-      return
+    // Arma un archivo PNG por cada foto.
+    const archivos: File[] = []
+    for (const c of canvases) {
+      const blob = await canvasABlob(c.canvas)
+      if (blob) archivos.push(new File([blob], c.nombre.replace(/\s+/g, '-'), { type: 'image/png' }))
     }
 
-    const archivo = new File([blob], nombreArchivo.replace(/\s+/g, '-'), { type: 'image/png' })
-
-    // En celular (Web Share API con archivos) abrimos el menú nativo para elegir WhatsApp.
-    if (typeof navigator.canShare === 'function' && navigator.canShare({ files: [archivo] })) {
+    // En celular: menú nativo con TODAS las fotos en un solo envío (se elige WhatsApp).
+    if (archivos.length > 0 && typeof navigator.canShare === 'function' && navigator.canShare({ files: archivos })) {
       try {
-        await navigator.share({ files: [archivo], text: textoCompartir })
+        await navigator.share({ files: archivos, text: textoCompartir })
       } catch (e) {
-        // El usuario canceló el menú de compartir: no es un error.
-        if ((e as Error)?.name === 'AbortError') return
-        // Otro fallo al compartir: caemos al respaldo (descargar).
-        descargarCanvas(canvas, nombreArchivo)
+        if ((e as Error)?.name === 'AbortError') return // el usuario canceló
+        canvases.forEach((c) => descargarCanvas(c.canvas, c.nombre))
       }
       return
     }
 
-    // Respaldo (computador o navegador sin soporte): descargamos la imagen para adjuntar a mano.
-    descargarCanvas(canvas, nombreArchivo)
+    // Respaldo (computador o sin soporte): descarga cada foto para adjuntar a mano.
+    canvases.forEach((c) => descargarCanvas(c.canvas, c.nombre))
     alert(
-      'Tu dispositivo no permite adjuntar la imagen directamente a WhatsApp. La descargamos: ' +
-        'ábrela en WhatsApp y adjúntala manualmente.',
+      'Tu dispositivo no permite adjuntar las imágenes directamente a WhatsApp. Las descargamos: ' +
+        'ábrelas en WhatsApp y adjúntalas manualmente.',
     )
   }
 
@@ -56,7 +59,7 @@ export function BotonCompartirWhatsapp({
       onClick={compartir}
       className="rounded-lg bg-[#25D366] px-3 py-1 text-sm font-semibold text-white hover:opacity-90"
     >
-      🟢 Compartir por WhatsApp
+      🟢 Compartir por WhatsApp{targets.length > 1 ? ` (${targets.length} fotos)` : ''}
     </button>
   )
 }
