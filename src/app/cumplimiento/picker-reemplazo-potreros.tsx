@@ -45,7 +45,7 @@ export function PickerReemplazoPotreros({ lotes, conBultos, unidadLabel }: { lot
       {fincaBloqueada && (
         <span className="text-xs text-tierra">Finca fija: {fincaBloqueada} — desmarca los potreros para cambiarla</span>
       )}
-      {finca && (
+      {fincaActiva && (
         <div className="flex max-h-48 flex-col gap-1 overflow-auto rounded-lg border border-borde bg-marfil p-2">
           {filtrados.map((l) => {
             const checked = l.id in sel

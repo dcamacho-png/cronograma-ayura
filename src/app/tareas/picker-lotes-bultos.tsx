@@ -39,7 +39,7 @@ export function PickerLotesBultos({ lotes, seleccionInicial = {}, campo = 'bulto
       {fincaBloqueada && (
         <span className="text-xs text-tierra">Finca fija: {fincaBloqueada} — desmarca los lotes para cambiarla</span>
       )}
-      {finca && (
+      {fincaActiva && (
         <div className="flex max-h-48 flex-col gap-1 overflow-auto rounded-lg border border-borde bg-marfil p-2">
           {filtrados.map((l) => {
             const checked = l.id in sel
