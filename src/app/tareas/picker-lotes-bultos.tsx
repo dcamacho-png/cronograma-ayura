@@ -12,8 +12,12 @@ export function PickerLotesBultos({ lotes, seleccionInicial = {}, campo = 'bulto
   const [sel, setSel] = useState<Record<string, string>>(seleccionInicial) // loteId -> bultos (texto); presencia = marcado
 
   const fincas = [...new Set(lotes.map((l) => l.finca.nombre))].sort()
-  const filtrados = finca ? lotes.filter((l) => l.finca.nombre === finca) : []
   const seleccionados = lotes.filter((l) => l.id in sel)
+  // Una tarea = una sola finca: al marcar el primer lote la finca queda fija en la de
+  // ese lote y no se puede cambiar hasta desmarcar todo (evita mezclar fincas).
+  const fincaBloqueada = seleccionados.length > 0 ? seleccionados[0].finca.nombre : null
+  const fincaActiva = fincaBloqueada ?? finca
+  const filtrados = fincaActiva ? lotes.filter((l) => l.finca.nombre === fincaActiva) : []
 
   const toggle = (id: string) =>
     setSel((prev) => {
@@ -26,12 +30,15 @@ export function PickerLotesBultos({ lotes, seleccionInicial = {}, campo = 'bulto
 
   return (
     <div className="flex flex-col gap-1">
-      <select value={finca} onChange={(e) => setFinca(e.target.value)} className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
+      <select value={fincaActiva} onChange={(e) => setFinca(e.target.value)} disabled={!!fincaBloqueada} className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40 disabled:opacity-70">
         <option value="">— elegir finca —</option>
         {fincas.map((f) => (
           <option key={f} value={f}>{f}</option>
         ))}
       </select>
+      {fincaBloqueada && (
+        <span className="text-xs text-tierra">Finca fija: {fincaBloqueada} — desmarca los lotes para cambiarla</span>
+      )}
       {finca && (
         <div className="flex max-h-48 flex-col gap-1 overflow-auto rounded-lg border border-borde bg-marfil p-2">
           {filtrados.map((l) => {

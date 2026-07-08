@@ -47,9 +47,18 @@ export function FormAvance({
   const [loteAnexar, setLoteAnexar] = useState('')
   const conocida = UNIDADES.find((u) => u.toLowerCase() === (unidadActual ?? '').toLowerCase())
   const [unidadSel, setUnidadSel] = useState(conocida ?? (unidadActual ? 'Otro' : (esMaquinaria ? 'Ha' : 'Cantidad')))
+  const [unidadOtraTxt, setUnidadOtraTxt] = useState(conocida ? '' : (unidadActual ?? ''))
+  // Etiqueta que se muestra al lado de cada potrero: la unidad elegida arriba (no "ha" fijo).
+  const unidadLote = unidadSel === 'Otro' ? (unidadOtraTxt.trim() || 'medida') : unidadSel
   const conBultos = descripcion ? usaBultos(descripcion) : false
   const filasPotreros = [...lotesActividad, ...anexados]
   const fincasAnexar = [...new Set(lotesCatalogo.map((l) => l.finca.nombre))].sort()
+  // Anexar solo dentro de la finca de la actividad (una actividad = una sola finca).
+  const fincaDeId = (id: string) => lotesCatalogo.find((l) => l.id === id)?.finca.nombre ?? null
+  const fincaAncla = (fincaDefault || null)
+    ?? (lotesActividad.length > 0 ? fincaDeId(lotesActividad[0].id) : null)
+    ?? (anexados.length > 0 ? fincaDeId(anexados[0].id) : null)
+  const fincaAnexActiva = fincaAncla ?? fincaAnexar
 
   if (!abierto) {
     return (
@@ -106,7 +115,7 @@ export function FormAvance({
       </label>
       {unidadSel === 'Otro' && (
         <label className="flex flex-col">Unidad (texto)
-          <input name="unidadOtra" defaultValue={conocida ? '' : unidadActual ?? ''} placeholder="ej. bultos" className="w-28 rounded-lg border border-borde bg-marfil p-1 focus:outline-none focus:ring-2 focus:ring-bosque/40" />
+          <input name="unidadOtra" value={unidadOtraTxt} onChange={(e) => setUnidadOtraTxt(e.target.value)} placeholder="ej. bultos" className="w-28 rounded-lg border border-borde bg-marfil p-1 focus:outline-none focus:ring-2 focus:ring-bosque/40" />
         </label>
       )}
       <div className="flex w-full flex-col gap-2 rounded-lg border border-borde bg-arena p-2">
@@ -118,7 +127,7 @@ export function FormAvance({
                 <input type="checkbox" name="loteHecho" value={l.id} defaultChecked className="accent-bosque" />
                 {l.nombre}
               </label>
-              <label className="flex items-center gap-1">ha
+              <label className="flex items-center gap-1">{unidadLote}
                 <input name={`ha_${l.id}`} type="number" step="any" min="0" defaultValue={l.hectareas ?? ''} className="w-20 rounded-lg border border-borde bg-marfil p-0.5" />
               </label>
               {conBultos && (
@@ -131,13 +140,13 @@ export function FormAvance({
         </div>
         <div className="flex flex-wrap items-end gap-2 border-t border-borde pt-2">
           <span className="w-full text-tierra">Anexar potrero(s):</span>
-          <select value={fincaAnexar} onChange={(e) => { setFincaAnexar(e.target.value); setLoteAnexar('') }} className="rounded-lg border border-borde bg-marfil p-1">
+          <select value={fincaAnexActiva} onChange={(e) => { setFincaAnexar(e.target.value); setLoteAnexar('') }} disabled={!!fincaAncla} className="rounded-lg border border-borde bg-marfil p-1 disabled:opacity-70">
             <option value="">— finca —</option>
             {fincasAnexar.map((f) => (<option key={f} value={f}>{f}</option>))}
           </select>
           <select value={loteAnexar} onChange={(e) => setLoteAnexar(e.target.value)} className="rounded-lg border border-borde bg-marfil p-1">
             <option value="">— lote —</option>
-            {lotesCatalogo.filter((l) => l.finca.nombre === fincaAnexar && !filasPotreros.some((x) => x.id === l.id)).map((l) => (<option key={l.id} value={l.id}>{l.nombre}</option>))}
+            {lotesCatalogo.filter((l) => l.finca.nombre === fincaAnexActiva && !filasPotreros.some((x) => x.id === l.id)).map((l) => (<option key={l.id} value={l.id}>{l.nombre}</option>))}
           </select>
           <button
             type="button"

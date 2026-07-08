@@ -154,7 +154,7 @@ describe('filasCumplimientoGrupo — una sola fila por actividad aunque tenga va
 })
 
 describe('filasCumplimiento — con avances extra', () => {
-  it('repite los datos de actividad (bultos, centro de costo, potreros) en cada fila de avance', () => {
+  it('bultos por lote: cada fila de avance trae los bultos de SU lote, no el texto de todos', () => {
     const a = act({
       lotes: [{ id: 'l1', nombre: 'L1' }, { id: 'l2', nombre: 'L2' }],
       bultosPorLote: { l1: 3, l2: 2 },
@@ -165,10 +165,21 @@ describe('filasCumplimiento — con avances extra', () => {
     const filas = filasCumplimiento(a, '15 jun', mapa, ctx)
     expect(filas.length).toBe(2)
     for (const f of filas) {
-      expect(f[10]).toBe('L1: 3, L2: 2') // bultos por lote
-      expect(f[11]).toBe('Ceba')          // centro de costo
-      expect(f[12]).toBe('L1')            // potreros realizados
+      expect(f[10]).toBe(3)      // bultos SOLO de l1 (no 'L1: 3, L2: 2')
+      expect(f[11]).toBe('Ceba') // centro de costo
+      expect(f[12]).toBe('L1')   // potreros realizados
     }
+  })
+
+  it('bultos por lote: fila de un lote sin bultos → celda vacía', () => {
+    const a = act({
+      lotes: [{ id: 'l1', nombre: 'L1' }, { id: 'l2', nombre: 'L2' }],
+      bultosPorLote: { l1: 3 }, // l2 sin bultos
+      avancePorLote: { l2: [{ dia: 1, maquinaId: null, cantidad: 2 }] },
+    })
+    const filas = filasCumplimiento(a, '15 jun', mapa, ctx)
+    expect(filas.length).toBe(1)
+    expect(filas[0][10]).toBe('') // l2 no tiene bultos
   })
 })
 

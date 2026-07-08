@@ -77,7 +77,7 @@ export function filasCumplimiento(
         estado,
         e.cantidad,
         unidadDisplay,
-        bultos,
+        a.bultosPorLote?.[l.id] ?? '', // bultos de ESTE lote (no el texto de todos)
         e.centroCosto ?? centro,
         potreros,
         ejecutadaPor,
