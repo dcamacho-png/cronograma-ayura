@@ -6,7 +6,7 @@ import { usaBultos } from '@/dominio/bultos'
 
 const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 const UNIDADES = ['Ha', 'Hora', 'Kg', 'Cantidad', 'Bultos', 'Jornales'] // + "Otro" (texto libre)
-type Lote = { id: string; nombre: string; finca: { nombre: string } }
+type Lote = { id: string; nombre: string; hectareas?: number | null; finca: { nombre: string } }
 
 // Un avance puede registrar varios potreros a la vez: día, responsable, unidad (por actividad),
 // observación, tabla por potrero (casilla + ha = medida + bultos en fertilización), anexar
@@ -143,7 +143,7 @@ export function FormAvance({
             type="button"
             onClick={() => {
               const l = lotesCatalogo.find((x) => x.id === loteAnexar)
-              if (l) { setAnexados((prev) => [...prev, { id: l.id, nombre: l.nombre }]); setLoteAnexar('') }
+              if (l) { setAnexados((prev) => [...prev, { id: l.id, nombre: l.nombre, hectareas: l.hectareas }]); setLoteAnexar('') }
             }}
             className="rounded-lg border border-bosque px-2 py-1 font-semibold text-bosque hover:bg-arena/40"
           >
