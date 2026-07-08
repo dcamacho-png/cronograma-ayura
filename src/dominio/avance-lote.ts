@@ -93,6 +93,24 @@ export function agregarAvances(
   return out
 }
 
+// Al marcar una actividad como CUMPLIDA directamente (sin registrar avances), completa el
+// historial para que los datos queden completos: a cada lote SIN ninguna entrada de avance le
+// agrega una entrada con su área completa (hectáreas del potrero) en el día dado. Los lotes que
+// ya tienen avances se dejan intactos. Un lote sin hectáreas recibe cantidad 0 (para que igual
+// aparezca por lote en el Excel). Si no falta ninguno, devuelve el mismo objeto.
+export function completarAvancesCumplida(
+  lotes: { id: string; hectareas?: number | null }[],
+  avance: AvancePorLote,
+  dia: number,
+  responsableId?: string | null,
+): AvancePorLote {
+  const faltantes = lotes
+    .filter((l) => !(avance[l.id] ?? []).length)
+    .map((l) => ({ loteId: l.id, cantidad: l.hectareas ?? 0 }))
+  if (faltantes.length === 0) return avance
+  return agregarAvances(avance, dia, null, faltantes, null, responsableId)
+}
+
 // Devuelve una copia de `avance` con la entrada (loteId, index) modificada en los campos
 // dados. `observacion` vacía elimina el campo. Fuera de rango ⇒ devuelve el mismo objeto.
 export function editarAvanceEntrada(

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   lotesPendientes, textoAvancePorLote, textoAvanceConFecha,
-  normalizarAvancePorLote, totalAvanceLotes, agregarAvances, type AvancePorLote,
+  normalizarAvancePorLote, totalAvanceLotes, agregarAvances, completarAvancesCumplida, type AvancePorLote,
 } from './avance-lote'
 
 const lotes = [{ id: 'a', nombre: 'L-A' }, { id: 'b', nombre: 'L-B' }, { id: 'c', nombre: 'L-C' }]
@@ -191,5 +191,39 @@ describe('eliminarAvanceEntrada', () => {
   it('índice fuera de rango: sin cambios', () => {
     const orig = base()
     expect(eliminarAvanceEntrada(orig, 'a', 9)).toBe(orig)
+  })
+})
+
+describe('completarAvancesCumplida', () => {
+  const lotesHa = [
+    { id: 'a', nombre: 'L-A', hectareas: 5 },
+    { id: 'b', nombre: 'L-B', hectareas: 3 },
+    { id: 'c', nombre: 'L-C', hectareas: null },
+  ]
+
+  it('sin avances: cada lote recibe una entrada con su área (hectáreas) en el día dado', () => {
+    const out = completarAvancesCumplida(lotesHa, {}, 4)
+    expect(out.a).toEqual([{ dia: 4, maquinaId: null, cantidad: 5 }])
+    expect(out.b).toEqual([{ dia: 4, maquinaId: null, cantidad: 3 }])
+    // lote sin hectáreas: entrada con cantidad 0 (para que igual aparezca por lote)
+    expect(out.c).toEqual([{ dia: 4, maquinaId: null, cantidad: 0 }])
+    expect(totalAvanceLotes(lotesHa, out)).toBe(8)
+  })
+
+  it('respeta los lotes que ya tienen avances; solo completa los faltantes', () => {
+    const previo: AvancePorLote = { a: [{ dia: 1, maquinaId: null, cantidad: 2 }] }
+    const out = completarAvancesCumplida(lotesHa, previo, 3)
+    expect(out.a).toEqual([{ dia: 1, maquinaId: null, cantidad: 2 }]) // intacto
+    expect(out.b).toEqual([{ dia: 3, maquinaId: null, cantidad: 3 }])
+    expect(out.c).toEqual([{ dia: 3, maquinaId: null, cantidad: 0 }])
+  })
+
+  it('todos los lotes ya tienen avance: devuelve el mismo objeto', () => {
+    const previo: AvancePorLote = {
+      a: [{ dia: 1, maquinaId: null, cantidad: 2 }],
+      b: [{ dia: 1, maquinaId: null, cantidad: 1 }],
+      c: [{ dia: 1, maquinaId: null, cantidad: 1 }],
+    }
+    expect(completarAvancesCumplida(lotesHa, previo, 3)).toBe(previo)
   })
 })

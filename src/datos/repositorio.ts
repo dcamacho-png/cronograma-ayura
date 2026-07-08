@@ -9,6 +9,7 @@ import {
   normalizarAvancePorLote,
   agregarAvances,
   totalAvanceLotes,
+  completarAvancesCumplida,
   editarAvanceEntrada,
   eliminarAvanceEntrada,
   type AvanceEntrada,
@@ -834,18 +835,19 @@ export async function registrarAvanceObservacionGrupo(id: string, nota: string) 
 export async function marcarCumplidaGrupo(id: string) {
   const g = await filasHermanas(id)
   if (!g) return null
-  const total = totalAvanceLotes(
-    g.base.lotes,
-    normalizarAvancePorLote(g.base.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null),
-  )
   const tieneLotes = g.base.lotes.length > 0
+  // Al cumplir directo, completar el avance de los lotes sin registro con su área (hectáreas),
+  // para que el Excel desglose por lote y el total refleje las áreas.
+  const avanceActual = normalizarAvancePorLote(g.base.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null)
+  const avanceCompleto = tieneLotes ? completarAvancesCumplida(g.base.lotes, avanceActual, g.base.dia) : avanceActual
+  const total = totalAvanceLotes(g.base.lotes, avanceCompleto)
   await prisma.$transaction(
     g.filas
       .filter((f) => f.estado === 'PENDIENTE' || f.estado === 'PARCIAL')
       .map((f) =>
         prisma.actividad.update({
           where: { id: f.id },
-          data: { estado: 'CUMPLIDA', cerrada: true, ...(tieneLotes ? { haRealizada: total } : {}) },
+          data: { estado: 'CUMPLIDA', cerrada: true, ...(tieneLotes ? { haRealizada: total, avancePorLote: avanceCompleto } : {}) },
         }),
       ),
   )
