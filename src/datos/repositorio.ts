@@ -1160,14 +1160,18 @@ export async function crearActividadRealizada(datos: {
   dia: number
   responsableId: string
   descripcion: string
-  loteId: string | null
+  loteIds: string[]
   maquinaId: string | null
-  medida: number | null
   centroCosto: string | null
+  unidad: string | null
+  avancePorLote: Record<string, AvanceEntrada[]> | null
+  bultosPorLote: Record<string, number> | null
+  haRealizada: number | null
 }) {
+  // La finca se deduce del primer lote (una actividad = una sola finca).
   let fincaId: string | null = null
-  if (datos.loteId) {
-    const lote = await prisma.lote.findUnique({ where: { id: datos.loteId } })
+  if (datos.loteIds.length > 0) {
+    const lote = await prisma.lote.findUnique({ where: { id: datos.loteIds[0] } })
     fincaId = lote?.fincaId ?? null
   }
   return prisma.actividad.create({
@@ -1182,9 +1186,12 @@ export async function crearActividadRealizada(datos: {
       fincaId,
       responsableId: datos.responsableId,
       maquinaId: datos.maquinaId,
-      haRealizada: datos.medida,
+      haRealizada: datos.haRealizada,
       centroCosto: datos.centroCosto,
-      lotes: datos.loteId ? { connect: [{ id: datos.loteId }] } : undefined,
+      unidadRealizada: datos.unidad,
+      avancePorLote: datos.avancePorLote ?? undefined,
+      bultosPorLote: datos.bultosPorLote ?? undefined,
+      lotes: datos.loteIds.length ? { connect: datos.loteIds.map((id) => ({ id })) } : undefined,
     },
   })
 }

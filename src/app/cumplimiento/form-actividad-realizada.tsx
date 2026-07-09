@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { SelectFincaLote } from '../_componentes/select-finca-lote'
-import { etiquetaMedida, normalizarUnidad, type Unidad } from '@/dominio/unidad'
+import { PickerReemplazoPotreros } from './picker-reemplazo-potreros'
+import { usaBultos } from '@/dominio/bultos'
 import { CENTROS_COSTO } from '@/dominio/centro-costo'
 
 const DIAS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+const UNIDADES = ['Ha', 'Hora', 'Kg', 'Cantidad', 'Bultos', 'Jornales'] // + "Otro" (texto libre)
 
-type Lote = { id: string; nombre: string; finca: { nombre: string } }
+type Lote = { id: string; nombre: string; hectareas?: number | null; finca: { nombre: string } }
 type Estipulada = { id: string; nombre: string; unidad: string }
 
 export function FormActividadRealizada({
@@ -31,12 +32,19 @@ export function FormActividadRealizada({
   estipuladas: Estipulada[]
   accion: (formData: FormData) => void | Promise<void>
 }) {
-  // Para maquinaria, la descripción se elige del catálogo (o "Otra").
+  // Descripción: en maquinaria se elige del catálogo (o "Otra" texto); en estándar es texto libre.
   const [desc, setDesc] = useState('')
+  const [descOtra, setDescOtra] = useState('')
   const [centroCosto, setCentroCosto] = useState('')
-  const unidadPorNombre = new Map(estipuladas.map((e) => [e.nombre, normalizarUnidad(e.unidad)]))
+  const [unidadSel, setUnidadSel] = useState(esMaquinaria ? 'Ha' : 'Cantidad')
+  const [unidadOtraTxt, setUnidadOtraTxt] = useState('')
+
   const esOtra = desc === '__otra__'
-  const unidadSel: Unidad = esOtra || desc === '' ? 'ha' : unidadPorNombre.get(desc) ?? 'ha'
+  // Descripción efectiva (para saber si usa bultos): en maquinaria el catálogo o el texto "Otra";
+  // en estándar el texto libre (guardado en `desc`).
+  const descripcionActual = esMaquinaria ? (esOtra ? descOtra : desc) : desc
+  const conBultos = usaBultos(descripcionActual)
+  const unidadLabel = unidadSel === 'Otro' ? (unidadOtraTxt.trim() || 'medida') : unidadSel
 
   return (
     <form action={accion} className="mb-6 flex flex-wrap items-end gap-2 rounded-xl border border-borde bg-arena p-3">
@@ -82,20 +90,34 @@ export function FormActividadRealizada({
           {esOtra && (
             <label className="flex flex-1 flex-col text-xs">
               Otra (texto libre)
-              <input name="descripcionOtra" required placeholder="¿Qué se hizo?" className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
+              <input name="descripcionOtra" required value={descOtra} onChange={(e) => setDescOtra(e.target.value)} placeholder="¿Qué se hizo?" className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
             </label>
           )}
         </>
       ) : (
         <label className="flex flex-1 flex-col text-xs">
           Descripción
-          <input name="descripcion" required placeholder="¿Qué se hizo?" className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
+          <input name="descripcion" required value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="¿Qué se hizo?" className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
         </label>
       )}
       <label className="flex flex-col text-xs">
-        Finca y lote
-        <SelectFincaLote lotes={lotes} name="loteId" />
+        Unidad
+        <select
+          name="unidad"
+          value={unidadSel === 'Otro' ? 'otro' : unidadSel.toLowerCase()}
+          onChange={(e) => setUnidadSel(e.target.value === 'otro' ? 'Otro' : e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1))}
+          className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
+        >
+          {UNIDADES.map((u) => (<option key={u} value={u.toLowerCase()}>{u}</option>))}
+          <option value="otro">Otro…</option>
+        </select>
       </label>
+      {unidadSel === 'Otro' && (
+        <label className="flex flex-col text-xs">
+          Unidad (texto)
+          <input name="unidadOtra" value={unidadOtraTxt} onChange={(e) => setUnidadOtraTxt(e.target.value)} placeholder="ej. bultos" className="w-28 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
+        </label>
+      )}
       {esMaquinaria && (
         <>
           <label className="flex flex-col text-xs">
@@ -106,10 +128,6 @@ export function FormActividadRealizada({
                 <option key={m.id} value={m.id}>{m.nombre}</option>
               ))}
             </select>
-          </label>
-          <label className="flex flex-col text-xs">
-            {etiquetaMedida(unidadSel)} (opcional)
-            <input name="medida" type="number" step="any" min="0" className="w-28 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
           </label>
           <label className="flex flex-col text-xs">
             Centro de costo
@@ -134,6 +152,10 @@ export function FormActividadRealizada({
           )}
         </>
       )}
+      <label className="flex w-full flex-col text-xs">
+        Potreros (medida por lote{conBultos ? ' + bultos' : ''} + observación)
+        <PickerReemplazoPotreros lotes={lotes} conBultos={conBultos} unidadLabel={unidadLabel} prefijo="np" conObservacion />
+      </label>
       <button className="rounded-lg bg-bosque px-3 py-1 text-sm font-semibold text-white">Agregar</button>
     </form>
   )

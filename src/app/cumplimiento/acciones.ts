@@ -71,6 +71,23 @@ export async function agregarActividadRealizadaAccion(form: FormData) {
   if (await bloqueadoPorPlazo(anio, semana)) return
   const centroSelect = texto(form, 'centroCosto')
   const centroCosto = centroSelect === '__otra__' ? textoOpcional(form, 'centroCostoOtra') : (centroSelect || null)
+  const maquinaId = textoOpcional(form, 'maquinaId')
+  const loteIds = form.getAll('npLoteId').map((v) => String(v).trim()).filter(Boolean)
+  // Una entrada de avance por lote (medida = cantidad; observación por lote) + bultos por lote.
+  const avancePorLote: Record<string, { dia: number; maquinaId: string | null; cantidad: number; centroCosto?: string; responsableId?: string; observacion?: string }[]> = {}
+  const bultosPorLote: Record<string, number> = {}
+  for (const loteId of loteIds) {
+    const cantidad = numeroOpcional(form, `npMedida_${loteId}`) ?? 0
+    const obs = textoOpcional(form, `npObs_${loteId}`)
+    avancePorLote[loteId] = [{
+      dia, maquinaId, cantidad, responsableId,
+      ...(centroCosto ? { centroCosto } : {}),
+      ...(obs ? { observacion: obs } : {}),
+    }]
+    const b = numeroOpcional(form, `npBultos_${loteId}`)
+    if (b != null) bultosPorLote[loteId] = b
+  }
+  const total = loteIds.reduce((s, id) => s + (avancePorLote[id][0].cantidad || 0), 0)
   await crearActividadRealizada({
     areaId,
     anio,
@@ -78,10 +95,13 @@ export async function agregarActividadRealizadaAccion(form: FormData) {
     dia,
     responsableId,
     descripcion,
-    loteId: textoOpcional(form, 'loteId'),
-    maquinaId: textoOpcional(form, 'maquinaId'),
-    medida: numeroOpcional(form, 'medida'),
+    loteIds,
+    maquinaId,
     centroCosto,
+    unidad: unidadElegida(form),
+    avancePorLote: loteIds.length ? avancePorLote : null,
+    bultosPorLote: Object.keys(bultosPorLote).length ? bultosPorLote : null,
+    haRealizada: loteIds.length ? total : null,
   })
   revalidatePath('/cumplimiento')
 }

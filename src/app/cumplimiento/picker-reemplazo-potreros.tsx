@@ -4,13 +4,27 @@ import { useState } from 'react'
 
 type Lote = { id: string; nombre: string; hectareas?: number | null; finca: { nombre: string } }
 
-// Multiselección de potreros por finca para el reemplazo (motivo = cambio). Cada potrero
-// marcado lleva un valor de medida y —en fertilización— sus bultos. Emite por lote marcado
-// <input name="reemplazoLoteId"> y, cuando tienen valor, <input name="reemplazoMedida_<id>">
-// y <input name="reemplazoBultos_<id>">. La selección persiste al cambiar de finca (por id).
-export function PickerReemplazoPotreros({ lotes, conBultos, unidadLabel }: { lotes: Lote[]; conBultos: boolean; unidadLabel: string }) {
+// Multiselección de potreros por finca. Cada potrero marcado lleva una medida (precargada con
+// sus hectáreas, editable) y —cuando aplica— sus bultos y una observación. Emite por lote
+// marcado <input name="<prefijo>LoteId"> y, cuando tienen valor, <input name="<prefijo>Medida_<id>">,
+// <input name="<prefijo>Bultos_<id>"> y <input name="<prefijo>Obs_<id>">. La selección persiste al
+// cambiar de finca (por id) y la finca queda fija al marcar el primer potrero (una sola finca).
+// `prefijo` default 'reemplazo' preserva el uso original del reemplazo (motivo = cambio).
+export function PickerReemplazoPotreros({
+  lotes,
+  conBultos,
+  unidadLabel,
+  prefijo = 'reemplazo',
+  conObservacion = false,
+}: {
+  lotes: Lote[]
+  conBultos: boolean
+  unidadLabel: string
+  prefijo?: string
+  conObservacion?: boolean
+}) {
   const [finca, setFinca] = useState('')
-  const [sel, setSel] = useState<Record<string, { medida: string; bultos: string }>>({})
+  const [sel, setSel] = useState<Record<string, { medida: string; bultos: string; observacion: string }>>({})
 
   const fincas = [...new Set(lotes.map((l) => l.finca.nombre))].sort()
   const seleccionados = lotes.filter((l) => l.id in sel)
@@ -27,11 +41,11 @@ export function PickerReemplazoPotreros({ lotes, conBultos, unidadLabel }: { lot
       if (id in next) delete next[id]
       else {
         const ha = lotes.find((l) => l.id === id)?.hectareas
-        next[id] = { medida: ha != null ? String(ha) : '', bultos: '' }
+        next[id] = { medida: ha != null ? String(ha) : '', bultos: '', observacion: '' }
       }
       return next
     })
-  const setValor = (id: string, campo: 'medida' | 'bultos', v: string) =>
+  const setValor = (id: string, campo: 'medida' | 'bultos' | 'observacion', v: string) =>
     setSel((prev) => ({ ...prev, [id]: { ...prev[id], [campo]: v } }))
 
   return (
@@ -50,8 +64,8 @@ export function PickerReemplazoPotreros({ lotes, conBultos, unidadLabel }: { lot
           {filtrados.map((l) => {
             const checked = l.id in sel
             return (
-              <div key={l.id} className="flex items-center gap-2 text-sm">
-                <label className="flex flex-1 items-center gap-1">
+              <div key={l.id} className="flex flex-wrap items-center gap-2 text-sm">
+                <label className="flex min-w-32 flex-1 items-center gap-1">
                   <input type="checkbox" checked={checked} onChange={() => toggle(l.id)} className="accent-bosque" />
                   {l.nombre}
                 </label>
@@ -77,6 +91,15 @@ export function PickerReemplazoPotreros({ lotes, conBultos, unidadLabel }: { lot
                         className="w-24 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
                       />
                     )}
+                    {conObservacion && (
+                      <input
+                        type="text"
+                        placeholder="observación"
+                        value={sel[l.id].observacion}
+                        onChange={(e) => setValor(l.id, 'observacion', e.target.value)}
+                        className="min-w-40 flex-1 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
+                      />
+                    )}
                   </>
                 )}
               </div>
@@ -86,9 +109,10 @@ export function PickerReemplazoPotreros({ lotes, conBultos, unidadLabel }: { lot
       )}
       {seleccionados.map((l) => (
         <span key={l.id}>
-          <input type="hidden" name="reemplazoLoteId" value={l.id} />
-          {sel[l.id].medida !== '' && <input type="hidden" name={`reemplazoMedida_${l.id}`} value={sel[l.id].medida} />}
-          {conBultos && sel[l.id].bultos !== '' && <input type="hidden" name={`reemplazoBultos_${l.id}`} value={sel[l.id].bultos} />}
+          <input type="hidden" name={`${prefijo}LoteId`} value={l.id} />
+          {sel[l.id].medida !== '' && <input type="hidden" name={`${prefijo}Medida_${l.id}`} value={sel[l.id].medida} />}
+          {conBultos && sel[l.id].bultos !== '' && <input type="hidden" name={`${prefijo}Bultos_${l.id}`} value={sel[l.id].bultos} />}
+          {conObservacion && sel[l.id].observacion !== '' && <input type="hidden" name={`${prefijo}Obs_${l.id}`} value={sel[l.id].observacion} />}
         </span>
       ))}
       {seleccionados.length > 0 && (
