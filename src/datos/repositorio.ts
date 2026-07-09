@@ -520,7 +520,10 @@ export async function registrarCumplimiento(
 ) {
   const act = await prisma.actividad.findUnique({ where: { id }, include: { lotes: true } })
   if (!act || act.estado !== 'PENDIENTE') return null // ya registrada / bloqueada
-  const notaFinal = reemplazo ? `Cambiada por: ${reemplazo.descripcion}` : nota
+  // En un cambio se conserva la observación escrita junto al texto automático (antes se descartaba).
+  const notaFinal = reemplazo
+    ? (nota ? `Cambiada por: ${reemplazo.descripcion} — ${nota}` : `Cambiada por: ${reemplazo.descripcion}`)
+    : nota
   await prisma.actividad.update({
     where: { id },
     data: {
@@ -968,7 +971,10 @@ export async function registrarNovedadGrupo(
 ) {
   const g = await filasHermanas(id)
   if (!g) return null
-  const notaFinal = reemplazo ? `Cambiada por: ${reemplazo.descripcion}` : nota
+  // En un cambio se conserva la observación escrita junto al texto automático (antes se descartaba).
+  const notaFinal = reemplazo
+    ? (nota ? `Cambiada por: ${reemplazo.descripcion} — ${nota}` : `Cambiada por: ${reemplazo.descripcion}`)
+    : nota
   await prisma.$transaction(async (tx) => {
     for (const f of g.filas) {
       if (f.estado === 'CUMPLIDA') continue

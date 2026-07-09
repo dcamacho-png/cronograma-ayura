@@ -82,6 +82,14 @@ describe('textoAvanceConFecha', () => {
     expect(textoAvanceConFecha(lotes, avance, 'ha', (d) => `D${d}`))
       .toBe('D1 · L-A — 3 ha; D2 · L-A — 2 ha; D2 · L-B — 2 ha')
   })
+  it('incluye la observación del avance cuando existe', () => {
+    const conObs: AvancePorLote = {
+      a: [{ dia: 1, maquinaId: null, cantidad: 3, observacion: 'llovió' }],
+      b: [{ dia: 2, maquinaId: null, cantidad: 2 }],
+    }
+    expect(textoAvanceConFecha(lotes, conObs, 'ha', (d) => `D${d}`))
+      .toBe('D1 · L-A — 3 ha · llovió; D2 · L-B — 2 ha')
+  })
   it('vacío si no hay avance', () => {
     expect(textoAvanceConFecha([{ id: 'a', nombre: 'L-A' }], null, 'ha', (d) => `D${d}`)).toBe('')
   })

@@ -71,34 +71,43 @@ export function PickerReemplazoPotreros({
                 </label>
                 {checked && (
                   <>
-                    <input
-                      type="number"
-                      step="any"
-                      min="0"
-                      placeholder={unidadLabel}
-                      value={sel[l.id].medida}
-                      onChange={(e) => setValor(l.id, 'medida', e.target.value)}
-                      className="w-24 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
-                    />
-                    {conBultos && (
+                    <label className="flex items-center gap-1 text-xs text-tierra">
+                      {unidadLabel}
                       <input
                         type="number"
                         step="any"
                         min="0"
-                        placeholder="bultos"
-                        value={sel[l.id].bultos}
-                        onChange={(e) => setValor(l.id, 'bultos', e.target.value)}
-                        className="w-24 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
+                        placeholder={unidadLabel}
+                        value={sel[l.id].medida}
+                        onChange={(e) => setValor(l.id, 'medida', e.target.value)}
+                        className="w-20 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
                       />
+                    </label>
+                    {conBultos && (
+                      <label className="flex items-center gap-1 text-xs text-tierra">
+                        bultos
+                        <input
+                          type="number"
+                          step="any"
+                          min="0"
+                          placeholder="bultos"
+                          value={sel[l.id].bultos}
+                          onChange={(e) => setValor(l.id, 'bultos', e.target.value)}
+                          className="w-20 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
+                        />
+                      </label>
                     )}
                     {conObservacion && (
-                      <input
-                        type="text"
-                        placeholder="observación"
-                        value={sel[l.id].observacion}
-                        onChange={(e) => setValor(l.id, 'observacion', e.target.value)}
-                        className="min-w-40 flex-1 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
-                      />
+                      <label className="flex min-w-40 flex-1 items-center gap-1 text-xs text-tierra">
+                        obs.
+                        <input
+                          type="text"
+                          placeholder="observación"
+                          value={sel[l.id].observacion}
+                          onChange={(e) => setValor(l.id, 'observacion', e.target.value)}
+                          className="flex-1 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
+                        />
+                      </label>
                     )}
                   </>
                 )}

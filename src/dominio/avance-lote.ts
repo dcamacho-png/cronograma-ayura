@@ -54,7 +54,7 @@ export function textoAvanceConFecha(
   const partes: string[] = []
   for (const l of lotes) {
     for (const e of avance[l.id] ?? []) {
-      partes.push(`${etiquetaDia(e.dia)} · ${l.nombre} — ${e.cantidad} ${unidadAbrev}`)
+      partes.push(`${etiquetaDia(e.dia)} · ${l.nombre} — ${e.cantidad} ${unidadAbrev}${e.observacion ? ` · ${e.observacion}` : ''}`)
     }
   }
   return partes.join('; ')
