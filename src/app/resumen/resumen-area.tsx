@@ -211,6 +211,20 @@ export function ResumenArea({
         </div>
       )}
 
+      {esMaquinaria && medidaActividadLista.some(([, m]) => m.valor > 0) && (
+        <div className="mb-8">
+          <h2 className="mb-3 text-lg font-semibold text-tinta">🚜 Trabajo por actividad</h2>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
+            {medidaActividadLista.filter(([, m]) => m.valor > 0).map(([desc, { valor, unidad }]) => (
+              <div key={desc} className="tarjeta p-4">
+                <div className="mb-1 text-xs text-tierra">{desc}</div>
+                <div className="text-2xl font-extrabold text-[#2e9e5b]">{Math.round(valor * 10) / 10} {unidadAbreviada(unidad)}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Chips de conteo (visibles) */}
       <h2 className="mb-2 text-lg font-semibold text-tinta">📊 Detalle por estado</h2>
       <div className="mb-6 flex flex-wrap gap-3 text-sm">
