@@ -24,6 +24,7 @@ export function FormAvance({
   bultosAsignados,
   descripcion,
   unidadActual,
+  unidadCatalogo,
   accion,
 }: {
   actividadId: string
@@ -38,6 +39,7 @@ export function FormAvance({
   bultosAsignados?: Record<string, number> | null
   descripcion?: string
   unidadActual?: string | null
+  unidadCatalogo?: string
   accion: (f: FormData) => void | Promise<void>
 }) {
   const [abierto, setAbierto] = useState(false)
@@ -45,9 +47,12 @@ export function FormAvance({
   const [anexados, setAnexados] = useState<{ id: string; nombre: string; hectareas?: number | null }[]>([])
   const [fincaAnexar, setFincaAnexar] = useState(fincaDefault)
   const [loteAnexar, setLoteAnexar] = useState('')
-  const conocida = UNIDADES.find((u) => u.toLowerCase() === (unidadActual ?? '').toLowerCase())
-  const [unidadSel, setUnidadSel] = useState(conocida ?? (unidadActual ? 'Otro' : (esMaquinaria ? 'Ha' : 'Cantidad')))
-  const [unidadOtraTxt, setUnidadOtraTxt] = useState(conocida ? '' : (unidadActual ?? ''))
+  // Unidad por defecto: la ya registrada (unidadActual) si existe; si no, la del catálogo de
+  // la actividad (unidadCatalogo); si no, genérica. Siempre editable.
+  const fuenteUnidad = ((unidadActual ?? '').trim() || (unidadCatalogo ?? '').trim())
+  const conocida = UNIDADES.find((u) => u.toLowerCase() === fuenteUnidad.toLowerCase())
+  const [unidadSel, setUnidadSel] = useState(conocida ?? (fuenteUnidad ? 'Otro' : (esMaquinaria ? 'Ha' : 'Cantidad')))
+  const [unidadOtraTxt, setUnidadOtraTxt] = useState(conocida ? '' : fuenteUnidad)
   // Etiqueta que se muestra al lado de cada potrero: la unidad elegida arriba (no "ha" fijo).
   const unidadLote = unidadSel === 'Otro' ? (unidadOtraTxt.trim() || 'medida') : unidadSel
   const conBultos = descripcion ? usaBultos(descripcion) : false

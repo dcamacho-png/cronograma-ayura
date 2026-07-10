@@ -39,6 +39,13 @@ export function FormActividadRealizada({
   const [unidadSel, setUnidadSel] = useState(esMaquinaria ? 'Ha' : 'Cantidad')
   const [unidadOtraTxt, setUnidadOtraTxt] = useState('')
 
+  // Al elegir una actividad del catálogo, fijar su unidad por defecto (editable).
+  const matchUnidad = (u: string | undefined) => UNIDADES.find((x) => x.toLowerCase() === (u ?? '').toLowerCase())
+  const elegirDesc = (v: string) => {
+    setDesc(v)
+    const u = matchUnidad(estipuladas.find((x) => x.nombre === v)?.unidad)
+    if (u) setUnidadSel(u)
+  }
   const esOtra = desc === '__otra__'
   // Descripción efectiva (para saber si usa bultos): en maquinaria el catálogo o el texto "Otra";
   // en estándar el texto libre (guardado en `desc`).
@@ -77,7 +84,7 @@ export function FormActividadRealizada({
               name="descripcion"
               required
               value={desc}
-              onChange={(e) => setDesc(e.target.value)}
+              onChange={(e) => elegirDesc(e.target.value)}
               className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
             >
               <option value="" disabled>— elige —</option>

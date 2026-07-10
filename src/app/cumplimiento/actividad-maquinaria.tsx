@@ -28,6 +28,7 @@ export function ActividadMaquinaria({
   responsableActividadId,
   fincaActividad,
   unidadRealizada,
+  unidadCatalogo,
   bultosAsignados,
   descripcion,
   registrarAvance,
@@ -53,6 +54,7 @@ export function ActividadMaquinaria({
   responsableActividadId: string
   fincaActividad: string
   unidadRealizada: string | null
+  unidadCatalogo?: string
   bultosAsignados?: Record<string, number> | null
   descripcion?: string
   registrarAvance: (f: FormData) => void | Promise<void>
@@ -80,6 +82,7 @@ export function ActividadMaquinaria({
         bultosAsignados={bultosAsignados}
         descripcion={descripcion}
         unidadActual={unidadRealizada}
+        unidadCatalogo={unidadCatalogo}
         accion={registrarAvance}
       />
       <div className="flex flex-col gap-2">

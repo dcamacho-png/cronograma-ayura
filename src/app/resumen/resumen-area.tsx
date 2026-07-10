@@ -88,20 +88,23 @@ export function ResumenArea({
   // Una sola "actividad" por grupo (tareaId): estado agrupado y medida tomada UNA vez.
   const actividadesUnicas = [...agruparPorActividad(actividades).values()].map((filas) => {
     const base = filas[0]
+    const avances = Object.values(normalizarAvancePorLote(base.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null)).flat().map((e) => ({ maquinaId: e.maquinaId, cantidad: e.cantidad }))
+    const sumAvances = avances.reduce((s, e) => s + e.cantidad, 0)
     return {
       id: base.id,
       estado: estadoActividad(filas.map((f) => ({ estado: f.estado as Estado }))),
       descripcion: base.descripcion,
       unidad: unidadDe(unidadPorNombre, base.descripcion),
       haProgramada: haActividad(base),
-      haRealizada: base.haRealizada ?? null,
+      // La medida realizada vive en haRealizada o, en PARCIAL, en la suma de los avances.
+      haRealizada: base.haRealizada ?? (sumAvances > 0 ? sumAvances : null),
       lotes: base.lotes,
       maquinaId: base.maquinaId,
       maquinas: new Set(filas.map((f) => f.maquina?.nombre).filter((n): n is string => !!n)),
       responsable: base.responsable,
       noProgramada: base.noProgramada,
       bultosPorLote: base.bultosPorLote as Record<string, number> | null,
-      avances: Object.values(normalizarAvancePorLote(base.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null)).flat().map((e) => ({ maquinaId: e.maquinaId, cantidad: e.cantidad })),
+      avances,
     }
   })
 

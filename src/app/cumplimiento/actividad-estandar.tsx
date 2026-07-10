@@ -23,6 +23,7 @@ export function ActividadEstandar({
   lotesActividad,
   lotesCatalogo,
   unidadRealizada,
+  unidadCatalogo,
   estipuladas,
   motivos,
   motivoCambioId,
@@ -48,6 +49,7 @@ export function ActividadEstandar({
   lotesActividad: { id: string; nombre: string; hectareas?: number | null }[]
   lotesCatalogo: Lote[]
   unidadRealizada: string | null
+  unidadCatalogo?: string
   estipuladas: Estipulada[]
   motivos: Motivo[]
   motivoCambioId: string | null
@@ -67,8 +69,10 @@ export function ActividadEstandar({
   editarPotreros: (f: FormData) => void | Promise<void>
 }) {
   const esParcial = estado === 'PARCIAL'
-  const conocida = UNIDADES.find((u) => u.toLowerCase() === (unidadRealizada ?? '').toLowerCase())
-  const [unidadSel, setUnidadSel] = useState(conocida ?? (unidadRealizada ? 'Otro' : 'Cantidad'))
+  // Unidad por defecto: la registrada si existe; si no, la del catálogo; si no, genérica.
+  const fuenteUnidad = ((unidadRealizada ?? '').trim() || (unidadCatalogo ?? '').trim())
+  const conocida = UNIDADES.find((u) => u.toLowerCase() === fuenteUnidad.toLowerCase())
+  const [unidadSel, setUnidadSel] = useState(conocida ?? (fuenteUnidad ? 'Otro' : 'Cantidad'))
 
   // Selector de unidad reutilizable (se envía con cada registro).
   const selectorUnidad = (
@@ -90,7 +94,7 @@ export function ActividadEstandar({
   const inputUnidadOtra = unidadSel === 'Otro' && (
     <label className="flex flex-col text-xs">
       Unidad (texto)
-      <input name="unidadOtra" defaultValue={conocida ? '' : unidadRealizada ?? ''} placeholder="ej. bultos" className="w-28 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
+      <input name="unidadOtra" defaultValue={conocida ? '' : fuenteUnidad} placeholder="ej. bultos" className="w-28 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
     </label>
   )
 
@@ -127,6 +131,7 @@ export function ActividadEstandar({
             bultosAsignados={bultosAsignados}
             descripcion={descripcion}
             unidadActual={unidadRealizada}
+            unidadCatalogo={unidadCatalogo}
             accion={registrarAvance}
           />
         </>

@@ -341,6 +341,7 @@ export default async function CumplimientoPage({
                             responsableActividadId={cab.responsableId}
                             fincaActividad={cab.finca?.nombre ?? ''}
                             unidadRealizada={cab.unidadRealizada}
+                            unidadCatalogo={unidadPorNombre[cab.descripcion] ?? ''}
                             bultosAsignados={cab.bultosPorLote as Record<string, number> | null}
                             descripcion={cab.descripcion}
                             nota={cab.nota}
@@ -360,6 +361,7 @@ export default async function CumplimientoPage({
                             lotesActividad={cab.lotes}
                             lotesCatalogo={lotes}
                             unidadRealizada={cab.unidadRealizada}
+                            unidadCatalogo={unidadPorNombre[cab.descripcion] ?? ''}
                             estipuladas={estipuladasMaq}
                             motivos={motivos}
                             motivoCambioId={motivoCambioId}
