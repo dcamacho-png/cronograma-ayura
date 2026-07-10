@@ -154,7 +154,7 @@ describe('filasCumplimientoGrupo — una sola fila por actividad aunque tenga va
 })
 
 describe('filasCumplimiento — con avances extra', () => {
-  it('bultos por lote: cada fila de avance trae los bultos de SU lote, no el texto de todos', () => {
+  it('bultos por lote: con varios avances del mismo lote, los bultos van SOLO en la primera fila (no se duplican al sumar)', () => {
     const a = act({
       lotes: [{ id: 'l1', nombre: 'L1' }, { id: 'l2', nombre: 'L2' }],
       bultosPorLote: { l1: 3, l2: 2 },
@@ -164,8 +164,9 @@ describe('filasCumplimiento — con avances extra', () => {
     })
     const filas = filasCumplimiento(a, '15 jun', mapa, ctx)
     expect(filas.length).toBe(2)
+    expect(filas[0][10]).toBe(3)   // bultos de l1 en su 1a fila
+    expect(filas[1][10]).toBe('')  // 2a fila del mismo lote: vacío (no repite los 3)
     for (const f of filas) {
-      expect(f[10]).toBe(3)      // bultos SOLO de l1 (no 'L1: 3, L2: 2')
       expect(f[11]).toBe('Ceba') // centro de costo
       expect(f[12]).toBe('L1')   // potreros realizados
     }

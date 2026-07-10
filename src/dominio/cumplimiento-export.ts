@@ -65,7 +65,8 @@ export function filasCumplimiento(
 
   const filas: (string | number)[][] = []
   for (const l of a.lotes) {
-    for (const e of avances[l.id] ?? []) {
+    const entradas = avances[l.id] ?? []
+    entradas.forEach((e, idx) => {
       filas.push([
         DIAS[e.dia] ?? '',
         ctx.fechaDeDia(e.dia),
@@ -77,14 +78,16 @@ export function filasCumplimiento(
         estado,
         e.cantidad,
         unidadDisplay,
-        a.bultosPorLote?.[l.id] ?? '', // bultos de ESTE lote (no el texto de todos)
+        // Los bultos son por lote (total), no por avance: se ponen SOLO en la primera fila
+        // del lote para que la columna no se duplique cuando el lote tiene varios avances.
+        idx === 0 ? (a.bultosPorLote?.[l.id] ?? '') : '',
         e.centroCosto ?? centro,
         potreros,
         ejecutadaPor,
         e.observacion ?? a.nota ?? '',
         detalle,
       ])
-    }
+    })
   }
   if (filas.length > 0) return filas
 
