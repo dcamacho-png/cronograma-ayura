@@ -3,9 +3,7 @@ import {
   colorPorcentaje,
   actividadesConCambio,
   finalizadasPorLabor,
-  medidasPorUnidad,
   medidasPorTractor,
-  bultosAplicados,
 } from '@/dominio/resumen'
 import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
 import { unidadDe, unidadAbreviada, type Unidad } from '@/dominio/unidad'
@@ -110,21 +108,9 @@ export function ResumenArea({
 
   const nuevas = actividadesUnicas.filter((a) => a.noProgramada)
 
-  const totales = medidasPorUnidad(
-    actividadesUnicas.map((a) => ({ estado: a.estado, haProgramada: a.haProgramada, haRealizada: a.haRealizada, unidad: a.unidad })),
-  )
-  const bultos = bultosAplicados(actividadesUnicas.map((a) => ({ estado: a.estado, bultosPorLote: a.bultosPorLote })))
   const porTractor = medidasPorTractor(
     actividadesUnicas.map((a) => ({ estado: a.estado, unidad: a.unidad, haProgramada: a.haProgramada, haRealizada: a.haRealizada, maquinaId: a.maquinaId, avances: a.avances })),
   )
-
-  const medidas = [
-    { etq: 'Horas', v: totales.hora },
-    { etq: 'Bultos aplicados', v: bultos },
-    { etq: 'Ha aplicadas', v: totales.ha },
-    { etq: 'Kg (granel)', v: totales.kg },
-    { etq: 'Cantidad (estércoles)', v: totales.cantidad },
-  ].filter((m) => m.v > 0)
 
   const UNIDADES_TABLA: { u: Unidad; etq: string }[] = [
     { u: 'hora', etq: 'Horas' }, { u: 'ha', etq: 'Ha' }, { u: 'kg', etq: 'Kg' }, { u: 'cantidad', etq: 'Cantidad' },
@@ -177,20 +163,11 @@ export function ResumenArea({
         </div>
       </div>
 
-      {/* Medidas de maquinaria */}
-      {esMaquinaria && (medidas.length > 0 || filasTractor.length > 0) && (
+      {/* Medidas de maquinaria: tabla por tractor (los totales por unidad se quitaron por
+          redundantes con los cuadritos "Trabajo por actividad" y esta tabla). */}
+      {esMaquinaria && filasTractor.length > 0 && colsTractor.length > 0 && (
         <div className="mb-8">
           <h2 className="mb-3 text-lg font-semibold text-tinta">🚜 Medidas de tractores</h2>
-          {medidas.length > 0 && (
-            <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
-              {medidas.map((m) => (
-                <div key={m.etq} className="tarjeta p-4">
-                  <div className="mb-1 text-xs text-tierra">{m.etq}</div>
-                  <div className="text-2xl font-extrabold text-[#2e9e5b]">{m.v}</div>
-                </div>
-              ))}
-            </div>
-          )}
           {filasTractor.length > 0 && colsTractor.length > 0 && (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-sm">
