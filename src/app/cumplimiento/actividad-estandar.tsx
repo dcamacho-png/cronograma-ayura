@@ -24,6 +24,7 @@ export function ActividadEstandar({
   lotesCatalogo,
   unidadRealizada,
   unidadCatalogo,
+  lotesPendientesIds,
   estipuladas,
   motivos,
   motivoCambioId,
@@ -50,6 +51,7 @@ export function ActividadEstandar({
   lotesCatalogo: Lote[]
   unidadRealizada: string | null
   unidadCatalogo?: string
+  lotesPendientesIds?: string[]
   estipuladas: Estipulada[]
   motivos: Motivo[]
   motivoCambioId: string | null
@@ -132,6 +134,7 @@ export function ActividadEstandar({
             descripcion={descripcion}
             unidadActual={unidadRealizada}
             unidadCatalogo={unidadCatalogo}
+            lotesPendientesIds={lotesPendientesIds}
             accion={registrarAvance}
           />
         </>

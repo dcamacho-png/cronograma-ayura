@@ -25,6 +25,7 @@ export function FormAvance({
   descripcion,
   unidadActual,
   unidadCatalogo,
+  lotesPendientesIds,
   accion,
 }: {
   actividadId: string
@@ -40,6 +41,7 @@ export function FormAvance({
   descripcion?: string
   unidadActual?: string | null
   unidadCatalogo?: string
+  lotesPendientesIds?: string[]
   accion: (f: FormData) => void | Promise<void>
 }) {
   const [abierto, setAbierto] = useState(false)
@@ -57,6 +59,10 @@ export function FormAvance({
   const unidadLote = unidadSel === 'Otro' ? (unidadOtraTxt.trim() || 'medida') : unidadSel
   const conBultos = descripcion ? usaBultos(descripcion) : false
   const filasPotreros = [...lotesActividad, ...anexados]
+  // Un nuevo avance pre-marca solo los potreros PENDIENTES (los ya avanzados no, para no
+  // volver a registrarlos otro día) y los recién anexados. Sin la lista, marca todos (compat).
+  const anexadosIds = new Set(anexados.map((a) => a.id))
+  const estaMarcado = (id: string) => anexadosIds.has(id) || (lotesPendientesIds ? lotesPendientesIds.includes(id) : true)
   const fincasAnexar = [...new Set(lotesCatalogo.map((l) => l.finca.nombre))].sort()
   // Anexar solo dentro de la finca de la actividad (una actividad = una sola finca).
   const fincaDeId = (id: string) => lotesCatalogo.find((l) => l.id === id)?.finca.nombre ?? null
@@ -129,7 +135,7 @@ export function FormAvance({
           {filasPotreros.map((l) => (
             <div key={l.id} className="flex flex-wrap items-center gap-2">
               <label className="flex items-center gap-1">
-                <input type="checkbox" name="loteHecho" value={l.id} defaultChecked className="accent-bosque" />
+                <input type="checkbox" name="loteHecho" value={l.id} defaultChecked={estaMarcado(l.id)} className="accent-bosque" />
                 {l.nombre}
               </label>
               <label className="flex items-center gap-1">{unidadLote}

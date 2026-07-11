@@ -231,9 +231,9 @@ export default async function CumplimientoPage({
                   const unidadStd = cab.unidadRealizada ?? unidadAbreviada(unidad)
                   const resumenAvances = textoAvanceConFecha(cab.lotes, avances, unidadStd, etiquetaDia)
                   const interactivo = !cab.cerrada && (estadoGrupo === 'PENDIENTE' || estadoGrupo === 'PARCIAL')
-                  const hayPotrerosPendientes =
-                    cab.lotes.length > 0 &&
-                    lotesPendientes(cab.lotes, avances, cab.lotesHechos as string[] | null).length > 0
+                  const potrerosPendientes = lotesPendientes(cab.lotes, avances, cab.lotesHechos as string[] | null)
+                  const idsPendientes = potrerosPendientes.map((l) => l.id)
+                  const hayPotrerosPendientes = cab.lotes.length > 0 && potrerosPendientes.length > 0
                   const etiquetaPorDia = [0, 1, 2, 3, 4, 5, 6, 7].map((d) => (d === 0 ? '' : etiquetaDia(d)))
                   const entradasAvance = cab.lotes.flatMap((l) =>
                     (avances[l.id] ?? []).map((e, index) => ({
@@ -342,6 +342,7 @@ export default async function CumplimientoPage({
                             fincaActividad={cab.finca?.nombre ?? ''}
                             unidadRealizada={cab.unidadRealizada}
                             unidadCatalogo={unidadPorNombre[cab.descripcion] ?? ''}
+                            lotesPendientesIds={idsPendientes}
                             bultosAsignados={cab.bultosPorLote as Record<string, number> | null}
                             descripcion={cab.descripcion}
                             nota={cab.nota}
@@ -362,6 +363,7 @@ export default async function CumplimientoPage({
                             lotesCatalogo={lotes}
                             unidadRealizada={cab.unidadRealizada}
                             unidadCatalogo={unidadPorNombre[cab.descripcion] ?? ''}
+                            lotesPendientesIds={idsPendientes}
                             estipuladas={estipuladasMaq}
                             motivos={motivos}
                             motivoCambioId={motivoCambioId}
