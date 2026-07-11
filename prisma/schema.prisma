@@ -53,6 +53,7 @@ model Responsable {
   fincaId     String?
   finca       Finca?      @relation(fields: [fincaId], references: [id])
   actividades Actividad[]
+  novedades   NovedadResponsable[]
   activo      Boolean     @default(true)
 }
 
@@ -80,6 +81,20 @@ model Motivo {
   id          String      @id @default(cuid())
   nombre      String      @unique
   actividades Actividad[]
+}
+
+model NovedadResponsable {
+  id            String      @id @default(cuid())
+  responsableId String
+  responsable   Responsable @relation(fields: [responsableId], references: [id], onDelete: Cascade)
+  tipo          String      // "VACACIONES" | "PERMISO"
+  fechaInicio   DateTime    @db.Date
+  fechaFin      DateTime    @db.Date
+  horario       String?
+  nota          String?
+  creadoEn      DateTime    @default(now())
+
+  @@index([responsableId])
 }
 
 model Actividad {
