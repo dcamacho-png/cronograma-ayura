@@ -1297,6 +1297,37 @@ export function reabrirNotaConservatorio(id: string) {
   })
 }
 
+// ————— Novedades por Responsable —————
+
+export function crearNovedadResponsable(data: {
+  responsableId: string
+  tipo: string
+  fechaInicio: Date
+  fechaFin: Date
+  horario: string | null
+  nota: string | null
+}) {
+  return prisma.novedadResponsable.create({ data })
+}
+
+export function eliminarNovedadResponsable(id: string) {
+  return prisma.novedadResponsable.delete({ where: { id } })
+}
+
+// Novedades de responsables del área cuyo rango [fechaInicio, fechaFin] se cruza
+// con [desde, hasta]. Incluye el nombre del responsable para la UI/reporte.
+export function listarNovedadesEnRango(areaId: string, desde: Date, hasta: Date) {
+  return prisma.novedadResponsable.findMany({
+    where: {
+      responsable: { areaId },
+      fechaInicio: { lte: hasta },
+      fechaFin: { gte: desde },
+    },
+    include: { responsable: { select: { nombre: true } } },
+    orderBy: { fechaInicio: 'asc' },
+  })
+}
+
 export function borrarNotaConservatorio(id: string) {
   return prisma.notaConservatorio.delete({ where: { id } })
 }
