@@ -125,6 +125,10 @@ export function FormActividadRealizada({
           <input name="unidadOtra" value={unidadOtraTxt} onChange={(e) => setUnidadOtraTxt(e.target.value)} placeholder="ej. bultos" className="w-28 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
         </label>
       )}
+      <label className="flex flex-col text-xs">
+        Medida total (si no eliges potreros)
+        <input name="medida" type="number" step="any" min="0" placeholder="opcional" className="w-32 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
+      </label>
       {esMaquinaria && (
         <>
           <label className="flex flex-col text-xs">

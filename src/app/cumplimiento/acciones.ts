@@ -101,7 +101,8 @@ export async function agregarActividadRealizadaAccion(form: FormData) {
     unidad: unidadElegida(form),
     avancePorLote: loteIds.length ? avancePorLote : null,
     bultosPorLote: Object.keys(bultosPorLote).length ? bultosPorLote : null,
-    haRealizada: loteIds.length ? total : null,
+    // Con potreros: suma por lote. Sin potreros: medida total general (para actividades sin lote).
+    haRealizada: loteIds.length ? total : (numeroOpcional(form, 'medida') ?? null),
   })
   revalidatePath('/cumplimiento')
 }

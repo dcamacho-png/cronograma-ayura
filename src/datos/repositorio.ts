@@ -839,10 +839,13 @@ export async function marcarCumplidaGrupo(id: string) {
   const g = await filasHermanas(id)
   if (!g) return null
   const tieneLotes = g.base.lotes.length > 0
-  // Al cumplir directo, completar el avance de los lotes sin registro con su área (hectáreas),
-  // para que el Excel desglose por lote y el total refleje las áreas.
   const avanceActual = normalizarAvancePorLote(g.base.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null)
-  const avanceCompleto = tieneLotes ? completarAvancesCumplida(g.base.lotes, avanceActual, g.base.dia) : avanceActual
+  // Al cumplir directo, SOLO las actividades medidas en HA (área) materializan el avance con las
+  // hectáreas del potrero (así el Excel desglosa por lote y el total refleja las áreas). En
+  // horas/kg/cantidad no se inventa una medida a partir de las hectáreas.
+  const est = tieneLotes ? await prisma.actividadEstipulada.findFirst({ where: { nombre: g.base.descripcion } }) : null
+  const esHa = est?.unidad === 'ha'
+  const avanceCompleto = (tieneLotes && esHa) ? completarAvancesCumplida(g.base.lotes, avanceActual, g.base.dia) : avanceActual
   const total = totalAvanceLotes(g.base.lotes, avanceCompleto)
   await prisma.$transaction(
     g.filas
@@ -850,7 +853,11 @@ export async function marcarCumplidaGrupo(id: string) {
       .map((f) =>
         prisma.actividad.update({
           where: { id: f.id },
-          data: { estado: 'CUMPLIDA', cerrada: true, ...(tieneLotes ? { haRealizada: total, avancePorLote: avanceCompleto } : {}) },
+          data: {
+            estado: 'CUMPLIDA',
+            cerrada: true,
+            ...(tieneLotes ? { haRealizada: total, ...(esHa ? { avancePorLote: avanceCompleto } : {}) } : {}),
+          },
         }),
       ),
   )
