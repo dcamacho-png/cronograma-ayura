@@ -9,6 +9,7 @@ import {
 import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
 import { unidadDe, unidadAbreviada, type Unidad } from '@/dominio/unidad'
 import { normalizarAvancePorLote, type AvanceEntrada } from '@/dominio/avance-lote'
+import type { AusenciaResumen } from '@/dominio/ausencias'
 
 const ESTADOS_ORDEN = [
   { v: ['CUMPLIDA'], etq: '✅ Cumplidas' },
@@ -24,6 +25,11 @@ const COLOR_HEX: Record<string, string> = {
   naranja: '#e8771a',
   rojo: '#d63b3b',
   ninguno: 'transparent',
+}
+
+function fmtRango(a: Date, b: Date) {
+  const f = (d: Date) => new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(d)
+  return a.getTime() === b.getTime() ? f(a) : `${f(a)}–${f(b)}`
 }
 
 type ActividadResumen = {
@@ -55,6 +61,7 @@ export function ResumenArea({
   responsables,
   motivos,
   recurrentesMes = [],
+  ausenciasMes = [],
 }: {
   areaNombre: string
   semana: number
@@ -65,6 +72,7 @@ export function ResumenArea({
   responsables: { id: string; nombre: string }[]
   motivos: { id: string; nombre: string }[]
   recurrentesMes?: { descripcion: string; areaNombre: string; veces: number }[]
+  ausenciasMes?: AusenciaResumen[]
 }) {
   const dominio = actividades as unknown as ActividadDominio[]
   const pct = porcentajeCumplimiento(dominio)
@@ -278,6 +286,38 @@ export function ResumenArea({
                 <li key={m.motivoId} className="flex justify-between">
                   <span>{nombreMotivo.get(m.motivoId) ?? 'Motivo'}</span>
                   <b>{m.conteo}</b>
+                </li>
+              ))}
+            </ul>
+          )}
+        </details>
+
+        <details className="tarjeta p-3">
+          <summary className="cursor-pointer select-none text-sm font-semibold text-tinta">🌴 Ausencias del mes ({ausenciasMes.length})</summary>
+          {ausenciasMes.length === 0 ? (
+            <p className="mt-2 text-sm text-tierra">Sin ausencias registradas este mes.</p>
+          ) : (
+            <ul className="mt-2 space-y-2 text-sm">
+              {ausenciasMes.map((a) => (
+                <li key={a.responsableId} className="rounded-lg border border-borde bg-marfil px-3 py-2">
+                  <div className="flex justify-between">
+                    <span className="font-medium">{a.nombre}</span>
+                    <span className="text-tierra">
+                      {a.vacaciones > 0 && `🌴 ${a.vacaciones} d`}
+                      {a.vacaciones > 0 && a.permiso > 0 && ' · '}
+                      {a.permiso > 0 && `📄 ${a.permiso} d`}
+                    </span>
+                  </div>
+                  <ul className="mt-1 space-y-0.5 text-xs text-tierra">
+                    {a.detalle.map((d, i) => (
+                      <li key={i}>
+                        {d.tipo === 'VACACIONES' ? '🌴' : '📄'}{' '}
+                        {fmtRango(d.fechaInicio, d.fechaFin)}
+                        {d.horario ? ` · ${d.horario}` : ''}
+                        {d.nota ? ` — ${d.nota}` : ''}
+                      </li>
+                    ))}
+                  </ul>
                 </li>
               ))}
             </ul>

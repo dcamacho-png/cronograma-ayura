@@ -9,6 +9,7 @@ import {
   tareasPorAsignar,
   listarMaquinas,
   listarDedicaciones,
+  listarNovedadesEnRango,
 } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, esSemanaFutura, diaActual, esDiaPasado } from '@/dominio/semana'
 import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
@@ -58,12 +59,15 @@ export default async function ProgramarPage({
   const hoyRef = { ...hoy, dia: diaActual() }
   const diasPasados = [1, 2, 3, 4, 5, 6, 7].filter((d) => esDiaPasado(anio, semana, d, hoyRef))
 
-  const [responsables, actividades, porAsignar, maquinas, dedicacionesRaw] = await Promise.all([
+  const fechas = fechasDeSemana(anio, semana)
+
+  const [responsables, actividades, porAsignar, maquinas, dedicacionesRaw, novedadesRaw] = await Promise.all([
     listarResponsablesPorArea(areaId),
     listarActividades(areaId, anio, semana),
     tareasPorAsignar(areaId, anio, semana),
     listarMaquinas(),
     listarDedicaciones(anio, semana),
+    listarNovedadesEnRango(areaId, fechas[0], fechas[6]),
   ])
   const esMaquinaria = esMaquinariaVar(areaActual, 'programar')
   const areasParaDedicar = areas.filter((a) => !esMaquinariaVar(a, 'programar'))
@@ -72,6 +76,15 @@ export default async function ProgramarPage({
     dia: d.dia,
     areaId: d.areaId,
     areaNombre: d.area.nombre,
+  }))
+  const novedades = novedadesRaw.map((n) => ({
+    id: n.id,
+    responsableId: n.responsableId,
+    tipo: n.tipo as 'VACACIONES' | 'PERMISO',
+    fechaInicio: n.fechaInicio,
+    fechaFin: n.fechaFin,
+    horario: n.horario,
+    nota: n.nota,
   }))
   const responsablesActivos = responsables.filter((r) => r.activo)
   const nombrePorResp = new Map(responsables.map((r) => [r.id, r.nombre]))
@@ -90,8 +103,6 @@ export default async function ProgramarPage({
     maquinaId: a.maquinaId,
     responsableId: a.responsableId,
   }))
-
-  const fechas = fechasDeSemana(anio, semana)
 
   const previa = semanaAnterior(anio, semana)
   const proxima = siguienteSemana(anio, semana)
@@ -213,6 +224,7 @@ export default async function ProgramarPage({
           fechas={fechas}
           responsables={responsablesActivos}
           actividades={actividadesCronograma}
+          novedades={novedades}
           turnoEditable={futura && !soloLectura}
           esMaquinaria={esMaquinaria}
         />
@@ -249,6 +261,7 @@ export default async function ProgramarPage({
               fechas={fechas}
               responsables={g.responsables}
               actividades={actividadesCronograma}
+              novedades={novedades}
               esMaquinaria={esMaquinaria}
               paraExportar
             />

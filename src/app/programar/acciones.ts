@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearResponsable, actualizarActividad, asignarTarea, quitarSeleccionTarea, devolverAAsignacion, devolverGrillaAlBanco, devolverActividadReprogramadaAlBanco, dedicarTractor } from '@/datos/repositorio'
+import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearResponsable, actualizarActividad, asignarTarea, quitarSeleccionTarea, devolverAAsignacion, devolverGrillaAlBanco, devolverActividadReprogramadaAlBanco, dedicarTractor, crearNovedadResponsable, eliminarNovedadResponsable } from '@/datos/repositorio'
 import { semanaAnterior, esSemanaPasada, semanaActual, diaActual, esDiaPasado, esSemanaFutura } from '@/dominio/semana'
 import type { Asignacion } from '@/dominio/programacion'
 import { usuarioActual } from '@/auth/sesion'
@@ -200,5 +200,47 @@ export async function dedicarTractorAccion(form: FormData) {
   if (!maquinaId || !Number.isInteger(anio) || !Number.isInteger(semana) || !Number.isInteger(dia)) return
   if (!esSemanaFutura(anio, semana, semanaActual())) return
   await dedicarTractor(maquinaId, areaId, anio, semana, dia)
+  revalidatePath('/programar')
+}
+
+// "YYYY-MM-DD" (input date) → Date a medianoche UTC; null si no es válida.
+function fechaUTC(form: FormData, clave: string): Date | null {
+  const v = texto(form, clave)
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return null
+  const d = new Date(v + 'T00:00:00.000Z')
+  return Number.isNaN(d.getTime()) ? null : d
+}
+
+export async function crearNovedadResponsableAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
+  const responsableId = texto(form, 'responsableId')
+  const tipo = texto(form, 'tipo')
+  const anio = Number(texto(form, 'anio'))
+  const semana = Number(texto(form, 'semana'))
+  if (!responsableId || (tipo !== 'VACACIONES' && tipo !== 'PERMISO')) return
+  if (!Number.isInteger(anio) || !Number.isInteger(semana) || !esSemanaFutura(anio, semana, semanaActual())) return
+  const fechaInicio = fechaUTC(form, 'fechaInicio')
+  if (!fechaInicio) return
+  let fechaFin = fechaUTC(form, 'fechaFin') ?? fechaInicio
+  if (fechaFin.getTime() < fechaInicio.getTime()) fechaFin = fechaInicio
+  await crearNovedadResponsable({
+    responsableId,
+    tipo,
+    fechaInicio,
+    fechaFin,
+    horario: textoOpcional(form, 'horario'),
+    nota: textoOpcional(form, 'nota'),
+  })
+  revalidatePath('/programar')
+}
+
+export async function eliminarNovedadResponsableAccion(form: FormData) {
+  if (await bloqueadoVisor()) return
+  const id = texto(form, 'id')
+  const anio = Number(texto(form, 'anio'))
+  const semana = Number(texto(form, 'semana'))
+  if (!id) return
+  if (!Number.isInteger(anio) || !Number.isInteger(semana) || !esSemanaFutura(anio, semana, semanaActual())) return
+  await eliminarNovedadResponsable(id)
   revalidatePath('/programar')
 }
