@@ -4,6 +4,7 @@ import {
   actividadesConCambio,
   finalizadasPorLabor,
   medidasPorTractor,
+  laboresPorTractor,
 } from '@/dominio/resumen'
 import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
 import { unidadDe, unidadAbreviada, type Unidad } from '@/dominio/unidad'
@@ -108,15 +109,20 @@ export function ResumenArea({
 
   const nuevas = actividadesUnicas.filter((a) => a.noProgramada)
 
-  const porTractor = medidasPorTractor(
-    actividadesUnicas.map((a) => ({ estado: a.estado, unidad: a.unidad, haProgramada: a.haProgramada, haRealizada: a.haRealizada, maquinaId: a.maquinaId, avances: a.avances })),
-  )
-
-  const UNIDADES_TABLA: { u: Unidad; etq: string }[] = [
-    { u: 'hora', etq: 'Horas' }, { u: 'ha', etq: 'Ha' }, { u: 'kg', etq: 'Kg' }, { u: 'cantidad', etq: 'Cantidad' },
-  ]
-  const filasTractor = [...porTractor.entries()]
-  const colsTractor = UNIDADES_TABLA.filter(({ u }) => filasTractor.some(([, r]) => r[u] > 0))
+  const filasTractorArg = actividadesUnicas.map((a) => ({ estado: a.estado, descripcion: a.descripcion, unidad: a.unidad, haProgramada: a.haProgramada, haRealizada: a.haRealizada, maquinaId: a.maquinaId, avances: a.avances }))
+  const porTractor = medidasPorTractor(filasTractorArg)
+  const laboresTractor = laboresPorTractor(filasTractorArg)
+  // Tarjetas: tractores por nombre, "— sin tractor —" al final.
+  const tractoresOrdenados = [...laboresTractor.keys()].sort((x, y) => {
+    if (x === '') return 1
+    if (y === '') return -1
+    return (nombreMaquina.get(x) ?? '').localeCompare(nombreMaquina.get(y) ?? '')
+  })
+  const totalTractorTexto = (t: string) => {
+    const r = porTractor.get(t)
+    if (!r) return ''
+    return (['ha', 'hora', 'kg', 'cantidad'] as Unidad[]).filter((u) => r[u] > 0).map((u) => `${r[u]} ${unidadAbreviada(u)}`).join(' · ')
+  }
 
   // Lista "realizado por actividad": suma la medida (única) por descripción.
   const medidaPorActividad = new Map<string, { valor: number; unidad: Unidad }>()
@@ -163,31 +169,28 @@ export function ResumenArea({
         </div>
       </div>
 
-      {/* Medidas de maquinaria: tabla por tractor (los totales por unidad se quitaron por
-          redundantes con los cuadritos "Trabajo por actividad" y esta tabla). */}
-      {esMaquinaria && filasTractor.length > 0 && colsTractor.length > 0 && (
+      {/* Medidas de maquinaria: una tarjeta por tractor con las labores que hizo y su medida. */}
+      {esMaquinaria && laboresTractor.size > 0 && (
         <div className="mb-8">
-          <h2 className="mb-3 text-lg font-semibold text-tinta">🚜 Medidas de tractores</h2>
-          {filasTractor.length > 0 && colsTractor.length > 0 && (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-sm">
-                <thead>
-                  <tr className="border-b border-borde text-left text-tierra">
-                    <th scope="col" className="p-2">Tractor</th>
-                    {colsTractor.map(({ u, etq }) => (<th key={u} scope="col" className="p-2">{etq}</th>))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filasTractor.map(([id, r]) => (
-                    <tr key={id || 'sin'} className="border-b border-borde/60">
-                      <td className="p-2 font-medium">{id === '' ? '— sin tractor —' : (nombreMaquina.get(id) ?? 'Tractor')}</td>
-                      {colsTractor.map(({ u }) => (<td key={u} className="p-2">{r[u] > 0 ? r[u] : '—'}</td>))}
-                    </tr>
+          <h2 className="mb-3 text-lg font-semibold text-tinta">🚜 Qué hizo cada tractor</h2>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+            {tractoresOrdenados.map((t) => (
+              <div key={t || 'sin'} className="tarjeta p-4">
+                <div className="mb-2 font-semibold text-tinta">🚜 {t === '' ? '— sin tractor —' : (nombreMaquina.get(t) ?? 'Tractor')}</div>
+                <ul className="flex flex-col gap-1 text-sm">
+                  {(laboresTractor.get(t) ?? []).map((l, i) => (
+                    <li key={i} className="flex items-baseline justify-between gap-2">
+                      <span className="text-tierra">{l.descripcion}</span>
+                      <span className="whitespace-nowrap font-semibold text-[#2e9e5b]">{l.total} {unidadAbreviada(l.unidad)}</span>
+                    </li>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                </ul>
+                {totalTractorTexto(t) && (
+                  <div className="mt-2 border-t border-borde pt-2 text-xs text-tierra">Total: <b className="text-tinta">{totalTractorTexto(t)}</b></div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

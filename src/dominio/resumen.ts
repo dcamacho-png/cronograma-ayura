@@ -170,6 +170,46 @@ export function medidasPorTractor(
   return out
 }
 
+// Labores realizadas por cada tractor: qué actividades hizo y con qué medida. Misma atribución
+// que `medidasPorTractor` (por avance a su tractor, o el de la actividad; si no hay avances, la
+// medida va al tractor de la actividad; ignora PENDIENTE), pero agrupando por (descripción +
+// unidad). Devuelve, por tractor (clave '' = sin tractor), la lista ordenada por total desc.
+export type LaborTractor = { descripcion: string; unidad: Unidad; total: number }
+export function laboresPorTractor(
+  filas: {
+    estado: string
+    descripcion: string
+    unidad: Unidad
+    haProgramada: number
+    haRealizada: number | null
+    maquinaId: string | null
+    avances: { maquinaId: string | null; cantidad: number }[]
+  }[],
+): Map<string, LaborTractor[]> {
+  const acc = new Map<string, Map<string, LaborTractor>>()
+  const add = (tractor: string, descripcion: string, unidad: Unidad, cant: number) => {
+    if (!cant) return
+    let m = acc.get(tractor)
+    if (!m) { m = new Map(); acc.set(tractor, m) }
+    const k = `${descripcion}|${unidad}`
+    const prev = m.get(k)
+    if (prev) prev.total = r1(prev.total + cant)
+    else m.set(k, { descripcion, unidad, total: r1(cant) })
+  }
+  for (const f of filas) {
+    if (f.estado === 'PENDIENTE') continue
+    if (f.avances.length > 0) {
+      for (const av of f.avances) add(av.maquinaId ?? f.maquinaId ?? '', f.descripcion, f.unidad, av.cantidad)
+    } else {
+      const medida = f.haRealizada ?? (f.unidad === 'ha' && f.estado === 'CUMPLIDA' ? f.haProgramada : 0)
+      add(f.maquinaId ?? '', f.descripcion, f.unidad, medida)
+    }
+  }
+  const out = new Map<string, LaborTractor[]>()
+  for (const [t, m] of acc) out.set(t, [...m.values()].sort((a, b) => b.total - a.total))
+  return out
+}
+
 // Escala de actividades que se han arrastrado (reprogramadas/parciales devueltas al banco).
 // Recibe filas (una por instancia semanal); deduplica por (descripción + área) tomando el
 // MAYOR vecesReprogramada, descarta las que nunca se arrastraron (veces=0) y ordena de más

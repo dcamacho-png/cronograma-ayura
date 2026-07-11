@@ -246,3 +246,42 @@ describe('actividadesRecurrentes', () => {
     expect(r.map((x) => x.descripcion)).toEqual(['Ccc', 'Aaa', 'Bbb'])
   })
 })
+
+import { laboresPorTractor } from './resumen'
+
+describe('laboresPorTractor', () => {
+  const fila = (over: Partial<Parameters<typeof laboresPorTractor>[0][number]>) => ({
+    estado: 'CUMPLIDA', descripcion: 'Fumigación', unidad: 'ha' as Unidad, haProgramada: 0, haRealizada: null as number | null, maquinaId: null as string | null, avances: [] as { maquinaId: string | null; cantidad: number }[], ...over,
+  })
+  it('lista las labores de cada tractor (por avance) con su medida', () => {
+    const m = laboresPorTractor([
+      fila({ descripcion: 'Fumigación', unidad: 'ha', avances: [{ maquinaId: 'A', cantidad: 30 }] }),
+      fila({ descripcion: 'Rastra', unidad: 'ha', avances: [{ maquinaId: 'A', cantidad: 9.5 }] }),
+      fila({ descripcion: 'Movimientos', unidad: 'hora', haRealizada: 5, maquinaId: 'A' }),
+    ])
+    expect(m.get('A')).toEqual([
+      { descripcion: 'Fumigación', unidad: 'ha', total: 30 },
+      { descripcion: 'Rastra', unidad: 'ha', total: 9.5 },
+      { descripcion: 'Movimientos', unidad: 'hora', total: 5 },
+    ])
+  })
+  it('suma la misma labor+unidad y ordena por total desc', () => {
+    const m = laboresPorTractor([
+      fila({ descripcion: 'Rastra', unidad: 'ha', avances: [{ maquinaId: 'A', cantidad: 2 }] }),
+      fila({ descripcion: 'Fumigación', unidad: 'ha', avances: [{ maquinaId: 'A', cantidad: 30 }] }),
+      fila({ descripcion: 'Rastra', unidad: 'ha', avances: [{ maquinaId: 'A', cantidad: 3 }] }),
+    ])
+    expect(m.get('A')).toEqual([
+      { descripcion: 'Fumigación', unidad: 'ha', total: 30 },
+      { descripcion: 'Rastra', unidad: 'ha', total: 5 },
+    ])
+  })
+  it('tractor nulo cae en clave vacía; ignora PENDIENTE', () => {
+    const m = laboresPorTractor([
+      fila({ descripcion: 'Siembra', unidad: 'ha', haRealizada: 4.5, maquinaId: null }),
+      fila({ estado: 'PENDIENTE', descripcion: 'X', haRealizada: 9, maquinaId: 'A' }),
+    ])
+    expect(m.get('')).toEqual([{ descripcion: 'Siembra', unidad: 'ha', total: 4.5 }])
+    expect(m.has('A')).toBe(false)
+  })
+})
