@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { pantallasDe, puedeVer, esSoloLectura, puedeMarcarConservatorio } from './permisos'
+import { pantallasDe, puedeVer, esSoloLectura, puedeMarcarConservatorio, puedeMutarArea } from './permisos'
 
 describe('pantallasDe', () => {
   it('ADMIN ve todo, incluida configuracion', () => {
@@ -78,5 +78,32 @@ describe('puedeMarcarConservatorio', () => {
     expect(puedeMarcarConservatorio({ rol: 'ADMIN', pantallas: null })).toBe(true)
     expect(puedeMarcarConservatorio({ rol: 'VISOR', pantallas: null })).toBe(true)
     expect(puedeMarcarConservatorio({ rol: 'AREA', pantallas: null })).toBe(false)
+  })
+})
+
+describe('puedeMutarArea', () => {
+  it('ADMIN puede mutar cualquier área (incluso null)', () => {
+    expect(puedeMutarArea({ rol: 'ADMIN', areaId: null }, 'a1')).toBe(true)
+    expect(puedeMutarArea({ rol: 'ADMIN', areaId: 'a2' }, 'a1')).toBe(true)
+    expect(puedeMutarArea({ rol: 'ADMIN', areaId: null }, null)).toBe(true)
+  })
+
+  it('VISOR nunca puede mutar, ni siquiera su propia área', () => {
+    expect(puedeMutarArea({ rol: 'VISOR', areaId: 'a1' }, 'a1')).toBe(false)
+    expect(puedeMutarArea({ rol: 'VISOR', areaId: null }, 'a1')).toBe(false)
+  })
+
+  it('AREA solo muta su propia área', () => {
+    expect(puedeMutarArea({ rol: 'AREA', areaId: 'a1' }, 'a1')).toBe(true)
+    expect(puedeMutarArea({ rol: 'AREA', areaId: 'a1' }, 'a2')).toBe(false)
+  })
+
+  it('AREA con área objetivo no resuelta (null) se deniega', () => {
+    expect(puedeMutarArea({ rol: 'AREA', areaId: 'a1' }, null)).toBe(false)
+  })
+
+  it('AREA sin área asignada nunca muta', () => {
+    expect(puedeMutarArea({ rol: 'AREA', areaId: null }, 'a1')).toBe(false)
+    expect(puedeMutarArea({ rol: 'AREA', areaId: null }, null)).toBe(false)
   })
 })
