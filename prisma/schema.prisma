@@ -119,9 +119,10 @@ model Actividad {
   motivo        Motivo?  @relation(fields: [motivoId], references: [id])
 
   // Reprogramación: relación a sí misma (la actividad de origen).
-  origenId String?
+  // @unique: una actividad solo puede reprogramarse una vez (evita duplicados por carrera).
+  origenId String?     @unique
   origen   Actividad?  @relation("Reprogramacion", fields: [origenId], references: [id])
-  derivadas Actividad[] @relation("Reprogramacion")
+  derivada Actividad?  @relation("Reprogramacion")
 
   // Campos de maquinaria (opcionales).
   maquinaId  String?
