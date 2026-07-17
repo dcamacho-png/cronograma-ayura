@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { reprogramarActividad, crearActividadRealizada, devolverAlBanco, semanaDeActividad, registrarAvanceLoteGrupo, registrarAvanceObservacionGrupo, marcarCumplidaGrupo, registrarNovedadGrupo, reabrirGrupo, setLotesGrupo, setUnidadRealizadaGrupo, anexarLotesGrupo, registrarMedidaGeneralGrupo, editarAvanceEntradaGrupo, eliminarAvanceEntradaGrupo, agregarNovedadGrupo, eliminarNovedadGrupo, cerrarParcialGrupo, reabrirCierreGrupo, editarNovedadGrupo } from '@/datos/repositorio'
 import { siguienteSemana, plazoCumplimientoVencido, semanaActual } from '@/dominio/semana'
 import { usuarioActual } from '@/auth/sesion'
-import { esSoloLectura } from '@/auth/permisos'
+import { puedeMutarArea } from '@/auth/permisos'
 
 const ESTADOS_VALIDOS = ['PENDIENTE', 'CUMPLIDA', 'PARCIAL', 'NO_CUMPLIDA', 'REPROGRAMADA']
 
@@ -31,35 +31,39 @@ async function bloqueadoPorPlazo(anio: number, semana: number): Promise<boolean>
   return plazoCumplimientoVencido(anio, semana, semanaActual())
 }
 
-// Igual, resolviendo la semana a partir del id de actividad. Si la actividad no existe,
-// se bloquea (la acción no tendría nada válido que hacer).
-async function bloqueadoPorPlazoActividad(id: string): Promise<boolean> {
-  const a = await semanaDeActividad(id)
-  if (!a) return true
-  return bloqueadoPorPlazo(a.anio, a.semana)
+// ¿El usuario actual puede mutar datos del área dada? (sesión válida + rol + propiedad).
+async function autorizado(areaId: string | null): Promise<boolean> {
+  const u = await usuarioActual()
+  return !!u && puedeMutarArea(u, areaId)
 }
 
-// El Visor (solo consulta) nunca puede mutar. Doble candado con la UI.
-async function bloqueadoVisor(): Promise<boolean> {
+// Guarda completa para acciones sobre una actividad existente: sin sesión, VISOR,
+// otra área, actividad inexistente o plazo vencido ⇒ bloqueada. Una sola consulta
+// de usuario + una de actividad (que ya incluye areaId y semana).
+async function bloqueadaActividad(id: string): Promise<boolean> {
   const u = await usuarioActual()
-  return !!u && esSoloLectura(u)
+  if (!u) return true
+  const a = await semanaDeActividad(id)
+  if (!a) return true
+  if (!puedeMutarArea(u, a.areaId)) return true
+  if (u.rol === 'ADMIN') return false
+  return plazoCumplimientoVencido(a.anio, a.semana, semanaActual())
 }
 
 export async function reprogramarAccion(form: FormData) {
-  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   const anio = Number(texto(form, 'anio'))
   const semana = Number(texto(form, 'semana'))
   if (!id || !anio || !semana || !Number.isInteger(anio) || !Number.isInteger(semana)) return
-  if (await bloqueadoPorPlazo(anio, semana)) return
+  if (await bloqueadaActividad(id)) return
   const prox = siguienteSemana(anio, semana)
   await reprogramarActividad(id, prox.anio, prox.semana)
   revalidatePath('/cumplimiento')
 }
 
 export async function agregarActividadRealizadaAccion(form: FormData) {
-  if (await bloqueadoVisor()) return
   const areaId = texto(form, 'areaId')
+  if (!(await autorizado(areaId))) return
   const anio = Number(texto(form, 'anio'))
   const semana = Number(texto(form, 'semana'))
   const dia = Number(texto(form, 'dia'))
@@ -108,38 +112,34 @@ export async function agregarActividadRealizadaAccion(form: FormData) {
 }
 
 export async function devolverAlBancoAccion(form: FormData) {
-  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   if (!id) return
-  if (await bloqueadoPorPlazoActividad(id)) return
+  if (await bloqueadaActividad(id)) return
   await devolverAlBanco(id)
   revalidatePath('/cumplimiento')
 }
 
 export async function registrarAvanceObservacionAccion(form: FormData) {
-  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   const nota = texto(form, 'nota')
   if (!id || nota === '') return
-  if (await bloqueadoPorPlazoActividad(id)) return
+  if (await bloqueadaActividad(id)) return
   await registrarAvanceObservacionGrupo(id, nota)
   revalidatePath('/cumplimiento')
 }
 
 export async function marcarCumplidaActividadAccion(form: FormData) {
-  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   if (!id) return
-  if (await bloqueadoPorPlazoActividad(id)) return
+  if (await bloqueadaActividad(id)) return
   await marcarCumplidaGrupo(id)
   revalidatePath('/cumplimiento')
 }
 
 export async function setLotesActividadAccion(form: FormData) {
-  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   if (!id) return
-  if (await bloqueadoPorPlazoActividad(id)) return
+  if (await bloqueadaActividad(id)) return
   const loteIds = form.getAll('loteId').map((v) => String(v))
   if (loteIds.length === 0) return
   await setLotesGrupo(id, loteIds)
@@ -177,11 +177,10 @@ function leerReemplazo(form: FormData, diaFallback?: number) {
 }
 
 export async function registrarAvanceAccion(form: FormData) {
-  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   const dia = Number(texto(form, 'dia'))
   if (!id || !(dia >= 1 && dia <= 7)) return
-  if (await bloqueadoPorPlazoActividad(id)) return
+  if (await bloqueadaActividad(id)) return
   const lotesHechos = form.getAll('loteHecho').map((v) => String(v))
   if (lotesHechos.length === 0) return
   const responsableId = textoOpcional(form, 'responsableId')
@@ -202,12 +201,11 @@ export async function registrarAvanceAccion(form: FormData) {
 }
 
 export async function editarAvanceAccion(form: FormData) {
-  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   const loteId = texto(form, 'loteId')
   const index = Number(texto(form, 'index'))
   if (!id || !loteId || !Number.isInteger(index) || index < 0) return
-  if (await bloqueadoPorPlazoActividad(id)) return
+  if (await bloqueadaActividad(id)) return
   const cantidad = numeroOpcional(form, 'cantidad') ?? 0
   const dia = Number(texto(form, 'dia'))
   const observacion = textoOpcional(form, 'observacion')
@@ -220,22 +218,20 @@ export async function editarAvanceAccion(form: FormData) {
 }
 
 export async function eliminarAvanceAccion(form: FormData) {
-  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   const loteId = texto(form, 'loteId')
   const index = Number(texto(form, 'index'))
   if (!id || !loteId || !Number.isInteger(index) || index < 0) return
-  if (await bloqueadoPorPlazoActividad(id)) return
+  if (await bloqueadaActividad(id)) return
   await eliminarAvanceEntradaGrupo(id, loteId, index)
   revalidatePath('/cumplimiento')
 }
 
 export async function agregarNovedadAccion(form: FormData) {
-  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   const dia = Number(texto(form, 'dia'))
   if (!id || !(dia >= 1 && dia <= 7)) return
-  if (await bloqueadoPorPlazoActividad(id)) return
+  if (await bloqueadaActividad(id)) return
   const motivoId = textoOpcional(form, 'motivoId')
   const observacion = textoOpcional(form, 'observacion')
   // Bloque de cambio (opcional): el día del reemplazo es el de la novedad (este formulario no
@@ -247,20 +243,18 @@ export async function agregarNovedadAccion(form: FormData) {
 }
 
 export async function eliminarNovedadAccion(form: FormData) {
-  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   const index = Number(texto(form, 'index'))
   if (!id || !Number.isInteger(index) || index < 0) return
-  if (await bloqueadoPorPlazoActividad(id)) return
+  if (await bloqueadaActividad(id)) return
   await eliminarNovedadGrupo(id, index)
   revalidatePath('/cumplimiento')
 }
 
 export async function registrarMedidaGeneralAccion(form: FormData) {
-  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   if (!id) return
-  if (await bloqueadoPorPlazoActividad(id)) return
+  if (await bloqueadaActividad(id)) return
   const cantidad = numeroOpcional(form, 'cantidad') ?? 0
   const nota = textoOpcional(form, 'nota')
   await registrarMedidaGeneralGrupo(id, unidadElegida(form), cantidad, nota)
@@ -268,13 +262,12 @@ export async function registrarMedidaGeneralAccion(form: FormData) {
 }
 
 export async function registrarNovedadActividadAccion(form: FormData) {
-  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   const estado = texto(form, 'estado')
   if (!id || !ESTADOS_VALIDOS.includes(estado) || estado === 'PENDIENTE' || estado === 'CUMPLIDA') return
   const motivoId = textoOpcional(form, 'motivoId')
   if (!motivoId) return
-  if (await bloqueadoPorPlazoActividad(id)) return
+  if (await bloqueadaActividad(id)) return
   const nota = textoOpcional(form, 'nota')
   const lotesHechos = form.getAll('loteHecho').map((v) => String(v))
   const reemplazo = leerReemplazo(form)
@@ -284,38 +277,34 @@ export async function registrarNovedadActividadAccion(form: FormData) {
 }
 
 export async function desmarcarActividadAccion(form: FormData) {
-  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   if (!id) return
-  if (await bloqueadoPorPlazoActividad(id)) return
+  if (await bloqueadaActividad(id)) return
   await reabrirGrupo(id)
   revalidatePath('/cumplimiento')
 }
 
 export async function cerrarParcialAccion(form: FormData) {
-  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   if (!id) return
-  if (await bloqueadoPorPlazoActividad(id)) return
+  if (await bloqueadaActividad(id)) return
   await cerrarParcialGrupo(id)
   revalidatePath('/cumplimiento')
 }
 
 export async function reabrirCierreAccion(form: FormData) {
-  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   if (!id) return
-  if (await bloqueadoPorPlazoActividad(id)) return
+  if (await bloqueadaActividad(id)) return
   await reabrirCierreGrupo(id)
   revalidatePath('/cumplimiento')
 }
 
 export async function editarNovedadAccion(form: FormData) {
-  if (await bloqueadoVisor()) return
   const id = texto(form, 'id')
   const index = Number(texto(form, 'index'))
   if (!id || !Number.isInteger(index) || index < 0) return
-  if (await bloqueadoPorPlazoActividad(id)) return
+  if (await bloqueadaActividad(id)) return
   const dia = Number(texto(form, 'dia'))
   await editarNovedadGrupo(id, index, {
     ...(dia >= 1 && dia <= 7 ? { dia } : {}),
