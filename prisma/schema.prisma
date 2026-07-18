@@ -3,8 +3,11 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  // Runtime (serverless) usa el pooler; las migraciones usan la conexión DIRECTA,
+  // porque el pooler (PgBouncer) no sostiene los advisory locks de `migrate deploy`.
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Area {
