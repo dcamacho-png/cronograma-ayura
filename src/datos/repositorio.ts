@@ -398,6 +398,31 @@ export function eliminarTarea(id: string) {
   return prisma.tarea.delete({ where: { id } })
 }
 
+// Edita una tarea PROPIA del banco (descripción, detalle, lotes, bultos y finca).
+// No toca los campos de sugerencia (día/colaboradores), que son de solicitudes.
+export async function editarTarea(
+  id: string,
+  datos: {
+    descripcion: string
+    detalle: string | null
+    loteIds: string[]
+    bultosPorLote: Record<string, number> | null
+    fincaNombre: string | null
+  },
+) {
+  const fincaId = await resolverFincaId(datos.loteIds, datos.fincaNombre)
+  return prisma.tarea.update({
+    where: { id },
+    data: {
+      descripcion: datos.descripcion,
+      detalle: datos.detalle,
+      fincaId,
+      bultosPorLote: datos.bultosPorLote ?? undefined,
+      ...(datos.loteIds.length > 0 ? { lotes: { set: datos.loteIds.map((lid) => ({ id: lid })) } } : {}),
+    },
+  })
+}
+
 // Elimina una solicitud (tarea) junto con cualquier actividad ligada, en una transacción.
 // Evita dejar actividades huérfanas (tareaId=null) por el onDelete: SetNull por defecto.
 // Pensado para solicitudes no PROGRAMADAS (que no deberían tener actividades reales).

@@ -20,6 +20,7 @@ export function FormEditarSolicitud({
   lotesActuales,
   bultosActuales,
   accion,
+  sinSugerencias = false,
 }: {
   id: string
   esMaquinaria: boolean
@@ -33,6 +34,9 @@ export function FormEditarSolicitud({
   lotesActuales: { id: string; nombre: string }[]
   bultosActuales: Record<string, number> | null
   accion: (formData: FormData) => void | Promise<void>
+  // Oculta los campos de sugerencia (día/colaboradores), que solo aplican a solicitudes
+  // entre áreas. Para editar una tarea PROPIA del banco no tienen sentido.
+  sinSugerencias?: boolean
 }) {
   const seleccionBultos = Object.fromEntries(
     lotesActuales.map((l) => [l.id, bultosActuales?.[l.id] != null ? String(bultosActuales[l.id]) : '']),
@@ -78,11 +82,13 @@ export function FormEditarSolicitud({
           ? <PickerLotesBultos lotes={lotes} seleccionInicial={seleccionBultos} />
           : <PickerLotesBultos lotes={lotes} sinCantidad seleccionInicial={seleccionBultos} />}
       </label>
-      <div className="flex flex-col gap-1 text-xs">
-        <span>Día sugerido</span>
-        <CasillasDias seleccion={diasSeleccion} />
-      </div>
-      {!esMaquinaria && (
+      {!sinSugerencias && (
+        <div className="flex flex-col gap-1 text-xs">
+          <span>Día sugerido</span>
+          <CasillasDias seleccion={diasSeleccion} />
+        </div>
+      )}
+      {!sinSugerencias && !esMaquinaria && (
         <div className="flex flex-col gap-1 text-xs">
           <span>Colaboradores sugeridos</span>
           <CasillasColaboradores responsables={responsablesB} seleccion={responsablesSeleccion} />

@@ -16,7 +16,7 @@ import { InfoLotes } from '../_componentes/info-lotes'
 import { FormNuevaTareaMaquinaria } from './form-nueva-tarea-maquinaria'
 import { FormNuevaTareaEstandar } from './form-nueva-tarea-estandar'
 import { FormSolicitar } from './form-solicitar'
-import { crearTareaAccion, eliminarTareaAccion, programarTareaAccion, crearSolicitudAccion, devolverAlSolicitanteAccion, reenviarSolicitudAccion, editarSolicitudAccion, eliminarSolicitudAccion } from './acciones'
+import { crearTareaAccion, eliminarTareaAccion, programarTareaAccion, crearSolicitudAccion, devolverAlSolicitanteAccion, reenviarSolicitudAccion, editarSolicitudAccion, eliminarSolicitudAccion, editarTareaAccion } from './acciones'
 import { FormEditarSolicitud } from './form-editar-solicitud'
 import { FormEliminar } from './form-eliminar'
 import { parseCsv } from '@/dominio/sugerencia'
@@ -165,10 +165,27 @@ export default async function TareasPage({
                       <button className="text-sm text-amber-700 hover:underline">↩️ Devolver</button>
                     </form>
                   ) : (
-                    <form action={eliminarTareaAccion}>
-                      <input type="hidden" name="id" value={t.id} />
-                      <button className="text-sm text-red-600 hover:underline">eliminar</button>
-                    </form>
+                    <>
+                      <FormEditarSolicitud
+                        id={t.id}
+                        esMaquinaria={esMaquinaria}
+                        descripcion={t.descripcion}
+                        detalle={t.detalle}
+                        diasSeleccion={[]}
+                        responsablesSeleccion={[]}
+                        responsablesB={[]}
+                        estipuladas={estipuladasMaq}
+                        lotes={lotes}
+                        lotesActuales={t.lotes}
+                        bultosActuales={t.bultosPorLote as Record<string, number> | null}
+                        accion={editarTareaAccion}
+                        sinSugerencias
+                      />
+                      <form action={eliminarTareaAccion}>
+                        <input type="hidden" name="id" value={t.id} />
+                        <button className="text-sm text-red-600 hover:underline">eliminar</button>
+                      </form>
+                    </>
                   )}
                 </li>
               )

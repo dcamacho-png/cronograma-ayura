@@ -10,6 +10,7 @@ import {
   devolverAlSolicitante,
   reenviarSolicitud,
   editarSolicitud,
+  editarTarea,
   eliminarSolicitud,
   areaDeTarea,
 } from '@/datos/repositorio'
@@ -37,6 +38,14 @@ async function solicitudEditable(id: string): Promise<boolean> {
   const t = await areaDeTarea(id)
   if (!t || t.estado === 'PROGRAMADA') return false
   return puedeMutarArea(u, t.solicitadaPorAreaId)
+}
+// El área DUEÑA puede editar/eliminar su tarea del banco mientras no esté PROGRAMADA.
+async function tareaPropiaEditable(id: string): Promise<boolean> {
+  const u = await usuarioActual()
+  if (!u) return false
+  const t = await areaDeTarea(id)
+  if (!t || t.estado === 'PROGRAMADA') return false
+  return puedeMutarArea(u, t.areaId)
 }
 
 function texto(form: FormData, clave: string): string {
@@ -97,8 +106,29 @@ export async function crearTareaAccion(form: FormData) {
 
 export async function eliminarTareaAccion(form: FormData) {
   const id = texto(form, 'id')
-  if (!id || !(await autorizadoTarea(id, 'ejecutora'))) return
+  // Tarea propia del banco: la dueña puede eliminarla mientras no esté programada.
+  if (!id || !(await tareaPropiaEditable(id))) return
   await eliminarTarea(id)
+  revalidatePath('/tareas')
+}
+
+export async function editarTareaAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (!id || !(await tareaPropiaEditable(id))) return
+  const est = textoOpcional(form, 'estipulada')
+  const descripcion = est === '__otra__'
+    ? textoOpcional(form, 'otra')
+    : (est ?? textoOpcional(form, 'descripcion'))
+  if (!descripcion) return
+  const loteIds = form.getAll('loteId').map((v) => String(v).trim()).filter(Boolean)
+  const bultos: Record<string, number> = {}
+  for (const lid of loteIds) {
+    const b = numeroOpcional(form, `bultos_${lid}`)
+    if (b != null) bultos[lid] = b
+  }
+  const detalle = textoOpcional(form, 'detalle')
+  const fincaNombre = textoOpcional(form, 'fincaNombre')
+  await editarTarea(id, { descripcion, detalle, loteIds, bultosPorLote: Object.keys(bultos).length > 0 ? bultos : null, fincaNombre })
   revalidatePath('/tareas')
 }
 
