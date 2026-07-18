@@ -54,6 +54,19 @@ describe('resumenAusenciasMes', () => {
     expect(r[0]).toMatchObject({ nombre: 'Beto', vacaciones: 2 })
   })
 
+  it('Cumpleaños/Otro no suman a vacaciones/permiso, pero sí aparecen en el detalle', () => {
+    const r = resumenAusenciasMes(
+      [
+        { ...nov({ id: 'c', tipo: 'CUMPLEAÑOS', fechaInicio: d('2026-07-08'), fechaFin: d('2026-07-08') }), nombre: 'Ana' },
+        { ...nov({ id: 'o', tipo: 'OTRO', fechaInicio: d('2026-07-09'), fechaFin: d('2026-07-09'), nota: 'capacitación' }), nombre: 'Ana' },
+      ],
+      primer, ultimo,
+    )
+    expect(r[0]).toMatchObject({ nombre: 'Ana', vacaciones: 0, permiso: 0 })
+    expect(r[0].detalle).toHaveLength(2)
+    expect(r[0].detalle.map((x) => x.tipo)).toEqual(['CUMPLEAÑOS', 'OTRO'])
+  })
+
   it('excluye novedades que no intersectan el mes y ordena por nombre', () => {
     const r = resumenAusenciasMes(
       [

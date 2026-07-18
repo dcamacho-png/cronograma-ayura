@@ -1,7 +1,19 @@
+export type TipoNovedad = 'VACACIONES' | 'PERMISO' | 'CUMPLEAÑOS' | 'OTRO'
+
+// Emoji + etiqueta para mostrar una novedad de responsable de forma consistente.
+export function etiquetaNovedad(tipo: string): { emoji: string; label: string } {
+  switch (tipo) {
+    case 'VACACIONES': return { emoji: '🌴', label: 'Vacaciones' }
+    case 'PERMISO': return { emoji: '📄', label: 'Permiso' }
+    case 'CUMPLEAÑOS': return { emoji: '🎂', label: 'Cumpleaños' }
+    default: return { emoji: '📌', label: 'Otro' }
+  }
+}
+
 export type NovedadRango = {
   id: string
   responsableId: string
-  tipo: 'VACACIONES' | 'PERMISO'
+  tipo: TipoNovedad
   fechaInicio: Date
   fechaFin: Date
   horario: string | null
@@ -14,7 +26,7 @@ export type AusenciaResumen = {
   vacaciones: number
   permiso: number
   detalle: {
-    tipo: 'VACACIONES' | 'PERMISO'
+    tipo: TipoNovedad
     fechaInicio: Date
     fechaFin: Date
     horario: string | null
@@ -58,8 +70,9 @@ export function resumenAusenciasMes(
       r = { responsableId: n.responsableId, nombre: n.nombre, vacaciones: 0, permiso: 0, detalle: [] }
       porResp.set(n.responsableId, r)
     }
+    // Cumpleaños/Otro no suman a los contadores de vacaciones/permiso; solo van al detalle.
     if (n.tipo === 'VACACIONES') r.vacaciones += dias
-    else r.permiso += dias
+    else if (n.tipo === 'PERMISO') r.permiso += dias
     r.detalle.push({ tipo: n.tipo, fechaInicio: n.fechaInicio, fechaFin: n.fechaFin, horario: n.horario, nota: n.nota })
   }
   return [...porResp.values()].sort((a, b) => a.nombre.localeCompare(b.nombre))

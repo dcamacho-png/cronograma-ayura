@@ -237,7 +237,7 @@ export async function crearNovedadResponsableAccion(form: FormData) {
   const tipo = texto(form, 'tipo')
   const anio = Number(texto(form, 'anio'))
   const semana = Number(texto(form, 'semana'))
-  if (!responsableId || (tipo !== 'VACACIONES' && tipo !== 'PERMISO')) return
+  if (!responsableId || !['VACACIONES', 'PERMISO', 'CUMPLEAÑOS', 'OTRO'].includes(tipo)) return
   if (!(await autorizadoResponsable(responsableId))) return
   if (!Number.isInteger(anio) || !Number.isInteger(semana) || !esSemanaFutura(anio, semana, semanaActual())) return
   const fechaInicio = fechaUTC(form, 'fechaInicio')

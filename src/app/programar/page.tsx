@@ -80,7 +80,7 @@ export default async function ProgramarPage({
   const novedades = novedadesRaw.map((n) => ({
     id: n.id,
     responsableId: n.responsableId,
-    tipo: n.tipo as 'VACACIONES' | 'PERMISO',
+    tipo: n.tipo as 'VACACIONES' | 'PERMISO' | 'CUMPLEAÑOS' | 'OTRO',
     fechaInicio: n.fechaInicio,
     fechaFin: n.fechaFin,
     horario: n.horario,

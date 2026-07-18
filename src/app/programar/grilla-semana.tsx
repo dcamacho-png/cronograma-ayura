@@ -2,10 +2,17 @@ import { Fragment } from 'react'
 import { InfoLotes } from '../_componentes/info-lotes'
 import { actualizarActividadAccion, devolverAAsignacionAccion, devolverGrillaAlBancoAccion, devolverActividadAlBancoAccion, eliminarNovedadResponsableAccion } from './acciones'
 import { agruparResponsablesPorFinca, hayFincasAsignadas } from '@/dominio/responsables-finca'
-import { diasCubiertos } from '@/dominio/ausencias'
+import { diasCubiertos, etiquetaNovedad, type TipoNovedad } from '@/dominio/ausencias'
 import { FormNovedad } from './form-novedad'
 
 const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+
+const COLOR_NOVEDAD: Record<string, string> = {
+  VACACIONES: 'bg-amber-100 text-amber-900',
+  PERMISO: 'bg-sky-100 text-sky-900',
+  CUMPLEAÑOS: 'bg-rose-100 text-rose-900',
+  OTRO: 'bg-stone-100 text-stone-800',
+}
 
 type ActividadGrilla = {
   id: string
@@ -24,7 +31,7 @@ type ActividadGrilla = {
 type NovedadGrilla = {
   id: string
   responsableId: string
-  tipo: 'VACACIONES' | 'PERMISO'
+  tipo: TipoNovedad
   fechaInicio: Date
   fechaFin: Date
   horario: string | null
@@ -81,7 +88,7 @@ export function GrillaSemana({
           .filter((n) => n.responsableId === r.id)
           .map((n) => (
             <div key={n.id} className="mt-1 flex items-center gap-1 text-xs font-normal text-tierra">
-              <span>{n.tipo === 'VACACIONES' ? '🌴' : '📄'} {fmtFecha(n.fechaInicio)}–{fmtFecha(n.fechaFin)}</span>
+              <span>{etiquetaNovedad(n.tipo).emoji} {fmtFecha(n.fechaInicio)}–{fmtFecha(n.fechaFin)}</span>
               {editable && (
                 <form action={eliminarNovedadResponsableAccion}>
                   <input type="hidden" name="id" value={n.id} />
@@ -149,11 +156,11 @@ export function GrillaSemana({
               .map((n) => (
                 <div
                   key={n.id}
-                  className={`mb-1 rounded-lg p-1 ${paraExportar ? 'text-sm' : 'text-xs'} ${
-                    n.tipo === 'VACACIONES' ? 'bg-amber-100 text-amber-900' : 'bg-sky-100 text-sky-900'
-                  }`}
+                  className={`mb-1 rounded-lg p-1 ${paraExportar ? 'text-sm' : 'text-xs'} ${COLOR_NOVEDAD[n.tipo] ?? COLOR_NOVEDAD.OTRO}`}
                 >
-                  {n.tipo === 'VACACIONES' ? '🌴 Vacaciones' : `📄 Permiso${n.horario ? ` · ${n.horario}` : ''}`}
+                  {etiquetaNovedad(n.tipo).emoji} {etiquetaNovedad(n.tipo).label}
+                  {n.tipo === 'PERMISO' && n.horario ? ` · ${n.horario}` : ''}
+                  {(n.tipo === 'OTRO' || n.tipo === 'CUMPLEAÑOS') && n.nota ? ` · ${n.nota}` : ''}
                 </div>
               ))}
           </td>

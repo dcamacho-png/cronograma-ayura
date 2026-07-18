@@ -9,7 +9,7 @@ import {
 import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
 import { unidadDe, unidadAbreviada, type Unidad } from '@/dominio/unidad'
 import { normalizarAvancePorLote, type AvanceEntrada } from '@/dominio/avance-lote'
-import type { AusenciaResumen } from '@/dominio/ausencias'
+import { etiquetaNovedad, type AusenciaResumen } from '@/dominio/ausencias'
 
 const ESTADOS_ORDEN = [
   { v: ['CUMPLIDA'], etq: '✅ Cumplidas' },
@@ -311,7 +311,7 @@ export function ResumenArea({
                   <ul className="mt-1 space-y-0.5 text-xs text-tierra">
                     {a.detalle.map((d, i) => (
                       <li key={i}>
-                        {d.tipo === 'VACACIONES' ? '🌴' : '📄'}{' '}
+                        {etiquetaNovedad(d.tipo).emoji}{' '}
                         {fmtRango(d.fechaInicio, d.fechaFin)}
                         {d.horario ? ` · ${d.horario}` : ''}
                         {d.nota ? ` — ${d.nota}` : ''}
