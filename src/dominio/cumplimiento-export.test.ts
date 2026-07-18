@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { filasCumplimiento, filasCumplimientoGrupo, COLUMNAS_CUMPLIMIENTO, type ActividadExport } from './cumplimiento-export'
 
-const mapa: Record<string, string> = { ESTERCOLERO: 'hora', GRANEL: 'kg', ENCALADORA: 'ha' }
+const mapa: Record<string, string> = { ESTERCOLERO: 'hora', GRANEL: 'kg', ENCALADORA: 'ha', RENOVADOR: 'jornales' }
 const ctx = {
   fechaDeDia: (d: number) => `D${d}`,
   nombreMaquina: (id: string | null) => (id ? `MAQ-${id}` : ''),
@@ -107,6 +107,21 @@ describe('filasCumplimiento — parcial sin avances no se emite', () => {
   it('PARCIAL con avances → sí emite las filas de avance', () => {
     const a = act({ estado: 'PARCIAL', avancePorLote: { l1: [{ dia: 1, maquinaId: null, cantidad: 2 }] } })
     expect(filasCumplimiento(a, '15 jun', mapa, ctx)).toHaveLength(1)
+  })
+})
+
+describe('filasCumplimiento — unidad de respaldo (catálogo no estándar)', () => {
+  it('sin unidadRealizada usa la unidad cruda del catálogo si NO es estándar (jornales)', () => {
+    const fila = filasCumplimiento(act({ descripcion: 'RENOVADOR', haRealizada: 2, unidadRealizada: null }), '15 jun', mapa, ctx)[0]
+    expect(fila[9]).toBe('jornales')
+  })
+  it('una unidad estándar del catálogo se mantiene abreviada (hora → horas)', () => {
+    const fila = filasCumplimiento(act({ descripcion: 'ESTERCOLERO', haRealizada: 2, unidadRealizada: null }), '15 jun', mapa, ctx)[0]
+    expect(fila[9]).toBe('horas')
+  })
+  it('unidadRealizada siempre manda sobre el catálogo', () => {
+    const fila = filasCumplimiento(act({ descripcion: 'RENOVADOR', haRealizada: 2, unidadRealizada: 'kg' }), '15 jun', mapa, ctx)[0]
+    expect(fila[9]).toBe('kg')
   })
 })
 

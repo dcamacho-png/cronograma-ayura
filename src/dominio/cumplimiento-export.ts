@@ -53,9 +53,14 @@ export function filasCumplimiento(
   ctx: { fechaDeDia: (dia: number) => string; nombreMaquina: (maquinaId: string | null) => string; nombreResponsable?: (id: string | null) => string },
   ejecutadaPor = '',
 ): (string | number)[][] {
-  const unidad: Unidad = normalizarUnidad(unidadPorNombre[a.descripcion])
+  const catalogUnidad = unidadPorNombre[a.descripcion]
+  const unidad: Unidad = normalizarUnidad(catalogUnidad)
   const unidadAbrev = unidadAbreviada(unidad)
-  const unidadDisplay = a.unidadRealizada ?? unidadAbrev
+  // Respaldo cuando no hay unidad realizada: si el catálogo trae una unidad NO estándar
+  // (jornales/bultos/otro), se muestra cruda en vez de forzarla a "ha". La unidad
+  // realizada (la que se guardó al programar/registrar) siempre tiene prioridad.
+  const noEstandar = catalogUnidad != null && !['ha', 'hora', 'kg', 'cantidad'].includes(catalogUnidad)
+  const unidadDisplay = a.unidadRealizada ?? (noEstandar ? catalogUnidad : unidadAbrev)
   const estado = ESTADO_TXT[a.estado] ?? a.estado
   const bultos = textoBultosPorLote(a.lotes, a.bultosPorLote)
   const centro = a.centroCosto ?? ''
