@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   lotesPendientes, textoAvancePorLote, textoAvanceConFecha,
-  normalizarAvancePorLote, totalAvanceLotes, agregarAvances, completarAvancesCumplida, type AvancePorLote,
+  normalizarAvancePorLote, totalAvanceLotes, agregarAvances, completarAvancesCumplida, lotesRealizadosCumplida, type AvancePorLote,
 } from './avance-lote'
 
 const lotes = [{ id: 'a', nombre: 'L-A' }, { id: 'b', nombre: 'L-B' }, { id: 'c', nombre: 'L-C' }]
@@ -116,6 +116,34 @@ describe('agregarAvances', () => {
       b: [{ dia: 2, maquinaId: 'm1', cantidad: 4 }],
     })
     expect(base).toEqual({ a: [{ dia: 1, maquinaId: null, cantidad: 3 }] }) // intacto
+  })
+})
+
+describe('lotesRealizadosCumplida', () => {
+  const l3 = [{ id: 'a', nombre: 'L-A' }, { id: 'b', nombre: 'L-B' }, { id: 'c', nombre: 'L-C' }]
+
+  it('sin ninguna señal (cumplida directa) devuelve TODOS los lotes', () => {
+    expect(lotesRealizadosCumplida(l3, {}, null)).toEqual(l3)
+  })
+
+  it('con avance (cantidad>0) en algunos, solo esos', () => {
+    const av: AvancePorLote = { a: [{ dia: 1, maquinaId: null, cantidad: 2 }] }
+    expect(lotesRealizadosCumplida(l3, av, null).map((l) => l.id)).toEqual(['a'])
+  })
+
+  it('un avance de cantidad 0 NO cuenta como realizado', () => {
+    const av: AvancePorLote = { a: [{ dia: 1, maquinaId: null, cantidad: 0 }] }
+    // ninguna señal real → todos (se asume cumplida directa)
+    expect(lotesRealizadosCumplida(l3, av, null)).toEqual(l3)
+  })
+
+  it('los marcados en lotesHechos cuentan aunque no tengan avance', () => {
+    expect(lotesRealizadosCumplida(l3, {}, ['b']).map((l) => l.id)).toEqual(['b'])
+  })
+
+  it('une avance (cantidad>0) y lotesHechos', () => {
+    const av: AvancePorLote = { a: [{ dia: 1, maquinaId: null, cantidad: 2 }] }
+    expect(lotesRealizadosCumplida(l3, av, ['c']).map((l) => l.id)).toEqual(['a', 'c'])
   })
 })
 

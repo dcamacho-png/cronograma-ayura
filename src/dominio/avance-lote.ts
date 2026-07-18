@@ -101,6 +101,24 @@ export function agregarAvances(
   return out
 }
 
+// Al marcar CUMPLIDA, ¿qué lotes deben desglosarse (aparecer con medida) en el Excel?
+// Un lote cuenta como "realizado" si tiene algún avance con cantidad > 0, o si está
+// marcado en la lista "Potreros realizados" (lotesHechos). Si hay al menos una señal,
+// se devuelven SOLO esos lotes; si no hay ninguna (cumplida directa), se devuelven
+// TODOS (se asume que la actividad se hizo completa — comportamiento histórico).
+export function lotesRealizadosCumplida<T extends { id: string }>(
+  lotes: T[],
+  avance: AvancePorLote,
+  lotesHechos?: string[] | null,
+): T[] {
+  const hechos = new Set<string>(lotesHechos ?? [])
+  for (const [id, entradas] of Object.entries(avance)) {
+    if (entradas.some((e) => e.cantidad > 0)) hechos.add(id)
+  }
+  if (hechos.size === 0) return lotes
+  return lotes.filter((l) => hechos.has(l.id))
+}
+
 // Al marcar una actividad como CUMPLIDA directamente (sin registrar avances), completa el
 // historial para que los datos queden completos: a cada lote SIN ninguna entrada de avance le
 // agrega una entrada con su área completa (hectáreas del potrero) en el día dado. Los lotes que

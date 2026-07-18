@@ -10,6 +10,7 @@ import {
   agregarAvances,
   totalAvanceLotes,
   completarAvancesCumplida,
+  lotesRealizadosCumplida,
   editarAvanceEntrada,
   eliminarAvanceEntrada,
   type AvanceEntrada,
@@ -812,7 +813,11 @@ export async function marcarCumplidaGrupo(id: string) {
   // horas/kg/cantidad no se inventa una medida a partir de las hectáreas.
   const est = tieneLotes ? await prisma.actividadEstipulada.findFirst({ where: { nombre: g.base.descripcion } }) : null
   const esHa = est?.unidad === 'ha'
-  const avanceCompleto = (tieneLotes && esHa) ? completarAvancesCumplida(g.base.lotes, avanceActual, g.base.dia) : avanceActual
+  // Solo se desglosan los lotes realmente realizados (con avance o marcados en "Potreros
+  // realizados"); si no hay ninguna señal, todos (cumplida directa = actividad completa).
+  // Así el Excel no lista lotes asignados que no se trabajaron al marcar Cumplida.
+  const lotesDesglose = lotesRealizadosCumplida(g.base.lotes, avanceActual, g.base.lotesHechos as string[] | null)
+  const avanceCompleto = (tieneLotes && esHa) ? completarAvancesCumplida(lotesDesglose, avanceActual, g.base.dia) : avanceActual
   const total = totalAvanceLotes(g.base.lotes, avanceCompleto)
   await prisma.$transaction(
     g.filas
