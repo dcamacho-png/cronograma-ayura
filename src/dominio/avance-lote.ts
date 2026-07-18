@@ -75,8 +75,11 @@ export function totalAvanceLotes(
   return total
 }
 
-// Devuelve una copia de `avance` con una entrada nueva agregada a cada lote indicado.
-// No muta la entrada recibida.
+// Devuelve una copia de `avance` con el registro de cada lote indicado en el día dado.
+// Una sola entrada por (lote, día): si ya existe una de ese día se REEMPLAZA en su
+// posición (y se descartan duplicados viejos del mismo día); un día distinto se agrega
+// aparte. Así, al reabrir y volver a registrar el mismo día, el Excel deja solo el
+// último valor en vez de acumular el viejo y el nuevo. No muta lo recibido.
 export function agregarAvances(
   avance: AvancePorLote,
   dia: number,
@@ -88,7 +91,12 @@ export function agregarAvances(
 ): AvancePorLote {
   const out: AvancePorLote = { ...avance }
   for (const { loteId, cantidad } of entradas) {
-    out[loteId] = [...(out[loteId] ?? []), { dia, maquinaId, cantidad, ...(centroCosto ? { centroCosto } : {}), ...(responsableId ? { responsableId } : {}), ...(observacion ? { observacion } : {}) }]
+    const nueva: AvanceEntrada = { dia, maquinaId, cantidad, ...(centroCosto ? { centroCosto } : {}), ...(responsableId ? { responsableId } : {}), ...(observacion ? { observacion } : {}) }
+    const lista = out[loteId] ?? []
+    const idx = lista.findIndex((e) => e.dia === dia)
+    out[loteId] = idx === -1
+      ? [...lista, nueva]
+      : lista.map((e, i) => (i === idx ? nueva : e)).filter((e, i) => i === idx || e.dia !== dia)
   }
   return out
 }

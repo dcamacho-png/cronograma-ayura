@@ -119,6 +119,29 @@ describe('agregarAvances', () => {
   })
 })
 
+describe('agregarAvances — reemplazo por lote+día', () => {
+  it('re-registrar el MISMO lote y día reemplaza la entrada (no la duplica)', () => {
+    const base: AvancePorLote = { a: [{ dia: 1, maquinaId: 'm1', cantidad: 3 }] }
+    const out = agregarAvances(base, 1, 'm2', [{ loteId: 'a', cantidad: 5 }])
+    expect(out).toEqual({ a: [{ dia: 1, maquinaId: 'm2', cantidad: 5 }] })
+    expect(base).toEqual({ a: [{ dia: 1, maquinaId: 'm1', cantidad: 3 }] }) // intacto
+  })
+
+  it('un día distinto en el mismo lote sí agrega una entrada nueva', () => {
+    const base: AvancePorLote = { a: [{ dia: 1, maquinaId: 'm1', cantidad: 3 }] }
+    const out = agregarAvances(base, 2, 'm1', [{ loteId: 'a', cantidad: 2 }])
+    expect(out.a).toHaveLength(2)
+  })
+
+  it('conserva la posición al reemplazar y descarta duplicados viejos del mismo día', () => {
+    const base: AvancePorLote = {
+      a: [{ dia: 1, maquinaId: null, cantidad: 3 }, { dia: 2, maquinaId: null, cantidad: 4 }, { dia: 1, maquinaId: null, cantidad: 1 }],
+    }
+    const out = agregarAvances(base, 1, 'm9', [{ loteId: 'a', cantidad: 9 }])
+    expect(out.a).toEqual([{ dia: 1, maquinaId: 'm9', cantidad: 9 }, { dia: 2, maquinaId: null, cantidad: 4 }])
+  })
+})
+
 describe('agregarAvances — centro de costo', () => {
   it('guarda el centroCosto en cada entrada nueva', () => {
     const out = agregarAvances({}, 2, 'M1', [{ loteId: 'l1', cantidad: 3 }], 'Ceba')
