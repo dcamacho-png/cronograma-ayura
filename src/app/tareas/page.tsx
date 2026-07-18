@@ -213,7 +213,7 @@ export default async function TareasPage({
                 {(s.finca?.nombre ?? s.lotes[0]?.finca?.nombre) && (
                   <div className="text-xs font-medium text-tierra">🏠 {s.finca?.nombre ?? s.lotes[0]?.finca?.nombre}</div>
                 )}
-                <InfoLotes lotes={s.lotes} bultosPorLote={s.bultosPorLote as Record<string, number> | null} />
+                <InfoLotes lotes={s.lotes} bultosPorLote={s.bultosPorLote as Record<string, number> | null} medidaPorLote={s.medidaPorLote as Record<string, number> | null} unidad={s.unidad} />
                 {s.detalle && (
                   <div className="mt-1 whitespace-pre-line text-xs text-tierra">📝 {s.detalle}</div>
                 )}

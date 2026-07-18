@@ -163,15 +163,19 @@ export async function crearSolicitudAccion(form: FormData) {
   if (!solicitanteAreaId || !areaEjecutoraId || !descripcion || areaEjecutoraId === solicitanteAreaId) return
   const loteIds = form.getAll('loteId').map((v) => String(v).trim()).filter(Boolean)
   const bultos: Record<string, number> = {}
+  const medida: Record<string, number> = {}
   for (const id of loteIds) {
     const b = numeroOpcional(form, `bultos_${id}`)
     if (b != null) bultos[id] = b
+    const m = numeroOpcional(form, `medida_${id}`)
+    if (m != null) medida[id] = m
   }
   const detalle = textoOpcional(form, 'detalle')
+  const unidad = unidadElegida(form)
   const diasSugeridos = form.getAll('diaSugerido').map((v) => String(v).trim()).filter(Boolean).join(',') || null
   const responsablesSugeridosIds = form.getAll('responsableSugerido').map((v) => String(v).trim()).filter(Boolean).join(',') || null
   const fincaNombre = textoOpcional(form, 'fincaNombre')
-  await crearSolicitud(areaEjecutoraId, descripcion, solicitanteAreaId, loteIds, Object.keys(bultos).length > 0 ? bultos : null, detalle, diasSugeridos, responsablesSugeridosIds, fincaNombre)
+  await crearSolicitud(areaEjecutoraId, descripcion, solicitanteAreaId, loteIds, Object.keys(bultos).length > 0 ? bultos : null, detalle, diasSugeridos, responsablesSugeridosIds, fincaNombre, Object.keys(medida).length > 0 ? medida : null, unidad)
   revalidatePath('/tareas')
 }
 
@@ -209,6 +213,8 @@ export async function editarSolicitudAccion(form: FormData) {
   const detalle = textoOpcional(form, 'detalle')
   const diasSugeridos = form.getAll('diaSugerido').map((v) => String(v).trim()).filter(Boolean).join(',') || null
   const responsablesSugeridosIds = form.getAll('responsableSugerido').map((v) => String(v).trim()).filter(Boolean).join(',') || null
+  // Nota: la edición NO toca unidad/medidaPorLote (no están en el form de edición);
+  // editarSolicitud las deja intactas al recibirlas como undefined.
   await editarSolicitud(id, { descripcion, detalle, loteIds, bultosPorLote: Object.keys(bultos).length > 0 ? bultos : null, diasSugeridos, responsablesSugeridosIds })
   revalidatePath('/tareas')
 }

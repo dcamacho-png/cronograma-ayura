@@ -5,6 +5,7 @@ import { PickerLotesBultos } from './picker-lotes-bultos'
 import { usaBultos } from '@/dominio/bultos'
 import { CasillasDias, CasillasColaboradores } from './campos-sugerencia'
 
+const UNIDADES = ['Ha', 'Hora', 'Kg', 'Cantidad', 'Bultos', 'Jornales'] // + "Otro" (texto libre)
 type Lote = { id: string; nombre: string; finca: { nombre: string } }
 type Estipulada = { id: string; nombre: string }
 type Area = { id: string; nombre: string; maqTareas: boolean }
@@ -26,6 +27,7 @@ export function FormSolicitar({
 }) {
   const [areaEjecutoraId, setAreaEjecutoraId] = useState('')
   const [estipulada, setEstipulada] = useState('')
+  const [unidadSel, setUnidadSel] = useState('Jornales')
   const esMaquinaria = areas.find((a) => a.id === areaEjecutoraId)?.maqTareas ?? false
   const conBultos = usaBultos(estipulada)
   const responsablesB = responsablesPorArea[areaEjecutoraId] ?? []
@@ -87,8 +89,26 @@ export function FormSolicitar({
             <input name="descripcion" placeholder="Ej: pasar renovador en lote X" className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
           </label>
           <label className="flex flex-col text-sm">
-            Lotes (opcional)
-            <PickerLotesBultos lotes={lotes} sinCantidad />
+            Unidad
+            <select
+              name="unidad"
+              value={unidadSel === 'Otro' ? 'otro' : unidadSel.toLowerCase()}
+              onChange={(e) => setUnidadSel(e.target.value === 'otro' ? 'Otro' : e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1))}
+              className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
+            >
+              {UNIDADES.map((u) => (<option key={u} value={u.toLowerCase()}>{u}</option>))}
+              <option value="otro">Otro…</option>
+            </select>
+          </label>
+          {unidadSel === 'Otro' && (
+            <label className="flex flex-col text-sm">
+              Unidad (texto)
+              <input name="unidadOtra" placeholder="ej. viajes" className="w-28 rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
+            </label>
+          )}
+          <label className="flex flex-col text-sm">
+            Lotes y medida por lote (opcional)
+            <PickerLotesBultos lotes={lotes} campo="medida" placeholder="medida" />
           </label>
           <label className="flex flex-col text-sm">
             Descripción (opcional)

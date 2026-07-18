@@ -1076,6 +1076,8 @@ export async function crearSolicitud(
   diasSugeridos: string | null = null,
   responsablesSugeridosIds: string | null = null,
   fincaNombre: string | null = null,
+  medidaPorLote: Record<string, number> | null = null,
+  unidad: string | null = null,
 ) {
   const fincaId = await resolverFincaId(loteIds, fincaNombre)
   return prisma.tarea.create({
@@ -1089,6 +1091,8 @@ export async function crearSolicitud(
       responsablesSugeridosIds,
       lotes: { connect: loteIds.map((id) => ({ id })) },
       ...(bultosPorLote ? { bultosPorLote } : {}),
+      ...(medidaPorLote ? { medidaPorLote } : {}),
+      ...(unidad ? { unidad } : {}),
     },
   })
 }
@@ -1161,6 +1165,8 @@ export function editarSolicitud(
     bultosPorLote: Record<string, number> | null
     diasSugeridos: string | null
     responsablesSugeridosIds: string | null
+    medidaPorLote?: Record<string, number> | null
+    unidad?: string | null
   },
 ) {
   return prisma.tarea.update({
@@ -1171,6 +1177,8 @@ export function editarSolicitud(
       diasSugeridos: datos.diasSugeridos,
       responsablesSugeridosIds: datos.responsablesSugeridosIds,
       bultosPorLote: datos.bultosPorLote ?? undefined,
+      ...(datos.medidaPorLote !== undefined ? { medidaPorLote: datos.medidaPorLote ?? undefined } : {}),
+      ...(datos.unidad !== undefined ? { unidad: datos.unidad } : {}),
       ...(datos.loteIds.length > 0 ? { lotes: { set: datos.loteIds.map((lid) => ({ id: lid })) } } : {}),
     },
   })
