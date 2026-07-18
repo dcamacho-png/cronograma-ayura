@@ -193,6 +193,9 @@ export default async function TareasPage({
                     {s.estado === 'PROGRAMADA' ? '✅ Programada' : s.estado === 'DEVUELTA' ? '🔴 No realizada' : '🕓 En banco'}
                   </span>
                 </div>
+                {s.lotes[0]?.finca && (
+                  <div className="text-xs font-medium text-tierra">🏠 {s.lotes[0].finca.nombre}</div>
+                )}
                 <InfoLotes lotes={s.lotes} bultosPorLote={s.bultosPorLote as Record<string, number> | null} />
                 {s.detalle && (
                   <div className="mt-1 whitespace-pre-line text-xs text-tierra">📝 {s.detalle}</div>

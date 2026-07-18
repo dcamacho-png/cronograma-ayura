@@ -1130,7 +1130,8 @@ export function listarSolicitudesDeArea(areaId: string) {
     where: { solicitadaPorAreaId: areaId },
     include: {
       area: true,
-      lotes: true,
+      // La solicitud no guarda fincaId; la finca se deriva de sus lotes (una finca por tarea).
+      lotes: { include: { finca: true } },
       _count: { select: { actividades: { where: { estado: 'CUMPLIDA' } } } },
     },
     orderBy: { descripcion: 'asc' },
