@@ -135,6 +135,9 @@ export default async function TareasPage({
                         </span>
                       )}
                     </div>
+                    {t.finca && (
+                      <div className="text-xs font-medium text-tierra">🏠 {t.finca.nombre}</div>
+                    )}
                     <InfoLotes lotes={t.lotes} bultosPorLote={t.bultosPorLote as Record<string, number> | null} medidaPorLote={t.medidaPorLote as Record<string, number> | null} unidad={t.unidad} />
                     {t.detalle && (
                       <div className="mt-1 whitespace-pre-line text-xs text-tierra">📝 {t.detalle}</div>
