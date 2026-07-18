@@ -2,11 +2,12 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { usuarioActual } from '@/auth/sesion'
 import { puedeVer, esSoloLectura } from '@/auth/permisos'
-import { listarAreas, listarResponsablesPorArea, listarMotivos, listarActividades, listarActividadesDeSemanas, listarActividadesEstipuladas } from '@/datos/repositorio'
+import { listarAreas, listarResponsablesPorArea, listarMotivos, listarActividades, listarActividadesDeSemanas, listarActividadesEstipuladas, listarNovedadesEnRango } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, semanasDelMes } from '@/dominio/semana'
 import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
 import { ResumenArea } from './resumen-area'
 import { actividadesRecurrentes } from '@/dominio/resumen'
+import { resumenAusenciasMes } from '@/dominio/ausencias'
 
 export default async function ResumenPage({
   searchParams,
@@ -44,13 +45,34 @@ export default async function ResumenPage({
   const jueves = fechasDeSemana(anio, semana)[3]
   const semanasMes = semanasDelMes(jueves.getUTCFullYear(), jueves.getUTCMonth() + 1)
 
-  const [responsables, motivos, actividades, estipuladas, actividadesMes] = await Promise.all([
+  // Bordes del mes de la semana seleccionada, para el reporte mensual de ausencias.
+  const anioMes = jueves.getUTCFullYear()
+  const mes0 = jueves.getUTCMonth() // 0-based
+  const primerDiaMes = new Date(Date.UTC(anioMes, mes0, 1))
+  const ultimoDiaMes = new Date(Date.UTC(anioMes, mes0 + 1, 0))
+
+  const [responsables, motivos, actividades, estipuladas, actividadesMes, novedadesMes] = await Promise.all([
     listarResponsablesPorArea(areaId),
     listarMotivos(),
     listarActividades(areaId, anio, semana),
     listarActividadesEstipuladas(),
     listarActividadesDeSemanas(semanasMes),
+    listarNovedadesEnRango(areaId, primerDiaMes, ultimoDiaMes),
   ])
+  const ausenciasMes = resumenAusenciasMes(
+    novedadesMes.map((n) => ({
+      id: n.id,
+      responsableId: n.responsableId,
+      tipo: n.tipo as 'VACACIONES' | 'PERMISO',
+      fechaInicio: n.fechaInicio,
+      fechaFin: n.fechaFin,
+      horario: n.horario,
+      nota: n.nota,
+      nombre: n.responsable.nombre,
+    })),
+    primerDiaMes,
+    ultimoDiaMes,
+  )
   const unidadPorNombre = Object.fromEntries(estipuladas.map((e) => [e.nombre, e.unidad]))
   const recurrentesMes = actividadesRecurrentes(
     actividadesMes
@@ -116,6 +138,7 @@ export default async function ResumenPage({
         responsables={responsables}
         motivos={motivos}
         recurrentesMes={recurrentesMes}
+        ausenciasMes={ausenciasMes}
       />
     </main>
   )

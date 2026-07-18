@@ -26,6 +26,18 @@ export function esSoloLectura(u: UsuarioPermiso): boolean {
   return u.rol === 'VISOR'
 }
 
+// ¿Puede el usuario mutar datos de un área concreta?
+// ADMIN: cualquier área. VISOR: nunca (solo lectura). AREA: solo la suya.
+// `areaId` null (área no resuelta / entidad inexistente) siempre se deniega salvo ADMIN.
+export function puedeMutarArea(
+  u: { rol: string; areaId: string | null },
+  areaId: string | null,
+): boolean {
+  if (u.rol === 'ADMIN') return true
+  if (u.rol === 'VISOR') return false
+  return u.areaId != null && areaId != null && u.areaId === areaId
+}
+
 // Marcar/reabrir temas del Conservatorio: solo gerencia (Visor) y admin.
 export function puedeMarcarConservatorio(u: UsuarioPermiso): boolean {
   return u.rol === 'ADMIN' || u.rol === 'VISOR'

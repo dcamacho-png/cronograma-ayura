@@ -53,6 +53,7 @@ model Responsable {
   fincaId     String?
   finca       Finca?      @relation(fields: [fincaId], references: [id])
   actividades Actividad[]
+  novedades   NovedadResponsable[]
   activo      Boolean     @default(true)
 }
 
@@ -82,6 +83,20 @@ model Motivo {
   actividades Actividad[]
 }
 
+model NovedadResponsable {
+  id            String      @id @default(cuid())
+  responsableId String
+  responsable   Responsable @relation(fields: [responsableId], references: [id], onDelete: Cascade)
+  tipo          String      // "VACACIONES" | "PERMISO"
+  fechaInicio   DateTime    @db.Date
+  fechaFin      DateTime    @db.Date
+  horario       String?
+  nota          String?
+  creadoEn      DateTime    @default(now())
+
+  @@index([responsableId])
+}
+
 model Actividad {
   id                String   @id @default(cuid())
   anio              Int
@@ -104,9 +119,10 @@ model Actividad {
   motivo        Motivo?  @relation(fields: [motivoId], references: [id])
 
   // Reprogramación: relación a sí misma (la actividad de origen).
-  origenId String?
+  // @unique: una actividad solo puede reprogramarse una vez (evita duplicados por carrera).
+  origenId String?     @unique
   origen   Actividad?  @relation("Reprogramacion", fields: [origenId], references: [id])
-  derivadas Actividad[] @relation("Reprogramacion")
+  derivada Actividad?  @relation("Reprogramacion")
 
   // Campos de maquinaria (opcionales).
   maquinaId  String?

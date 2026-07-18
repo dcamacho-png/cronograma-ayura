@@ -1,7 +1,9 @@
 import { Fragment } from 'react'
 import { InfoLotes } from '../_componentes/info-lotes'
-import { actualizarActividadAccion, devolverAAsignacionAccion, devolverGrillaAlBancoAccion, devolverActividadAlBancoAccion } from './acciones'
+import { actualizarActividadAccion, devolverAAsignacionAccion, devolverGrillaAlBancoAccion, devolverActividadAlBancoAccion, eliminarNovedadResponsableAccion } from './acciones'
 import { agruparResponsablesPorFinca, hayFincasAsignadas } from '@/dominio/responsables-finca'
+import { diasCubiertos } from '@/dominio/ausencias'
+import { FormNovedad } from './form-novedad'
 
 const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
 
@@ -19,6 +21,16 @@ type ActividadGrilla = {
   tarea?: { detalle: string | null } | null
 }
 
+type NovedadGrilla = {
+  id: string
+  responsableId: string
+  tipo: 'VACACIONES' | 'PERMISO'
+  fechaInicio: Date
+  fechaFin: Date
+  horario: string | null
+  nota: string | null
+}
+
 function fmtFecha(f: Date) {
   return new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(f)
 }
@@ -30,6 +42,7 @@ export function GrillaSemana({
   fechas,
   responsables,
   actividades,
+  novedades = [],
   turnoEditable = false,
   esMaquinaria,
   paraExportar = false,
@@ -40,6 +53,7 @@ export function GrillaSemana({
   fechas: Date[]
   responsables: { id: string; nombre: string; finca: { nombre: string } | null }[]
   actividades: ActividadGrilla[]
+  novedades?: NovedadGrilla[]
   turnoEditable?: boolean
   esMaquinaria: boolean
   paraExportar?: boolean
@@ -61,7 +75,25 @@ export function GrillaSemana({
   )
   const filaResponsable = (r: { id: string; nombre: string }) => (
     <tr key={r.id}>
-      <td className="border border-borde p-2 font-medium">{r.nombre}</td>
+      <td className="border border-borde p-2 align-top font-medium">
+        <div>{r.nombre}</div>
+        {novedades
+          .filter((n) => n.responsableId === r.id)
+          .map((n) => (
+            <div key={n.id} className="mt-1 flex items-center gap-1 text-xs font-normal text-tierra">
+              <span>{n.tipo === 'VACACIONES' ? '🌴' : '📄'} {fmtFecha(n.fechaInicio)}–{fmtFecha(n.fechaFin)}</span>
+              {editable && (
+                <form action={eliminarNovedadResponsableAccion}>
+                  <input type="hidden" name="id" value={n.id} />
+                  <input type="hidden" name="anio" value={anio} />
+                  <input type="hidden" name="semana" value={semana} />
+                  <button type="submit" aria-label="Quitar novedad" className="text-red-600 hover:underline">✕</button>
+                </form>
+              )}
+            </div>
+          ))}
+        {editable && <FormNovedad responsableId={r.id} anio={anio} semana={semana} />}
+      </td>
       {DIAS.map((_, i) => {
         const dia = i + 1
         const celdas = actividades.filter((a) => a.responsableId === r.id && a.dia === dia)
@@ -112,6 +144,18 @@ export function GrillaSemana({
                 )}
               </div>
             ))}
+            {novedades
+              .filter((n) => n.responsableId === r.id && diasCubiertos(n, fechas).includes(dia))
+              .map((n) => (
+                <div
+                  key={n.id}
+                  className={`mb-1 rounded-lg p-1 ${paraExportar ? 'text-sm' : 'text-xs'} ${
+                    n.tipo === 'VACACIONES' ? 'bg-amber-100 text-amber-900' : 'bg-sky-100 text-sky-900'
+                  }`}
+                >
+                  {n.tipo === 'VACACIONES' ? '🌴 Vacaciones' : `📄 Permiso${n.horario ? ` · ${n.horario}` : ''}`}
+                </div>
+              ))}
           </td>
         )
       })}

@@ -10,8 +10,24 @@ import {
   devolverAlSolicitante,
   reenviarSolicitud,
   editarSolicitud,
+  areaDeTarea,
 } from '@/datos/repositorio'
 import { esSemanaPasada, esSemanaFutura, semanaActual } from '@/dominio/semana'
+import { usuarioActual } from '@/auth/sesion'
+import { puedeMutarArea } from '@/auth/permisos'
+
+// ¿El usuario actual puede mutar datos del área dada? (sesión válida + rol + propiedad).
+async function autorizado(areaId: string | null): Promise<boolean> {
+  const u = await usuarioActual()
+  return !!u && puedeMutarArea(u, areaId)
+}
+// Autoriza sobre una tarea existente según la "cara" del flujo de solicitudes:
+// 'ejecutora' = quien la tiene en su tablero (areaId); 'solicitante' = quien la pidió.
+async function autorizadoTarea(id: string, cara: 'ejecutora' | 'solicitante'): Promise<boolean> {
+  const t = await areaDeTarea(id)
+  if (!t) return false
+  return autorizado(cara === 'ejecutora' ? t.areaId : t.solicitadaPorAreaId)
+}
 
 function texto(form: FormData, clave: string): string {
   const v = form.get(clave)
@@ -38,6 +54,7 @@ function unidadElegida(form: FormData): string | null {
 
 export async function crearTareaAccion(form: FormData) {
   const areaId = texto(form, 'areaId')
+  if (!(await autorizado(areaId))) return
   const est = textoOpcional(form, 'estipulada')
   const descripcion = est === '__otra__'
     ? textoOpcional(form, 'otra')
@@ -68,7 +85,8 @@ export async function crearTareaAccion(form: FormData) {
 
 export async function eliminarTareaAccion(form: FormData) {
   const id = texto(form, 'id')
-  if (id) await eliminarTarea(id)
+  if (!id || !(await autorizadoTarea(id, 'ejecutora'))) return
+  await eliminarTarea(id)
   revalidatePath('/tareas')
 }
 
@@ -77,6 +95,7 @@ export async function seleccionarTareaAccion(form: FormData) {
   const anio = Number(texto(form, 'anio'))
   const semana = Number(texto(form, 'semana'))
   if (id && Number.isInteger(anio) && Number.isInteger(semana)) {
+    if (!(await autorizadoTarea(id, 'ejecutora'))) return
     if (esSemanaPasada(anio, semana, semanaActual())) return
     await seleccionarTarea(id, anio, semana)
   }
@@ -85,13 +104,16 @@ export async function seleccionarTareaAccion(form: FormData) {
 
 export async function quitarSeleccionTareaAccion(form: FormData) {
   const id = texto(form, 'id')
-  if (id) await quitarSeleccionTarea(id)
+  if (!id || !(await autorizadoTarea(id, 'ejecutora'))) return
+  await quitarSeleccionTarea(id)
   revalidatePath('/tareas')
 }
 
 export async function crearSolicitudAccion(form: FormData) {
   const solicitanteAreaId = texto(form, 'solicitanteAreaId')
   const areaEjecutoraId = texto(form, 'areaEjecutoraId')
+  // La solicitud la crea el área solicitante: debe ser la del usuario (o ADMIN).
+  if (!(await autorizado(solicitanteAreaId))) return
   const est = textoOpcional(form, 'estipulada')
   const descripcion = est === '__otra__'
     ? textoOpcional(form, 'otra')
@@ -112,19 +134,24 @@ export async function crearSolicitudAccion(form: FormData) {
 
 export async function devolverAlSolicitanteAccion(form: FormData) {
   const id = texto(form, 'id')
-  if (id) await devolverAlSolicitante(id, textoOpcional(form, 'observacion'))
+  // Devolver al solicitante lo hace el área ejecutora (la que tiene la tarea).
+  if (!id || !(await autorizadoTarea(id, 'ejecutora'))) return
+  await devolverAlSolicitante(id, textoOpcional(form, 'observacion'))
   revalidatePath('/tareas')
 }
 
 export async function reenviarSolicitudAccion(form: FormData) {
   const id = texto(form, 'id')
-  if (id) await reenviarSolicitud(id)
+  // Reenviar una solicitud devuelta lo hace el área solicitante.
+  if (!id || !(await autorizadoTarea(id, 'solicitante'))) return
+  await reenviarSolicitud(id)
   revalidatePath('/tareas')
 }
 
 export async function editarSolicitudAccion(form: FormData) {
   const id = texto(form, 'id')
-  if (!id) return
+  // Editar una solicitud la hace el área solicitante.
+  if (!id || !(await autorizadoTarea(id, 'solicitante'))) return
   const est = textoOpcional(form, 'estipulada')
   const descripcion = est === '__otra__'
     ? textoOpcional(form, 'otra')
@@ -145,7 +172,7 @@ export async function editarSolicitudAccion(form: FormData) {
 
 export async function programarTareaAccion(form: FormData) {
   const id = texto(form, 'id')
-  if (!id) return
+  if (!id || !(await autorizadoTarea(id, 'ejecutora'))) return
   const v = texto(form, 'anioSemana')
   if (!v) {
     await quitarSeleccionTarea(id)

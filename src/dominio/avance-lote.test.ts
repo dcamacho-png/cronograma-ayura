@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   lotesPendientes, textoAvancePorLote, textoAvanceConFecha,
-  normalizarAvancePorLote, totalAvanceLotes, agregarAvances, completarAvancesCumplida, type AvancePorLote,
+  normalizarAvancePorLote, totalAvanceLotes, agregarAvances, completarAvancesCumplida, lotesRealizadosCumplida, type AvancePorLote,
 } from './avance-lote'
 
 const lotes = [{ id: 'a', nombre: 'L-A' }, { id: 'b', nombre: 'L-B' }, { id: 'c', nombre: 'L-C' }]
@@ -116,6 +116,57 @@ describe('agregarAvances', () => {
       b: [{ dia: 2, maquinaId: 'm1', cantidad: 4 }],
     })
     expect(base).toEqual({ a: [{ dia: 1, maquinaId: null, cantidad: 3 }] }) // intacto
+  })
+})
+
+describe('lotesRealizadosCumplida', () => {
+  const l3 = [{ id: 'a', nombre: 'L-A' }, { id: 'b', nombre: 'L-B' }, { id: 'c', nombre: 'L-C' }]
+
+  it('sin ninguna señal (cumplida directa) devuelve TODOS los lotes', () => {
+    expect(lotesRealizadosCumplida(l3, {}, null)).toEqual(l3)
+  })
+
+  it('con avance (cantidad>0) en algunos, solo esos', () => {
+    const av: AvancePorLote = { a: [{ dia: 1, maquinaId: null, cantidad: 2 }] }
+    expect(lotesRealizadosCumplida(l3, av, null).map((l) => l.id)).toEqual(['a'])
+  })
+
+  it('un avance de cantidad 0 NO cuenta como realizado', () => {
+    const av: AvancePorLote = { a: [{ dia: 1, maquinaId: null, cantidad: 0 }] }
+    // ninguna señal real → todos (se asume cumplida directa)
+    expect(lotesRealizadosCumplida(l3, av, null)).toEqual(l3)
+  })
+
+  it('los marcados en lotesHechos cuentan aunque no tengan avance', () => {
+    expect(lotesRealizadosCumplida(l3, {}, ['b']).map((l) => l.id)).toEqual(['b'])
+  })
+
+  it('une avance (cantidad>0) y lotesHechos', () => {
+    const av: AvancePorLote = { a: [{ dia: 1, maquinaId: null, cantidad: 2 }] }
+    expect(lotesRealizadosCumplida(l3, av, ['c']).map((l) => l.id)).toEqual(['a', 'c'])
+  })
+})
+
+describe('agregarAvances — reemplazo por lote+día', () => {
+  it('re-registrar el MISMO lote y día reemplaza la entrada (no la duplica)', () => {
+    const base: AvancePorLote = { a: [{ dia: 1, maquinaId: 'm1', cantidad: 3 }] }
+    const out = agregarAvances(base, 1, 'm2', [{ loteId: 'a', cantidad: 5 }])
+    expect(out).toEqual({ a: [{ dia: 1, maquinaId: 'm2', cantidad: 5 }] })
+    expect(base).toEqual({ a: [{ dia: 1, maquinaId: 'm1', cantidad: 3 }] }) // intacto
+  })
+
+  it('un día distinto en el mismo lote sí agrega una entrada nueva', () => {
+    const base: AvancePorLote = { a: [{ dia: 1, maquinaId: 'm1', cantidad: 3 }] }
+    const out = agregarAvances(base, 2, 'm1', [{ loteId: 'a', cantidad: 2 }])
+    expect(out.a).toHaveLength(2)
+  })
+
+  it('conserva la posición al reemplazar y descarta duplicados viejos del mismo día', () => {
+    const base: AvancePorLote = {
+      a: [{ dia: 1, maquinaId: null, cantidad: 3 }, { dia: 2, maquinaId: null, cantidad: 4 }, { dia: 1, maquinaId: null, cantidad: 1 }],
+    }
+    const out = agregarAvances(base, 1, 'm9', [{ loteId: 'a', cantidad: 9 }])
+    expect(out.a).toEqual([{ dia: 1, maquinaId: 'm9', cantidad: 9 }, { dia: 2, maquinaId: null, cantidad: 4 }])
   })
 })
 

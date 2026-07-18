@@ -10,6 +10,7 @@ import {
   agregarAvances,
   totalAvanceLotes,
   completarAvancesCumplida,
+  lotesRealizadosCumplida,
   editarAvanceEntrada,
   eliminarAvanceEntrada,
   type AvanceEntrada,
@@ -76,7 +77,6 @@ export function listarActividades(areaId: string, anio: number, semana: number) 
       areaTarea: true,
       tarea: { select: { detalle: true } },
       lotes: true,
-      _count: { select: { derivadas: true } },
     },
     orderBy: [{ dia: 'asc' }],
   })
@@ -101,7 +101,6 @@ export function listarActividadesSolicitadas(areaId: string, anio: number, seman
       area: true,
       tarea: { select: { detalle: true } },
       lotes: true,
-      _count: { select: { derivadas: true } },
     },
     orderBy: [{ dia: 'asc' }],
   })
@@ -183,7 +182,38 @@ export function reabrirActividad(id: string) {
 
 // Año/semana ISO a la que pertenece una actividad; null si no existe.
 export function semanaDeActividad(id: string) {
-  return prisma.actividad.findUnique({ where: { id }, select: { anio: true, semana: true } })
+  return prisma.actividad.findUnique({ where: { id }, select: { anio: true, semana: true, areaId: true } })
+}
+
+// --- Resolvers de propiedad de área (para autorización en server actions) ---
+// Devuelven el área a la que pertenece la entidad, o null si no existe.
+
+export function areaDeActividad(id: string) {
+  return prisma.actividad.findUnique({ where: { id }, select: { areaId: true } })
+}
+
+export function areaDeTarea(id: string) {
+  return prisma.tarea.findUnique({ where: { id }, select: { areaId: true, solicitadaPorAreaId: true } })
+}
+
+export function areaDeResponsable(id: string) {
+  return prisma.responsable.findUnique({ where: { id }, select: { areaId: true } })
+}
+
+export async function areaDeNovedadResponsable(id: string) {
+  const n = await prisma.novedadResponsable.findUnique({
+    where: { id },
+    select: { responsable: { select: { areaId: true } } },
+  })
+  return n ? { areaId: n.responsable.areaId } : null
+}
+
+// Área a la que está dedicado un tractor en un día concreto (null si no hay dedicación).
+export function areaDedicacionTractor(maquinaId: string, anio: number, semana: number, dia: number) {
+  return prisma.dedicacionTractor.findUnique({
+    where: { maquinaId_anio_semana_dia: { maquinaId, anio, semana, dia } },
+    select: { areaId: true },
+  })
 }
 
 // Crea un responsable nuevo en un área.
@@ -199,11 +229,20 @@ export async function reprogramarActividad(
 ) {
   const origen = await prisma.actividad.findUnique({ where: { id } })
   if (!origen) return null
-  // Evitar reprogramar dos veces la misma actividad.
-  const yaReprogramada = await prisma.actividad.findFirst({ where: { origenId: id } })
+  // Evitar reprogramar dos veces la misma actividad (guard optimista).
+  const yaReprogramada = await prisma.actividad.findUnique({ where: { origenId: id } })
   if (yaReprogramada) return yaReprogramada
   const datos = datosReprogramacion(origen as unknown as ActividadDominio, anioDestino, semanaDestino)
-  return prisma.actividad.create({ data: datos })
+  try {
+    return await prisma.actividad.create({ data: datos })
+  } catch (e) {
+    // Carrera: otra llamada creó la reprogramación entre el guard y este create
+    // (viola @unique origenId). Devolvemos la que ganó en vez de duplicar.
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
+      return prisma.actividad.findUnique({ where: { origenId: id } })
+    }
+    throw e
+  }
 }
 
 export function crearArea(nombre: string) {
@@ -508,77 +547,6 @@ export function eliminarLote(id: string) {
   return prisma.lote.delete({ where: { id } })
 }
 
-export async function registrarCumplimiento(
-  id: string,
-  estado: string,
-  motivoId: string | null,
-  nota: string | null,
-  haRealizada: number | null,
-  reemplazo?: { descripcion: string; loteId: string | null; maquinaId: string | null; medida: number | null } | null,
-  centroCosto: string | null = null,
-  lotesHechos: string[] = [],
-) {
-  const act = await prisma.actividad.findUnique({ where: { id }, include: { lotes: true } })
-  if (!act || act.estado !== 'PENDIENTE') return null // ya registrada / bloqueada
-  // En un cambio se conserva la observación escrita junto al texto automático (antes se descartaba).
-  const notaFinal = reemplazo
-    ? (nota ? `Cambiada por: ${reemplazo.descripcion} — ${nota}` : `Cambiada por: ${reemplazo.descripcion}`)
-    : nota
-  await prisma.actividad.update({
-    where: { id },
-    data: {
-      estado,
-      motivoId,
-      nota: notaFinal,
-      haRealizada: reemplazo ? null : haRealizada,
-      centroCosto,
-      ...(lotesHechos.length ? { lotesHechos: lotesHechos as Prisma.InputJsonValue } : {}),
-    },
-  })
-
-  // Novedad que vuelve al banco automáticamente: solo No cumplida / Reprogramada
-  // (el Parcial se maneja con los botones de la UI). Solo tareas de un día.
-  if ((estado === 'NO_CUMPLIDA' || estado === 'REPROGRAMADA') && act.tareaId) {
-    const enLaSemana = await prisma.actividad.count({
-      where: { tareaId: act.tareaId, anio: act.anio, semana: act.semana },
-    })
-    if (enLaSemana === 1) {
-      await prisma.tarea.update({
-        where: { id: act.tareaId },
-        data: { estado: 'PENDIENTE', anioSel: null, semanaSel: null, vecesReprogramada: act.vecesReprogramada + 1 },
-      })
-    }
-  }
-
-  // Cambio de actividad: crear la que SÍ se hizo, como cumplida, mismo día/responsable.
-  if (reemplazo && reemplazo.descripcion) {
-    let fincaId: string | null = null
-    if (reemplazo.loteId) {
-      const lote = await prisma.lote.findUnique({ where: { id: reemplazo.loteId } })
-      fincaId = lote?.fincaId ?? null
-    }
-    await prisma.actividad.create({
-      data: {
-        anio: act.anio,
-        semana: act.semana,
-        dia: act.dia,
-        descripcion: reemplazo.descripcion,
-        turno: act.turno,
-        estado: 'CUMPLIDA',
-        areaId: act.areaId,
-        fincaId,
-        responsableId: act.responsableId,
-        maquinaId: reemplazo.maquinaId,
-        haRealizada: reemplazo.medida,
-        nota: `En reemplazo de: ${act.descripcion}`,
-        lotes: reemplazo.loteId ? { connect: [{ id: reemplazo.loteId }] } : undefined,
-      },
-    })
-  }
-
-  return true
-}
-
 // Agrega un avance (incremental, por día) al historial de cada lote indicado.
 // `avancePorLote` es Record<loteId, AvanceEntrada[]>. La actividad queda SIEMPRE
 // PARCIAL; CUMPLIDA se marca a mano con marcarCumplidaDesdeParcial.
@@ -845,7 +813,11 @@ export async function marcarCumplidaGrupo(id: string) {
   // horas/kg/cantidad no se inventa una medida a partir de las hectáreas.
   const est = tieneLotes ? await prisma.actividadEstipulada.findFirst({ where: { nombre: g.base.descripcion } }) : null
   const esHa = est?.unidad === 'ha'
-  const avanceCompleto = (tieneLotes && esHa) ? completarAvancesCumplida(g.base.lotes, avanceActual, g.base.dia) : avanceActual
+  // Solo se desglosan los lotes realmente realizados (con avance o marcados en "Potreros
+  // realizados"); si no hay ninguna señal, todos (cumplida directa = actividad completa).
+  // Así el Excel no lista lotes asignados que no se trabajaron al marcar Cumplida.
+  const lotesDesglose = lotesRealizadosCumplida(g.base.lotes, avanceActual, g.base.lotesHechos as string[] | null)
+  const avanceCompleto = (tieneLotes && esHa) ? completarAvancesCumplida(lotesDesglose, avanceActual, g.base.dia) : avanceActual
   const total = totalAvanceLotes(g.base.lotes, avanceCompleto)
   await prisma.$transaction(
     g.filas
@@ -1294,6 +1266,37 @@ export function reabrirNotaConservatorio(id: string) {
   return prisma.notaConservatorio.update({
     where: { id },
     data: { hablado: false, habladaEn: null },
+  })
+}
+
+// ————— Novedades por Responsable —————
+
+export function crearNovedadResponsable(data: {
+  responsableId: string
+  tipo: string
+  fechaInicio: Date
+  fechaFin: Date
+  horario: string | null
+  nota: string | null
+}) {
+  return prisma.novedadResponsable.create({ data })
+}
+
+export function eliminarNovedadResponsable(id: string) {
+  return prisma.novedadResponsable.delete({ where: { id } })
+}
+
+// Novedades de responsables del área cuyo rango [fechaInicio, fechaFin] se cruza
+// con [desde, hasta]. Incluye el nombre del responsable para la UI/reporte.
+export function listarNovedadesEnRango(areaId: string, desde: Date, hasta: Date) {
+  return prisma.novedadResponsable.findMany({
+    where: {
+      responsable: { areaId },
+      fechaInicio: { lte: hasta },
+      fechaFin: { gte: desde },
+    },
+    include: { responsable: { select: { nombre: true } } },
+    orderBy: { fechaInicio: 'asc' },
   })
 }
 
