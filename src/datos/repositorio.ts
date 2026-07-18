@@ -112,8 +112,11 @@ export function listarActividadesSolicitadas(areaId: string, anio: number, seman
 export function consultarCulminadas(areaId: string) {
   return prisma.actividad.findMany({
     where: {
-      estado: 'CUMPLIDA',
-      OR: [{ areaId }, { tarea: { solicitadaPorAreaId: areaId } }],
+      // Culminadas = cerradas por el área ejecutora: CUMPLIDA o Parcial cerrada.
+      AND: [
+        { OR: [{ areaId }, { tarea: { solicitadaPorAreaId: areaId } }] },
+        { OR: [{ estado: 'CUMPLIDA' }, { cerrada: true }] },
+      ],
     },
     include: {
       responsable: true,
@@ -1157,7 +1160,9 @@ export function listarSolicitudesDeArea(areaId: string) {
       finca: true,
       // Fallback para solicitudes viejas sin fincaId: derivar la finca de sus lotes.
       lotes: { include: { finca: true } },
-      _count: { select: { actividades: { where: { estado: 'CUMPLIDA' } } } },
+      // Se oculta de "Mis solicitudes" cuando la otra área ya cerró/cumplió al menos una
+      // actividad (CUMPLIDA o cerrada, incluida la Parcial cerrada): pasan a /consulta.
+      _count: { select: { actividades: { where: { OR: [{ estado: 'CUMPLIDA' }, { cerrada: true }] } } } },
     },
     orderBy: { descripcion: 'asc' },
   })

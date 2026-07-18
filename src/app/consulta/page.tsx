@@ -79,7 +79,9 @@ export default async function ConsultaPage({
     }
     for (const semItems of porSemana.values()) {
       for (const grupo of agruparPorActividad(semItems).values()) {
-        if (estadoActividad(grupo.map((a) => ({ estado: a.estado as Estado }))) !== 'CUMPLIDA') continue
+        // Culminadas: la actividad cumplida, o cerrada como Parcial por el área ejecutora.
+        const est = estadoActividad(grupo.map((a) => ({ estado: a.estado as Estado })))
+        if (est !== 'CUMPLIDA' && !grupo.some((a) => a.cerrada)) continue
         if (!pasaFiltros(grupo)) continue
         const base = grupo[0]
         const fechas = fechasDeSemana(base.anio, base.semana)
