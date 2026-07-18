@@ -352,6 +352,20 @@ export function listarTareasPendientes(areaId: string) {
   })
 }
 
+// Finca de una tarea: si tiene lotes, la del primer lote (una finca por tarea); si no
+// tiene lotes pero se eligió una finca en el formulario, la resuelve por nombre (@unique).
+async function resolverFincaId(loteIds: string[], fincaNombre?: string | null): Promise<string | null> {
+  if (loteIds.length > 0) {
+    const primer = await prisma.lote.findUnique({ where: { id: loteIds[0] } })
+    return primer?.fincaId ?? null
+  }
+  if (fincaNombre) {
+    const f = await prisma.finca.findUnique({ where: { nombre: fincaNombre } })
+    return f?.id ?? null
+  }
+  return null
+}
+
 export async function crearTarea(
   areaId: string,
   descripcion: string,
@@ -360,12 +374,9 @@ export async function crearTarea(
   detalle: string | null = null,
   medidaPorLote: Record<string, number> | null = null,
   unidad: string | null = null,
+  fincaNombre: string | null = null,
 ) {
-  let fincaId: string | null = null
-  if (loteIds.length > 0) {
-    const primer = await prisma.lote.findUnique({ where: { id: loteIds[0] } })
-    fincaId = primer?.fincaId ?? null
-  }
+  const fincaId = await resolverFincaId(loteIds, fincaNombre)
   return prisma.tarea.create({
     data: {
       areaId,
@@ -1017,7 +1028,7 @@ export async function reabrirGrupo(id: string) {
 }
 
 // Crea una solicitud: una tarea que ejecuta `areaEjecutoraId`, pedida por `solicitadaPorAreaId`.
-export function crearSolicitud(
+export async function crearSolicitud(
   areaEjecutoraId: string,
   descripcion: string,
   solicitadaPorAreaId: string,
@@ -1026,12 +1037,15 @@ export function crearSolicitud(
   detalle: string | null = null,
   diasSugeridos: string | null = null,
   responsablesSugeridosIds: string | null = null,
+  fincaNombre: string | null = null,
 ) {
+  const fincaId = await resolverFincaId(loteIds, fincaNombre)
   return prisma.tarea.create({
     data: {
       areaId: areaEjecutoraId,
       descripcion,
       solicitadaPorAreaId,
+      fincaId,
       detalle,
       diasSugeridos,
       responsablesSugeridosIds,
@@ -1130,7 +1144,8 @@ export function listarSolicitudesDeArea(areaId: string) {
     where: { solicitadaPorAreaId: areaId },
     include: {
       area: true,
-      // La solicitud no guarda fincaId; la finca se deriva de sus lotes (una finca por tarea).
+      finca: true,
+      // Fallback para solicitudes viejas sin fincaId: derivar la finca de sus lotes.
       lotes: { include: { finca: true } },
       _count: { select: { actividades: { where: { estado: 'CUMPLIDA' } } } },
     },

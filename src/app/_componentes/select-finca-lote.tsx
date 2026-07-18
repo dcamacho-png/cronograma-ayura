@@ -15,6 +15,7 @@ export function SelectFincaLote({
   required = false,
   multiple = false,
   valorInicial = '',
+  emitirFinca = false,
 }: {
   lotes: Lote[]
   name?: string
@@ -22,6 +23,8 @@ export function SelectFincaLote({
   multiple?: boolean
   // Solo modo simple: id de lote a preseleccionar (deriva la finca automáticamente).
   valorInicial?: string
+  // Envía la finca elegida (name="fincaNombre") para persistirla aunque no se elija lote.
+  emitirFinca?: boolean
 }) {
   const fincaInicial = valorInicial ? (lotes.find((l) => l.id === valorInicial)?.finca.nombre ?? '') : ''
   const [finca, setFinca] = useState(fincaInicial)
@@ -32,6 +35,7 @@ export function SelectFincaLote({
 
   return (
     <div className="flex flex-col gap-1">
+      {emitirFinca && finca && <input type="hidden" name="fincaNombre" value={finca} />}
       <select
         value={finca}
         onChange={(e) => { setFinca(e.target.value); setLote('') }}

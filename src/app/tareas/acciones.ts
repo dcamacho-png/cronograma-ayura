@@ -71,6 +71,7 @@ export async function crearTareaAccion(form: FormData) {
   }
   const detalle = textoOpcional(form, 'detalle')
   const unidad = unidadElegida(form)
+  const fincaNombre = textoOpcional(form, 'fincaNombre')
   await crearTarea(
     areaId,
     descripcion,
@@ -79,6 +80,7 @@ export async function crearTareaAccion(form: FormData) {
     detalle,
     Object.keys(medida).length > 0 ? medida : null,
     unidad,
+    fincaNombre,
   )
   revalidatePath('/tareas')
 }
@@ -128,7 +130,8 @@ export async function crearSolicitudAccion(form: FormData) {
   const detalle = textoOpcional(form, 'detalle')
   const diasSugeridos = form.getAll('diaSugerido').map((v) => String(v).trim()).filter(Boolean).join(',') || null
   const responsablesSugeridosIds = form.getAll('responsableSugerido').map((v) => String(v).trim()).filter(Boolean).join(',') || null
-  await crearSolicitud(areaEjecutoraId, descripcion, solicitanteAreaId, loteIds, Object.keys(bultos).length > 0 ? bultos : null, detalle, diasSugeridos, responsablesSugeridosIds)
+  const fincaNombre = textoOpcional(form, 'fincaNombre')
+  await crearSolicitud(areaEjecutoraId, descripcion, solicitanteAreaId, loteIds, Object.keys(bultos).length > 0 ? bultos : null, detalle, diasSugeridos, responsablesSugeridosIds, fincaNombre)
   revalidatePath('/tareas')
 }
 

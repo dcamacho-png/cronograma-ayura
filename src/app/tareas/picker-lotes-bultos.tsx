@@ -30,6 +30,8 @@ export function PickerLotesBultos({ lotes, seleccionInicial = {}, campo = 'bulto
 
   return (
     <div className="flex flex-col gap-1">
+      {/* Persiste la finca elegida aunque no se marque ningún lote (una finca por tarea). */}
+      {fincaActiva && <input type="hidden" name="fincaNombre" value={fincaActiva} />}
       <select value={fincaActiva} onChange={(e) => setFinca(e.target.value)} disabled={!!fincaBloqueada} className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40 disabled:opacity-70">
         <option value="">— elegir finca —</option>
         {fincas.map((f) => (

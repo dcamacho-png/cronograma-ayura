@@ -51,7 +51,7 @@ export function FormNuevaTareaMaquinaria({
         {conBultos ? (
           <PickerLotesBultos lotes={lotes} />
         ) : (
-          <SelectFincaLote lotes={lotes} name="loteId" />
+          <SelectFincaLote lotes={lotes} name="loteId" emitirFinca />
         )}
       </label>
       <label className="flex w-full flex-col text-sm">
