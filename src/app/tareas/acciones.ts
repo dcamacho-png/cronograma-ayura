@@ -10,6 +10,7 @@ import {
   devolverAlSolicitante,
   reenviarSolicitud,
   editarSolicitud,
+  eliminarSolicitud,
   areaDeTarea,
 } from '@/datos/repositorio'
 import { esSemanaPasada, esSemanaFutura, semanaActual } from '@/dominio/semana'
@@ -27,6 +28,15 @@ async function autorizadoTarea(id: string, cara: 'ejecutora' | 'solicitante'): P
   const t = await areaDeTarea(id)
   if (!t) return false
   return autorizado(cara === 'ejecutora' ? t.areaId : t.solicitadaPorAreaId)
+}
+// El área SOLICITANTE puede editar/eliminar su solicitud mientras NO esté PROGRAMADA
+// (una vez la otra área la programa, ya hay trabajo asignado y no se toca).
+async function solicitudEditable(id: string): Promise<boolean> {
+  const u = await usuarioActual()
+  if (!u) return false
+  const t = await areaDeTarea(id)
+  if (!t || t.estado === 'PROGRAMADA') return false
+  return puedeMutarArea(u, t.solicitadaPorAreaId)
 }
 
 function texto(form: FormData, clave: string): string {
@@ -153,8 +163,8 @@ export async function reenviarSolicitudAccion(form: FormData) {
 
 export async function editarSolicitudAccion(form: FormData) {
   const id = texto(form, 'id')
-  // Editar una solicitud la hace el área solicitante.
-  if (!id || !(await autorizadoTarea(id, 'solicitante'))) return
+  // La edita el área solicitante, y solo mientras la solicitud no esté PROGRAMADA.
+  if (!id || !(await solicitudEditable(id))) return
   const est = textoOpcional(form, 'estipulada')
   const descripcion = est === '__otra__'
     ? textoOpcional(form, 'otra')
@@ -170,6 +180,15 @@ export async function editarSolicitudAccion(form: FormData) {
   const diasSugeridos = form.getAll('diaSugerido').map((v) => String(v).trim()).filter(Boolean).join(',') || null
   const responsablesSugeridosIds = form.getAll('responsableSugerido').map((v) => String(v).trim()).filter(Boolean).join(',') || null
   await editarSolicitud(id, { descripcion, detalle, loteIds, bultosPorLote: Object.keys(bultos).length > 0 ? bultos : null, diasSugeridos, responsablesSugeridosIds })
+  revalidatePath('/tareas')
+}
+
+// El área solicitante elimina su solicitud mientras no esté PROGRAMADA (borra también
+// cualquier actividad ligada para no dejar residuos).
+export async function eliminarSolicitudAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (!id || !(await solicitudEditable(id))) return
+  await eliminarSolicitud(id)
   revalidatePath('/tareas')
 }
 

@@ -193,7 +193,7 @@ export function areaDeActividad(id: string) {
 }
 
 export function areaDeTarea(id: string) {
-  return prisma.tarea.findUnique({ where: { id }, select: { areaId: true, solicitadaPorAreaId: true } })
+  return prisma.tarea.findUnique({ where: { id }, select: { areaId: true, solicitadaPorAreaId: true, estado: true } })
 }
 
 export function areaDeResponsable(id: string) {
@@ -393,6 +393,16 @@ export async function crearTarea(
 
 export function eliminarTarea(id: string) {
   return prisma.tarea.delete({ where: { id } })
+}
+
+// Elimina una solicitud (tarea) junto con cualquier actividad ligada, en una transacción.
+// Evita dejar actividades huérfanas (tareaId=null) por el onDelete: SetNull por defecto.
+// Pensado para solicitudes no PROGRAMADAS (que no deberían tener actividades reales).
+export function eliminarSolicitud(id: string) {
+  return prisma.$transaction([
+    prisma.actividad.deleteMany({ where: { tareaId: id } }),
+    prisma.tarea.delete({ where: { id } }),
+  ])
 }
 
 export function seleccionarTarea(id: string, anio: number, semana: number) {

@@ -16,7 +16,7 @@ import { InfoLotes } from '../_componentes/info-lotes'
 import { FormNuevaTareaMaquinaria } from './form-nueva-tarea-maquinaria'
 import { FormNuevaTareaEstandar } from './form-nueva-tarea-estandar'
 import { FormSolicitar } from './form-solicitar'
-import { crearTareaAccion, eliminarTareaAccion, programarTareaAccion, crearSolicitudAccion, devolverAlSolicitanteAccion, reenviarSolicitudAccion, editarSolicitudAccion } from './acciones'
+import { crearTareaAccion, eliminarTareaAccion, programarTareaAccion, crearSolicitudAccion, devolverAlSolicitanteAccion, reenviarSolicitudAccion, editarSolicitudAccion, eliminarSolicitudAccion } from './acciones'
 import { FormEditarSolicitud } from './form-editar-solicitud'
 import { FormEliminar } from './form-eliminar'
 import { parseCsv } from '@/dominio/sugerencia'
@@ -203,12 +203,16 @@ export default async function TareasPage({
                 {s.estado === 'DEVUELTA' && s.observacionDevolucion && (
                   <div className="mt-1 text-xs italic text-tierra">Obs.: {s.observacionDevolucion}</div>
                 )}
-                {s.estado === 'DEVUELTA' && (
+                {/* El solicitante puede editar/eliminar mientras la otra área no la haya
+                    programado; Reenviar solo aplica a las devueltas. */}
+                {s.estado !== 'PROGRAMADA' && (
                   <div className="mt-1 flex flex-wrap items-center gap-3">
-                    <form action={reenviarSolicitudAccion}>
-                      <input type="hidden" name="id" value={s.id} />
-                      <button className="text-xs font-semibold text-arcilla hover:underline">Reenviar</button>
-                    </form>
+                    {s.estado === 'DEVUELTA' && (
+                      <form action={reenviarSolicitudAccion}>
+                        <input type="hidden" name="id" value={s.id} />
+                        <button className="text-xs font-semibold text-arcilla hover:underline">Reenviar</button>
+                      </form>
+                    )}
                     <FormEditarSolicitud
                       id={s.id}
                       esMaquinaria={s.area.maqTareas}
@@ -223,7 +227,7 @@ export default async function TareasPage({
                       bultosActuales={s.bultosPorLote as Record<string, number> | null}
                       accion={editarSolicitudAccion}
                     />
-                    <FormEliminar accion={eliminarTareaAccion} id={s.id} etiqueta={s.descripcion} />
+                    <FormEliminar accion={eliminarSolicitudAccion} id={s.id} etiqueta={s.descripcion} />
                   </div>
                 )}
               </li>
