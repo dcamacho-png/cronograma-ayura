@@ -106,6 +106,24 @@ export function listarActividadesSolicitadas(areaId: string, anio: number, seman
   })
 }
 
+// TODAS las actividades (todas las áreas y semanas), con las relaciones del export.
+// Para el respaldo maestro a Drive: se agrupa por (área, año, semana) en memoria.
+export function listarActividadesTodas() {
+  return prisma.actividad.findMany({
+    include: {
+      responsable: true,
+      finca: true,
+      motivo: true,
+      maquina: true,
+      areaTarea: true,
+      area: true,
+      tarea: { select: { detalle: true } },
+      lotes: true,
+    },
+    orderBy: [{ anio: 'asc' }, { semana: 'asc' }, { dia: 'asc' }],
+  })
+}
+
 // Actividades CUMPLIDA del área para la pantalla de Consulta (solo lectura): propias
 // (areaId) o solicitadas por el área a otras (tarea.solicitadaPorAreaId). El filtrado y
 // el agrupado por actividad se hacen en la página (datos acotados).
