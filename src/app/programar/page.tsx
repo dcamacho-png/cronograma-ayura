@@ -11,7 +11,7 @@ import {
   listarDedicaciones,
   listarNovedadesEnRango,
 } from '@/datos/repositorio'
-import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, esSemanaFutura, diaActual, esDiaPasado } from '@/dominio/semana'
+import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, diaActual, esDiaPasado, programacionAbierta } from '@/dominio/semana'
 import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
 import { textoSugerencia } from '@/dominio/sugerencia'
 import { asignarTareaAccion, devolverAlBancoAccion, dedicarTractorAccion } from './acciones'
@@ -53,7 +53,7 @@ export default async function ProgramarPage({
   const semanaRaw = Number(sp.semana)
   const anio = sp.anio && Number.isInteger(anioRaw) ? anioRaw : hoy.anio
   const semana = sp.semana && Number.isInteger(semanaRaw) ? semanaRaw : hoy.semana
-  const futura = esSemanaFutura(anio, semana, hoy)
+  const programable = programacionAbierta(anio, semana)
   // Días ya pasados de la semana mostrada (solo aplica a la semana actual; en
   // futuras queda vacío y en pasadas el formulario no se muestra).
   const hoyRef = { ...hoy, dia: diaActual() }
@@ -143,13 +143,13 @@ export default async function ProgramarPage({
         </Link>
       </div>
 
-      {!futura && (
+      {!programable && (
         <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
-          🔒 Esta semana ya empezó — solo lectura. La programación se hace antes del lunes de inicio de la semana.
+          🔒 El plazo para programar esta semana venció (lunes 11 pm). Ahora es solo lectura. La programación se puede hacer hasta el lunes de la semana, 11 pm.
         </div>
       )}
 
-      {futura && !soloLectura && porAsignar.length > 0 && (
+      {programable && !soloLectura && porAsignar.length > 0 && (
         <div className="mb-6 rounded-xl border border-borde bg-arena p-4">
           <h2 className="mb-3 font-semibold text-bosque">📌 Tareas por asignar — semana {semana}</h2>
           {responsablesActivos.length === 0 ? (
@@ -225,7 +225,7 @@ export default async function ProgramarPage({
           responsables={responsablesActivos}
           actividades={actividadesCronograma}
           novedades={novedades}
-          turnoEditable={futura && !soloLectura}
+          turnoEditable={programable && !soloLectura}
           esMaquinaria={esMaquinaria}
         />
       </div>
@@ -236,7 +236,7 @@ export default async function ProgramarPage({
           maquinas={maquinas}
           dedicaciones={dedicaciones}
           areasParaDedicar={areasParaDedicar}
-          futura={futura && !soloLectura}
+          programable={programable && !soloLectura}
           anio={anio}
           semana={semana}
           accion={dedicarTractorAccion}

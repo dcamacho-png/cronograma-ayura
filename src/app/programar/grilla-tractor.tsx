@@ -16,7 +16,7 @@ export function GrillaTractor({
   maquinas,
   dedicaciones,
   areasParaDedicar,
-  futura,
+  programable,
   anio,
   semana,
   accion,
@@ -26,7 +26,7 @@ export function GrillaTractor({
   maquinas: { id: string; nombre: string }[]
   dedicaciones: { maquinaId: string; dia: number; areaId: string; areaNombre: string }[]
   areasParaDedicar: { id: string; nombre: string }[]
-  futura: boolean
+  programable: boolean
   anio: number
   semana: number
   accion: (form: FormData) => void
@@ -73,7 +73,7 @@ export function GrillaTractor({
                           </div>
                         ))
                       )}
-                      {futura && (
+                      {programable && (
                         <SelectDedicacion
                           maquinaId={t.maquinaId}
                           anio={anio}

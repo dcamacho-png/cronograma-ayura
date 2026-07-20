@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearResponsable, actualizarActividad, asignarTarea, quitarSeleccionTarea, devolverAAsignacion, devolverGrillaAlBanco, devolverActividadReprogramadaAlBanco, dedicarTractor, crearNovedadResponsable, eliminarNovedadResponsable, areaDeActividad, areaDeTarea, areaDeResponsable, areaDeNovedadResponsable, areaDedicacionTractor } from '@/datos/repositorio'
-import { semanaAnterior, esSemanaPasada, semanaActual, diaActual, esDiaPasado, esSemanaFutura } from '@/dominio/semana'
+import { semanaAnterior, semanaActual, diaActual, esDiaPasado, programacionAbierta } from '@/dominio/semana'
 import type { Asignacion } from '@/dominio/programacion'
 import { usuarioActual } from '@/auth/sesion'
 import { puedeMutarArea } from '@/auth/permisos'
@@ -54,7 +54,7 @@ export async function crearActividadAccion(form: FormData) {
   if (!(await autorizado(areaId))) return
   const anio = Number(texto(form, 'anio'))
   const semana = Number(texto(form, 'semana'))
-  if (esSemanaPasada(anio, semana, semanaActual())) return
+  if (!programacionAbierta(anio, semana)) return
   const dia = Number(texto(form, 'dia'))
   if (esDiaPasado(anio, semana, dia, { ...semanaActual(), dia: diaActual() })) return
   const loteId = texto(form, 'loteId')
@@ -91,7 +91,7 @@ export async function duplicarSemanaAccion(form: FormData) {
   if (!(await autorizado(areaId))) return
   const anio = Number(texto(form, 'anio'))
   const semana = Number(texto(form, 'semana'))
-  if (esSemanaPasada(anio, semana, semanaActual())) return
+  if (!programacionAbierta(anio, semana)) return
   const previa = semanaAnterior(anio, semana)
   await duplicarSemana(areaId, previa.anio, previa.semana, anio, semana)
   revalidatePath('/programar')
@@ -113,7 +113,7 @@ export async function actualizarActividadAccion(form: FormData) {
   const anio = Number(texto(form, 'anio'))
   const semana = Number(texto(form, 'semana'))
   if (!id || !descripcion) return
-  if (!Number.isInteger(anio) || !Number.isInteger(semana) || !esSemanaFutura(anio, semana, semanaActual())) return
+  if (!Number.isInteger(anio) || !Number.isInteger(semana) || !programacionAbierta(anio, semana)) return
   await actualizarActividad(id, descripcion, turno)
   revalidatePath('/programar')
 }
@@ -124,6 +124,7 @@ export async function asignarTareaAccion(form: FormData) {
   const responsableIds = form.getAll('responsableId').map((v) => String(v)).filter(Boolean)
   const anioForm = Number(texto(form, 'anio'))
   const semanaForm = Number(texto(form, 'semana'))
+  if (!programacionAbierta(anioForm, semanaForm)) return
   const hoy = { ...semanaActual(), dia: diaActual() }
   const loteId = textoOpcional(form, 'loteId')
   const esMaquinaria = texto(form, 'esMaquinaria') === '1'
@@ -179,7 +180,7 @@ export async function devolverAAsignacionAccion(form: FormData) {
   const semana = Number(texto(form, 'semana'))
   if (!tareaId || !Number.isInteger(anio) || !Number.isInteger(semana)) return
   if (!(await autorizadoTarea(tareaId))) return
-  if (!esSemanaFutura(anio, semana, semanaActual())) return
+  if (!programacionAbierta(anio, semana)) return
   await devolverAAsignacion(tareaId, anio, semana)
   revalidatePath('/programar')
 }
@@ -190,7 +191,7 @@ export async function devolverGrillaAlBancoAccion(form: FormData) {
   const semana = Number(texto(form, 'semana'))
   if (!tareaId || !Number.isInteger(anio) || !Number.isInteger(semana)) return
   if (!(await autorizadoTarea(tareaId))) return
-  if (!esSemanaFutura(anio, semana, semanaActual())) return
+  if (!programacionAbierta(anio, semana)) return
   await devolverGrillaAlBanco(tareaId, anio, semana)
   revalidatePath('/programar')
 }
@@ -203,7 +204,7 @@ export async function devolverActividadAlBancoAccion(form: FormData) {
   const semana = Number(texto(form, 'semana'))
   if (!id || !Number.isInteger(anio) || !Number.isInteger(semana)) return
   if (!(await autorizadoActividad(id))) return
-  if (!esSemanaFutura(anio, semana, semanaActual())) return
+  if (!programacionAbierta(anio, semana)) return
   await devolverActividadReprogramadaAlBanco(id)
   revalidatePath('/programar')
 }
@@ -215,7 +216,7 @@ export async function dedicarTractorAccion(form: FormData) {
   const semana = Number(texto(form, 'semana'))
   const dia = Number(texto(form, 'dia'))
   if (!maquinaId || !Number.isInteger(anio) || !Number.isInteger(semana) || !Number.isInteger(dia)) return
-  if (!esSemanaFutura(anio, semana, semanaActual())) return
+  if (!programacionAbierta(anio, semana)) return
   // Al dedicar: el área objetivo debe ser la del usuario. Al quitar: debe ser el
   // dueño de la dedicación existente (no se puede quitar la de otra área).
   const areaObjetivo = areaId ?? (await areaDedicacionTractor(maquinaId, anio, semana, dia))?.areaId ?? null
@@ -239,7 +240,7 @@ export async function crearNovedadResponsableAccion(form: FormData) {
   const semana = Number(texto(form, 'semana'))
   if (!responsableId || !['VACACIONES', 'PERMISO', 'CUMPLEAÑOS', 'OTRO'].includes(tipo)) return
   if (!(await autorizadoResponsable(responsableId))) return
-  if (!Number.isInteger(anio) || !Number.isInteger(semana) || !esSemanaFutura(anio, semana, semanaActual())) return
+  if (!Number.isInteger(anio) || !Number.isInteger(semana) || !programacionAbierta(anio, semana)) return
   const fechaInicio = fechaUTC(form, 'fechaInicio')
   if (!fechaInicio) return
   let fechaFin = fechaUTC(form, 'fechaFin') ?? fechaInicio
@@ -260,7 +261,7 @@ export async function eliminarNovedadResponsableAccion(form: FormData) {
   const anio = Number(texto(form, 'anio'))
   const semana = Number(texto(form, 'semana'))
   if (!id) return
-  if (!Number.isInteger(anio) || !Number.isInteger(semana) || !esSemanaFutura(anio, semana, semanaActual())) return
+  if (!Number.isInteger(anio) || !Number.isInteger(semana) || !programacionAbierta(anio, semana)) return
   if (!(await autorizadoNovedadResponsable(id))) return
   await eliminarNovedadResponsable(id)
   revalidatePath('/programar')

@@ -14,7 +14,7 @@ import {
   eliminarSolicitud,
   areaDeTarea,
 } from '@/datos/repositorio'
-import { esSemanaPasada, esSemanaFutura, semanaActual } from '@/dominio/semana'
+import { esSemanaPasada, semanaActual, programacionAbierta } from '@/dominio/semana'
 import { usuarioActual } from '@/auth/sesion'
 import { puedeMutarArea } from '@/auth/permisos'
 
@@ -239,7 +239,7 @@ export async function programarTareaAccion(form: FormData) {
     const anio = Number(anioStr)
     const semana = Number(semanaStr)
     if (Number.isInteger(anio) && Number.isInteger(semana)) {
-      if (!esSemanaFutura(anio, semana, semanaActual())) return
+      if (!programacionAbierta(anio, semana)) return
       await seleccionarTarea(id, anio, semana)
     }
   }
