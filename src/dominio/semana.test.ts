@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest'
-import { isoSemanaDeFecha, siguienteSemana, semanaAnterior, esSemanaFutura, plazoCumplimientoVencido } from './semana'
+import {
+  isoSemanaDeFecha,
+  siguienteSemana,
+  semanaAnterior,
+  esSemanaFutura,
+  plazoCumplimientoVencido,
+  programacionAbierta,
+} from './semana'
 
 describe('isoSemanaDeFecha', () => {
   it('calcula la semana ISO de una fecha conocida', () => {
@@ -170,5 +177,31 @@ describe('plazoCumplimientoVencido', () => {
   })
   it('cruza el cambio de año: 2026 s53 está vencida frente a 2027 s1', () => {
     expect(plazoCumplimientoVencido(2026, 53, { anio: 2027, semana: 1 })).toBe(true)
+  })
+})
+
+describe('programacionAbierta', () => {
+  const H = 3600_000
+  const lunes = fechasDeSemana(2026, 30)[0].getTime() // lunes 00:00 UTC de 2026-W30
+  // lunes 23:00 Colombia = lunes 00:00 UTC + 5h (offset) + 23h = lunes + 28h
+  const limite = lunes + 28 * H
+
+  it('un día antes del lunes (semana aún futura) → abierta', () => {
+    expect(programacionAbierta(2026, 30, new Date(lunes - 24 * H))).toBe(true)
+  })
+  it('lunes 22:59 Colombia → abierta', () => {
+    expect(programacionAbierta(2026, 30, new Date(limite - 60_000))).toBe(true)
+  })
+  it('lunes 23:00 Colombia exacto → cerrada (borde estricto)', () => {
+    expect(programacionAbierta(2026, 30, new Date(limite))).toBe(false)
+  })
+  it('lunes 23:01 Colombia → cerrada', () => {
+    expect(programacionAbierta(2026, 30, new Date(limite + 60_000))).toBe(false)
+  })
+  it('martes de la semana → cerrada', () => {
+    expect(programacionAbierta(2026, 30, new Date(limite + 12 * H))).toBe(false)
+  })
+  it('semana ya pasada → cerrada', () => {
+    expect(programacionAbierta(2026, 30, new Date(lunes + 60 * 24 * H))).toBe(false)
   })
 })

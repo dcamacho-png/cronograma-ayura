@@ -110,6 +110,19 @@ export function esSemanaFutura(anio: number, semana: number, referencia: Semana)
   return anio > referencia.anio || (anio === referencia.anio && semana > referencia.semana)
 }
 
+// Hora límite (Colombia) para programar/editar una semana: el LUNES de esa semana.
+const HORA_LIMITE_PROGRAMACION_COT = 23 // 11 pm
+
+// ¿Está abierta la programación de la semana (anio, semana)? Se puede programar/editar
+// hasta el LUNES de esa semana a las 23:00 hora de Colombia. Las semanas futuras están
+// abiertas (su lunes aún no llega); pasado el lunes 23:00 (Colombia) queda en solo lectura.
+// `ahora` por defecto es el instante real; se puede inyectar para pruebas deterministas.
+export function programacionAbierta(anio: number, semana: number, ahora: Date = new Date()): boolean {
+  const lunes = lunesDeIsoSemana(anio, semana) // lunes 00:00 UTC de esa semana ISO
+  const limite = lunes.getTime() + OFFSET_COLOMBIA_MS + HORA_LIMITE_PROGRAMACION_COT * 60 * 60 * 1000
+  return ahora.getTime() < limite
+}
+
 // El plazo para diligenciar el cumplimiento de una semana vence al terminar su domingo,
 // es decir, cuando esa semana ya es pasada respecto a hoy (la semana ISO termina el domingo
 // 23:59 y "hoy" se evalúa en hora de Colombia vía semanaActual()).
