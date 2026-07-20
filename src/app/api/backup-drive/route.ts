@@ -21,37 +21,46 @@ export async function GET(req: NextRequest) {
     return new NextResponse('faltan DRIVE_WEBHOOK_URL / DRIVE_WEBHOOK_TOKEN', { status: 500 })
   }
 
-  const [actividades, estipuladas, maquinas, responsables] = await Promise.all([
-    listarActividadesTodas(),
-    listarActividadesEstipuladas(),
-    listarMaquinas(),
-    listarResponsablesTodos(),
-  ])
+  // Corre desatendido (cron nocturno): logueamos la etapa que falle para poder
+  // diagnosticar desde los logs de Vercel sin tener que re-disparar la ruta.
+  try {
+    const [actividades, estipuladas, maquinas, responsables] = await Promise.all([
+      listarActividadesTodas(),
+      listarActividadesEstipuladas(),
+      listarMaquinas(),
+      listarResponsablesTodos(),
+    ])
 
-  const filas = construirFilasMaestro(
-    actividades as unknown as ActMaestro[],
-    estipuladas,
-    maquinas,
-    responsables,
-  )
+    const filas = construirFilasMaestro(
+      actividades as unknown as ActMaestro[],
+      estipuladas,
+      maquinas,
+      responsables,
+    )
 
-  const wb = new ExcelJS.Workbook()
-  const ws = wb.addWorksheet('Cumplimiento')
-  const header = ws.addRow([...COLUMNAS_MAESTRO])
-  header.font = { bold: true }
-  for (const fila of filas) ws.addRow(fila)
-  const buffer = await wb.xlsx.writeBuffer()
+    const wb = new ExcelJS.Workbook()
+    const ws = wb.addWorksheet('Cumplimiento')
+    const header = ws.addRow([...COLUMNAS_MAESTRO])
+    header.font = { bold: true }
+    for (const fila of filas) ws.addRow(fila)
+    const buffer = await wb.xlsx.writeBuffer()
 
-  // Subir a la Web App de Apps Script (form-urlencoded: token + archivo en base64).
-  const body = new URLSearchParams({
-    token,
-    file: Buffer.from(buffer).toString('base64'),
-  })
-  const res = await fetch(url, { method: 'POST', body })
-  const texto = (await res.text()).trim()
-  if (!res.ok || texto !== 'ok') {
-    return new NextResponse(`fallo al subir a Drive: ${res.status} ${texto}`, { status: 500 })
+    // Subir a la Web App de Apps Script (form-urlencoded: token + archivo en base64).
+    const body = new URLSearchParams({
+      token,
+      file: Buffer.from(buffer).toString('base64'),
+    })
+    const res = await fetch(url, { method: 'POST', body })
+    const texto = (await res.text()).trim()
+    if (!res.ok || texto !== 'ok') {
+      // No logueamos el token; solo el estado y la respuesta del webhook.
+      console.error(`[backup-drive] fallo al subir a Drive: ${res.status} ${texto}`)
+      return new NextResponse(`fallo al subir a Drive: ${res.status} ${texto}`, { status: 500 })
+    }
+
+    return NextResponse.json({ filas: filas.length, bytes: (buffer as ArrayBuffer).byteLength })
+  } catch (e) {
+    console.error('[backup-drive] error al generar/subir el maestro:', e)
+    return new NextResponse('error al generar/subir el maestro', { status: 500 })
   }
-
-  return NextResponse.json({ filas: filas.length, bytes: (buffer as ArrayBuffer).byteLength })
 }
