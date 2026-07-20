@@ -112,7 +112,7 @@ no cambia. Se actualiza `docs/BACKUP-DRIVE.md` con el script nuevo y este paso.
 
 - `src/dominio/semana.test.ts`: `mesDeSemana` — casos deterministas, incluyendo una semana que
   cruza fin de mes (verifica que el mes se toma por el jueves).
-- `src/dominio/export-cumplimiento.test.ts`: `construirLibrosPorArea` —
+- `src/datos/export-cumplimiento.test.ts`: `construirLibrosPorArea` —
   - un archivo por área (áreas sin datos omitidas);
   - hoja `General` con columnas `[Mes, Semana, ...]` y orden Mes→Semana;
   - una hoja por mes con nombre `AÑO-MM`, en orden ascendente, con solo las filas de ese mes y
