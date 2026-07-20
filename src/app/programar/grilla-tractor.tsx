@@ -8,8 +8,9 @@ function fmtFecha(f: Date) {
 }
 
 // Resumen por tractor: TODAS las máquinas del catálogo (una fila cada una), columnas Lun–Dom,
-// con sus actividades por día. En semanas futuras, cada celda deja dedicar el tractor a un área
-// ese día (solo informativo). Inverso del cronograma.
+// con sus actividades por día. Mientras la programación de la semana está abierta (hasta el
+// lunes 11 pm), cada celda deja dedicar el tractor a un área ese día (solo informativo).
+// Inverso del cronograma.
 export function GrillaTractor({
   fechas,
   actividades,

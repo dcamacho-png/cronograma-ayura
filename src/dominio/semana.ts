@@ -119,6 +119,7 @@ const HORA_LIMITE_PROGRAMACION_COT = 23 // 11 pm
 // `ahora` por defecto es el instante real; se puede inyectar para pruebas deterministas.
 export function programacionAbierta(anio: number, semana: number, ahora: Date = new Date()): boolean {
   const lunes = lunesDeIsoSemana(anio, semana) // lunes 00:00 UTC de esa semana ISO
+  // lunes 00:00 UTC + 5h (offset Colombia) + 23h = lunes 23:00 Colombia (= martes 04:00 UTC).
   const limite = lunes.getTime() + OFFSET_COLOMBIA_MS + HORA_LIMITE_PROGRAMACION_COT * 60 * 60 * 1000
   return ahora.getTime() < limite
 }

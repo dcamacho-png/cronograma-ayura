@@ -14,7 +14,7 @@ import {
   eliminarSolicitud,
   areaDeTarea,
 } from '@/datos/repositorio'
-import { esSemanaPasada, semanaActual, programacionAbierta } from '@/dominio/semana'
+import { programacionAbierta } from '@/dominio/semana'
 import { usuarioActual } from '@/auth/sesion'
 import { puedeMutarArea } from '@/auth/permisos'
 
@@ -138,7 +138,7 @@ export async function seleccionarTareaAccion(form: FormData) {
   const semana = Number(texto(form, 'semana'))
   if (id && Number.isInteger(anio) && Number.isInteger(semana)) {
     if (!(await autorizadoTarea(id, 'ejecutora'))) return
-    if (esSemanaPasada(anio, semana, semanaActual())) return
+    if (!programacionAbierta(anio, semana)) return
     await seleccionarTarea(id, anio, semana)
   }
   revalidatePath('/tareas')
