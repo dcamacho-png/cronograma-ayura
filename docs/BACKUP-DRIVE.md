@@ -1,7 +1,8 @@
 # Respaldo diario del Excel maestro a Google Drive
 
-Cada noche (23:59 hora Colombia) la app regenera el Excel maestro completo (todas las
-áreas y semanas) y lo sobrescribe en una carpeta de tu Google Drive.
+Cada noche (23:59 hora Colombia) la app genera **un archivo Excel por área** en tu carpeta de Drive.
+Cada archivo (`cumplimiento-<Área>.xlsx`) tiene una hoja **General** (toda la info del área) y una
+**hoja por mes**. Se sobrescriben cada noche.
 
 ## 1. Crear la carpeta en Drive
 
@@ -18,7 +19,7 @@ Cada noche (23:59 hora Colombia) la app regenera el Excel maestro completo (toda
 function doPost(e) {
   var TOKEN = 'PON_AQUI_UN_SECRETO_LARGO';       // inventá una cadena larga
   var FOLDER_ID = 'PON_AQUI_EL_FOLDER_ID';        // de la URL de la carpeta
-  var NAME = 'cumplimiento-maestro.xlsx';
+  var NAME = (e.parameter.name || 'cumplimiento-maestro.xlsx');
   if (!e || !e.parameter || e.parameter.token !== TOKEN) {
     return ContentService.createTextOutput('unauthorized');
   }
@@ -42,6 +43,11 @@ function doPost(e) {
    - Implementar → autorizá los permisos que pide (es tu propia cuenta).
 4. Copiá la **URL de la app web** (termina en `/exec`). Ese es el `DRIVE_WEBHOOK_URL`.
    El `TOKEN` que pusiste arriba es el `DRIVE_WEBHOOK_TOKEN`.
+
+> **Al ACTUALIZAR el código del Apps Script** (p. ej. esta versión que acepta `name`): pegá el
+> código nuevo, guardá (💾) y **volvé a implementar** para que la URL `/exec` use la versión nueva:
+> **Implementar → Administrar implementaciones → ✏️ (editar) → Versión: Nueva versión → Implementar**.
+> La URL `/exec` NO cambia, así que no hay que tocar las variables en Vercel.
 
 ## 3. Variables de entorno en Vercel
 
@@ -77,5 +83,6 @@ curl -i -H "Authorization: Bearer <CRON_SECRET>" \
   https://cronograma-ayura.vercel.app/api/backup-drive
 ```
 
-Esperado: `200` con `{"filas":N,"bytes":M}` y `cumplimiento-maestro.xlsx` creado/actualizado
-en la carpeta de Drive.
+Esperado: `200` con `{"archivos":N,"areas":[...]}` y, en la carpeta de Drive, **un archivo por área**
+(`cumplimiento-<Área>.xlsx`), cada uno con hoja `General` + hojas por mes en orden ascendente. (El
+viejo `cumplimiento-maestro.xlsx` queda sin usar; se puede borrar a mano.)
