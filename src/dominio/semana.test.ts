@@ -6,6 +6,7 @@ import {
   esSemanaFutura,
   plazoCumplimientoVencido,
   programacionAbierta,
+  mesDeSemana,
 } from './semana'
 
 describe('isoSemanaDeFecha', () => {
@@ -203,5 +204,18 @@ describe('programacionAbierta', () => {
   })
   it('semana ya pasada → cerrada', () => {
     expect(programacionAbierta(2026, 30, new Date(lunes + 60 * 24 * H))).toBe(false)
+  })
+})
+
+describe('mesDeSemana', () => {
+  it('semana normal → su mes', () => {
+    expect(mesDeSemana(2026, 30)).toEqual({ anio: 2026, mes: 7 }) // lunes 20-jul
+  })
+  it('semana que cruza fin de mes → mes del jueves', () => {
+    // 2026-W27: lunes 29-jun, jueves 2-jul → julio (no junio)
+    expect(mesDeSemana(2026, 27)).toEqual({ anio: 2026, mes: 7 })
+  })
+  it('agosto', () => {
+    expect(mesDeSemana(2026, 35)).toEqual({ anio: 2026, mes: 8 }) // jueves 27-ago
   })
 })

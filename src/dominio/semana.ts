@@ -100,6 +100,13 @@ export function fechasDeSemana(anio: number, semana: number): Date[] {
   })
 }
 
+// Mes calendario (1-12) al que pertenece una semana ISO: el del JUEVES de esa semana
+// (misma convención que semanasDelMes), para que una semana no se parta entre dos meses.
+export function mesDeSemana(anio: number, semana: number): { anio: number; mes: number } {
+  const jueves = fechasDeSemana(anio, semana)[3] // [0]=lunes ... [3]=jueves
+  return { anio: jueves.getUTCFullYear(), mes: jueves.getUTCMonth() + 1 }
+}
+
 // ¿La semana (anio, semana) es estrictamente anterior a la semana de referencia?
 export function esSemanaPasada(anio: number, semana: number, referencia: Semana): boolean {
   return anio < referencia.anio || (anio === referencia.anio && semana < referencia.semana)
