@@ -8,7 +8,7 @@ import {
   listarSolicitudesDeArea,
   listarResponsablesTodos,
 } from '@/datos/repositorio'
-import { semanaActual, siguienteSemana } from '@/dominio/semana'
+import { semanaActual, siguienteSemana, programacionAbierta } from '@/dominio/semana'
 import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
 import { usuarioActual } from '@/auth/sesion'
 import { puedeVer } from '@/auth/permisos'
@@ -61,8 +61,11 @@ export default async function TareasPage({
     ;(responsablesPorArea[r.areaId] ??= []).push({ id: r.id, nombre: r.nombre })
   }
 
+  const hoy = semanaActual()
   const semanas: { anio: number; semana: number }[] = []
-  let w = siguienteSemana(semanaActual().anio, semanaActual().semana)
+  // Ofrecer la semana en curso solo si su programación sigue abierta (lunes antes de las 11pm);
+  // si ya cerró, empezar en la siguiente. Coincide con el tope del servidor (programacionAbierta).
+  let w = programacionAbierta(hoy.anio, hoy.semana) ? hoy : siguienteSemana(hoy.anio, hoy.semana)
   for (let i = 0; i < 8; i++) {
     semanas.push(w)
     w = siguienteSemana(w.anio, w.semana)
