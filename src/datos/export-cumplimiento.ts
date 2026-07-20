@@ -84,6 +84,10 @@ export type LibroArea = { area: string; hojas: HojaExport[] } // hojas[0] = Gene
 const COLS_GENERAL: string[] = ['Mes', 'Semana', ...COLUMNAS_CUMPLIMIENTO]
 const COLS_MES: string[] = ['Semana', ...COLUMNAS_CUMPLIMIENTO]
 
+// La primera columna de una fila de cumplimiento es el día (Lun..Dom); lo mapeamos a 1..7
+// para poder ordenar por fecha dentro de una semana.
+const ORDEN_DIA: Record<string, number> = { Lun: 1, Mar: 2, Mié: 3, Jue: 4, Vie: 5, Sáb: 6, Dom: 7 }
+
 // Un libro (archivo) por área con datos: hoja "General" (todas las filas del área con
 // columnas Mes+Semana) + una hoja por mes (nombre "AÑO-MM", columnas Semana+…), ordenadas
 // del más reciente al más viejo (mes desc, semana desc). Solo propias, solo CUMPLIDA/PARCIAL.
@@ -120,7 +124,7 @@ export function construirLibrosPorArea(
       g.items.push(a)
       porSemana.set(k, g)
     }
-    type FilaMes = { anioMes: number; mesLabel: string; semana: number; semanaLabel: string; fila: (string | number)[] }
+    type FilaMes = { anioMes: number; mesLabel: string; semana: number; dia: number; semanaLabel: string; fila: (string | number)[] }
     const todas: FilaMes[] = []
     for (const s of porSemana.values()) {
       const fechas = fechasDeSemana(s.anio, s.semana)
@@ -130,17 +134,19 @@ export function construirLibrosPorArea(
       const mesLabel = `${ma}-${String(mes).padStart(2, '0')}`
       const semanaLabel = `${s.anio}-S${s.semana}`
       for (const fila of construirFilasCumplimiento(s.items, ctx, () => '')) {
-        todas.push({ anioMes: ma * 100 + mes, mesLabel, semana: s.semana, semanaLabel, fila })
+        // fila[0] es el día (Lun..Dom); lo usamos para ordenar por fecha dentro de la semana.
+        const dia = ORDEN_DIA[String(fila[0])] ?? 0
+        todas.push({ anioMes: ma * 100 + mes, mesLabel, semana: s.semana, dia, semanaLabel, fila })
       }
     }
     if (todas.length === 0) continue // área sin datos → sin archivo
 
+    // Orden del más reciente al más viejo: mes desc, semana desc, día desc.
+    const desc = (a: FilaMes, b: FilaMes) => b.anioMes - a.anioMes || b.semana - a.semana || b.dia - a.dia
     const general: HojaExport = {
       nombre: 'General',
       columnas: COLS_GENERAL,
-      filas: [...todas]
-        .sort((a, b) => b.anioMes - a.anioMes || b.semana - a.semana)
-        .map((r) => [r.mesLabel, r.semanaLabel, ...r.fila]),
+      filas: [...todas].sort(desc).map((r) => [r.mesLabel, r.semanaLabel, ...r.fila]),
     }
     // "AÑO-MM" ordena lexicográficamente = cronológico; .reverse() → más reciente primero.
     const meses = [...new Set(todas.map((r) => r.mesLabel))].sort().reverse()
@@ -149,7 +155,7 @@ export function construirLibrosPorArea(
       columnas: COLS_MES,
       filas: todas
         .filter((r) => r.mesLabel === mesLabel)
-        .sort((a, b) => b.semana - a.semana)
+        .sort(desc)
         .map((r) => [r.semanaLabel, ...r.fila]),
     }))
 

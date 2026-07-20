@@ -82,4 +82,13 @@ describe('construirLibrosPorArea', () => {
     expect(hojaAgo.filas).toHaveLength(1)
     expect(hojaAgo.filas[0][0]).toBe('2026-S35')
   })
+
+  it('dentro de una semana ordena por día del más reciente al más viejo', () => {
+    const mar = actMaestro({ id: 'd2', tareaId: 'td2', dia: 2, semana: 30 }) // Mar
+    const vie = actMaestro({ id: 'd5', tareaId: 'td5', dia: 5, semana: 30 }) // Vie
+    const [libro] = construirLibrosPorArea([mar, vie], [], [], [])
+    const hoja = libro.hojas.find((h) => h.nombre === '2026-07')! // W30 → julio
+    // columnas [Semana, Día, ...] → fila[1] = día; Vie (5) antes que Mar (2)
+    expect(hoja.filas.map((f) => f[1])).toEqual(['Vie', 'Mar'])
+  })
 })
