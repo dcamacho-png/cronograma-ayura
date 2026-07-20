@@ -1,8 +1,9 @@
-import { filasCumplimientoGrupo, type ActividadExport } from '@/dominio/cumplimiento-export'
+import { filasCumplimientoGrupo, COLUMNAS_CUMPLIMIENTO, type ActividadExport } from '@/dominio/cumplimiento-export'
 import { agruparPorActividad, estadoActividad } from '@/dominio/metricas'
 import type { Estado } from '@/dominio/tipos'
 import type { AvanceEntrada } from '@/dominio/avance-lote'
 import type { BultosPorLote } from '@/dominio/bultos'
+import { fechasDeSemana } from '@/dominio/semana'
 
 // Forma mínima de una actividad cargada con relaciones que necesitan el agrupado
 // (id/tareaId), el filtro de estado (estado/dia) y el mapeo a ActividadExport.
@@ -65,6 +66,57 @@ export function construirFilasCumplimiento(
       ejecutadaPor(grupo),
     )) {
       filas.push(fila)
+    }
+  }
+  return filas
+}
+
+export const COLUMNAS_MAESTRO = ['Semana', 'Área', ...COLUMNAS_CUMPLIMIENTO] as const
+
+export type ActMaestro = ActExportRaw & {
+  areaId: string
+  anio: number
+  semana: number
+  area: { nombre: string }
+}
+
+// Arma TODAS las filas del maestro: agrupa por (área, año, semana), antepone
+// [Semana, Área] y ordena Área → Semana → día (el día viene del orden interno de
+// construirFilasCumplimiento). Solo propias por área ⇒ cada actividad una sola vez.
+export function construirFilasMaestro(
+  actividades: ActMaestro[],
+  catalogo: { nombre: string; unidad: string }[],
+  maquinas: { id: string; nombre: string }[],
+  responsables: { id: string; nombre: string }[],
+): (string | number)[][] {
+  const unidadPorNombre = Object.fromEntries(catalogo.map((e) => [e.nombre, e.unidad]))
+  const mapMaquina = new Map(maquinas.map((m) => [m.id, m.nombre]))
+  const mapResponsable = new Map(responsables.map((r) => [r.id, r.nombre]))
+  const nombreMaquina = (id: string | null) => (id ? mapMaquina.get(id) ?? '' : '')
+  const nombreResponsable = (id: string | null) => (id ? mapResponsable.get(id) ?? '' : '')
+  const fmtFecha = (f: Date) =>
+    new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(f)
+
+  // Agrupar por (área, año, semana).
+  const grupos = new Map<string, { areaNombre: string; anio: number; semana: number; items: ActMaestro[] }>()
+  for (const a of actividades) {
+    const k = `${a.areaId}|${a.anio}|${a.semana}`
+    const g = grupos.get(k) ?? { areaNombre: a.area.nombre, anio: a.anio, semana: a.semana, items: [] }
+    g.items.push(a)
+    grupos.set(k, g)
+  }
+  const ordenados = [...grupos.values()].sort(
+    (x, y) => x.areaNombre.localeCompare(y.areaNombre) || x.anio - y.anio || x.semana - y.semana,
+  )
+
+  const filas: (string | number)[][] = []
+  for (const g of ordenados) {
+    const fechas = fechasDeSemana(g.anio, g.semana)
+    const fechaDeDia = (dia: number) => (fechas[dia - 1] ? fmtFecha(fechas[dia - 1]) : '')
+    const ctx: CtxFilas = { unidadPorNombre, nombreMaquina, nombreResponsable, fechaDeDia }
+    const semanaLabel = `${g.anio}-S${g.semana}`
+    for (const fila of construirFilasCumplimiento(g.items, ctx, () => '')) {
+      filas.push([semanaLabel, g.areaNombre, ...fila])
     }
   }
   return filas

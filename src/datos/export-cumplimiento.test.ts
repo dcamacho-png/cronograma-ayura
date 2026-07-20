@@ -41,3 +41,38 @@ describe('construirFilasCumplimiento', () => {
     expect(filas[0][13]).toBe('Maquinaria') // col "Ejecutada por"
   })
 })
+
+import { construirFilasMaestro, COLUMNAS_MAESTRO, type ActMaestro } from './export-cumplimiento'
+
+const actMaestro = (over: Partial<ActMaestro>): ActMaestro => ({
+  ...base, areaId: 'ar1', anio: 2026, semana: 29, area: { nombre: 'Ganadería' }, ...over,
+})
+
+describe('construirFilasMaestro', () => {
+  it('antepone Semana y Área a cada fila', () => {
+    const filas = construirFilasMaestro([actMaestro({})], [], [], [])
+    expect(filas).toHaveLength(1)
+    expect(filas[0][0]).toBe('2026-S29') // Semana
+    expect(filas[0][1]).toBe('Ganadería') // Área
+    expect(filas[0][5]).toBe('Fumigar') // Actividad = 3 + 2 columnas antepuestas
+  })
+
+  it('ordena por Área, luego Semana', () => {
+    const filas = construirFilasMaestro([
+      actMaestro({ id: 'x', tareaId: 'tx', area: { nombre: 'Nelore' }, areaId: 'ar2', semana: 28 }),
+      actMaestro({ id: 'y', tareaId: 'ty', area: { nombre: 'Ganadería' }, areaId: 'ar1', semana: 30 }),
+      actMaestro({ id: 'z', tareaId: 'tz', area: { nombre: 'Ganadería' }, areaId: 'ar1', semana: 29 }),
+    ], [], [], [])
+    expect(filas.map((f) => [f[1], f[0]])).toEqual([
+      ['Ganadería', '2026-S29'],
+      ['Ganadería', '2026-S30'],
+      ['Nelore', '2026-S28'],
+    ])
+  })
+
+  it('el header maestro tiene Semana y Área al frente', () => {
+    expect(COLUMNAS_MAESTRO[0]).toBe('Semana')
+    expect(COLUMNAS_MAESTRO[1]).toBe('Área')
+    expect(COLUMNAS_MAESTRO.length).toBe(18) // 2 + 16 columnas de cumplimiento
+  })
+})
