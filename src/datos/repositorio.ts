@@ -498,6 +498,9 @@ export async function asignarTarea(
     if (!primer) return { ok: false, motivo: 'tarea' }
     fincaId = primer.fincaId
   }
+  // Si no se resolvió por lotes, conservar la finca elegida en la tarea: se puede elegir
+  // finca sin marcar lotes, y antes la actividad quedaba "sin finca" en la grilla.
+  fincaId = fincaId ?? tarea.fincaId
   return prisma.$transaction(async (tx) => {
     // Guardia contra choques (a prueba de carreras: la consulta va dentro de la transacción).
     const existentes = await tx.actividad.findMany({
