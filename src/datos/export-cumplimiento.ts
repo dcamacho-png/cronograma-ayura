@@ -3,7 +3,7 @@ import { agruparPorActividad, estadoActividad } from '@/dominio/metricas'
 import type { Estado } from '@/dominio/tipos'
 import type { AvanceEntrada } from '@/dominio/avance-lote'
 import type { BultosPorLote } from '@/dominio/bultos'
-import { fechasDeSemana } from '@/dominio/semana'
+import { fechasDeSemana, mesDeSemana } from '@/dominio/semana'
 
 // Forma mínima de una actividad cargada con relaciones que necesitan el agrupado
 // (id/tareaId), el filtro de estado (estado/dia) y el mapeo a ActividadExport.
@@ -71,8 +71,6 @@ export function construirFilasCumplimiento(
   return filas
 }
 
-export const COLUMNAS_MAESTRO = ['Semana', 'Área', ...COLUMNAS_CUMPLIMIENTO] as const
-
 export type ActMaestro = ActExportRaw & {
   areaId: string
   anio: number
@@ -80,15 +78,21 @@ export type ActMaestro = ActExportRaw & {
   area: { nombre: string }
 }
 
-// Arma TODAS las filas del maestro: agrupa por (área, año, semana), antepone
-// [Semana, Área] y ordena Área → Semana → día (el día viene del orden interno de
-// construirFilasCumplimiento). Solo propias por área ⇒ cada actividad una sola vez.
-export function construirFilasMaestro(
+export type HojaExport = { nombre: string; columnas: string[]; filas: (string | number)[][] }
+export type LibroArea = { area: string; hojas: HojaExport[] } // hojas[0] = General, luego meses asc
+
+const COLS_GENERAL: string[] = ['Mes', 'Semana', ...COLUMNAS_CUMPLIMIENTO]
+const COLS_MES: string[] = ['Semana', ...COLUMNAS_CUMPLIMIENTO]
+
+// Un libro (archivo) por área con datos: hoja "General" (todas las filas del área con
+// columnas Mes+Semana, orden Mes→Semana) + una hoja por mes (nombre "AÑO-MM", columnas
+// Semana+…, orden Semana), en orden cronológico ascendente. Solo propias, solo CUMPLIDA/PARCIAL.
+export function construirLibrosPorArea(
   actividades: ActMaestro[],
   catalogo: { nombre: string; unidad: string }[],
   maquinas: { id: string; nombre: string }[],
   responsables: { id: string; nombre: string }[],
-): (string | number)[][] {
+): LibroArea[] {
   const unidadPorNombre = Object.fromEntries(catalogo.map((e) => [e.nombre, e.unidad]))
   const mapMaquina = new Map(maquinas.map((m) => [m.id, m.nombre]))
   const mapResponsable = new Map(responsables.map((r) => [r.id, r.nombre]))
@@ -97,27 +101,59 @@ export function construirFilasMaestro(
   const fmtFecha = (f: Date) =>
     new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(f)
 
-  // Agrupar por (área, año, semana).
-  const grupos = new Map<string, { areaNombre: string; anio: number; semana: number; items: ActMaestro[] }>()
+  // Agrupar por área.
+  const porArea = new Map<string, { areaNombre: string; items: ActMaestro[] }>()
   for (const a of actividades) {
-    const k = `${a.areaId}|${a.anio}|${a.semana}`
-    const g = grupos.get(k) ?? { areaNombre: a.area.nombre, anio: a.anio, semana: a.semana, items: [] }
+    const g = porArea.get(a.areaId) ?? { areaNombre: a.area.nombre, items: [] }
     g.items.push(a)
-    grupos.set(k, g)
+    porArea.set(a.areaId, g)
   }
-  const ordenados = [...grupos.values()].sort(
-    (x, y) => x.areaNombre.localeCompare(y.areaNombre) || x.anio - y.anio || x.semana - y.semana,
-  )
 
-  const filas: (string | number)[][] = []
-  for (const g of ordenados) {
-    const fechas = fechasDeSemana(g.anio, g.semana)
-    const fechaDeDia = (dia: number) => (fechas[dia - 1] ? fmtFecha(fechas[dia - 1]) : '')
-    const ctx: CtxFilas = { unidadPorNombre, nombreMaquina, nombreResponsable, fechaDeDia }
-    const semanaLabel = `${g.anio}-S${g.semana}`
-    for (const fila of construirFilasCumplimiento(g.items, ctx, () => '')) {
-      filas.push([semanaLabel, g.areaNombre, ...fila])
+  const libros: LibroArea[] = []
+  const areas = [...porArea.values()].sort((x, y) => x.areaNombre.localeCompare(y.areaNombre))
+  for (const area of areas) {
+    // Agrupar las actividades del área por (año, semana) y armar sus filas.
+    const porSemana = new Map<string, { anio: number; semana: number; items: ActMaestro[] }>()
+    for (const a of area.items) {
+      const k = `${a.anio}|${a.semana}`
+      const g = porSemana.get(k) ?? { anio: a.anio, semana: a.semana, items: [] }
+      g.items.push(a)
+      porSemana.set(k, g)
     }
+    type FilaMes = { anioMes: number; mesLabel: string; semana: number; semanaLabel: string; fila: (string | number)[] }
+    const todas: FilaMes[] = []
+    for (const s of porSemana.values()) {
+      const fechas = fechasDeSemana(s.anio, s.semana)
+      const fechaDeDia = (dia: number) => (fechas[dia - 1] ? fmtFecha(fechas[dia - 1]) : '')
+      const ctx: CtxFilas = { unidadPorNombre, nombreMaquina, nombreResponsable, fechaDeDia }
+      const { anio: ma, mes } = mesDeSemana(s.anio, s.semana)
+      const mesLabel = `${ma}-${String(mes).padStart(2, '0')}`
+      const semanaLabel = `${s.anio}-S${s.semana}`
+      for (const fila of construirFilasCumplimiento(s.items, ctx, () => '')) {
+        todas.push({ anioMes: ma * 100 + mes, mesLabel, semana: s.semana, semanaLabel, fila })
+      }
+    }
+    if (todas.length === 0) continue // área sin datos → sin archivo
+
+    const general: HojaExport = {
+      nombre: 'General',
+      columnas: COLS_GENERAL,
+      filas: [...todas]
+        .sort((a, b) => a.anioMes - b.anioMes || a.semana - b.semana)
+        .map((r) => [r.mesLabel, r.semanaLabel, ...r.fila]),
+    }
+    // "AÑO-MM" ordena lexicográficamente = cronológico.
+    const meses = [...new Set(todas.map((r) => r.mesLabel))].sort()
+    const hojasMes: HojaExport[] = meses.map((mesLabel) => ({
+      nombre: mesLabel,
+      columnas: COLS_MES,
+      filas: todas
+        .filter((r) => r.mesLabel === mesLabel)
+        .sort((a, b) => a.semana - b.semana)
+        .map((r) => [r.semanaLabel, ...r.fila]),
+    }))
+
+    libros.push({ area: area.areaNombre, hojas: [general, ...hojasMes] })
   }
-  return filas
+  return libros
 }
