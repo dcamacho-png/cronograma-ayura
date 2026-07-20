@@ -85,8 +85,8 @@ const COLS_GENERAL: string[] = ['Mes', 'Semana', ...COLUMNAS_CUMPLIMIENTO]
 const COLS_MES: string[] = ['Semana', ...COLUMNAS_CUMPLIMIENTO]
 
 // Un libro (archivo) por área con datos: hoja "General" (todas las filas del área con
-// columnas Mes+Semana, orden Mes→Semana) + una hoja por mes (nombre "AÑO-MM", columnas
-// Semana+…, orden Semana), en orden cronológico ascendente. Solo propias, solo CUMPLIDA/PARCIAL.
+// columnas Mes+Semana) + una hoja por mes (nombre "AÑO-MM", columnas Semana+…), ordenadas
+// del más reciente al más viejo (mes desc, semana desc). Solo propias, solo CUMPLIDA/PARCIAL.
 export function construirLibrosPorArea(
   actividades: ActMaestro[],
   catalogo: { nombre: string; unidad: string }[],
@@ -139,17 +139,17 @@ export function construirLibrosPorArea(
       nombre: 'General',
       columnas: COLS_GENERAL,
       filas: [...todas]
-        .sort((a, b) => a.anioMes - b.anioMes || a.semana - b.semana)
+        .sort((a, b) => b.anioMes - a.anioMes || b.semana - a.semana)
         .map((r) => [r.mesLabel, r.semanaLabel, ...r.fila]),
     }
-    // "AÑO-MM" ordena lexicográficamente = cronológico.
-    const meses = [...new Set(todas.map((r) => r.mesLabel))].sort()
+    // "AÑO-MM" ordena lexicográficamente = cronológico; .reverse() → más reciente primero.
+    const meses = [...new Set(todas.map((r) => r.mesLabel))].sort().reverse()
     const hojasMes: HojaExport[] = meses.map((mesLabel) => ({
       nombre: mesLabel,
       columnas: COLS_MES,
       filas: todas
         .filter((r) => r.mesLabel === mesLabel)
-        .sort((a, b) => a.semana - b.semana)
+        .sort((a, b) => b.semana - a.semana)
         .map((r) => [r.semanaLabel, ...r.fila]),
     }))
 

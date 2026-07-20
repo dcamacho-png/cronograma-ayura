@@ -57,17 +57,17 @@ describe('construirLibrosPorArea', () => {
     expect(libros.map((l) => l.area)).toEqual(['Ganadería', 'Nelore'])
   })
 
-  it('hoja General con columnas [Mes, Semana, ...] y una hoja por mes en orden ascendente', () => {
+  it('hoja General con columnas [Mes, Semana, ...] y hojas por mes del más reciente al más viejo', () => {
     const jul = actMaestro({ id: 'j', tareaId: 'tj', semana: 27 }) // W27 → 2026-07
     const ago = actMaestro({ id: 'a', tareaId: 'ta', semana: 35 }) // W35 → 2026-08
-    const [libro] = construirLibrosPorArea([ago, jul], [], [], [])
-    expect(libro.hojas.map((h) => h.nombre)).toEqual(['General', '2026-07', '2026-08'])
+    const [libro] = construirLibrosPorArea([jul, ago], [], [], [])
+    expect(libro.hojas.map((h) => h.nombre)).toEqual(['General', '2026-08', '2026-07'])
     const general = libro.hojas[0]
     expect(general.columnas[0]).toBe('Mes')
     expect(general.columnas[1]).toBe('Semana')
     expect(general.filas).toHaveLength(2)
-    expect(general.filas[0][0]).toBe('2026-07') // Mes de la primera fila (orden asc)
-    expect(general.filas[1][0]).toBe('2026-08')
+    expect(general.filas[0][0]).toBe('2026-08') // más reciente primero
+    expect(general.filas[1][0]).toBe('2026-07')
   })
 
   it('cada hoja de mes tiene columnas [Semana, ...] y solo las filas de ese mes', () => {
