@@ -3,11 +3,8 @@ import ExcelJS from 'exceljs'
 import { usuarioActual } from '@/auth/sesion'
 import { listarAreas, listarActividades, listarActividadesSolicitadas, listarActividadesEstipuladas, listarMaquinas, listarResponsablesTodos } from '@/datos/repositorio'
 import { fechasDeSemana } from '@/dominio/semana'
-import { COLUMNAS_CUMPLIMIENTO, filasCumplimientoGrupo } from '@/dominio/cumplimiento-export'
-import { agruparPorActividad, estadoActividad } from '@/dominio/metricas'
-import type { Estado } from '@/dominio/tipos'
-import type { AvanceEntrada } from '@/dominio/avance-lote'
-import type { BultosPorLote } from '@/dominio/bultos'
+import { COLUMNAS_CUMPLIMIENTO } from '@/dominio/cumplimiento-export'
+import { construirFilasCumplimiento } from '@/datos/export-cumplimiento'
 
 // exceljs necesita runtime Node (no edge).
 export const runtime = 'nodejs'
@@ -49,45 +46,24 @@ export async function GET(req: NextRequest) {
   const fmtFecha = (f: Date) =>
     new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(f)
 
+  const semanaLabel = `${anio}-S${semana}`
   const wb = new ExcelJS.Workbook()
   const ws = wb.addWorksheet('Cumplimiento')
-  const header = ws.addRow([...COLUMNAS_CUMPLIMIENTO])
+  // Columna "Semana" al frente (mismo formato "AÑO-SNN" que /consulta) como referencia,
+  // útil sobre todo cuando varios Excel semanales se acumulan/consolidan (p. ej. en Drive).
+  const header = ws.addRow(['Semana', ...COLUMNAS_CUMPLIMIENTO])
   header.font = { bold: true }
   const fechaDeDia = (dia: number) => (fechas[dia - 1] ? fmtFecha(fechas[dia - 1]) : '')
 
-  // Una actividad es UNA sola aunque tenga varios responsables/días (filas hermanas con
-  // el mismo tareaId). Agrupamos por actividad y emitimos una fila representativa; el
-  // estado de la actividad es CUMPLIDA/PARCIAL si el grupo lo es.
-  const aExport = (a: (typeof actividades)[number] | (typeof solicitadas)[number]) => ({
-    ...a,
-    bultosPorLote: a.bultosPorLote as BultosPorLote | null,
-    lotesHechos: a.lotesHechos as string[] | null,
-    avancePorLote: a.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null,
-    detalle: a.tarea?.detalle ?? null,
-  })
-  const agregarGrupos = (
-    items: ((typeof actividades)[number] | (typeof solicitadas)[number])[],
-    ejecutadaPor: (grupo: typeof items) => string,
-  ) => {
-    for (const grupo of agruparPorActividad(items).values()) {
-      const e = estadoActividad(grupo.map((a) => ({ estado: a.estado as Estado })))
-      if (e !== 'CUMPLIDA' && e !== 'PARCIAL') continue // solo lo que se hizo
-      for (const fila of filasCumplimientoGrupo(
-        grupo.map(aExport),
-        fechaDeDia(grupo[0].dia),
-        unidadPorNombre,
-        { fechaDeDia, nombreMaquina, nombreResponsable },
-        ejecutadaPor(grupo),
-      )) {
-        ws.addRow(fila)
-      }
-    }
-  }
-
+  const ctx = { unidadPorNombre, nombreMaquina, nombreResponsable, fechaDeDia }
   // Actividades propias del área.
-  agregarGrupos(actividades, () => '')
+  for (const fila of construirFilasCumplimiento(actividades, ctx, () => '')) {
+    ws.addRow([semanaLabel, ...fila])
+  }
   // Actividades que esta área solicitó a otra (ejecutadas por la otra área).
-  agregarGrupos(solicitadas, (grupo) => (grupo[0] as (typeof solicitadas)[number]).area.nombre)
+  for (const fila of construirFilasCumplimiento(solicitadas, ctx, (grupo) => grupo[0].area?.nombre ?? '')) {
+    ws.addRow([semanaLabel, ...fila])
+  }
 
   const buffer = await wb.xlsx.writeBuffer()
   const safe = area.nombre.replace(/[^\p{L}\p{N}]+/gu, '-')
