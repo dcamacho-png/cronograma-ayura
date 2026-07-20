@@ -65,6 +65,11 @@ programacionAbierta(anio: number, semana: number, ahora?: Date): boolean
 - La autorización por rol/área (`puedeMutarArea`, VISOR bloqueado) no cambia. **ADMIN no gana
   bypass** del tope en programar (igual que hoy).
 
+**Servidor** — `src/app/tareas/acciones.ts` (mismo tope, decisión 2026-07-20):
+- `programarTareaAccion` (línea ~242): agendar una tarea del banco a una semana
+  (`seleccionarTarea`) también pasa de `esSemanaFutura` a `programacionAbierta(anio, semana)`, para
+  que "programar en una semana" use la misma regla en /tareas y en /programar.
+
 ### 3. Texto del candado — `src/app/programar/page.tsx` (~línea 148)
 
 De *"🔒 Esta semana ya empezó — solo lectura. La programación se hace antes del lunes de inicio de
@@ -97,7 +102,9 @@ es aditiva).
 ## Fuera de alcance (YAGNI)
 
 - No se toca el plazo de **cumplimiento** (`plazoCumplimientoVencido`).
-- No se toca `esSemanaFutura`/`esSemanaPasada` (se conservan para otros consumidores).
+- No se borra `esSemanaFutura`/`esSemanaPasada`: la función se conserva (la usan `semana.test.ts`,
+  `plazoCumplimientoVencido` y `esSemanaPasada`), solo se cambian los call sites de programar +
+  el de `programarTareaAccion`.
 - Sin bypass de ADMIN en programar.
 - Sin configurabilidad de la hora (23:00 fijo).
 
