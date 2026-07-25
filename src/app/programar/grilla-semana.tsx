@@ -1,8 +1,9 @@
 import { Fragment } from 'react'
 import { InfoLotes } from '../_componentes/info-lotes'
-import { actualizarActividadAccion, devolverAAsignacionAccion, devolverGrillaAlBancoAccion, devolverActividadAlBancoAccion, eliminarNovedadResponsableAccion } from './acciones'
+import { actualizarActividadAccion, devolverAAsignacionAccion, devolverGrillaAlBancoAccion, devolverActividadAlBancoAccion, eliminarNovedadResponsableAccion, agregarOrdenAseoAccion, quitarOrdenAseoAccion } from './acciones'
 import { agruparResponsablesPorFinca, hayFincasAsignadas } from '@/dominio/responsables-finca'
 import { diasCubiertos, etiquetaNovedad, type TipoNovedad } from '@/dominio/ausencias'
+import { agruparOrdenAseoPorDia, type AsignacionOrdenAseo } from '@/dominio/orden-aseo'
 import { FormNovedad } from './form-novedad'
 
 const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
@@ -53,6 +54,9 @@ export function GrillaSemana({
   turnoEditable = false,
   esMaquinaria,
   paraExportar = false,
+  conOrdenAseo = false,
+  ordenAseo = [],
+  todosResponsables = [],
 }: {
   areaNombre: string
   anio: number
@@ -64,6 +68,9 @@ export function GrillaSemana({
   turnoEditable?: boolean
   esMaquinaria: boolean
   paraExportar?: boolean
+  conOrdenAseo?: boolean
+  ordenAseo?: AsignacionOrdenAseo[]
+  todosResponsables?: { id: string; nombre: string; areaNombre: string }[]
 }) {
   const rango = fechas.length === 7 ? `${fmtFecha(fechas[0])} – ${fmtFecha(fechas[6])}` : ''
   // En modo export nunca hay controles interactivos (turno como texto, sin "Devolver a asignar").
@@ -177,6 +184,56 @@ export function GrillaSemana({
       </td>
     </tr>
   )
+  const diasOrdenAseo = agruparOrdenAseoPorDia(ordenAseo)
+  const filaOrdenAseo = (
+    <tr key="orden-aseo" className="border-t-2 border-borde">
+      <td className={`border border-borde bg-arena p-2 align-top font-semibold text-bosque ${paraExportar ? 'text-lg' : ''}`}>
+        🧹 Orden y aseo
+      </td>
+      {diasOrdenAseo.map((d) => (
+        <td key={d.dia} className="border border-borde p-2 align-top">
+          <div className="flex flex-wrap gap-1">
+            {d.encargados.map((e) => (
+              <span
+                key={e.responsableId}
+                className={`inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 ${paraExportar ? 'text-sm' : 'text-xs'}`}
+              >
+                {e.nombre}
+                {editable && (
+                  <form action={quitarOrdenAseoAccion} className="inline">
+                    <input type="hidden" name="anio" value={anio} />
+                    <input type="hidden" name="semana" value={semana} />
+                    <input type="hidden" name="dia" value={d.dia} />
+                    <input type="hidden" name="responsableId" value={e.responsableId} />
+                    <button type="submit" aria-label={`Quitar a ${e.nombre}`} className="text-red-600 hover:underline">✕</button>
+                  </form>
+                )}
+              </span>
+            ))}
+          </div>
+          {editable && (
+            <form action={agregarOrdenAseoAccion} className="mt-1 flex items-center gap-1">
+              <input type="hidden" name="anio" value={anio} />
+              <input type="hidden" name="semana" value={semana} />
+              <input type="hidden" name="dia" value={d.dia} />
+              <select
+                name="responsableId"
+                defaultValue=""
+                aria-label={`Agregar encargado día ${d.dia}`}
+                className="w-full rounded-lg border border-borde bg-marfil p-0.5 text-xs focus:outline-none focus:ring-2 focus:ring-bosque/40"
+              >
+                <option value="" disabled>+ agregar…</option>
+                {todosResponsables.map((r) => (
+                  <option key={r.id} value={r.id}>{r.nombre} — {r.areaNombre}</option>
+                ))}
+              </select>
+              <button type="submit" className="rounded-lg bg-bosque px-1.5 text-xs font-semibold text-white">➕</button>
+            </form>
+          )}
+        </td>
+      ))}
+    </tr>
+  )
   return (
     <div className="rounded-xl border border-borde bg-white text-tinta">
       <div className="border-b border-borde p-3">
@@ -199,6 +256,7 @@ export function GrillaSemana({
                     </Fragment>
                   ))
                 : responsables.map((r) => filaResponsable(r))}
+              {conOrdenAseo && filaOrdenAseo}
             </tbody>
           </table>
         </div>
