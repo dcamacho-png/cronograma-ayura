@@ -240,7 +240,7 @@ export function GrillaSemana({
         <div className={`font-bold text-bosque ${paraExportar ? 'text-xl' : 'text-lg'}`}>{areaNombre}</div>
         <div className={paraExportar ? 'text-base text-black' : 'text-sm text-tierra'}>Semana {semana}{rango ? ` · ${rango}` : ''}</div>
       </div>
-      {responsables.length === 0 ? (
+      {responsables.length === 0 && !conOrdenAseo ? (
         <p className="p-4 text-center text-sm italic text-tierra">Sin actividades programadas</p>
       ) : (
         <div className="overflow-x-auto">
