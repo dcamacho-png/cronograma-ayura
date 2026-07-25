@@ -10,6 +10,8 @@ import {
   listarMaquinas,
   listarDedicaciones,
   listarNovedadesEnRango,
+  listarOrdenAseo,
+  listarTodosResponsables,
 } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, diaActual, esDiaPasado, programacionAbierta } from '@/dominio/semana'
 import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
@@ -61,13 +63,15 @@ export default async function ProgramarPage({
 
   const fechas = fechasDeSemana(anio, semana)
 
-  const [responsables, actividades, porAsignar, maquinas, dedicacionesRaw, novedadesRaw] = await Promise.all([
+  const [responsables, actividades, porAsignar, maquinas, dedicacionesRaw, novedadesRaw, ordenAseo, todosResponsables] = await Promise.all([
     listarResponsablesPorArea(areaId),
     listarActividades(areaId, anio, semana),
     tareasPorAsignar(areaId, anio, semana),
     listarMaquinas(),
     listarDedicaciones(anio, semana),
     listarNovedadesEnRango(areaId, fechas[0], fechas[6]),
+    listarOrdenAseo(anio, semana),
+    listarTodosResponsables(),
   ])
   const esMaquinaria = esMaquinariaVar(areaActual, 'programar')
   const areasParaDedicar = areas.filter((a) => !esMaquinariaVar(a, 'programar'))
@@ -227,6 +231,9 @@ export default async function ProgramarPage({
           novedades={novedades}
           turnoEditable={programable && !soloLectura}
           esMaquinaria={esMaquinaria}
+          conOrdenAseo
+          ordenAseo={ordenAseo}
+          todosResponsables={todosResponsables}
         />
       </div>
       {esMaquinaria && (
@@ -263,6 +270,8 @@ export default async function ProgramarPage({
               actividades={actividadesCronograma}
               novedades={novedades}
               esMaquinaria={esMaquinaria}
+              conOrdenAseo
+              ordenAseo={ordenAseo}
               paraExportar
             />
           </div>
