@@ -165,6 +165,7 @@ export default async function ProgramarPage({
                   <AsignarTareaForm
                     tareaId={t.id}
                     descripcion={t.descripcion}
+                    finca={t.finca?.nombre ?? t.lotes[0]?.finca?.nombre ?? null}
                     lotesTarea={t.lotes}
                     bultosPorLote={t.bultosPorLote as Record<string, number> | null}
                     responsables={responsablesActivos}
