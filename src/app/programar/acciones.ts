@@ -2,11 +2,11 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearResponsable, actualizarActividad, asignarTarea, quitarSeleccionTarea, devolverAAsignacion, devolverGrillaAlBanco, devolverActividadReprogramadaAlBanco, dedicarTractor, crearNovedadResponsable, eliminarNovedadResponsable, areaDeActividad, areaDeTarea, areaDeResponsable, areaDeNovedadResponsable, areaDedicacionTractor } from '@/datos/repositorio'
+import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearResponsable, actualizarActividad, asignarTarea, quitarSeleccionTarea, devolverAAsignacion, devolverGrillaAlBanco, devolverActividadReprogramadaAlBanco, dedicarTractor, crearNovedadResponsable, eliminarNovedadResponsable, areaDeActividad, areaDeTarea, areaDeResponsable, areaDeNovedadResponsable, areaDedicacionTractor, agregarOrdenAseo, quitarOrdenAseo } from '@/datos/repositorio'
 import { semanaAnterior, semanaActual, diaActual, esDiaPasado, programacionAbierta } from '@/dominio/semana'
 import type { Asignacion } from '@/dominio/programacion'
 import { usuarioActual } from '@/auth/sesion'
-import { puedeMutarArea } from '@/auth/permisos'
+import { puedeMutarArea, puedeVer, esSoloLectura } from '@/auth/permisos'
 
 const DIAS_CORTOS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
@@ -264,5 +264,39 @@ export async function eliminarNovedadResponsableAccion(form: FormData) {
   if (!Number.isInteger(anio) || !Number.isInteger(semana) || !programacionAbierta(anio, semana)) return
   if (!(await autorizadoNovedadResponsable(id))) return
   await eliminarNovedadResponsable(id)
+  revalidatePath('/programar')
+}
+
+// Orden y aseo es un recurso GLOBAL (compartido por todas las áreas, sin dueño),
+// así que NO se autoriza con puedeMutarArea. Basta con sesión válida, permiso de
+// programar y no ser solo-lectura (Visor). ADMIN pasa; VISOR nunca.
+async function autorizadoGlobalProgramar(): Promise<boolean> {
+  const u = await usuarioActual()
+  return !!u && puedeVer(u, 'programar') && !esSoloLectura(u)
+}
+
+export async function agregarOrdenAseoAccion(form: FormData) {
+  const anio = Number(texto(form, 'anio'))
+  const semana = Number(texto(form, 'semana'))
+  const dia = Number(texto(form, 'dia'))
+  const responsableId = texto(form, 'responsableId')
+  if (!responsableId || !Number.isInteger(anio) || !Number.isInteger(semana)) return
+  if (!Number.isInteger(dia) || dia < 1 || dia > 7) return
+  if (!programacionAbierta(anio, semana)) return
+  if (!(await autorizadoGlobalProgramar())) return
+  await agregarOrdenAseo(anio, semana, dia, responsableId)
+  revalidatePath('/programar')
+}
+
+export async function quitarOrdenAseoAccion(form: FormData) {
+  const anio = Number(texto(form, 'anio'))
+  const semana = Number(texto(form, 'semana'))
+  const dia = Number(texto(form, 'dia'))
+  const responsableId = texto(form, 'responsableId')
+  if (!responsableId || !Number.isInteger(anio) || !Number.isInteger(semana)) return
+  if (!Number.isInteger(dia) || dia < 1 || dia > 7) return
+  if (!programacionAbierta(anio, semana)) return
+  if (!(await autorizadoGlobalProgramar())) return
+  await quitarOrdenAseo(anio, semana, dia, responsableId)
   revalidatePath('/programar')
 }
