@@ -69,11 +69,18 @@ export async function listarOrdenAseo(anio: number, semana: number) {
 
 export async function agregarOrdenAseo(anio: number, semana: number, dia: number, responsableId: string): Promise<void> {
   // Idempotente: si ya existe (mismo anio/semana/dia/responsable), no duplica.
-  await prisma.ordenAseo.upsert({
-    where: { anio_semana_dia_responsableId: { anio, semana, dia, responsableId } },
-    create: { anio, semana, dia, responsableId },
-    update: {},
-  })
+  try {
+    await prisma.ordenAseo.upsert({
+      where: { anio_semana_dia_responsableId: { anio, semana, dia, responsableId } },
+      create: { anio, semana, dia, responsableId },
+      update: {},
+    })
+  } catch (e) {
+    // Responsable inexistente (p. ej. borrado mientras otra pantalla tenía el id en caché):
+    // la violación de llave foránea se trata como no-op, igual que los demás guards de la acción.
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2003') return
+    throw e
+  }
 }
 
 export async function quitarOrdenAseo(anio: number, semana: number, dia: number, responsableId: string): Promise<void> {
