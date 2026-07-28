@@ -9,7 +9,7 @@ const PANTALLAS: { clave: string; etiqueta: string }[] = [
   { clave: 'resumen', etiqueta: 'Resumen' },
   { clave: 'tablero', etiqueta: 'Tablero' },
   { clave: 'consulta', etiqueta: 'Consulta' },
-  { clave: 'conservatorio', etiqueta: 'Conservatorio' },
+  { clave: 'conservatorio', etiqueta: 'Conversatorio' },
 ]
 
 // pantallas: CSV guardado (null = set por defecto de área, ver DEFAULT_AREA)

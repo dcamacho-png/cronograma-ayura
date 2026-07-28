@@ -58,6 +58,44 @@ export async function dedicarTractor(
   })
 }
 
+// ————— Orden y aseo (fila global compartida por todas las áreas) —————
+export async function listarOrdenAseo(anio: number, semana: number) {
+  const filas = await prisma.ordenAseo.findMany({
+    where: { anio, semana },
+    include: { responsable: { select: { nombre: true } } },
+  })
+  return filas.map((f) => ({ dia: f.dia, responsableId: f.responsableId, nombre: f.responsable.nombre }))
+}
+
+export async function agregarOrdenAseo(anio: number, semana: number, dia: number, responsableId: string): Promise<void> {
+  // Idempotente: si ya existe (mismo anio/semana/dia/responsable), no duplica.
+  try {
+    await prisma.ordenAseo.upsert({
+      where: { anio_semana_dia_responsableId: { anio, semana, dia, responsableId } },
+      create: { anio, semana, dia, responsableId },
+      update: {},
+    })
+  } catch (e) {
+    // Responsable inexistente (p. ej. borrado mientras otra pantalla tenía el id en caché):
+    // la violación de llave foránea se trata como no-op, igual que los demás guards de la acción.
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2003') return
+    throw e
+  }
+}
+
+export async function quitarOrdenAseo(anio: number, semana: number, dia: number, responsableId: string): Promise<void> {
+  await prisma.ordenAseo.deleteMany({ where: { anio, semana, dia, responsableId } })
+}
+
+export async function listarTodosResponsables() {
+  const rs = await prisma.responsable.findMany({
+    where: { activo: true },
+    include: { area: { select: { nombre: true } } },
+    orderBy: [{ area: { nombre: 'asc' } }, { nombre: 'asc' }],
+  })
+  return rs.map((r) => ({ id: r.id, nombre: r.nombre, areaNombre: r.area.nombre }))
+}
+
 export function listarResponsablesPorArea(areaId: string) {
   return prisma.responsable.findMany({
     where: { areaId },

@@ -59,7 +59,7 @@ export default async function ConservatorioPage() {
 
   return (
     <main className="mx-auto max-w-2xl p-6">
-      <h1 className="mb-4 text-2xl font-bold text-bosque">🗣️ Conservatorio</h1>
+      <h1 className="mb-4 text-2xl font-bold text-bosque">🗣️ Conversatorio</h1>
 
       {puedeCrear && <FormNuevaNota lotes={lotes} accion={crearNotaAccion} />}
       {u.rol === 'AREA' && !u.areaId && (

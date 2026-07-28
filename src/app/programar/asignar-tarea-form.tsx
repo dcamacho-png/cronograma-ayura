@@ -9,6 +9,7 @@ const DIAS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 export function AsignarTareaForm({
   tareaId,
   descripcion,
+  finca,
   lotesTarea,
   bultosPorLote,
   responsables,
@@ -23,6 +24,7 @@ export function AsignarTareaForm({
 }: {
   tareaId: string
   descripcion: string
+  finca: string | null
   lotesTarea: { id: string; nombre: string }[]
   bultosPorLote?: Record<string, number> | null
   responsables: { id: string; nombre: string }[]
@@ -84,8 +86,25 @@ export function AsignarTareaForm({
       <input type="hidden" name="semana" value={semana} />
       <input type="hidden" name="esMaquinaria" value={esMaquinaria ? '1' : ''} />
 
+      {/* Encabezado: qué se va a programar (claro y prominente, antes de los controles). */}
+      <div className="flex flex-col gap-0.5">
+        <span className="text-base font-semibold text-tinta">{descripcion}</span>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-tierra">
+          {finca && <span>🏠 {finca}</span>}
+          <span>
+            {lotesTarea.length > 0
+              ? `Lote(s): ${lotesTarea
+                  .map((l) => {
+                    const bb = bultosPorLote?.[l.id]
+                    return typeof bb === 'number' ? `${l.nombre} (${bb} bultos)` : l.nombre
+                  })
+                  .join(', ')}`
+              : 'Sin lote'}
+          </span>
+        </div>
+      </div>
+
       <div className="flex flex-wrap items-center gap-2">
-        <span className="min-w-[160px] flex-1 font-medium">{descripcion}</span>
         <div className="relative flex flex-col text-xs">
           Responsables
           <button
@@ -114,16 +133,6 @@ export function AsignarTareaForm({
             ))}
           </div>
         </div>
-        <span className="text-xs text-tierra">
-          {lotesTarea.length > 0
-            ? `Lote(s): ${lotesTarea
-                .map((l) => {
-                  const bb = bultosPorLote?.[l.id]
-                  return typeof bb === 'number' ? `${l.nombre} (${bb} bultos)` : l.nombre
-                })
-                .join(', ')}`
-            : 'Sin lote'}
-        </span>
         <button
           disabled={totalDias === 0 || conflictosResp.length > 0}
           className="ml-auto rounded-lg bg-bosque px-3 py-1 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-arena disabled:text-tierra"
