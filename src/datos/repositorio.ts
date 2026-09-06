@@ -25,6 +25,18 @@ import {
 } from '@/dominio/avance-general'
 import { normalizarNovedades, agregarNovedad, eliminarNovedad, editarNovedad } from '@/dominio/novedades'
 
+// Espejo en SQL de `trabajoRegistrado` (src/dominio/trabajo-registrado.ts): la actividad
+// que el área ejecutora ya trabajó. Se usa para sacar la solicitud de "Mis solicitudes"
+// y para dejarla ver en /consulta. Mantener las dos definiciones en sintonía.
+const ACTIVIDAD_TRABAJADA: Prisma.ActividadWhereInput = {
+  OR: [
+    { estado: 'CUMPLIDA' },
+    { cerrada: true },
+    { estado: 'PARCIAL', NOT: { avancePorLote: { equals: Prisma.DbNull } } },
+    { estado: 'PARCIAL', NOT: { avanceGeneral: { equals: Prisma.DbNull } } },
+  ],
+}
+
 export function listarAreas() {
   return prisma.area.findMany({ orderBy: { nombre: 'asc' } })
 }
@@ -176,10 +188,12 @@ export function listarActividadesTodas() {
 export function consultarCulminadas(areaId: string) {
   return prisma.actividad.findMany({
     where: {
-      // Culminadas = cerradas por el área ejecutora: CUMPLIDA o Parcial cerrada.
+      // Lo que el área ejecutora ya trabajó: cumplida, cerrada, o parcial con avances.
+      // Debe cubrir todo lo que se oculta de "Mis solicitudes", para que nada quede
+      // invisible en las dos pantallas a la vez.
       AND: [
         { OR: [{ areaId }, { tarea: { solicitadaPorAreaId: areaId } }] },
-        { OR: [{ estado: 'CUMPLIDA' }, { cerrada: true }] },
+        ACTIVIDAD_TRABAJADA,
       ],
     },
     include: {
@@ -1309,9 +1323,9 @@ export function listarSolicitudesDeArea(areaId: string) {
       finca: true,
       // Fallback para solicitudes viejas sin fincaId: derivar la finca de sus lotes.
       lotes: { include: { finca: true } },
-      // Se oculta de "Mis solicitudes" cuando la otra área ya cerró/cumplió al menos una
-      // actividad (CUMPLIDA o cerrada, incluida la Parcial cerrada): pasan a /consulta.
-      _count: { select: { actividades: { where: { OR: [{ estado: 'CUMPLIDA' }, { cerrada: true }] } } } },
+      // Se oculta de "Mis solicitudes" cuando la otra área ya trabajó al menos una
+      // actividad (cumplida, cerrada, o parcial con avances): pasan a /consulta.
+      _count: { select: { actividades: { where: ACTIVIDAD_TRABAJADA } } },
     },
     orderBy: { descripcion: 'asc' },
   })

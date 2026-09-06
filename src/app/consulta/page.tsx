@@ -4,9 +4,9 @@ import { usuarioActual } from '@/auth/sesion'
 import { puedeVer } from '@/auth/permisos'
 import { listarAreas, listarActividadesEstipuladas, listarMaquinas, listarResponsablesTodos, consultarCulminadas } from '@/datos/repositorio'
 import { fechasDeSemana } from '@/dominio/semana'
-import { agruparPorActividad, estadoActividad } from '@/dominio/metricas'
+import { agruparPorActividad } from '@/dominio/metricas'
+import { grupoTrabajado } from '@/dominio/trabajo-registrado'
 import { COLUMNAS_CUMPLIMIENTO, filasCumplimientoGrupo, type ActividadExport } from '@/dominio/cumplimiento-export'
-import type { Estado } from '@/dominio/tipos'
 import type { AvanceEntrada } from '@/dominio/avance-lote'
 import type { AvanceGeneralEntrada } from '@/dominio/avance-general'
 import type { BultosPorLote } from '@/dominio/bultos'
@@ -81,9 +81,10 @@ export default async function ConsultaPage({
     }
     for (const semItems of porSemana.values()) {
       for (const grupo of agruparPorActividad(semItems).values()) {
-        // Culminadas: la actividad cumplida, o cerrada como Parcial por el área ejecutora.
-        const est = estadoActividad(grupo.map((a) => ({ estado: a.estado as Estado })))
-        if (est !== 'CUMPLIDA' && !grupo.some((a) => a.cerrada)) continue
+        // Lo que el área ejecutora ya trabajó: cumplida, cerrada, o parcial con avances.
+        // Mismo criterio con el que la solicitud sale de "Mis solicitudes", para que no
+        // desaparezca de las dos pantallas a la vez.
+        if (!grupoTrabajado(grupo)) continue
         if (!pasaFiltros(grupo)) continue
         const base = grupo[0]
         const fechas = fechasDeSemana(base.anio, base.semana)
