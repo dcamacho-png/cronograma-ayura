@@ -10,8 +10,9 @@ type Lote = { id: string; nombre: string; hectareas?: number | null; finca: { no
 type Estipulada = { id: string; nombre: string; unidad: string }
 
 // Control de cumplimiento de UNA actividad de maquinaria (grupo tareaId), PENDIENTE o
-// PARCIAL: avances por lote (máquina + cantidad + centro de costo + día) que se acumulan,
-// y cierre manual (Cumplida). Novedad y devolver al banco como en el estándar.
+// PARCIAL: avances que se acumulan día a día (máquina + cantidad + centro de costo + día),
+// por potrero cuando la actividad tiene, y de la actividad completa cuando no (taller,
+// movimientos, coordinación…). Cierre manual (Cumplida); novedad y banco como en el estándar.
 export function ActividadMaquinaria({
   actividadId,
   estado,
@@ -33,6 +34,7 @@ export function ActividadMaquinaria({
   bultosAsignados,
   descripcion,
   registrarAvance,
+  registrarAvanceGeneral,
   marcarCumplida,
   cerrarParcial,
   noSeHizo,
@@ -60,6 +62,7 @@ export function ActividadMaquinaria({
   bultosAsignados?: Record<string, number> | null
   descripcion?: string
   registrarAvance: (f: FormData) => void | Promise<void>
+  registrarAvanceGeneral: (f: FormData) => void | Promise<void>
   marcarCumplida: (f: FormData) => void | Promise<void>
   cerrarParcial: (f: FormData) => void | Promise<void>
   noSeHizo: (f: FormData) => void | Promise<void>
@@ -87,6 +90,7 @@ export function ActividadMaquinaria({
         unidadCatalogo={unidadCatalogo}
         lotesPendientesIds={lotesPendientesIds}
         accion={registrarAvance}
+        accionGeneral={registrarAvanceGeneral}
       />
       <div className="flex flex-col gap-2">
         <FormCerrar

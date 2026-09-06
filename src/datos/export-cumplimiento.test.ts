@@ -13,7 +13,7 @@ const base: ActExportRaw = {
   haRealizada: 3, centroCosto: null, nota: null, unidadRealizada: null,
   responsable: { nombre: 'Ana' }, maquina: null, finca: { nombre: 'F1' },
   lotes: [{ id: 'l1', nombre: 'L1' }],
-  bultosPorLote: null, lotesHechos: null, avancePorLote: null,
+  bultosPorLote: null, lotesHechos: null, avancePorLote: null, avanceGeneral: null,
   tarea: { detalle: null }, area: { nombre: 'Ganadería' },
 }
 

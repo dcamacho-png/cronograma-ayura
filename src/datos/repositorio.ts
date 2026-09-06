@@ -15,6 +15,14 @@ import {
   eliminarAvanceEntrada,
   type AvanceEntrada,
 } from '@/dominio/avance-lote'
+import {
+  normalizarAvanceGeneral,
+  agregarAvanceGeneral,
+  totalAvanceGeneral,
+  editarAvanceGeneral,
+  eliminarAvanceGeneral,
+  type AvanceGeneralEntrada,
+} from '@/dominio/avance-general'
 import { normalizarNovedades, agregarNovedad, eliminarNovedad, editarNovedad } from '@/dominio/novedades'
 
 export function listarAreas() {
@@ -927,6 +935,8 @@ export async function marcarCumplidaGrupo(id: string) {
   const lotesDesglose = lotesRealizadosCumplida(g.base.lotes, avanceActual, g.base.lotesHechos as string[] | null)
   const avanceCompleto = (tieneLotes && esHa) ? completarAvancesCumplida(lotesDesglose, avanceActual, g.base.dia) : avanceActual
   const total = totalAvanceLotes(g.base.lotes, avanceCompleto)
+  // Sin potreros, la medida sale de la bitácora día a día (si no hay, se respeta lo ya capturado).
+  const general = tieneLotes ? [] : normalizarAvanceGeneral(g.base.avanceGeneral)
   await prisma.$transaction(
     g.filas
       .filter((f) => f.estado === 'PENDIENTE' || f.estado === 'PARCIAL')
@@ -936,7 +946,9 @@ export async function marcarCumplidaGrupo(id: string) {
           data: {
             estado: 'CUMPLIDA',
             cerrada: true,
-            ...(tieneLotes ? { haRealizada: total, ...(esHa ? { avancePorLote: avanceCompleto } : {}) } : {}),
+            ...(tieneLotes
+              ? { haRealizada: total, ...(esHa ? { avancePorLote: avanceCompleto } : {}) }
+              : (general.length ? { haRealizada: totalAvanceGeneral(general) } : {})),
           },
         }),
       ),
@@ -990,25 +1002,69 @@ export async function anexarLotesGrupo(id: string, loteIds: string[]) {
   return true
 }
 
-// Actividad general (sin lotes): fija unidad + medida (haRealizada) + nota, y deja las
-// filas abiertas en PARCIAL (igual que la observación actual).
-export async function registrarMedidaGeneralGrupo(id: string, unidad: string, cantidad: number, nota: string | null) {
-  const g = await filasHermanas(id)
-  if (!g) return null
+// ---- Bitácora día a día de actividades SIN potreros (avance general) ----
+
+// Escribe la bitácora consolidada en las filas abiertas del grupo y mantiene la medida
+// total (haRealizada) sincronizada con la suma de los días. Las tres operaciones
+// (registrar/editar/eliminar) comparten este cierre. Solo REGISTRAR mueve el estado a
+// PARCIAL; editar o borrar una entrada no cambia el estado (igual que el avance por lote).
+async function guardarAvanceGeneralGrupo(
+  filas: { id: string; estado: string }[],
+  lista: AvanceGeneralEntrada[],
+  opciones: { unidad?: string | null; marcarParcial?: boolean } = {},
+) {
   await prisma.$transaction(
-    g.filas
+    filas
       .filter((f) => f.estado === 'PENDIENTE' || f.estado === 'PARCIAL')
       .map((f) =>
         prisma.actividad.update({
           where: { id: f.id },
-          data: { unidadRealizada: unidad, haRealizada: cantidad, nota, estado: 'PARCIAL' },
+          data: {
+            avanceGeneral: lista as unknown as Prisma.InputJsonValue,
+            haRealizada: lista.length ? totalAvanceGeneral(lista) : null,
+            ...(opciones.marcarParcial ? { estado: 'PARCIAL' } : {}),
+            ...(opciones.unidad ? { unidadRealizada: opciones.unidad } : {}),
+          },
         }),
       ),
   )
+}
+
+// Registra el avance de UN día en una actividad sin potreros. La actividad queda PARCIAL:
+// el cierre (Cumplida / No se hizo) sigue siendo manual al final de la semana.
+export async function registrarAvanceGeneralGrupo(
+  id: string,
+  entrada: AvanceGeneralEntrada,
+  unidad?: string | null,
+) {
+  const g = await filasHermanas(id)
+  if (!g) return null
+  const lista = agregarAvanceGeneral(normalizarAvanceGeneral(g.base.avanceGeneral), entrada)
+  await guardarAvanceGeneralGrupo(g.filas, lista, { unidad, marcarParcial: true })
   return true
 }
 
-type Reemplazo = { descripcion: string; unidad?: string | null; maquinaId?: string | null; loteIds?: string[]; medida?: Record<string, number>; bultos?: Record<string, number>; dia?: number | null }
+export async function editarAvanceGeneralGrupo(
+  id: string,
+  index: number,
+  cambios: { dia?: number; cantidad?: number; observacion?: string | null },
+) {
+  const g = await filasHermanas(id)
+  if (!g) return null
+  const lista = editarAvanceGeneral(normalizarAvanceGeneral(g.base.avanceGeneral), index, cambios)
+  await guardarAvanceGeneralGrupo(g.filas, lista)
+  return true
+}
+
+export async function eliminarAvanceGeneralGrupo(id: string, index: number) {
+  const g = await filasHermanas(id)
+  if (!g) return null
+  const lista = eliminarAvanceGeneral(normalizarAvanceGeneral(g.base.avanceGeneral), index)
+  await guardarAvanceGeneralGrupo(g.filas, lista)
+  return true
+}
+
+type Reemplazo ={ descripcion: string; unidad?: string | null; maquinaId?: string | null; loteIds?: string[]; medida?: Record<string, number>; bultos?: Record<string, number>; dia?: number | null }
 
 // Crea UNA actividad de reemplazo ("En reemplazo de: <base.descripcion>", CUMPLIDA) dentro de
 // una transacción. Reutilizado por registrarNovedadGrupo (al cerrar por cambio) y por
@@ -1116,6 +1172,7 @@ export async function reabrirGrupo(id: string) {
           nota: null,
           lotesHechos: Prisma.DbNull,
           avancePorLote: Prisma.DbNull,
+          avanceGeneral: Prisma.DbNull,
           cerrada: false,
         },
       }),

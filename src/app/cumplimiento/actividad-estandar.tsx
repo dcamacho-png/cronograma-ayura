@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import type { Estado } from '@/dominio/tipos'
 import { FormCerrar } from './form-cerrar'
 import { FormAvance } from './form-avance'
@@ -9,12 +8,9 @@ type Motivo = { id: string; nombre: string }
 type Lote = { id: string; nombre: string; hectareas?: number | null; finca: { nombre: string } }
 type Estipulada = { id: string; nombre: string; unidad: string }
 
-const UNIDADES = ['Ha', 'Hora', 'Kg', 'Cantidad', 'Bultos', 'Jornales'] // + "Otro" (texto libre)
-const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
-
 // Control de cumplimiento de UNA actividad estándar (no maquinaria), PENDIENTE o PARCIAL.
-// Unidad elegible (una por actividad); con potreros: Finca→Lote→cantidad (anexa lote nuevo);
-// sin potreros: unidad + cantidad + observación. Cierre manual (Cumplida); novedad aparte.
+// El avance se registra día a día con `FormAvance`: con potreros, una medida por potrero;
+// sin potreros, una medida del día (bitácora general). Cierre manual (Cumplida); novedad aparte.
 export function ActividadEstandar({
   actividadId,
   estado,
@@ -28,14 +24,13 @@ export function ActividadEstandar({
   estipuladas,
   motivos,
   motivoCambioId,
-  nota,
   responsables,
   responsableActividadId,
   fincaActividad,
   bultosAsignados,
   descripcion,
   registrarAvance,
-  registrarMedidaGeneral,
+  registrarAvanceGeneral,
   marcarCumplida,
   cerrarParcial,
   noSeHizo,
@@ -55,14 +50,13 @@ export function ActividadEstandar({
   estipuladas: Estipulada[]
   motivos: Motivo[]
   motivoCambioId: string | null
-  nota: string | null
   responsables: { id: string; nombre: string }[]
   responsableActividadId: string
   fincaActividad: string
   bultosAsignados?: Record<string, number> | null
   descripcion?: string
   registrarAvance: (f: FormData) => void | Promise<void>
-  registrarMedidaGeneral: (f: FormData) => void | Promise<void>
+  registrarAvanceGeneral: (f: FormData) => void | Promise<void>
   marcarCumplida: (f: FormData) => void | Promise<void>
   cerrarParcial: (f: FormData) => void | Promise<void>
   noSeHizo: (f: FormData) => void | Promise<void>
@@ -71,89 +65,43 @@ export function ActividadEstandar({
   editarPotreros: (f: FormData) => void | Promise<void>
 }) {
   const esParcial = estado === 'PARCIAL'
-  // Unidad por defecto: la registrada si existe; si no, la del catálogo; si no, genérica.
-  const fuenteUnidad = ((unidadRealizada ?? '').trim() || (unidadCatalogo ?? '').trim())
-  const conocida = UNIDADES.find((u) => u.toLowerCase() === fuenteUnidad.toLowerCase())
-  const [unidadSel, setUnidadSel] = useState(conocida ?? (fuenteUnidad ? 'Otro' : 'Cantidad'))
-
-  // Selector de unidad reutilizable (se envía con cada registro).
-  const selectorUnidad = (
-    <label className="flex flex-col text-xs">
-      Unidad
-      <select
-        name="unidad"
-        value={unidadSel === 'Otro' ? 'otro' : unidadSel.toLowerCase()}
-        onChange={(e) => setUnidadSel(e.target.value === 'otro' ? 'Otro' : e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1))}
-        className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
-      >
-        {UNIDADES.map((u) => (
-          <option key={u} value={u.toLowerCase()}>{u}</option>
-        ))}
-        <option value="otro">Otro…</option>
-      </select>
-    </label>
-  )
-  const inputUnidadOtra = unidadSel === 'Otro' && (
-    <label className="flex flex-col text-xs">
-      Unidad (texto)
-      <input name="unidadOtra" defaultValue={conocida ? '' : fuenteUnidad} placeholder="ej. bultos" className="w-28 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
-    </label>
-  )
 
   return (
     <div className="flex w-full flex-col gap-3 text-sm">
-      {tieneLotes ? (
-        <>
-          {lotesActividad.length > 0 && (
-            <div className="flex flex-wrap gap-2 text-xs">
-              {lotesActividad.map((l) => (
-                <span key={l.id} className="flex items-center gap-1 rounded-lg border border-borde bg-arena px-2 py-0.5">
-                  {l.nombre}
-                  <form action={editarPotreros} className="inline">
-                    <input type="hidden" name="id" value={actividadId} />
-                    {lotesActividad.filter((x) => x.id !== l.id).map((x) => (
-                      <input key={x.id} type="hidden" name="loteId" value={x.id} />
-                    ))}
-                    <button className="text-tierra hover:text-rose-700" title="quitar potrero">×</button>
-                  </form>
-                </span>
-              ))}
-            </div>
-          )}
-          <FormAvance
-            actividadId={actividadId}
-            diaActividad={dia}
-            esMaquinaria={false}
-            responsables={responsables}
-            responsableDefault={responsableActividadId}
-            maquinas={[]}
-            lotesActividad={lotesActividad}
-            lotesCatalogo={lotesCatalogo}
-            fincaDefault={fincaActividad}
-            bultosAsignados={bultosAsignados}
-            descripcion={descripcion}
-            unidadActual={unidadRealizada}
-            unidadCatalogo={unidadCatalogo}
-            lotesPendientesIds={lotesPendientesIds}
-            accion={registrarAvance}
-          />
-        </>
-      ) : (
-        <form action={registrarMedidaGeneral} className="flex flex-wrap items-end gap-2">
-          <input type="hidden" name="id" value={actividadId} />
-          {selectorUnidad}
-          {inputUnidadOtra}
-          <label className="flex flex-col text-xs">
-            Cantidad
-            <input name="cantidad" type="number" step="any" min="0" className="w-24 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
-          </label>
-          <label className="flex flex-1 flex-col text-xs">
-            Observación
-            <input name="nota" defaultValue={nota ?? ''} placeholder="¿qué se avanzó?" className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
-          </label>
-          <button className="rounded-lg border border-bosque px-3 py-1 text-xs font-semibold text-bosque hover:bg-arena/40">Guardar</button>
-        </form>
+      {tieneLotes && lotesActividad.length > 0 && (
+        <div className="flex flex-wrap gap-2 text-xs">
+          {lotesActividad.map((l) => (
+            <span key={l.id} className="flex items-center gap-1 rounded-lg border border-borde bg-arena px-2 py-0.5">
+              {l.nombre}
+              <form action={editarPotreros} className="inline">
+                <input type="hidden" name="id" value={actividadId} />
+                {lotesActividad.filter((x) => x.id !== l.id).map((x) => (
+                  <input key={x.id} type="hidden" name="loteId" value={x.id} />
+                ))}
+                <button className="text-tierra hover:text-rose-700" title="quitar potrero">×</button>
+              </form>
+            </span>
+          ))}
+        </div>
       )}
+      <FormAvance
+        actividadId={actividadId}
+        diaActividad={dia}
+        esMaquinaria={false}
+        responsables={responsables}
+        responsableDefault={responsableActividadId}
+        maquinas={[]}
+        lotesActividad={lotesActividad}
+        lotesCatalogo={lotesCatalogo}
+        fincaDefault={fincaActividad}
+        bultosAsignados={bultosAsignados}
+        descripcion={descripcion}
+        unidadActual={unidadRealizada}
+        unidadCatalogo={unidadCatalogo}
+        lotesPendientesIds={lotesPendientesIds}
+        accion={registrarAvance}
+        accionGeneral={registrarAvanceGeneral}
+      />
 
       <div className="flex flex-col gap-2">
         <FormCerrar

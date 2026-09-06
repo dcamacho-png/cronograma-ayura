@@ -146,6 +146,8 @@ model Actividad {
   bultosPorLote Json?
   lotesHechos  Json?
   avancePorLote Json?
+  // Bitácora día a día de las actividades SIN potreros (lista de entradas por día).
+  avanceGeneral Json?
   novedades    Json?
   lotes        Lote[]
 

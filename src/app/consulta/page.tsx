@@ -8,6 +8,7 @@ import { agruparPorActividad, estadoActividad } from '@/dominio/metricas'
 import { COLUMNAS_CUMPLIMIENTO, filasCumplimientoGrupo, type ActividadExport } from '@/dominio/cumplimiento-export'
 import type { Estado } from '@/dominio/tipos'
 import type { AvanceEntrada } from '@/dominio/avance-lote'
+import type { AvanceGeneralEntrada } from '@/dominio/avance-general'
 import type { BultosPorLote } from '@/dominio/bultos'
 import { FiltrosConsulta } from './filtros-consulta'
 
@@ -57,6 +58,7 @@ export default async function ConsultaPage({
     bultosPorLote: a.bultosPorLote as BultosPorLote | null,
     lotesHechos: a.lotesHechos as string[] | null,
     avancePorLote: a.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null,
+    avanceGeneral: a.avanceGeneral as AvanceGeneralEntrada[] | null,
     detalle: a.tarea?.detalle ?? null,
   })
 

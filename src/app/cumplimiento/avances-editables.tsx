@@ -2,10 +2,13 @@
 
 import { useState } from 'react'
 
-type Entrada = { loteId: string; loteNombre: string; index: number; dia: number; cantidad: number; observacion: string }
+// `loteId`/`etiqueta` faltan en las actividades SIN potreros (bitácora general): ahí la
+// entrada se ubica solo por su índice y se muestra sin nombre de lote.
+type Entrada = { loteId?: string; etiqueta?: string; index: number; dia: number; cantidad: number; observacion: string }
 
 // Lista de avances registrados con editar (✏️, mini-form en línea: día + cantidad + observación)
-// y borrar (×). Cada avance se ubica por loteId + index. Solo se usa en actividades abiertas.
+// y borrar (×). Cada avance se ubica por loteId + index (o solo por index si no hay potrero).
+// Solo se usa en actividades abiertas.
 export function AvancesEditables({
   actividadId,
   entradas,
@@ -30,12 +33,12 @@ export function AvancesEditables({
     <div className="flex flex-col gap-1 text-sm">
       <span className="text-tierra">Avances:</span>
       {entradas.map((e) => {
-        const clave = `${e.loteId}:${e.index}`
+        const clave = `${e.loteId ?? 'g'}:${e.index}`
         if (editando === clave) {
           return (
             <form key={clave} action={editar} onSubmit={() => setEditando(null)} className="flex flex-wrap items-end gap-2">
               <input type="hidden" name="id" value={actividadId} />
-              <input type="hidden" name="loteId" value={e.loteId} />
+              {e.loteId && <input type="hidden" name="loteId" value={e.loteId} />}
               <input type="hidden" name="index" value={e.index} />
               <label className="flex flex-col text-xs">
                 Día
@@ -58,11 +61,11 @@ export function AvancesEditables({
         }
         return (
           <div key={clave} className="flex flex-wrap items-center gap-2">
-            <span>{etiquetaPorDia[e.dia]} · {e.loteNombre} — {e.cantidad} {unidad}{e.observacion ? ` · ${e.observacion}` : ''}</span>
+            <span>{etiquetaPorDia[e.dia]}{e.etiqueta ? ` · ${e.etiqueta}` : ''} — {e.cantidad} {unidad}{e.observacion ? ` · ${e.observacion}` : ''}</span>
             <button type="button" onClick={() => setEditando(clave)} className="text-xs text-tierra hover:text-tinta" title="editar">✏️</button>
             <form action={eliminar} className="inline">
               <input type="hidden" name="id" value={actividadId} />
-              <input type="hidden" name="loteId" value={e.loteId} />
+              {e.loteId && <input type="hidden" name="loteId" value={e.loteId} />}
               <input type="hidden" name="index" value={e.index} />
               <button className="text-xs text-tierra hover:text-rose-700" title="borrar">×</button>
             </form>

@@ -2,6 +2,7 @@ import { normalizarUnidad, unidadAbreviada, type Unidad } from './unidad'
 import { textoBultosPorLote, type BultosPorLote } from './bultos'
 import { textoLotesHechos } from './lotes-hechos'
 import { normalizarAvancePorLote, type AvanceEntrada } from './avance-lote'
+import { normalizarAvanceGeneral, type AvanceGeneralEntrada } from './avance-general'
 import { estadoActividad } from './metricas'
 import type { Estado } from './tipos'
 
@@ -31,6 +32,7 @@ export type ActividadExport = {
   centroCosto: string | null
   lotesHechos: string[] | null
   avancePorLote: Record<string, AvanceEntrada | AvanceEntrada[]> | null
+  avanceGeneral: AvanceGeneralEntrada[] | null
   finca: { nombre: string } | null
   nota: string | null
   unidadRealizada?: string | null
@@ -95,6 +97,30 @@ export function filasCumplimiento(
     })
   }
   if (filas.length > 0) return filas
+
+  // Actividad SIN potreros (taller, movimientos, coordinación…): el día a día vive en la
+  // bitácora general. Una fila por día registrado, igual que con los avances por lote.
+  const general = normalizarAvanceGeneral(a.avanceGeneral)
+  if (general.length > 0) {
+    return general.map((e) => [
+      DIAS[e.dia] ?? '',
+      ctx.fechaDeDia(e.dia),
+      (ctx.nombreResponsable?.(e.responsableId ?? null)) || a.responsable.nombre,
+      a.descripcion,
+      ctx.nombreMaquina(e.maquinaId ?? null) || (a.maquina?.nombre ?? ''),
+      '',
+      a.finca?.nombre ?? '',
+      estado,
+      e.cantidad,
+      unidadDisplay,
+      '',
+      e.centroCosto ?? centro,
+      '',
+      ejecutadaPor,
+      e.observacion ?? a.nota ?? '',
+      detalle,
+    ])
+  }
 
   // Una actividad PARCIAL sin avances (p. ej. la actividad inicial que se cambió) no
   // aporta día a día real: no se emite fila. Solo las CUMPLIDAS (incluidas las de

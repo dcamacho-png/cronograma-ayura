@@ -21,6 +21,7 @@ function act(p: Partial<ActividadExport>): ActividadExport {
     centroCosto: null,
     lotesHechos: null,
     avancePorLote: null,
+    avanceGeneral: null,
     finca: null,
     nota: null,
     unidadRealizada: null,
@@ -259,7 +260,7 @@ describe('filasCumplimiento — Detalle (banco)', () => {
     const base = {
       dia: 1, descripcion: 'Fertilización', estado: 'CUMPLIDA', haRealizada: 5,
       responsable: { nombre: 'Ana' }, maquina: null, lotes: [{ id: 'l1', nombre: 'L1' }],
-      bultosPorLote: null, centroCosto: null, lotesHechos: null, avancePorLote: null,
+      bultosPorLote: null, centroCosto: null, lotesHechos: null, avancePorLote: null, avanceGeneral: null,
       finca: null, nota: 'obs', unidadRealizada: null, detalle: null,
     }
     const ctx2 = { fechaDeDia: () => '01/07', nombreMaquina: () => '' }
@@ -267,5 +268,46 @@ describe('filasCumplimiento — Detalle (banco)', () => {
     expect(conDetalle[0][conDetalle[0].length - 1]).toBe('aplicar urea')
     const sinDetalle = filasCumplimiento(base, '01/07', {}, ctx2)
     expect(sinDetalle[0][sinDetalle[0].length - 1]).toBe('')
+  })
+})
+
+describe('filasCumplimiento — avance general (actividad SIN potreros)', () => {
+  const sinLotes = (p: Partial<ActividadExport> = {}) =>
+    act({ descripcion: 'ESTERCOLERO', lotes: [], unidadRealizada: 'hora', haRealizada: 6, ...p })
+
+  it('emite UNA FILA POR DÍA con su medida, máquina, centro de costo y observación', () => {
+    const a = sinLotes({
+      estado: 'CUMPLIDA',
+      avanceGeneral: [
+        { dia: 1, cantidad: 4, maquinaId: 'm1', centroCosto: 'Ceba', responsableId: 'r1', observacion: 'cambio de aceite' },
+        { dia: 3, cantidad: 2, maquinaId: null, centroCosto: null, responsableId: null, observacion: null },
+      ],
+    })
+    expect(filasCumplimiento(a, '15 jun', mapa, ctx)).toEqual([
+      ['Lun', 'D1', 'RESP-r1', 'ESTERCOLERO', 'MAQ-m1', '', '', 'Cumplida', 4, 'hora', '', 'Ceba', '', '', 'cambio de aceite', ''],
+      ['Mié', 'D3', 'Ana', 'ESTERCOLERO', '6603', '', '', 'Cumplida', 2, 'hora', '', '', '', '', '', ''],
+    ])
+  })
+
+  it('una actividad PARCIAL con avance general SÍ se exporta (es el día a día de la semana)', () => {
+    const a = sinLotes({ estado: 'PARCIAL', avanceGeneral: [{ dia: 2, cantidad: 5 }] })
+    expect(filasCumplimiento(a, '15 jun', mapa, ctx)).toEqual([
+      ['Mar', 'D2', 'Ana', 'ESTERCOLERO', '6603', '', '', 'Parcial', 5, 'hora', '', '', '', '', '', ''],
+    ])
+  })
+
+  it('sin avance general se conserva la fila-resumen de siempre', () => {
+    expect(filasCumplimiento(sinLotes({ estado: 'CUMPLIDA', avanceGeneral: [] }), '15 jun', mapa, ctx)).toEqual([
+      ['Lun', '15 jun', 'Ana', 'ESTERCOLERO', '6603', '', '', 'Cumplida', 6, 'hora', '', '', '', '', '', ''],
+    ])
+  })
+
+  it('si hay potreros con avance, el avance general no se usa (no duplica filas)', () => {
+    const a = act({
+      estado: 'CUMPLIDA',
+      avancePorLote: { l1: [{ dia: 1, maquinaId: null, cantidad: 2 }] },
+      avanceGeneral: [{ dia: 4, cantidad: 9 }],
+    })
+    expect(filasCumplimiento(a, '15 jun', mapa, ctx)).toHaveLength(1)
   })
 })

@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { reprogramarActividad, crearActividadRealizada, devolverAlBanco, semanaDeActividad, registrarAvanceLoteGrupo, registrarAvanceObservacionGrupo, marcarCumplidaGrupo, registrarNovedadGrupo, reabrirGrupo, setLotesGrupo, setUnidadRealizadaGrupo, anexarLotesGrupo, registrarMedidaGeneralGrupo, editarAvanceEntradaGrupo, eliminarAvanceEntradaGrupo, agregarNovedadGrupo, eliminarNovedadGrupo, cerrarParcialGrupo, reabrirCierreGrupo, editarNovedadGrupo } from '@/datos/repositorio'
+import { reprogramarActividad, crearActividadRealizada, devolverAlBanco, semanaDeActividad, registrarAvanceLoteGrupo, registrarAvanceObservacionGrupo, marcarCumplidaGrupo, registrarNovedadGrupo, reabrirGrupo, setLotesGrupo, setUnidadRealizadaGrupo, anexarLotesGrupo, editarAvanceEntradaGrupo, eliminarAvanceEntradaGrupo, agregarNovedadGrupo, eliminarNovedadGrupo, cerrarParcialGrupo, reabrirCierreGrupo, editarNovedadGrupo, registrarAvanceGeneralGrupo, editarAvanceGeneralGrupo, eliminarAvanceGeneralGrupo } from '@/datos/repositorio'
 import { siguienteSemana, plazoCumplimientoVencido, semanaActual } from '@/dominio/semana'
 import { usuarioActual } from '@/auth/sesion'
 import { puedeMutarArea } from '@/auth/permisos'
@@ -200,6 +200,49 @@ export async function registrarAvanceAccion(form: FormData) {
   revalidatePath('/cumplimiento')
 }
 
+// Avance de UN día en una actividad SIN potreros (taller, movimientos, coordinación…):
+// mismo formulario que el avance por potrero, pero la medida es una sola cantidad del día.
+export async function registrarAvanceGeneralAccion(form: FormData) {
+  const id = texto(form, 'id')
+  const dia = Number(texto(form, 'dia'))
+  if (!id || !(dia >= 1 && dia <= 7)) return
+  if (await bloqueadaActividad(id)) return
+  const centroSelect = texto(form, 'centroCosto')
+  const centroCosto = centroSelect === '__otra__' ? textoOpcional(form, 'centroCostoOtra') : (centroSelect || null)
+  await registrarAvanceGeneralGrupo(id, {
+    dia,
+    cantidad: numeroOpcional(form, 'cantidad') ?? 0,
+    maquinaId: textoOpcional(form, 'maquinaId'),
+    centroCosto,
+    responsableId: textoOpcional(form, 'responsableId'),
+    observacion: textoOpcional(form, 'observacion'),
+  }, unidadElegida(form))
+  revalidatePath('/cumplimiento')
+}
+
+export async function editarAvanceGeneralAccion(form: FormData) {
+  const id = texto(form, 'id')
+  const index = Number(texto(form, 'index'))
+  if (!id || !Number.isInteger(index) || index < 0) return
+  if (await bloqueadaActividad(id)) return
+  const dia = Number(texto(form, 'dia'))
+  await editarAvanceGeneralGrupo(id, index, {
+    cantidad: numeroOpcional(form, 'cantidad') ?? 0,
+    ...(dia >= 1 && dia <= 7 ? { dia } : {}),
+    observacion: textoOpcional(form, 'observacion'),
+  })
+  revalidatePath('/cumplimiento')
+}
+
+export async function eliminarAvanceGeneralAccion(form: FormData) {
+  const id = texto(form, 'id')
+  const index = Number(texto(form, 'index'))
+  if (!id || !Number.isInteger(index) || index < 0) return
+  if (await bloqueadaActividad(id)) return
+  await eliminarAvanceGeneralGrupo(id, index)
+  revalidatePath('/cumplimiento')
+}
+
 export async function editarAvanceAccion(form: FormData) {
   const id = texto(form, 'id')
   const loteId = texto(form, 'loteId')
@@ -248,16 +291,6 @@ export async function eliminarNovedadAccion(form: FormData) {
   if (!id || !Number.isInteger(index) || index < 0) return
   if (await bloqueadaActividad(id)) return
   await eliminarNovedadGrupo(id, index)
-  revalidatePath('/cumplimiento')
-}
-
-export async function registrarMedidaGeneralAccion(form: FormData) {
-  const id = texto(form, 'id')
-  if (!id) return
-  if (await bloqueadaActividad(id)) return
-  const cantidad = numeroOpcional(form, 'cantidad') ?? 0
-  const nota = textoOpcional(form, 'nota')
-  await registrarMedidaGeneralGrupo(id, unidadElegida(form), cantidad, nota)
   revalidatePath('/cumplimiento')
 }
 

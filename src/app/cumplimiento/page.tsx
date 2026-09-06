@@ -10,13 +10,15 @@ import { textoLotesHechos } from '@/dominio/lotes-hechos'
 import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, conteoEstadoActividades, tieneDiaPendiente, estadoActividad, etiquetaEstado, ordenEstadoCumplimiento } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
 import { textoAvanceConFecha, normalizarAvancePorLote, totalAvanceLotes, lotesPendientes, type AvanceEntrada } from '@/dominio/avance-lote'
+import { normalizarAvanceGeneral, totalAvanceGeneral, textoAvanceGeneral } from '@/dominio/avance-general'
 import { normalizarNovedades } from '@/dominio/novedades'
-import { agregarActividadRealizadaAccion, devolverAlBancoAccion, registrarMedidaGeneralAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion, setLotesActividadAccion, registrarAvanceAccion, cerrarParcialAccion, reabrirCierreAccion, editarAvanceAccion, eliminarAvanceAccion, agregarNovedadAccion, editarNovedadAccion, eliminarNovedadAccion } from './acciones'
+import { agregarActividadRealizadaAccion, devolverAlBancoAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion, setLotesActividadAccion, registrarAvanceAccion, cerrarParcialAccion, reabrirCierreAccion, editarAvanceAccion, eliminarAvanceAccion, agregarNovedadAccion, editarNovedadAccion, eliminarNovedadAccion, registrarAvanceGeneralAccion, editarAvanceGeneralAccion, eliminarAvanceGeneralAccion } from './acciones'
 import { FormActividadRealizada } from './form-actividad-realizada'
 import { InfoLotes } from '../_componentes/info-lotes'
 import { ActividadEstandar } from './actividad-estandar'
 import { ActividadMaquinaria } from './actividad-maquinaria'
 import { AvancesEditables } from './avances-editables'
+import { BotonDesmarcar } from './boton-desmarcar'
 import { NovedadesLista } from './novedades-lista'
 
 const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
@@ -224,27 +226,44 @@ export default async function CumplimientoPage({
                   const avances = normalizarAvancePorLote(
                     cab.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null,
                   )
-                  const tieneAvances = Object.values(avances).some((es) => es.length > 0)
+                  const avancesGenerales = normalizarAvanceGeneral(cab.avanceGeneral)
+                  const hayAvancesLote = Object.values(avances).some((es) => es.length > 0)
+                  // Sin avances por potrero, manda la bitácora general (mismo criterio que el
+                  // Excel). Así una actividad que empezó sin potreros no pierde su día a día
+                  // si después se le agregan potreros.
+                  const usarGeneral = !hayAvancesLote && avancesGenerales.length > 0
+                  const tieneAvances = hayAvancesLote || avancesGenerales.length > 0
                   const etiquetaDia = (d: number) =>
                     `${DIAS[d] ?? ''} ${fechas[d - 1] ? fmtFecha(fechas[d - 1]) : ''}`.trim()
                   const tieneLotes = cab.lotes.length > 0
                   const unidadStd = cab.unidadRealizada ?? unidadAbreviada(unidad)
-                  const resumenAvances = textoAvanceConFecha(cab.lotes, avances, unidadStd, etiquetaDia)
+                  const resumenAvances = usarGeneral
+                    ? textoAvanceGeneral(avancesGenerales, unidadStd, etiquetaDia)
+                    : textoAvanceConFecha(cab.lotes, avances, unidadStd, etiquetaDia)
                   const interactivo = !cab.cerrada && (estadoGrupo === 'PENDIENTE' || estadoGrupo === 'PARCIAL')
                   const potrerosPendientes = lotesPendientes(cab.lotes, avances, cab.lotesHechos as string[] | null)
                   const idsPendientes = potrerosPendientes.map((l) => l.id)
                   const hayPotrerosPendientes = cab.lotes.length > 0 && potrerosPendientes.length > 0
                   const etiquetaPorDia = [0, 1, 2, 3, 4, 5, 6, 7].map((d) => (d === 0 ? '' : etiquetaDia(d)))
-                  const entradasAvance = cab.lotes.flatMap((l) =>
-                    (avances[l.id] ?? []).map((e, index) => ({
-                      loteId: l.id,
-                      loteNombre: l.nombre,
-                      index,
-                      dia: e.dia,
-                      cantidad: e.cantidad,
-                      observacion: e.observacion ?? '',
-                    })),
-                  )
+                  // Las actividades con potreros se editan por (lote, índice); las que no tienen
+                  // potrero, por el índice de su bitácora día a día.
+                  const entradasAvance = !usarGeneral
+                    ? cab.lotes.flatMap((l) =>
+                        (avances[l.id] ?? []).map((e, index) => ({
+                          loteId: l.id,
+                          etiqueta: l.nombre,
+                          index,
+                          dia: e.dia,
+                          cantidad: e.cantidad,
+                          observacion: e.observacion ?? '',
+                        })),
+                      )
+                    : avancesGenerales.map((e, index) => ({
+                        index,
+                        dia: e.dia,
+                        cantidad: e.cantidad,
+                        observacion: e.observacion ?? '',
+                      }))
                   const mapaMotivos = new Map(motivos.map((m) => [m.id, m.nombre]))
                   const entradasNovedad = normalizarNovedades(cab.novedades).map((n, index) => ({
                     index,
@@ -260,7 +279,7 @@ export default async function CumplimientoPage({
                         <div className="flex flex-wrap items-center gap-2 text-sm">
                           <span className="font-semibold">{etiquetaEstado(estadoGrupo)}</span>
                           {(tieneAvances || cab.haRealizada != null) && (
-                            <span className="text-tierra">· {tieneAvances ? totalAvanceLotes(cab.lotes, avances) : cab.haRealizada} {unidadStd}</span>
+                            <span className="text-tierra">· {tieneAvances ? (usarGeneral ? totalAvanceGeneral(avancesGenerales) : totalAvanceLotes(cab.lotes, avances)) : cab.haRealizada} {unidadStd}</span>
                           )}
                           {cab.motivo && <span className="text-tierra">· {cab.motivo.nombre}</span>}
                           {cab.nota && <span className="text-tierra">· {cab.nota}</span>}
@@ -281,10 +300,11 @@ export default async function CumplimientoPage({
                               </form>
                             )}
                             {estadoGrupo !== 'PARCIAL' && !bloqueado && (
-                              <form action={desmarcarActividadAccion}>
-                                <input type="hidden" name="id" value={cab.id} />
-                                <button className="text-xs text-tierra underline hover:text-tinta">↩ desmarcar</button>
-                              </form>
+                              <BotonDesmarcar
+                                actividadId={cab.id}
+                                avances={entradasAvance.length}
+                                accion={desmarcarActividadAccion}
+                              />
                             )}
                           </div>
                         </div>
@@ -296,8 +316,8 @@ export default async function CumplimientoPage({
                           unidad={unidadStd}
                           etiquetaPorDia={etiquetaPorDia}
                           diaLabels={DIAS}
-                          editar={editarAvanceAccion}
-                          eliminar={eliminarAvanceAccion}
+                          editar={usarGeneral ? editarAvanceGeneralAccion : editarAvanceAccion}
+                          eliminar={usarGeneral ? eliminarAvanceGeneralAccion : eliminarAvanceAccion}
                         />
                       ) : (
                         resumenAvances && <span className="text-sm text-tierra">Avances: {resumenAvances}</span>
@@ -347,6 +367,7 @@ export default async function CumplimientoPage({
                             descripcion={cab.descripcion}
                             nota={cab.nota}
                             registrarAvance={registrarAvanceAccion}
+                            registrarAvanceGeneral={registrarAvanceGeneralAccion}
                             marcarCumplida={marcarCumplidaActividadAccion}
                             cerrarParcial={cerrarParcialAccion}
                             noSeHizo={registrarNovedadActividadAccion}
@@ -367,14 +388,13 @@ export default async function CumplimientoPage({
                             estipuladas={estipuladasMaq}
                             motivos={motivos}
                             motivoCambioId={motivoCambioId}
-                            nota={cab.nota}
                             responsables={responsables}
                             responsableActividadId={cab.responsableId}
                             fincaActividad={cab.finca?.nombre ?? ''}
                             bultosAsignados={cab.bultosPorLote as Record<string, number> | null}
                             descripcion={cab.descripcion}
                             registrarAvance={registrarAvanceAccion}
-                            registrarMedidaGeneral={registrarMedidaGeneralAccion}
+                            registrarAvanceGeneral={registrarAvanceGeneralAccion}
                             marcarCumplida={marcarCumplidaActividadAccion}
                             cerrarParcial={cerrarParcialAccion}
                             noSeHizo={registrarNovedadActividadAccion}

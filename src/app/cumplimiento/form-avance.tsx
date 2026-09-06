@@ -10,7 +10,10 @@ type Lote = { id: string; nombre: string; hectareas?: number | null; finca: { no
 
 // Un avance puede registrar varios potreros a la vez: día, responsable, unidad (por actividad),
 // observación, tabla por potrero (casilla + ha = medida + bultos en fertilización), anexar
-// potreros no asignados, y —en maquinaria— tractor + centro de costo. La medida es siempre ha.
+// potreros no asignados, y —en maquinaria— tractor + centro de costo.
+// Si la actividad NO tiene potreros (taller, movimientos, coordinación…), el mismo formulario
+// captura UNA cantidad del día y va a `accionGeneral` (bitácora día a día). Sin esa rama el
+// envío se perdía en silencio, porque la acción por potrero exige al menos una casilla.
 export function FormAvance({
   actividadId,
   diaActividad,
@@ -27,6 +30,7 @@ export function FormAvance({
   unidadCatalogo,
   lotesPendientesIds,
   accion,
+  accionGeneral,
 }: {
   actividadId: string
   diaActividad: number
@@ -43,6 +47,7 @@ export function FormAvance({
   unidadCatalogo?: string
   lotesPendientesIds?: string[]
   accion: (f: FormData) => void | Promise<void>
+  accionGeneral?: (f: FormData) => void | Promise<void>
 }) {
   const [abierto, setAbierto] = useState(false)
   const [centro, setCentro] = useState('')
@@ -59,6 +64,8 @@ export function FormAvance({
   const unidadLote = unidadSel === 'Otro' ? (unidadOtraTxt.trim() || 'medida') : unidadSel
   const conBultos = descripcion ? usaBultos(descripcion) : false
   const filasPotreros = [...lotesActividad, ...anexados]
+  // Sin potreros (ni anexados) la medida es una sola cantidad del día, no una por lote.
+  const sinPotreros = filasPotreros.length === 0
   // Un nuevo avance pre-marca solo los potreros PENDIENTES (los ya avanzados no, para no
   // volver a registrarlos otro día) y los recién anexados. Sin la lista, marca todos (compat).
   const anexadosIds = new Set(anexados.map((a) => a.id))
@@ -79,7 +86,7 @@ export function FormAvance({
     )
   }
   return (
-    <form action={accion} className="flex w-full flex-wrap items-end gap-2 rounded-lg border border-borde bg-arena/40 p-2 text-xs">
+    <form action={sinPotreros && accionGeneral ? accionGeneral : accion} className="flex w-full flex-wrap items-end gap-2 rounded-lg border border-borde bg-arena/40 p-2 text-xs">
       <input type="hidden" name="id" value={actividadId} />
       <label className="flex flex-col">Día
         <select name="dia" defaultValue={diaActividad} className="rounded-lg border border-borde bg-marfil p-1 focus:outline-none focus:ring-2 focus:ring-bosque/40">
@@ -130,7 +137,13 @@ export function FormAvance({
         </label>
       )}
       <div className="flex w-full flex-col gap-2 rounded-lg border border-borde bg-arena p-2">
-        <span className="font-semibold text-tinta">Potreros realizados</span>
+        <span className="font-semibold text-tinta">{sinPotreros ? 'Medida del día' : 'Potreros realizados'}</span>
+        {sinPotreros ? (
+          <label className="flex items-center gap-1">
+            {unidadLote}
+            <input name="cantidad" type="number" step="any" min="0" className="w-24 rounded-lg border border-borde bg-marfil p-0.5" />
+          </label>
+        ) : (
         <div className="flex flex-col gap-1">
           {filasPotreros.map((l) => (
             <div key={l.id} className="flex flex-wrap items-center gap-2">
@@ -149,6 +162,7 @@ export function FormAvance({
             </div>
           ))}
         </div>
+        )}
         <div className="flex flex-wrap items-end gap-2 border-t border-borde pt-2">
           <span className="w-full text-tierra">Anexar potrero(s):</span>
           <select value={fincaAnexActiva} onChange={(e) => { setFincaAnexar(e.target.value); setLoteAnexar('') }} disabled={!!fincaAncla} className="rounded-lg border border-borde bg-marfil p-1 disabled:opacity-70">

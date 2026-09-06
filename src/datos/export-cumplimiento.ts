@@ -2,6 +2,7 @@ import { filasCumplimientoGrupo, COLUMNAS_CUMPLIMIENTO, type ActividadExport } f
 import { agruparPorActividad, estadoActividad } from '@/dominio/metricas'
 import type { Estado } from '@/dominio/tipos'
 import type { AvanceEntrada } from '@/dominio/avance-lote'
+import type { AvanceGeneralEntrada } from '@/dominio/avance-general'
 import type { BultosPorLote } from '@/dominio/bultos'
 import { fechasDeSemana, mesDeSemana } from '@/dominio/semana'
 
@@ -25,6 +26,7 @@ export type ActExportRaw = {
   bultosPorLote: unknown
   lotesHechos: unknown
   avancePorLote: unknown
+  avanceGeneral: unknown
   tarea?: { detalle: string | null } | null
   area?: { nombre: string } | null
 }
@@ -42,6 +44,7 @@ function aExport(a: ActExportRaw): ActividadExport {
     bultosPorLote: a.bultosPorLote as BultosPorLote | null,
     lotesHechos: a.lotesHechos as string[] | null,
     avancePorLote: a.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null,
+    avanceGeneral: a.avanceGeneral as AvanceGeneralEntrada[] | null,
     detalle: a.tarea?.detalle ?? null,
   }
 }
