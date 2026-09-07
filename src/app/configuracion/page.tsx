@@ -7,7 +7,7 @@ import {
   listarMaquinas,
   listarResponsablesTodos,
   listarActividadesEstipuladas,
-  listarLotes,
+  listarLotesTodos,
   listarUsuarios,
 } from '@/datos/repositorio'
 import {
@@ -29,6 +29,8 @@ import {
   setUnidadActividadEstipuladaAccion,
   crearLoteAccion,
   eliminarLoteAccion,
+  retirarLoteAccion,
+  reactivarLoteAccion,
   crearUsuarioAccion,
   cambiarContrasenaAccion,
   eliminarUsuarioAccion,
@@ -64,7 +66,7 @@ export default async function ConfiguracionPage({
     listarMaquinas(),
     listarResponsablesTodos(),
     listarActividadesEstipuladas(),
-    listarLotes(),
+    listarLotesTodos(),
     listarUsuarios(),
   ])
 
@@ -137,9 +139,27 @@ export default async function ConfiguracionPage({
 
         {/* Lotes / Potreros */}
         <section className="tarjeta p-4 md:col-span-2">
-          <h3 className="mb-2 font-semibold text-tinta">Lotes / Potreros ({lotes.length})</h3>
-          <p className="mb-3 text-xs text-tierra">Al crear actividades eliges el lote y la finca queda automática.</p>
-          <LotesLista lotes={lotes} eliminar={eliminarLoteAccion} />
+          <h3 className="mb-2 font-semibold text-tinta">
+            Lotes / Potreros ({lotes.filter((l) => l.activo).length} activos)
+          </h3>
+          <p className="mb-3 text-xs text-tierra">
+            Al crear actividades eliges el lote y la finca queda automática. Un potrero
+            <b> retirado</b> deja de aparecer al programar y registrar, pero conserva su historial.
+          </p>
+          <LotesLista
+            lotes={lotes.map((l) => ({
+              id: l.id,
+              nombre: l.nombre,
+              hectareas: l.hectareas,
+              tipoPasto: l.tipoPasto,
+              activo: l.activo,
+              referencias: l._count.actividades + l._count.tareas + l._count.tareasMulti + l._count.notasConservatorio,
+              finca: { nombre: l.finca.nombre },
+            }))}
+            eliminar={eliminarLoteAccion}
+            retirar={retirarLoteAccion}
+            reactivar={reactivarLoteAccion}
+          />
           <form action={crearLoteAccion} className="flex flex-wrap items-end gap-2">
             <input name="nombre" required placeholder="Nombre del lote" className="flex-1 rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
             <select name="fincaId" required className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">

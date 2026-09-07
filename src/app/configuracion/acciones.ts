@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, setResponsableActivo, setResponsableFinca, crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, setUnidadActividadEstipulada, crearLote, eliminarLote, crearUsuario, cambiarContrasena, eliminarUsuario, BloqueoError, setPantallasUsuario, setVariantesArea } from '@/datos/repositorio'
+import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, setResponsableActivo, setResponsableFinca, crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, setUnidadActividadEstipulada, crearLote, eliminarLote, setLoteActivo, crearUsuario, cambiarContrasena, eliminarUsuario, BloqueoError, setPantallasUsuario, setVariantesArea } from '@/datos/repositorio'
 import { usuarioActual } from '@/auth/sesion'
 import { normalizarUnidad } from '@/dominio/unidad'
 
@@ -170,6 +170,18 @@ export async function eliminarLoteAccion(form: FormData) {
   const id = texto(form, 'id')
   if (!id) faltanDatos()
   await correr(() => eliminarLote(id), 'Lote eliminado.')
+}
+
+export async function retirarLoteAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (!id) faltanDatos()
+  await correr(() => setLoteActivo(id, false), 'Potrero retirado.')
+}
+
+export async function reactivarLoteAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (!id) faltanDatos()
+  await correr(() => setLoteActivo(id, true), 'Potrero reactivado.')
 }
 
 export async function crearUsuarioAccion(form: FormData) {
