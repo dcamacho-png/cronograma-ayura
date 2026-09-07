@@ -24,6 +24,7 @@ import {
   type AvanceGeneralEntrada,
 } from '@/dominio/avance-general'
 import { normalizarNovedades, agregarNovedad, eliminarNovedad, editarNovedad } from '@/dominio/novedades'
+import { puedeBorrarse, textoReferencias, type ReferenciasLote } from '@/dominio/lote-retiro'
 
 // Espejo en SQL de `trabajoRegistrado` (src/dominio/trabajo-registrado.ts): la actividad
 // que el área ejecutora ya trabajó. Se usa para sacar la solicitud de "Mis solicitudes"
@@ -662,19 +663,65 @@ export function eliminarUsuario(id: string) {
 
 // ---- Lotes / potreros ----
 
+// Catálogo de potreros para elegir al programar y registrar: solo los ACTIVOS.
+// Un solo filtro aquí cubre los selectores de /configuracion, /conservatorio,
+// /cumplimiento y /tareas, que son las cuatro pantallas que la consumen.
 export function listarLotes() {
   return prisma.lote.findMany({
+    where: { activo: true },
     include: { finca: true },
     orderBy: [{ finca: { nombre: 'asc' } }, { nombre: 'asc' }],
   })
+}
+
+// Activos y retirados, con el conteo de referencias de cada uno. Solo para
+// /configuracion, que es donde se administran. Los retirados van al final.
+export function listarLotesTodos() {
+  return prisma.lote.findMany({
+    include: {
+      finca: true,
+      _count: { select: { actividades: true, tareas: true, tareasMulti: true, notasConservatorio: true } },
+    },
+    orderBy: [{ activo: 'desc' }, { finca: { nombre: 'asc' } }, { nombre: 'asc' }],
+  })
+}
+
+export function setLoteActivo(id: string, activo: boolean) {
+  return prisma.lote.update({ where: { id }, data: { activo } })
 }
 
 export function crearLote(nombre: string, fincaId: string, hectareas: number | null, tipoPasto: string | null) {
   return prisma.lote.create({ data: { nombre, fincaId, hectareas, tipoPasto } })
 }
 
-export function eliminarLote(id: string) {
-  return prisma.lote.delete({ where: { id } })
+// Borra el potrero SOLO si nada lo referencia. `actividades` y `tareasMulti` son
+// muchos-a-muchos implícitas: sin esta guarda el borrado no falla, elimina las filas
+// intermedias y saca el potrero del historial en silencio. El conteo va DENTRO de la
+// transacción para que no se cuele una referencia entre la lectura y el borrado.
+export async function eliminarLote(id: string) {
+  return prisma.$transaction(async (tx) => {
+    const lote = await tx.lote.findUnique({
+      where: { id },
+      select: {
+        nombre: true,
+        _count: { select: { actividades: true, tareas: true, tareasMulti: true, notasConservatorio: true } },
+      },
+    })
+    if (!lote) throw new BloqueoError('Ese potrero ya no existe.')
+    const refs: ReferenciasLote = {
+      actividades: lote._count.actividades,
+      tareas: lote._count.tareas,
+      tareasMulti: lote._count.tareasMulti,
+      notas: lote._count.notasConservatorio,
+    }
+    if (!puedeBorrarse(refs)) {
+      throw new BloqueoError(
+        `No se puede eliminar "${lote.nombre}": tiene ${textoReferencias(refs)}. `
+        + 'Retíralo en su lugar: deja de aparecer al programar y conserva el historial.',
+      )
+    }
+    return tx.lote.delete({ where: { id } })
+  })
 }
 
 // Agrega un avance (incremental, por día) al historial de cada lote indicado.

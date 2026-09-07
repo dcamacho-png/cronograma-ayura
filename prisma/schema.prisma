@@ -197,6 +197,9 @@ model Lote {
   nombre      String      @unique
   hectareas   Float?
   tipoPasto   String?
+  // Un potrero retirado (activo=false) no se ofrece al programar ni al registrar,
+  // pero conserva su nombre y su medida en todo lo ya registrado.
+  activo      Boolean     @default(true)
   fincaId     String
   finca       Finca       @relation(fields: [fincaId], references: [id])
   actividades Actividad[]
