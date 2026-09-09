@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export function middleware(req: NextRequest) {
+// Portón de la app: sin cookie de sesión, todo va a /login. Se llamaba `middleware`
+// hasta Next 16, que renombró la convención a `proxy` (misma API, runtime nodejs).
+export function proxy(req: NextRequest) {
   // Los crons se autentican solo con CRON_SECRET (Bearer), sin cookie de sesión: deben
-  // saltarse la redirección a /login del middleware. Sin esto el cron recibe un 307 a
-  // /login y no hace nada — el error que ya pasó una vez con el respaldo a Drive.
+  // saltarse la redirección a /login: sin esto reciben un 307 y no hacen nada — el
+  // error que ya pasó una vez con el respaldo a Drive.
   const p = req.nextUrl.pathname
   if (p.startsWith('/api/backup-drive') || p.startsWith('/api/cerrar-vencidas')) {
     return NextResponse.next()
