@@ -2,9 +2,10 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { usuarioActual } from '@/auth/sesion'
 import { puedeVer, esSoloLectura } from '@/auth/permisos'
-import { listarAreas, listarMotivos, listarActividades, listarLotes, listarMaquinas, listarResponsablesPorArea, listarActividadesEstipuladas } from '@/datos/repositorio'
+import { listarAreas, listarMotivos, listarActividades, listarLotes, listarMaquinas, listarResponsablesPorArea, listarActividadesEstipuladas, listarVencidasSinRegistrar } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, plazoCumplimientoVencido, diaActual } from '@/dominio/semana'
 import { avisarPlazoPorVencer } from '@/dominio/aviso-plazo'
+import { vencidaPorAtender } from '@/dominio/sin-registrar'
 import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
 import { unidadDe, unidadAbreviada } from '@/dominio/unidad'
 import { textoLotesHechos } from '@/dominio/lotes-hechos'
@@ -13,7 +14,8 @@ import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
 import { textoAvanceConFecha, normalizarAvancePorLote, totalAvanceLotes, lotesPendientes, type AvanceEntrada } from '@/dominio/avance-lote'
 import { normalizarAvanceGeneral, totalAvanceGeneral, textoAvanceGeneral } from '@/dominio/avance-general'
 import { normalizarNovedades } from '@/dominio/novedades'
-import { agregarActividadRealizadaAccion, devolverAlBancoAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion, setLotesActividadAccion, registrarAvanceAccion, cerrarParcialAccion, reabrirCierreAccion, editarAvanceAccion, eliminarAvanceAccion, agregarNovedadAccion, editarNovedadAccion, eliminarNovedadAccion, registrarAvanceGeneralAccion, editarAvanceGeneralAccion, eliminarAvanceGeneralAccion } from './acciones'
+import { agregarActividadRealizadaAccion, devolverAlBancoAccion, marcarCumplidaActividadAccion, registrarNovedadActividadAccion, desmarcarActividadAccion, setLotesActividadAccion, registrarAvanceAccion, cerrarParcialAccion, reabrirCierreAccion, editarAvanceAccion, eliminarAvanceAccion, agregarNovedadAccion, editarNovedadAccion, eliminarNovedadAccion, registrarAvanceGeneralAccion, editarAvanceGeneralAccion, eliminarAvanceGeneralAccion, devolverVencidaAlBancoAccion } from './acciones'
+import { BandejaVencidas, type Vencida } from './bandeja-vencidas'
 import { FormActividadRealizada } from './form-actividad-realizada'
 import { InfoLotes } from '../_componentes/info-lotes'
 import { ActividadEstandar } from './actividad-estandar'
@@ -67,13 +69,14 @@ export default async function CumplimientoPage({
   // Una semana queda en solo lectura para las áreas una vez vencido el plazo (fin del domingo).
   const bloqueado = soloLectura || (!esAdmin && plazoCumplimientoVencido(anio, semana, hoy))
 
-  const [motivos, actividades, lotes, maquinas, responsablesTodos, estipuladas] = await Promise.all([
+  const [motivos, actividades, lotes, maquinas, responsablesTodos, estipuladas, vencidasCrudas] = await Promise.all([
     listarMotivos(),
     listarActividades(areaId, anio, semana),
     listarLotes(),
     listarMaquinas(),
     listarResponsablesPorArea(areaId),
     listarActividadesEstipuladas(),
+    listarVencidasSinRegistrar(areaId),
   ])
   const responsables = responsablesTodos.filter((r) => r.activo)
   const motivoCambioId = motivos.find((m) => m.nombre === 'Cambio de actividad')?.id ?? null
@@ -100,6 +103,19 @@ export default async function CumplimientoPage({
   const conteoEstado = conteoEstadoActividades(dominio)
   // Actividades que aún tienen algún día sin registrar (para aviso y bloqueo de semana).
   const pendientes = gruposDominio.filter(tieneDiaPendiente).length
+
+  // Bandeja de vencidas: las que todavía esperan algo (su tarea sigue clavada en la semana
+  // que se venció), agrupadas por actividad — una vencida con dos responsables y tres días
+  // son seis filas, pero UNA sola entrada en la bandeja y un solo "Devolver al banco".
+  const vencidas: Vencida[] = [...agruparPorActividad(vencidasCrudas.filter(vencidaPorAtender)).values()]
+    .map((filas) => ({
+      id: filas[0].id,
+      descripcion: filas[0].descripcion,
+      anio: filas[0].anio,
+      semana: filas[0].semana,
+      responsables: [...new Set(filas.map((f) => f.responsable.nombre))].join(', '),
+      lotes: filas[0].lotes,
+    }))
 
   const previa = semanaAnterior(anio, semana)
   const proxima = siguienteSemana(anio, semana)
@@ -180,6 +196,10 @@ export default async function CumplimientoPage({
         <div className="mb-5 rounded-lg border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-800">
           ⛔ Plazo vencido: el cumplimiento de esta semana ya no se puede modificar. Solo el administrador puede hacer cambios.
         </div>
+      )}
+
+      {!soloLectura && (
+        <BandejaVencidas vencidas={vencidas} devolver={devolverVencidaAlBancoAccion} />
       )}
 
       {responsables.length > 0 && !bloqueado && (

@@ -813,6 +813,29 @@ export async function devolverAlBanco(actividadId: string) {
   })
 }
 
+// Vencidas sin registrar de un área, con lo que hace falta para decidir si todavía
+// esperan algo: dónde está su tarea (`vencidaPorAtender` en el dominio lo resuelve).
+// Alimentan la bandeja de /cumplimiento: no se pueden registrar —el plazo de esa semana
+// venció— pero su tarea sí se puede devolver al banco para programarla de nuevo.
+export function listarVencidasSinRegistrar(areaId: string) {
+  return prisma.actividad.findMany({
+    where: { areaId, estado: 'SIN_REGISTRAR' },
+    include: {
+      responsable: true,
+      lotes: true,
+      finca: true,
+      tarea: { select: { estado: true, anioSel: true, semanaSel: true } },
+    },
+    orderBy: [{ anio: 'desc' }, { semana: 'desc' }, { dia: 'asc' }],
+  })
+}
+
+// Área y estado de una actividad, para autorizar una acción sobre una vencida: hay que
+// validar las dos cosas, que sea del área del usuario y que esté SIN_REGISTRAR.
+export function areaYEstadoDeActividad(id: string) {
+  return prisma.actividad.findUnique({ where: { id }, select: { areaId: true, estado: true } })
+}
+
 // ---- Cumplimiento a nivel de ACTIVIDAD (grupo tareaId), versión estándar ----
 
 // Filas hermanas: todas las de la misma (tareaId, anio, semana). A partir de un id

@@ -1,7 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { reprogramarActividad, crearActividadRealizada, devolverAlBanco, semanaDeActividad, registrarAvanceLoteGrupo, registrarAvanceObservacionGrupo, marcarCumplidaGrupo, registrarNovedadGrupo, reabrirGrupo, setLotesGrupo, setUnidadRealizadaGrupo, anexarLotesGrupo, editarAvanceEntradaGrupo, eliminarAvanceEntradaGrupo, agregarNovedadGrupo, eliminarNovedadGrupo, cerrarParcialGrupo, reabrirCierreGrupo, editarNovedadGrupo, registrarAvanceGeneralGrupo, editarAvanceGeneralGrupo, eliminarAvanceGeneralGrupo } from '@/datos/repositorio'
+import { reprogramarActividad, crearActividadRealizada, devolverAlBanco, areaYEstadoDeActividad, semanaDeActividad, registrarAvanceLoteGrupo, registrarAvanceObservacionGrupo, marcarCumplidaGrupo, registrarNovedadGrupo, reabrirGrupo, setLotesGrupo, setUnidadRealizadaGrupo, anexarLotesGrupo, editarAvanceEntradaGrupo, eliminarAvanceEntradaGrupo, agregarNovedadGrupo, eliminarNovedadGrupo, cerrarParcialGrupo, reabrirCierreGrupo, editarNovedadGrupo, registrarAvanceGeneralGrupo, editarAvanceGeneralGrupo, eliminarAvanceGeneralGrupo } from '@/datos/repositorio'
 import { siguienteSemana, plazoCumplimientoVencido, semanaActual } from '@/dominio/semana'
 import { usuarioActual } from '@/auth/sesion'
 import { puedeMutarArea } from '@/auth/permisos'
@@ -115,6 +115,25 @@ export async function devolverAlBancoAccion(form: FormData) {
   const id = texto(form, 'id')
   if (!id) return
   if (await bloqueadaActividad(id)) return
+  await devolverAlBanco(id)
+  revalidatePath('/cumplimiento')
+}
+
+// Devolver al banco una vencida SIN REGISTRAR, para poder programarla de nuevo.
+//
+// NO pasa por `bloqueadaActividad` a propósito: se trata justamente de una actividad de
+// semana vencida, que esa guarda bloquea. El bypass del plazo queda acotado por la
+// validación de estado —solo SIN_REGISTRAR—, así que esto no abre la puerta a editar
+// cualquier semana cerrada: no toca la actividad vencida, que queda como constancia de
+// que no se hizo en su momento; solo devuelve su tarea al banco.
+export async function devolverVencidaAlBancoAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (!id) return
+  const u = await usuarioActual()
+  if (!u) return
+  const a = await areaYEstadoDeActividad(id)
+  if (!a || a.estado !== 'SIN_REGISTRAR') return
+  if (!puedeMutarArea(u, a.areaId)) return
   await devolverAlBanco(id)
   revalidatePath('/cumplimiento')
 }
