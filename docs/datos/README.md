@@ -40,3 +40,33 @@ La migración, a partir de este estado:
   Como los cuatro conteos de `_count` eran cero para todos ellos, no tenían
   ninguna actividad/tarea/nota enganchada — no hay nada más que restaurar
   aparte de la fila del potrero.
+
+## `2026-09-09-respaldo-vencidas-sin-registrar.json` y `…-linea-base-pct-vencidas.json`
+
+Estado previo de las **257 filas** (97 actividades) que la pasada retroactiva
+del plan `2026-09-08-sin-registrar-y-reprogramar-vencidas` cerró como
+`SIN_REGISTRAR`: lo que había quedado `PENDIENTE` en semanas ya vencidas antes
+de que existiera el cron semanal. Reparto por área: Ganadería ceba 127 ·
+Maquinaria 58 · Maiz-Riego 53 · Genetica Nelore 16 · Nelore 3, en las semanas
+28 a 36 de 2026.
+
+El respaldo es un array con **todos** los campos que el cierre NO debía tocar
+—`motivoId`, `nota`, `haRealizada`, `unidadRealizada`, `hectareas`, `horas`,
+`centroCosto`, `avancePorLote`, `avanceGeneral`, `lotesHechos`,
+`bultosPorLote`, `vecesReprogramada`, `origenId`, `maquinaId`,
+`responsableId`, `tareaId`— además de `estado` y `cerrada`, que son los dos
+únicos que sí cambiaron. Comprobado después de aplicar: 0 campos distintos
+fuera de esos dos.
+
+`linea-base-pct-vencidas.json` guarda el **% de cumplimiento y el conteo por
+estado de cada uno de los 17 pares (área, semana) afectados**, medidos antes
+de escribir. Es la prueba de que cerrar lo vencido no reescribe la historia:
+después de aplicar, los 17 porcentajes salieron idénticos.
+
+### Cómo revertir
+
+Un `updateMany` por lista de `id` de este archivo, poniendo
+`estado: 'PENDIENTE'` y `cerrada: false` (todas las filas del respaldo tenían
+exactamente ese estado). Ojo: el cron semanal las volvería a cerrar el lunes
+siguiente a la 01:17 de Colombia, así que revertir sin desactivar el cron solo
+dura hasta el lunes.
