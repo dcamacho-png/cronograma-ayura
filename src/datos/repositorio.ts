@@ -30,7 +30,10 @@ import { puedeBorrarse, textoReferencias, type ReferenciasLote } from '@/dominio
 // Espejo en SQL de `trabajoRegistrado` (src/dominio/trabajo-registrado.ts): la actividad
 // que el área ejecutora ya trabajó. Se usa para sacar la solicitud de "Mis solicitudes"
 // y para dejarla ver en /consulta. Mantener las dos definiciones en sintonía.
-const ACTIVIDAD_TRABAJADA: Prisma.ActividadWhereInput = {
+// Exportada solo para poder contrastarla contra `trabajoRegistrado` en un script de
+// verificación: las dos definiciones tienen que clasificar igual y no hay otra forma de
+// comprobarlo que evaluar este mismo objeto.
+export const ACTIVIDAD_TRABAJADA: Prisma.ActividadWhereInput = {
   // Las SIN_REGISTRAR están cerradas pero sin reporte: no cuentan como trabajadas.
   // Espejo de la primera línea de `trabajoRegistrado` (src/dominio/trabajo-registrado.ts):
   // las dos definiciones tienen que clasificar igual.
