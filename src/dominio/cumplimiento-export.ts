@@ -18,6 +18,9 @@ const ESTADO_TXT: Record<string, string> = {
   PARCIAL: 'Parcial',
   NO_CUMPLIDA: 'No se hizo',
   REPROGRAMADA: 'No se hizo',
+  // La semana venció y nadie reportó: sale al Excel con su rótulo y sin medida. Hoy las
+  // PENDIENTE no se exportan, así que la omisión no quedaba registrada en ninguna parte.
+  SIN_REGISTRAR: 'Sin registrar',
 }
 
 export type ActividadExport = {

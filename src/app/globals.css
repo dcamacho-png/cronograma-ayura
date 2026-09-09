@@ -23,6 +23,10 @@
   --color-est-nocumplida-bg: #f3d9d2;
   --color-est-reprogramada: #3e6079;
   --color-est-reprogramada-bg: #dde6ec;
+  /* Sin registrar: gris neutro a propósito. Los otros cinco tienen colores con carga
+     (verde cumplida, ámbar parcial, rojo no cumplida); esto es ausencia de dato, no falla. */
+  --color-est-sinregistrar: #6b7280;
+  --color-est-sinregistrar-bg: #e9e7e2;
 
   --shadow-tarjeta: 0 2px 8px rgba(120, 100, 60, 0.08);
 }
@@ -66,3 +70,4 @@ body {
 @utility chip-cumplida     { background: var(--color-est-cumplida-bg);     color: var(--color-est-cumplida); }
 @utility chip-nocumplida   { background: var(--color-est-nocumplida-bg);   color: var(--color-est-nocumplida); }
 @utility chip-reprogramada { background: var(--color-est-reprogramada-bg); color: var(--color-est-reprogramada); }
+@utility chip-sinregistrar { background: var(--color-est-sinregistrar-bg); color: var(--color-est-sinregistrar); }

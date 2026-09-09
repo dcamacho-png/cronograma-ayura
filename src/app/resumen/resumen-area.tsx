@@ -15,6 +15,7 @@ const ESTADOS_ORDEN = [
   { v: ['CUMPLIDA'], etq: '✅ Cumplidas' },
   { v: ['PARCIAL'], etq: '🟡 Parciales' },
   { v: ['NO_CUMPLIDA', 'REPROGRAMADA'], etq: '🔴 No se hizo' },
+  { v: ['SIN_REGISTRAR'], etq: '⚪ Sin registrar' },
   { v: ['PENDIENTE'], etq: '⏳ Pendientes' },
 ]
 
@@ -150,7 +151,7 @@ export function ResumenArea({
       </div>
 
       {/* Cuadros-resumen */}
-      <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+      <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-7">
         <div className="tarjeta p-5">
           <div className="mb-1 text-sm text-tierra">Cumplimiento</div>
           <div className="text-4xl font-extrabold" style={{ color: COLOR_HEX[colorPorcentaje(pct)] }}>{pct === null ? '—' : `${pct}%`}</div>
@@ -166,6 +167,10 @@ export function ResumenArea({
         <div className="tarjeta p-5">
           <div className="mb-1 text-sm text-tierra">No se hizo</div>
           <div className="text-4xl font-extrabold" style={{ color: COLOR_HEX[conteo.NO_CUMPLIDA + conteo.REPROGRAMADA > 0 ? 'naranja' : 'verde'] }}>{conteo.NO_CUMPLIDA + conteo.REPROGRAMADA}</div>
+        </div>
+        <div className="tarjeta p-5">
+          <div className="mb-1 text-sm text-tierra">Sin registrar</div>
+          <div className="text-4xl font-extrabold" style={{ color: COLOR_HEX[conteo.SIN_REGISTRAR > 0 ? 'gris' : 'verde'] }}>{conteo.SIN_REGISTRAR}</div>
         </div>
         <div className="tarjeta p-5">
           <div className="mb-1 text-sm text-tierra">Reprogramadas</div>
@@ -222,6 +227,7 @@ export function ResumenArea({
         <span className="chip-estado chip-cumplida">✅ Cumplidas: <b>{conteo.CUMPLIDA}</b></span>
         <span className="chip-estado chip-parcial">🟡 Parciales: <b>{conteo.PARCIAL}</b></span>
         <span className="chip-estado chip-nocumplida">🔴 No se hizo: <b>{conteo.NO_CUMPLIDA + conteo.REPROGRAMADA}</b></span>
+        <span className="chip-estado chip-sinregistrar">⚪ Sin registrar: <b>{conteo.SIN_REGISTRAR}</b></span>
         <span className="chip-estado chip-pendiente">⏳ Pendientes: <b>{conteo.PENDIENTE}</b></span>
       </div>
 

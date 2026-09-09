@@ -311,3 +311,15 @@ describe('filasCumplimiento — avance general (actividad SIN potreros)', () => 
     expect(filasCumplimiento(a, '15 jun', mapa, ctx)).toHaveLength(1)
   })
 })
+
+describe('filasCumplimiento — sin registrar', () => {
+  it('exporta la fila con el rótulo "Sin registrar" y sin medida', () => {
+    const fila = filasCumplimiento(
+      act({ estado: 'SIN_REGISTRAR', haRealizada: null, avancePorLote: null }),
+      '15 jun', mapa, ctx,
+    )[0]
+    expect(fila[7]).toBe('Sin registrar')   // columna Estado
+    expect(fila[8]).toBe('')                // Medida realizada
+    expect(fila[9]).toBe('')                // Unidad
+  })
+})
