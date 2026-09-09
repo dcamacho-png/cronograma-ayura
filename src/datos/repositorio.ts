@@ -664,8 +664,11 @@ export function eliminarUsuario(id: string) {
 // ---- Lotes / potreros ----
 
 // Catálogo de potreros para elegir al programar y registrar: solo los ACTIVOS.
-// Un solo filtro aquí cubre los selectores de /configuracion, /conservatorio,
-// /cumplimiento y /tareas, que son las cuatro pantallas que la consumen.
+// Un solo filtro aquí cubre los selectores de /conservatorio, /cumplimiento y
+// /tareas, que son las tres pantallas que la consumen. /configuracion NO usa
+// esta función: usa listarLotesTodos() porque administra activos y retirados.
+// /programar tampoco la consume: no ofrece un selector de catálogo, muestra
+// los potreros que ya trae la tarea asignada.
 export function listarLotes() {
   return prisma.lote.findMany({
     where: { activo: true },

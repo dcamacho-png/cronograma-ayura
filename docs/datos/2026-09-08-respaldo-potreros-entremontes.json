@@ -1,0 +1,2634 @@
+[
+ {
+  "id": "cmqme02lm000uod5q7q9bk0u4",
+  "nombre": "PISTAZURI1",
+  "hectareas": 2.6,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 37,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme031g000wod5q8rvxxlt3",
+  "nombre": "PISTAZURI2",
+  "hectareas": 2.6,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 28,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme03id000yod5qfhprnqp7",
+  "nombre": "PISTAZURI3",
+  "hectareas": 2.6,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 29,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme03z10010od5qqfflyos0",
+  "nombre": "CHILE1",
+  "hectareas": 30,
+  "tipoPasto": "MOMBAZA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 46,
+   "tareas": 0,
+   "tareasMulti": 6,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme04j00012od5qo5rk9lm2",
+  "nombre": "CHILE2",
+  "hectareas": 27,
+  "tipoPasto": "MOMBAZA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 18,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0bbl001uod5qhrag9wuu",
+  "nombre": "MORICHERA2",
+  "hectareas": 12.11,
+  "tipoPasto": "DECUMBENS",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 5,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0brw001wod5q1eidoze8",
+  "nombre": "MORICHERA",
+  "hectareas": 8,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 2,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0ems0028od5q6p826dzo",
+  "nombre": "GUADUAL1-2",
+  "hectareas": 1.3,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 12,
+   "tareas": 0,
+   "tareasMulti": 2,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0f3j002aod5q5qqzf2v6",
+  "nombre": "GUADUAL3-4",
+  "hectareas": 1.3,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0fku002cod5qqv5is6x8",
+  "nombre": "GUADUAL5-6",
+  "hectareas": 1.3,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0g4z002eod5qh57h2b2y",
+  "nombre": "GUADUAL7-8",
+  "hectareas": 1.2,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 6,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0hda002god5q639kkhty",
+  "nombre": "GUADUAL9-10",
+  "hectareas": 1.3,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 6,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0huo002iod5q3wrre48t",
+  "nombre": "GUADUAL11-12",
+  "hectareas": 1.3,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0ibs002kod5qk7h6slx9",
+  "nombre": "GUADUAL13-14",
+  "hectareas": 1.3,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0ite002mod5qzjs8fkq0",
+  "nombre": "GUADUAL15-16",
+  "hectareas": 1.2,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0l6h002wod5qv5orv1g4",
+  "nombre": "ESCONDIDO1",
+  "hectareas": 13.35,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 5,
+   "tareas": 0,
+   "tareasMulti": 2,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0ln4002yod5qwgc7cur8",
+  "nombre": "ESCONDIDO2",
+  "hectareas": 13,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 5,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0m3u0030od5qb4avxsvv",
+  "nombre": "PISTACUERDA1",
+  "hectareas": 8.7,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 24,
+   "tareas": 0,
+   "tareasMulti": 3,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0mkm0032od5qb881cdbe",
+  "nombre": "PISTACUERDA2",
+  "hectareas": 7.7,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 12,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0n1j0034od5qppslsvqg",
+  "nombre": "PISTASILO",
+  "hectareas": 12.16,
+  "tipoPasto": "MAIZ",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 5,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0ror003ood5q0mh45zio",
+  "nombre": "MANGON1",
+  "hectareas": 1.42,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0s56003qod5qygmpz4s9",
+  "nombre": "MANGON2",
+  "hectareas": 0.38,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0son003sod5qnfkrsy8a",
+  "nombre": "MANGON3",
+  "hectareas": 2.85,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0t50003uod5qrgnwhkqh",
+  "nombre": "ESMERALDA1",
+  "hectareas": 4.63,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 2,
+   "tareas": 0,
+   "tareasMulti": 3,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme13g50052od5qpfumg98l",
+  "nombre": "GUDUALMANGA",
+  "hectareas": 0.67,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme13yl0054od5qrhle6l94",
+  "nombre": "ESMERALDA 4",
+  "hectareas": 6.49,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme152p0058od5q2sbetzah",
+  "nombre": "OROSOL1",
+  "hectareas": 6.4,
+  "tipoPasto": "BRACHIARIA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 2,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme15j2005aod5qcgrxwl8l",
+  "nombre": "OROSOL2",
+  "hectareas": 9.13,
+  "tipoPasto": "BRACHIARIA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 2,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1600005cod5qpq1gu6q1",
+  "nombre": "OROSOL3",
+  "hectareas": 10.11,
+  "tipoPasto": "BRACHIARIA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 2,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme176h005eod5qefubo6lm",
+  "nombre": "OROSOL4",
+  "hectareas": 7.01,
+  "tipoPasto": "BRACHIARIA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 2,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme17q4005god5qc9hrkoun",
+  "nombre": "OROSOL5",
+  "hectareas": 11.41,
+  "tipoPasto": "BRACHIARIA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 6,
+   "tareas": 0,
+   "tareasMulti": 3,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme187y005iod5qv4satvkk",
+  "nombre": "OROSOL6",
+  "hectareas": 5.05,
+  "tipoPasto": "BRACHIARIA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 4,
+   "tareas": 0,
+   "tareasMulti": 2,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme18rf005kod5qgte7hl2j",
+  "nombre": "OROSOL7",
+  "hectareas": 7.5,
+  "tipoPasto": "BRACHIARIA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme19be005mod5ql1eqp36z",
+  "nombre": "OROSOL8",
+  "hectareas": 8.4,
+  "tipoPasto": "BRACHIARIA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme19t6005ood5qihaz1nfi",
+  "nombre": "OROSOL9",
+  "hectareas": 4.16,
+  "tipoPasto": "BRACHIARIA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1abd005qod5q4d2gwo0e",
+  "nombre": "OROSOL10",
+  "hectareas": 4.9,
+  "tipoPasto": "BRACHIARIA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 2,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1atj005sod5qd22musza",
+  "nombre": "OROSOL11",
+  "hectareas": 4.4,
+  "tipoPasto": "BRACHIARIA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 2,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1bb8005uod5qixy5klhx",
+  "nombre": "OROSOL12",
+  "hectareas": 2.5,
+  "tipoPasto": "BRACHIARIA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 2,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1cdf005yod5q1zibfhyr",
+  "nombre": "MORICHERA1",
+  "hectareas": 12.11,
+  "tipoPasto": "MAIZ",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1cvn0060od5qpcj5axrg",
+  "nombre": "MORICHERA4",
+  "hectareas": 9.56,
+  "tipoPasto": null,
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 12,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1ddi0062od5qy28cc5md",
+  "nombre": "CLINICA1",
+  "hectareas": 12.74,
+  "tipoPasto": "MAIZ",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 4,
+   "tareas": 0,
+   "tareasMulti": 3,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1dvk0064od5qqy5886bs",
+  "nombre": "CLINICA2",
+  "hectareas": 12.74,
+  "tipoPasto": "MAIZ",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1edp0066od5qk8a0tlxh",
+  "nombre": "CAÑOCOLORADO1",
+  "hectareas": 12.99,
+  "tipoPasto": "MAIZ",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 12,
+   "tareas": 0,
+   "tareasMulti": 3,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1ev40068od5qme75blxo",
+  "nombre": "CAÑOCOLORADO2",
+  "hectareas": 11.36,
+  "tipoPasto": "MAIZ",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 12,
+   "tareas": 0,
+   "tareasMulti": 3,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1fda006aod5qud7m39jj",
+  "nombre": "ARBOLEDA1",
+  "hectareas": 8,
+  "tipoPasto": "BRACHIARIA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 13,
+   "tareas": 0,
+   "tareasMulti": 2,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1fvc006cod5q804lzra4",
+  "nombre": "ARBOLEDA2",
+  "hectareas": 13.73,
+  "tipoPasto": "MAIZ",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 4,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1gcx006eod5qc03l3dx8",
+  "nombre": "GUADUAL2",
+  "hectareas": 10,
+  "tipoPasto": "MAIZ",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1gxw006god5qaoseyb69",
+  "nombre": "GUADUAL3",
+  "hectareas": 9.52,
+  "tipoPasto": "BRACHIARIA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1hes006iod5qbu2r2k9k",
+  "nombre": "GUADUAL 0",
+  "hectareas": 0.5,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 26,
+   "tareas": 0,
+   "tareasMulti": 3,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1hx2006kod5qb0p5f7f3",
+  "nombre": "LAGUNA1",
+  "hectareas": 18.92,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 22,
+   "tareas": 0,
+   "tareasMulti": 2,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1ig7006mod5qf921p9a2",
+  "nombre": "LAGUNA2",
+  "hectareas": 20.02,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 8,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1iyc006ood5q7tznrilm",
+  "nombre": "LAGUNA3",
+  "hectareas": 18.36,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 8,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1jhg006qod5qo98zgiau",
+  "nombre": "LAGUNA4",
+  "hectareas": 17.99,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 14,
+   "tareas": 0,
+   "tareasMulti": 3,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1k35006sod5qiha4k1bw",
+  "nombre": "L.SECA1",
+  "hectareas": 15.68,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 1,
+   "tareas": 0,
+   "tareasMulti": 2,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1kn4006uod5qc9dqi63r",
+  "nombre": "L.SECA2",
+  "hectareas": 6.85,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 14,
+   "tareas": 0,
+   "tareasMulti": 9,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1la9006wod5qlk4pv05p",
+  "nombre": "GUYACANA1",
+  "hectareas": 14.1,
+  "tipoPasto": "MAIZ",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 10,
+   "tareas": 0,
+   "tareasMulti": 2,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1lrr006yod5quleacjip",
+  "nombre": "GUYACANA2",
+  "hectareas": 5.3,
+  "tipoPasto": "MAIZ",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1sqk007qod5qpdky7lzu",
+  "nombre": "COROCORAMANGA1",
+  "hectareas": 2.68,
+  "tipoPasto": "MAIZ",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1t9a007sod5qk2bkx5zs",
+  "nombre": "COROCORAMANGA2",
+  "hectareas": 0.61,
+  "tipoPasto": "MAIZ",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1ttd007uod5qeeapvau7",
+  "nombre": "LAVEGA1",
+  "hectareas": 13.75,
+  "tipoPasto": "LLANERO",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 4,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1u9o007wod5qk60u9qa2",
+  "nombre": "LAVEGA2",
+  "hectareas": 17.79,
+  "tipoPasto": "LLANERO",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 3,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1xb60086od5qg2bt0jka",
+  "nombre": "ESMERALDA2",
+  "hectareas": 6.8,
+  "tipoPasto": "LLANERO",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme202a008iod5qtkhwpavr",
+  "nombre": "FALTANTES",
+  "hectareas": 1,
+  "tipoPasto": "BRACHIARIA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme21w6008qod5qfgeynton",
+  "nombre": "ESMERALDA3",
+  "hectareas": 6,
+  "tipoPasto": "BRACHIARIA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme352h00d0od5q5zwzvxkf",
+  "nombre": "GUADUAL1-1",
+  "hectareas": 0.59,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 14,
+   "tareas": 0,
+   "tareasMulti": 5,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme35jg00d2od5q0vxe4duf",
+  "nombre": "GUADUAL1-3",
+  "hectareas": 0.59,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 20,
+   "tareas": 0,
+   "tareasMulti": 4,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme360300d4od5q8mn1pggy",
+  "nombre": "GUADUAL1-4",
+  "hectareas": 0.59,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 8,
+   "tareas": 0,
+   "tareasMulti": 2,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme36gp00d6od5qjzvmq9tf",
+  "nombre": "GUADUAL1-5",
+  "hectareas": 0.59,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme36z100d8od5qq5snk4m7",
+  "nombre": "GUADUAL1-6",
+  "hectareas": 0.59,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 5,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme37gj00daod5qafl7kwsw",
+  "nombre": "GUADUAL1-7",
+  "hectareas": 0.59,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme37yi00dcod5qfcpva81y",
+  "nombre": "GUADUAL1-8",
+  "hectareas": 0.59,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 5,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme38gg00deod5quxoq6yqb",
+  "nombre": "GUADUAL1-9",
+  "hectareas": 0.59,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme38yu00dgod5qb7vkjrah",
+  "nombre": "GUADUAL1-10",
+  "hectareas": 0.59,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 61,
+   "tareas": 0,
+   "tareasMulti": 12,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme39gi00diod5qweod4t83",
+  "nombre": "GUADUAL1-11",
+  "hectareas": 0.59,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 14,
+   "tareas": 0,
+   "tareasMulti": 3,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme39xy00dkod5qdzsj1b5h",
+  "nombre": "GUADUAL2-1",
+  "hectareas": 0.59,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme3agi00dmod5qk4mggz3l",
+  "nombre": "GUADUAL2-2",
+  "hectareas": 0.59,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme3bqu00dood5q3qdnnofr",
+  "nombre": "GUADUAL2-3",
+  "hectareas": 0.59,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme3c8k00dqod5q2z9fievo",
+  "nombre": "GUADUAL2-4",
+  "hectareas": 0.59,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme3cp700dsod5qz3nyb8as",
+  "nombre": "GUADUAL2-5",
+  "hectareas": 0.59,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 10,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme3d6w00duod5qo277j9me",
+  "nombre": "GUADUAL2-6",
+  "hectareas": 0.59,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme3do500dwod5qxrlx533l",
+  "nombre": "GUADUAL2-7",
+  "hectareas": 0.59,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme3e6r00dyod5qzag6jcu6",
+  "nombre": "GUADUAL2-8",
+  "hectareas": 0.59,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme3eo100e0od5q6030h2ga",
+  "nombre": "GUADUAL2-9",
+  "hectareas": 0.59,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme3f5700e2od5qllo1yupv",
+  "nombre": "GUADUAL2-10",
+  "hectareas": 0.59,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme3fnh00e4od5qj0u7gimu",
+  "nombre": "GUADUAL2-11",
+  "hectareas": 0.59,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme3g4e00e6od5qx0njucha",
+  "nombre": "MODULO 1",
+  "hectareas": 1,
+  "tipoPasto": "SUPLEMENTACION",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme3gku00e8od5qh2qgl1qy",
+  "nombre": "MODULO 2",
+  "hectareas": 1,
+  "tipoPasto": "SUPLEMENTACION",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme3h1200eaod5qorfb72tz",
+  "nombre": "MODULO 3",
+  "hectareas": 0.5,
+  "tipoPasto": "SUPLEMENTACION",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme3hk400ecod5qe5phq2kx",
+  "nombre": "MODULO 4",
+  "hectareas": 1,
+  "tipoPasto": "SUPLEMENTACION",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme3i0o00eeod5qt7xdnwui",
+  "nombre": "COROCORA 1",
+  "hectareas": 9.12,
+  "tipoPasto": "MOMBAZA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 17,
+   "tareas": 0,
+   "tareasMulti": 4,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme3ih800egod5qvyit68tl",
+  "nombre": "COROCORA 2",
+  "hectareas": 10,
+  "tipoPasto": "MOMBAZA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 20,
+   "tareas": 0,
+   "tareasMulti": 2,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme3ixu00eiod5qbd404b90",
+  "nombre": "LAVEGA3",
+  "hectareas": 1,
+  "tipoPasto": "BRIZANTHA MARANDU",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme3jgu00ekod5qat3mgp0g",
+  "nombre": "LAVEGA4",
+  "hectareas": 1,
+  "tipoPasto": "BRIZANTHA MARANDU",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme3ku300eqod5qe5v0iwyk",
+  "nombre": "GUADUAL 0-1",
+  "hectareas": 0.5,
+  "tipoPasto": "MIYAGUI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 12,
+   "tareas": 0,
+   "tareasMulti": 3,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme3lao00esod5qydrqtfa3",
+  "nombre": "CORRAL 1",
+  "hectareas": 0.2,
+  "tipoPasto": "NA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqmdzynd000eod5qxotk6k4e",
+  "nombre": "ARGENTINA1",
+  "hectareas": 4.29,
+  "tipoPasto": "MOMBAZA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 32,
+   "tareas": 0,
+   "tareasMulti": 3,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqmdzzc2000god5qwq5kblck",
+  "nombre": "ARGENTINA2",
+  "hectareas": 7.49,
+  "tipoPasto": "MOMBAZA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 9,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqmdzzsw000iod5qlxnbvtoy",
+  "nombre": "ARGENTINA3",
+  "hectareas": 4.13,
+  "tipoPasto": "MOMBAZA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 7,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0099000kod5q46ly2ava",
+  "nombre": "ARGENTINA4",
+  "hectareas": 4.18,
+  "tipoPasto": "MOMBAZA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 7,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme00qc000mod5qt6hc4et2",
+  "nombre": "ARGENTINA5",
+  "hectareas": 8.37,
+  "tipoPasto": "MOMBAZA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 22,
+   "tareas": 0,
+   "tareasMulti": 2,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0171000ood5q8obui7ve",
+  "nombre": "ARGENTINA6",
+  "hectareas": 6.4,
+  "tipoPasto": "MOMBAZA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 18,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme01nz000qod5qrt1mjpxw",
+  "nombre": "ARGENTINA7",
+  "hectareas": 5.79,
+  "tipoPasto": "MOMBAZA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 7,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme024z000sod5quadxk0o3",
+  "nombre": "ARGENTINA8",
+  "hectareas": 4.03,
+  "tipoPasto": "MOMBAZA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 3,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme04zp0014od5q2jxsesr3",
+  "nombre": "ARIZONA1",
+  "hectareas": 7.87,
+  "tipoPasto": "MOMBAZA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 32,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme05g30016od5qbrvnrf67",
+  "nombre": "ARIZONA2",
+  "hectareas": 11.32,
+  "tipoPasto": "MOMBAZA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 14,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme05wj0018od5qulynkqxc",
+  "nombre": "ARIZONA3",
+  "hectareas": 7.58,
+  "tipoPasto": "DECUMBENS",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1bv1005wod5q711swo9q",
+  "nombre": "ARIZONA4",
+  "hectareas": 10.43,
+  "tipoPasto": "DECUMBENS",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 7,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme14m40056od5q4n2724al",
+  "nombre": "BAMBU 1",
+  "hectareas": 4.58,
+  "tipoPasto": "MASSAI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 13,
+   "tareas": 0,
+   "tareasMulti": 2,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme33bu00cuod5qyonmedxc",
+  "nombre": "BAMBU 2",
+  "hectareas": 6.75,
+  "tipoPasto": "MASSAI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 6,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme33so00cwod5q1eo84ow4",
+  "nombre": "BAMBU 3",
+  "hectareas": 4.36,
+  "tipoPasto": "MASSAI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 15,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme34iy00cyod5qvtsm1ey9",
+  "nombre": "BAMBU 4",
+  "hectareas": 4.05,
+  "tipoPasto": "MASSAI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 16,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1m950070od5q116lrat4",
+  "nombre": "BELLAVISTA1",
+  "hectareas": 12.75,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 13,
+   "tareas": 0,
+   "tareasMulti": 4,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1mqf0072od5q87sgy4ko",
+  "nombre": "BELLAVISTA2",
+  "hectareas": 8.66,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 13,
+   "tareas": 0,
+   "tareasMulti": 4,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1n7q0074od5q2hxc5x7i",
+  "nombre": "BELLAVISTA3",
+  "hectareas": 8.38,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 5,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1npb0076od5qq1ykfbfm",
+  "nombre": "BELLAVISTA4",
+  "hectareas": 11.89,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 12,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1o6t0078od5qnn29h55t",
+  "nombre": "BELLAVISTA5",
+  "hectareas": 15.3,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 5,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1uqe007yod5qggvffx1t",
+  "nombre": "BOCATOMA",
+  "hectareas": 11.03,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 4,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0tlu003wod5qd51bemwi",
+  "nombre": "BUENOSAIRES1",
+  "hectareas": 9.21,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 31,
+   "tareas": 0,
+   "tareasMulti": 3,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0u25003yod5q8h8a43ki",
+  "nombre": "BUENOSAIRES2",
+  "hectareas": 6.41,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 17,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0uij0040od5qjg120sg8",
+  "nombre": "BUENOSAIRES3",
+  "hectareas": 3.82,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 18,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0uza0042od5qfjidmv42",
+  "nombre": "BUENOSAIRES4",
+  "hectareas": 4.11,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 15,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1r5w007kod5q36627pxl",
+  "nombre": "CAÑOFISTOL",
+  "hectareas": 10.56,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 29,
+   "tareas": 0,
+   "tareasMulti": 4,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme08im001iod5qsmwfm67p",
+  "nombre": "COLONO1",
+  "hectareas": 10.1,
+  "tipoPasto": "DECUMBENS",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 6,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme08zj001kod5qj90ibqtj",
+  "nombre": "COLONO2",
+  "hectareas": 8.65,
+  "tipoPasto": "DECUMBENS",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 6,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme09gm001mod5q5qfo847n",
+  "nombre": "COLONO3",
+  "hectareas": 10.1,
+  "tipoPasto": "DECUMBENS",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 9,
+   "tareas": 0,
+   "tareasMulti": 3,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme09xn001ood5q5ljs7lmr",
+  "nombre": "COLONO4",
+  "hectareas": 10.74,
+  "tipoPasto": "DECUMBENS",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 6,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme06d8001aod5qaf813eno",
+  "nombre": "CONEJO1",
+  "hectareas": 17.71,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 9,
+   "tareas": 0,
+   "tareasMulti": 3,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme06ug001cod5qehd7gdd0",
+  "nombre": "CONEJO2",
+  "hectareas": 20.95,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 6,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme07bs001eod5qb0qity10",
+  "nombre": "CONEJO3",
+  "hectareas": 22.79,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 27,
+   "tareas": 0,
+   "tareasMulti": 6,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme07tv001god5qvn1t9x4q",
+  "nombre": "CONEJO4",
+  "hectareas": 20.39,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 10,
+   "tareas": 0,
+   "tareasMulti": 3,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0ava001sod5q8880u3fm",
+  "nombre": "CORINTO1",
+  "hectareas": 9,
+  "tipoPasto": "DECUMBENS",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 6,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0aeo001qod5q3wnvbohq",
+  "nombre": "CORINTO2",
+  "hectareas": 13.39,
+  "tipoPasto": "TANZANIA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 14,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme3jx100emod5qmd38am6k",
+  "nombre": "EUCALIPTO 3",
+  "hectareas": 5.23,
+  "tipoPasto": "MOMBAZA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 41,
+   "tareas": 0,
+   "tareasMulti": 5,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme3kdl00eood5qh5rq46lr",
+  "nombre": "EUCALIPTO 4",
+  "hectareas": 7.9,
+  "tipoPasto": "MOMBAZA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 23,
+   "tareas": 0,
+   "tareasMulti": 2,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0c9n001yod5qcjkl7fza",
+  "nombre": "EUCALIPTO1",
+  "hectareas": 6.84,
+  "tipoPasto": "MOMBAZA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 56,
+   "tareas": 0,
+   "tareasMulti": 9,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0cq90020od5qj963c6no",
+  "nombre": "EUCALIPTO2",
+  "hectareas": 6.1,
+  "tipoPasto": "MOMBAZA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 68,
+   "tareas": 0,
+   "tareasMulti": 11,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1zlz008god5qkp36t3bc",
+  "nombre": "GUADUAL ZURI",
+  "hectareas": 3.34,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 27,
+   "tareas": 0,
+   "tareasMulti": 9,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0d720022od5qpem4fskj",
+  "nombre": "LA96-1CUERDA",
+  "hectareas": 8.32,
+  "tipoPasto": "MOMBAZA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 16,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1z50008eod5qtdqui9fs",
+  "nombre": "LA96-2CUERDA",
+  "hectareas": 6.55,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 2,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0e5d0026od5qnan61y59",
+  "nombre": "LA96-3CUERDA",
+  "hectareas": 5.77,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 5,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0do90024od5q9ksudw0x",
+  "nombre": "LA96-4CUERDA",
+  "hectareas": 13.81,
+  "tipoPasto": "MOMBAZA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 29,
+   "tareas": 0,
+   "tareasMulti": 3,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1wul0084od5q38k3vo17",
+  "nombre": "LA96ZURI-1",
+  "hectareas": 8.91,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 9,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme21fo008ood5q3ag1kylk",
+  "nombre": "LA96ZURI-2",
+  "hectareas": 14.19,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 12,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1xrs0088od5qvr2ulqpm",
+  "nombre": "LA96ZURI-3",
+  "hectareas": 15.28,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 48,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1y7y008aod5qn8aqj2rs",
+  "nombre": "LA96ZURI-4",
+  "hectareas": 12.8,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 9,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1yoj008cod5qiek2urpf",
+  "nombre": "LA96ZURI-5",
+  "hectareas": 11.08,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 2,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0wsd004aod5qgbxyjhn1",
+  "nombre": "LILIANA1",
+  "hectareas": 7.12,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 27,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0x8q004cod5q252dr3q4",
+  "nombre": "LILIANA2",
+  "hectareas": 9.28,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 14,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0xpk004eod5qr72m4wwe",
+  "nombre": "LILIANA3",
+  "hectareas": 15.08,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 21,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0y5z004god5q7xe75xss",
+  "nombre": "LILIANA4",
+  "hectareas": 9.38,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 28,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0ym0004iod5qfxxtmkan",
+  "nombre": "LILIANA5",
+  "hectareas": 7.74,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 21,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0z2x004kod5qea22djyc",
+  "nombre": "LILIANA6",
+  "hectareas": 9.11,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 17,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0zj5004mod5qrf4u86ko",
+  "nombre": "LILIANA7",
+  "hectareas": 4.74,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 9,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1po6007eod5q6bnq59f5",
+  "nombre": "MARACOS1",
+  "hectareas": 13.77,
+  "tipoPasto": "DECUMBENS",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 27,
+   "tareas": 0,
+   "tareasMulti": 5,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1q6i007god5qymxf7qiq",
+  "nombre": "MARACOS2",
+  "hectareas": 15.8,
+  "tipoPasto": "DECUMBENS",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 30,
+   "tareas": 0,
+   "tareasMulti": 6,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1oo7007aod5qfe00mn9g",
+  "nombre": "MATEPOPOCHO1",
+  "hectareas": 17.32,
+  "tipoPasto": "DECUMBENS",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 36,
+   "tareas": 0,
+   "tareasMulti": 10,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1p5a007cod5qwekb91cd",
+  "nombre": "MATEPOPOCHO2",
+  "hectareas": 11.92,
+  "tipoPasto": "DECUMBENS",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 38,
+   "tareas": 0,
+   "tareasMulti": 10,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme11xr004wod5qfcgfyujb",
+  "nombre": "MATICAS1",
+  "hectareas": 5.41,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 4,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme12fz004yod5qs64bsljs",
+  "nombre": "MATICAS2",
+  "hectareas": 6.37,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 7,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme12xt0050od5q6kfbgv4k",
+  "nombre": "MATICAS3",
+  "hectareas": 6.09,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 13,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme20z4008mod5qjy53wn52",
+  "nombre": "MATICAS4",
+  "hectareas": 5.42,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 16,
+   "tareas": 0,
+   "tareasMulti": 4,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0zzn004ood5qlkrylrvr",
+  "nombre": "MORICHES1",
+  "hectareas": 9.58,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 8,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme10gw004qod5qtoxuo7k3",
+  "nombre": "MORICHES2",
+  "hectareas": 10.13,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 7,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme10zd004sod5q6tbjro7p",
+  "nombre": "MORICHES3",
+  "hectareas": 8.23,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 20,
+   "tareas": 0,
+   "tareasMulti": 4,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme11fy004uod5qtec3jbm0",
+  "nombre": "MORICHES4",
+  "hectareas": 7.81,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 11,
+   "tareas": 0,
+   "tareasMulti": 3,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0vfi0044od5qwlxfpydq",
+  "nombre": "PELOZUDA1",
+  "hectareas": 11.64,
+  "tipoPasto": "PIATA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 29,
+   "tareas": 0,
+   "tareasMulti": 8,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0vvo0046od5q87uyf5jt",
+  "nombre": "PELOZUDA2",
+  "hectareas": 11.98,
+  "tipoPasto": "PIATA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 25,
+   "tareas": 0,
+   "tareasMulti": 4,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0wc70048od5q99wr7chj",
+  "nombre": "PELOZUDA3",
+  "hectareas": 12.32,
+  "tipoPasto": "PIATA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 29,
+   "tareas": 0,
+   "tareasMulti": 9,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmrf0ir0u0001jp042if20ea2",
+  "nombre": "PIVOTE",
+  "hectareas": 41,
+  "tipoPasto": "Maiz",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 83,
+   "tareas": 0,
+   "tareasMulti": 20,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1ro0007mod5qz9rula3k",
+  "nombre": "PORTADA1",
+  "hectareas": 12.5,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 14,
+   "tareas": 0,
+   "tareasMulti": 2,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1s5i007ood5qjop2l93c",
+  "nombre": "PORTADA2",
+  "hectareas": 11.99,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 17,
+   "tareas": 0,
+   "tareasMulti": 2,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0jaq002ood5quz50nayu",
+  "nombre": "SILENCIO1",
+  "hectareas": 10.63,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 7,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0jsa002qod5qa2x0t9ud",
+  "nombre": "SILENCIO2",
+  "hectareas": 8.95,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0k92002sod5qi1l5h85u",
+  "nombre": "SILENCIO3",
+  "hectareas": 9.12,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0kpz002uod5qb8kr3ccy",
+  "nombre": "SILENCIO4",
+  "hectareas": 10.58,
+  "tipoPasto": "HUMIDICOLA",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 0,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0ni70036od5qqcua2kgd",
+  "nombre": "SOCA1",
+  "hectareas": 5.55,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 36,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0nzw0038od5qn8a5h2gq",
+  "nombre": "SOCA2",
+  "hectareas": 4.33,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 26,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0ogh003aod5qvyb28i6q",
+  "nombre": "SOCA3",
+  "hectareas": 4.17,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 26,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0owx003cod5qce14r85j",
+  "nombre": "SOCA4",
+  "hectareas": 3.99,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 9,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0pdr003eod5qy82irf5h",
+  "nombre": "SOCA5",
+  "hectareas": 2.55,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 6,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0pun003god5qt014a7s6",
+  "nombre": "SOCA6",
+  "hectareas": 5.33,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 6,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0qba003iod5qjcf7wc0a",
+  "nombre": "SOCA7",
+  "hectareas": 3.8,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 13,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0qrt003kod5qvgwwydp0",
+  "nombre": "SOCA8",
+  "hectareas": 6.55,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 19,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme0r86003mod5qwk4luqij",
+  "nombre": "SOCA9",
+  "hectareas": 6.3,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 20,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1v6v0080od5q9idnwb4t",
+  "nombre": "TROMPILLO1",
+  "hectareas": 7.39,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 3,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1vn90082od5qovzusyqi",
+  "nombre": "TROMPILLO2",
+  "hectareas": 11.85,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 12,
+   "tareas": 0,
+   "tareasMulti": 1,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme20il008kod5qm1emndb2",
+  "nombre": "TROMPILLO3",
+  "hectareas": 6.19,
+  "tipoPasto": "ZURI",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 14,
+   "tareas": 0,
+   "tareasMulti": 0,
+   "notasConservatorio": 0
+  }
+ },
+ {
+  "id": "cmqme1qoh007iod5qic3f020i",
+  "nombre": "VENADO",
+  "hectareas": 20.16,
+  "tipoPasto": "DECUMBENS",
+  "activo": true,
+  "fincaId": "cmqmdzuh60004od5qzt921oa6",
+  "_count": {
+   "actividades": 22,
+   "tareas": 0,
+   "tareasMulti": 5,
+   "notasConservatorio": 0
+  }
+ }
+]

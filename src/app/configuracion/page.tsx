@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { usuarioActual } from '@/auth/sesion'
+import { totalReferencias } from '@/dominio/lote-retiro'
 import {
   listarAreas,
   listarFincas,
@@ -153,7 +154,12 @@ export default async function ConfiguracionPage({
               hectareas: l.hectareas,
               tipoPasto: l.tipoPasto,
               activo: l.activo,
-              referencias: l._count.actividades + l._count.tareas + l._count.tareasMulti + l._count.notasConservatorio,
+              referencias: totalReferencias({
+                actividades: l._count.actividades,
+                tareas: l._count.tareas,
+                tareasMulti: l._count.tareasMulti,
+                notas: l._count.notasConservatorio,
+              }),
               finca: { nombre: l.finca.nombre },
             }))}
             eliminar={eliminarLoteAccion}
