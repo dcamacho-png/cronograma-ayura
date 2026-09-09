@@ -46,6 +46,22 @@ export const ACTIVIDAD_TRABAJADA: Prisma.ActividadWhereInput = {
   ],
 }
 
+// Un contenedor de avance VACÍO se guarda como NULL, no como `{}` ni `[]`.
+//
+// Para el dominio (`trabajoRegistrado`) un contenedor vacío no es trabajo, pero su espejo
+// en SQL (`ACTIVIDAD_TRABAJADA`, arriba) solo puede preguntar si la columna es NULL: con
+// `{}` la fila pasaba por trabajada. Se alcanzaba borrando el último avance de una
+// parcial, y esa actividad salía de "Mis solicitudes" y aparecía en /consulta como
+// culminada. Guardando NULL las dos definiciones vuelven a coincidir.
+function avanceLoteAGuardar(a: Record<string, AvanceEntrada[]>): Prisma.InputJsonValue | typeof Prisma.DbNull {
+  const conAvances = Object.fromEntries(Object.entries(a).filter(([, es]) => es.length > 0))
+  return Object.keys(conAvances).length ? (conAvances as Prisma.InputJsonValue) : Prisma.DbNull
+}
+
+function avanceGeneralAGuardar(l: AvanceGeneralEntrada[]): Prisma.InputJsonValue | typeof Prisma.DbNull {
+  return l.length ? (l as unknown as Prisma.InputJsonValue) : Prisma.DbNull
+}
+
 export function listarAreas() {
   return prisma.area.findMany({ orderBy: { nombre: 'asc' } })
 }
@@ -757,7 +773,7 @@ export async function registrarAvanceLote(
   return prisma.actividad.update({
     where: { id: actividadId },
     data: {
-      avancePorLote: actual as Prisma.InputJsonValue,
+      avancePorLote: avanceLoteAGuardar(actual),
       estado: 'PARCIAL',
     },
   })
@@ -863,7 +879,7 @@ export async function registrarAvanceLoteGrupo(
         prisma.actividad.update({
           where: { id: f.id },
           data: {
-            avancePorLote: actual as Prisma.InputJsonValue,
+            avancePorLote: avanceLoteAGuardar(actual),
             estado: 'PARCIAL',
             ...(bultosMerge ? { bultosPorLote: bultosMerge as Prisma.InputJsonValue } : {}),
           },
@@ -892,7 +908,7 @@ export async function editarAvanceEntradaGrupo(
   await prisma.$transaction(
     g.filas
       .filter((f) => f.estado === 'PENDIENTE' || f.estado === 'PARCIAL')
-      .map((f) => prisma.actividad.update({ where: { id: f.id }, data: { avancePorLote: actual as Prisma.InputJsonValue } })),
+      .map((f) => prisma.actividad.update({ where: { id: f.id }, data: { avancePorLote: avanceLoteAGuardar(actual) } })),
   )
   return true
 }
@@ -910,7 +926,7 @@ export async function eliminarAvanceEntradaGrupo(id: string, loteId: string, ind
   await prisma.$transaction(
     g.filas
       .filter((f) => f.estado === 'PENDIENTE' || f.estado === 'PARCIAL')
-      .map((f) => prisma.actividad.update({ where: { id: f.id }, data: { avancePorLote: actual as Prisma.InputJsonValue } })),
+      .map((f) => prisma.actividad.update({ where: { id: f.id }, data: { avancePorLote: avanceLoteAGuardar(actual) } })),
   )
   return true
 }
@@ -1112,7 +1128,7 @@ async function guardarAvanceGeneralGrupo(
         prisma.actividad.update({
           where: { id: f.id },
           data: {
-            avanceGeneral: lista as unknown as Prisma.InputJsonValue,
+            avanceGeneral: avanceGeneralAGuardar(lista),
             haRealizada: lista.length ? totalAvanceGeneral(lista) : null,
             ...(opciones.marcarParcial ? { estado: 'PARCIAL' } : {}),
             ...(opciones.unidad ? { unidadRealizada: opciones.unidad } : {}),
