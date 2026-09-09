@@ -3,7 +3,8 @@ import { redirect } from 'next/navigation'
 import { usuarioActual } from '@/auth/sesion'
 import { puedeVer, esSoloLectura } from '@/auth/permisos'
 import { listarAreas, listarMotivos, listarActividades, listarLotes, listarMaquinas, listarResponsablesPorArea, listarActividadesEstipuladas } from '@/datos/repositorio'
-import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, plazoCumplimientoVencido } from '@/dominio/semana'
+import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, plazoCumplimientoVencido, diaActual } from '@/dominio/semana'
+import { avisarPlazoPorVencer } from '@/dominio/aviso-plazo'
 import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
 import { unidadDe, unidadAbreviada } from '@/dominio/unidad'
 import { textoLotesHechos } from '@/dominio/lotes-hechos'
@@ -155,9 +156,19 @@ export default async function CumplimientoPage({
         </span>
         <span className="rounded-lg bg-arena px-3 py-1 text-sm">
           ✅ <b>{conteoEstado.CUMPLIDA}</b> · 🟡 <b>{conteoEstado.PARCIAL}</b> · 🔴 <b>{conteoEstado.NO_CUMPLIDA + conteoEstado.REPROGRAMADA}</b> No se hizo{' '}
+          {conteoEstado.SIN_REGISTRAR > 0 && <>· ⚪ <b>{conteoEstado.SIN_REGISTRAR}</b> Sin registrar{' '}</>}
           <span className="text-tierra">de {totalActividades}</span>
         </span>
       </div>
+
+      {/* Aviso con fecha límite: va arriba y con más peso visual que el informativo de
+          abajo, porque el domingo a medianoche estas actividades ya no se pueden registrar. */}
+      {avisarPlazoPorVencer({ anio, semana }, hoy, diaActual(), pendientes) && (
+        <div className="mb-5 rounded-lg border border-amber-300 bg-amber-100 px-4 py-3 text-sm font-semibold text-amber-900">
+          ⏳ Te quedan <b>{pendientes}</b> actividad(es) sin registrar y el plazo se cierra el
+          domingo a medianoche. Después no vas a poder marcarlas ni reportar novedades.
+        </div>
+      )}
 
       {pendientes > 0 && (
         <div className="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
