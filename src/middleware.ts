@@ -2,9 +2,11 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export function middleware(req: NextRequest) {
-  // El cron de respaldo se autentica solo con CRON_SECRET (Bearer), sin cookie de
-  // sesión: debe saltarse la redirección a /login del middleware.
-  if (req.nextUrl.pathname.startsWith('/api/backup-drive')) {
+  // Los crons se autentican solo con CRON_SECRET (Bearer), sin cookie de sesión: deben
+  // saltarse la redirección a /login del middleware. Sin esto el cron recibe un 307 a
+  // /login y no hace nada — el error que ya pasó una vez con el respaldo a Drive.
+  const p = req.nextUrl.pathname
+  if (p.startsWith('/api/backup-drive') || p.startsWith('/api/cerrar-vencidas')) {
     return NextResponse.next()
   }
   const tieneSesion = req.cookies.has('sesion')

@@ -5,6 +5,7 @@ import { duplicarActividades, datosReprogramacion, detectarConflictosAsignacion,
 import { turnoPorDia } from '@/dominio/turno'
 import type { BorradorActividad, Conflicto, Asignacion } from '@/dominio/programacion'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
+import type { Semana } from '@/dominio/semana'
 import {
   normalizarAvancePorLote,
   agregarAvances,
@@ -329,6 +330,27 @@ export async function reprogramarActividad(
     }
     throw e
   }
+}
+
+// Cierra como SIN_REGISTRAR lo que quedó PENDIENTE en una semana ya vencida: el área ya
+// no puede registrarlo (el plazo venció) y así deja de figurar como si faltara hacerlo.
+// Solo toca `estado` y `cerrada`: ni medidas, ni notas, ni avances, ni motivos.
+// El filtro de semana se arma en SQL para no traer toda la tabla; es el espejo de la
+// condición del dominio, `quedoSinRegistrar` (incluida su idempotencia: solo PENDIENTE
+// sin cerrar), así que correr el cron dos veces no cambia nada.
+export async function cerrarVencidasSinRegistrar(hoy: Semana): Promise<{ cerradas: number }> {
+  const r = await prisma.actividad.updateMany({
+    where: {
+      estado: 'PENDIENTE',
+      cerrada: false,
+      OR: [
+        { anio: { lt: hoy.anio } },
+        { anio: hoy.anio, semana: { lt: hoy.semana } },
+      ],
+    },
+    data: { estado: 'SIN_REGISTRAR', cerrada: true },
+  })
+  return { cerradas: r.count }
 }
 
 export function crearArea(nombre: string) {
