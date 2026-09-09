@@ -16,7 +16,7 @@ function agrupar<K extends string>(
 }
 
 // Peso de un estado para el cálculo de cumplimiento.
-// null = el estado no se evalúa (PENDIENTE, REPROGRAMADA).
+// null = el estado no se evalúa (PENDIENTE, REPROGRAMADA, SIN_REGISTRAR).
 export function pesoEstado(estado: Estado): number | null {
   switch (estado) {
     case 'CUMPLIDA': return 1
@@ -24,6 +24,9 @@ export function pesoEstado(estado: Estado): number | null {
     case 'NO_CUMPLIDA': return 0
     case 'PENDIENTE':
     case 'REPROGRAMADA':
+    // SIN_REGISTRAR pesa igual que PENDIENTE a propósito: son las mismas filas con otro
+    // rótulo, así que el cumplimiento de una semana pasada no se mueve al cerrarlas.
+    case 'SIN_REGISTRAR':
       return null
     default: {
       // Si se agrega un nuevo Estado y no se decide su peso aquí,
@@ -44,6 +47,7 @@ export function etiquetaEstado(estado: Estado): string {
     case 'NO_CUMPLIDA':
     case 'REPROGRAMADA':
       return 'No se hizo'
+    case 'SIN_REGISTRAR': return 'Sin registrar'
   }
 }
 
@@ -84,7 +88,7 @@ export function conteoEstadoActividades<
   T extends { id: string; tareaId?: string | null; estado: Estado },
 >(actividades: T[]): Record<Estado, number> {
   const r: Record<Estado, number> = {
-    PENDIENTE: 0, CUMPLIDA: 0, PARCIAL: 0, NO_CUMPLIDA: 0, REPROGRAMADA: 0,
+    PENDIENTE: 0, CUMPLIDA: 0, PARCIAL: 0, NO_CUMPLIDA: 0, REPROGRAMADA: 0, SIN_REGISTRAR: 0,
   }
   for (const dias of agruparPorActividad(actividades).values()) {
     r[estadoActividad(dias)] += 1
@@ -260,5 +264,9 @@ export function ordenEstadoCumplimiento(estado: Estado): number {
       return 2
     case 'CUMPLIDA':
       return 3
+    // No hay nada que hacer con una vencida sin registrar en /cumplimiento (el plazo
+    // venció): va al final para no estorbar arriba.
+    case 'SIN_REGISTRAR':
+      return 4
   }
 }

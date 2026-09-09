@@ -65,3 +65,27 @@ describe('grupoTrabajado', () => {
     expect(grupoTrabajado([])).toBe(false)
   })
 })
+
+describe('SIN_REGISTRAR no es trabajo registrado', () => {
+  it('aunque esté cerrada, nadie reportó nada', () => {
+    expect(trabajoRegistrado({ estado: 'SIN_REGISTRAR', cerrada: true })).toBe(false)
+  })
+  it('y con avances viejos tampoco: el estado manda', () => {
+    expect(trabajoRegistrado({
+      estado: 'SIN_REGISTRAR', cerrada: true,
+      avancePorLote: { l1: [{ dia: 1, maquinaId: null, cantidad: 3 }] },
+    })).toBe(false)
+  })
+  it('el grupo tampoco cuenta si todas sus filas quedaron sin registrar', () => {
+    expect(grupoTrabajado([
+      { estado: 'SIN_REGISTRAR', cerrada: true },
+      { estado: 'SIN_REGISTRAR', cerrada: true },
+    ])).toBe(false)
+  })
+  it('pero si una hermana sí se trabajó, el grupo cuenta', () => {
+    expect(grupoTrabajado([
+      { estado: 'SIN_REGISTRAR', cerrada: true },
+      { estado: 'CUMPLIDA', cerrada: true },
+    ])).toBe(true)
+  })
+})

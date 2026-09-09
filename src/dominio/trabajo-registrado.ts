@@ -19,6 +19,10 @@ export type FilaTrabajo = {
 }
 
 export function trabajoRegistrado(a: FilaTrabajo): boolean {
+  // Una vencida sin registrar está CERRADA pero nadie reportó nada: no es trabajo.
+  // Sin esta línea aparecería en /consulta como culminada, o sea trabajo que no se hizo
+  // listado como hecho. Su espejo en SQL es `ACTIVIDAD_TRABAJADA` (src/datos/repositorio.ts).
+  if (a.estado === 'SIN_REGISTRAR') return false
   if (a.cerrada || a.estado === 'CUMPLIDA') return true
   if (a.estado !== 'PARCIAL') return false
   const porLote = normalizarAvancePorLote(

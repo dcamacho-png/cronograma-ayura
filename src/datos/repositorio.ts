@@ -30,6 +30,10 @@ import { puedeBorrarse, textoReferencias, type ReferenciasLote } from '@/dominio
 // que el área ejecutora ya trabajó. Se usa para sacar la solicitud de "Mis solicitudes"
 // y para dejarla ver en /consulta. Mantener las dos definiciones en sintonía.
 const ACTIVIDAD_TRABAJADA: Prisma.ActividadWhereInput = {
+  // Las SIN_REGISTRAR están cerradas pero sin reporte: no cuentan como trabajadas.
+  // Espejo de la primera línea de `trabajoRegistrado` (src/dominio/trabajo-registrado.ts):
+  // las dos definiciones tienen que clasificar igual.
+  NOT: { estado: 'SIN_REGISTRAR' },
   OR: [
     { estado: 'CUMPLIDA' },
     { cerrada: true },

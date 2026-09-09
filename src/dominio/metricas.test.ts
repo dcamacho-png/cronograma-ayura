@@ -444,7 +444,7 @@ describe('conteoEstadoActividades', () => {
       { id: 'd', tareaId: null, estado: 'PENDIENTE' as const },
     ]
     expect(conteoEstadoActividades(acts)).toEqual({
-      PENDIENTE: 1, CUMPLIDA: 1, PARCIAL: 1, NO_CUMPLIDA: 0, REPROGRAMADA: 0,
+      PENDIENTE: 1, CUMPLIDA: 1, PARCIAL: 1, NO_CUMPLIDA: 0, REPROGRAMADA: 0, SIN_REGISTRAR: 0,
     })
   })
 })
@@ -478,5 +478,61 @@ describe('ordenEstadoCumplimiento', () => {
     const estados = ['CUMPLIDA', 'PENDIENTE', 'REPROGRAMADA', 'PARCIAL', 'NO_CUMPLIDA'] as const
     const ordenados = [...estados].sort((a, b) => ordenEstadoCumplimiento(a) - ordenEstadoCumplimiento(b))
     expect(ordenados).toEqual(['PENDIENTE', 'PARCIAL', 'REPROGRAMADA', 'NO_CUMPLIDA', 'CUMPLIDA'])
+  })
+})
+
+import { etiquetaEstado as etq, ordenEstadoCumplimiento as orden } from './metricas'
+
+describe('SIN_REGISTRAR en las métricas', () => {
+  it('no aporta al porcentaje: vale 0 igual que PENDIENTE', () => {
+    expect(fraccionFila({ estado: 'SIN_REGISTRAR' })).toBe(0)
+    expect(fraccionFila({ estado: 'PENDIENTE' })).toBe(0)
+  })
+  it('pesa igual que PENDIENTE: no se evalúa', () => {
+    expect(pesoEstado('SIN_REGISTRAR')).toBeNull()
+  })
+  it('tiene su propio rótulo, distinto de "No se hizo"', () => {
+    expect(etq('SIN_REGISTRAR')).toBe('Sin registrar')
+    expect(etq('NO_CUMPLIDA')).toBe('No se hizo')
+  })
+  it('se ordena al final, después de las cumplidas', () => {
+    expect(orden('SIN_REGISTRAR')).toBeGreaterThan(orden('CUMPLIDA'))
+  })
+  it('se cuenta en su propia clave', () => {
+    const c = conteoEstadoActividades([
+      { id: 'a', tareaId: 'T1', estado: 'SIN_REGISTRAR' },
+      { id: 'b', tareaId: 'T2', estado: 'CUMPLIDA' },
+    ])
+    expect(c.SIN_REGISTRAR).toBe(1)
+    expect(c.CUMPLIDA).toBe(1)
+  })
+
+  // La invariante del plan: cerrar lo vencido NO mueve la historia. Son las mismas filas
+  // con otro rótulo, así que el % de una semana pasada tiene que dar el mismo número.
+  it('el % de una semana no cambia al cerrar sus pendientes como SIN_REGISTRAR', () => {
+    const antes = [
+      act({ id: '1', tareaId: 'T1', estado: 'CUMPLIDA' }),
+      act({ id: '2', tareaId: 'T2', estado: 'PARCIAL' }),
+      act({ id: '3', tareaId: 'T3', estado: 'PENDIENTE' }),
+      act({ id: '4', tareaId: 'T4', estado: 'PENDIENTE' }),
+      act({ id: '5', tareaId: 'T5', estado: 'NO_CUMPLIDA' }),
+    ]
+    const despues = antes.map((a) =>
+      a.estado === 'PENDIENTE' ? act({ ...a, estado: 'SIN_REGISTRAR' }) : a)
+    expect(porcentajeCumplimiento(despues)).toBe(porcentajeCumplimiento(antes))
+  })
+
+  // Una actividad con dos responsables donde solo uno registró: la mezcla ya daba PARCIAL
+  // antes del cierre y tiene que seguir dando PARCIAL después.
+  it('una actividad mezclada sigue siendo PARCIAL después del cierre', () => {
+    expect(estadoActividad([{ estado: 'CUMPLIDA' }, { estado: 'PENDIENTE' }])).toBe('PARCIAL')
+    expect(estadoActividad([{ estado: 'CUMPLIDA' }, { estado: 'SIN_REGISTRAR' }])).toBe('PARCIAL')
+  })
+  it('y una toda sin registrar reporta SIN_REGISTRAR, no PENDIENTE', () => {
+    expect(estadoActividad([{ estado: 'SIN_REGISTRAR' }, { estado: 'SIN_REGISTRAR' }]))
+      .toBe('SIN_REGISTRAR')
+  })
+  it('una vencida sin registrar ya no cuenta como día pendiente', () => {
+    expect(tieneDiaPendiente([{ estado: 'SIN_REGISTRAR' }])).toBe(false)
   })
 })

@@ -5,6 +5,9 @@ export type Estado =
   | 'PARCIAL'
   | 'NO_CUMPLIDA'
   | 'REPROGRAMADA'
+  // La semana venció y nadie reportó nada. La cierra el cron semanal; ya no se puede
+  // registrar (el plazo venció), pero sí devolver la tarea al banco para programarla.
+  | 'SIN_REGISTRAR'
 
 // Una actividad del cronograma.
 export interface Actividad {
