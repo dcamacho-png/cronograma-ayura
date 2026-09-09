@@ -1,7 +1,7 @@
 import { prisma } from './prisma'
 import { Prisma } from '@prisma/client'
 import { hashPassword } from '@/auth/password'
-import { duplicarActividades, datosReprogramacion, detectarConflictosAsignacion, conflictosMaquinaEntreResponsables } from '@/dominio/programacion'
+import { duplicarActividades, detectarConflictosAsignacion, conflictosMaquinaEntreResponsables } from '@/dominio/programacion'
 import { turnoPorDia } from '@/dominio/turno'
 import type { BorradorActividad, Conflicto, Asignacion } from '@/dominio/programacion'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
@@ -309,30 +309,6 @@ export function areaDedicacionTractor(maquinaId: string, anio: number, semana: n
 // Crea un responsable nuevo en un área.
 export function crearResponsable(nombre: string, areaId: string, fincaId?: string | null) {
   return prisma.responsable.create({ data: { nombre, areaId, fincaId: fincaId ?? null } })
-}
-
-// Crea la copia reprogramada de una actividad en la semana destino.
-export async function reprogramarActividad(
-  id: string,
-  anioDestino: number,
-  semanaDestino: number,
-) {
-  const origen = await prisma.actividad.findUnique({ where: { id } })
-  if (!origen) return null
-  // Evitar reprogramar dos veces la misma actividad (guard optimista).
-  const yaReprogramada = await prisma.actividad.findUnique({ where: { origenId: id } })
-  if (yaReprogramada) return yaReprogramada
-  const datos = datosReprogramacion(origen as unknown as ActividadDominio, anioDestino, semanaDestino)
-  try {
-    return await prisma.actividad.create({ data: datos })
-  } catch (e) {
-    // Carrera: otra llamada creó la reprogramación entre el guard y este create
-    // (viola @unique origenId). Devolvemos la que ganó en vez de duplicar.
-    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
-      return prisma.actividad.findUnique({ where: { origenId: id } })
-    }
-    throw e
-  }
 }
 
 // Cierra como SIN_REGISTRAR lo que quedó PENDIENTE en una semana ya vencida: el área ya

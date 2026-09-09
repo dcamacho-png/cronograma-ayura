@@ -1,8 +1,8 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { reprogramarActividad, crearActividadRealizada, devolverAlBanco, areaYEstadoDeActividad, semanaDeActividad, registrarAvanceLoteGrupo, registrarAvanceObservacionGrupo, marcarCumplidaGrupo, registrarNovedadGrupo, reabrirGrupo, setLotesGrupo, setUnidadRealizadaGrupo, anexarLotesGrupo, editarAvanceEntradaGrupo, eliminarAvanceEntradaGrupo, agregarNovedadGrupo, eliminarNovedadGrupo, cerrarParcialGrupo, reabrirCierreGrupo, editarNovedadGrupo, registrarAvanceGeneralGrupo, editarAvanceGeneralGrupo, eliminarAvanceGeneralGrupo } from '@/datos/repositorio'
-import { siguienteSemana, plazoCumplimientoVencido, semanaActual } from '@/dominio/semana'
+import { crearActividadRealizada, devolverAlBanco, areaYEstadoDeActividad, semanaDeActividad, registrarAvanceLoteGrupo, registrarAvanceObservacionGrupo, marcarCumplidaGrupo, registrarNovedadGrupo, reabrirGrupo, setLotesGrupo, setUnidadRealizadaGrupo, anexarLotesGrupo, editarAvanceEntradaGrupo, eliminarAvanceEntradaGrupo, agregarNovedadGrupo, eliminarNovedadGrupo, cerrarParcialGrupo, reabrirCierreGrupo, editarNovedadGrupo, registrarAvanceGeneralGrupo, editarAvanceGeneralGrupo, eliminarAvanceGeneralGrupo } from '@/datos/repositorio'
+import { plazoCumplimientoVencido, semanaActual } from '@/dominio/semana'
 import { usuarioActual } from '@/auth/sesion'
 import { puedeMutarArea } from '@/auth/permisos'
 
@@ -48,17 +48,6 @@ async function bloqueadaActividad(id: string): Promise<boolean> {
   if (!puedeMutarArea(u, a.areaId)) return true
   if (u.rol === 'ADMIN') return false
   return plazoCumplimientoVencido(a.anio, a.semana, semanaActual())
-}
-
-export async function reprogramarAccion(form: FormData) {
-  const id = texto(form, 'id')
-  const anio = Number(texto(form, 'anio'))
-  const semana = Number(texto(form, 'semana'))
-  if (!id || !anio || !semana || !Number.isInteger(anio) || !Number.isInteger(semana)) return
-  if (await bloqueadaActividad(id)) return
-  const prox = siguienteSemana(anio, semana)
-  await reprogramarActividad(id, prox.anio, prox.semana)
-  revalidatePath('/cumplimiento')
 }
 
 export async function agregarActividadRealizadaAccion(form: FormData) {
