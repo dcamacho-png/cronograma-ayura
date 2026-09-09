@@ -9,6 +9,7 @@ import {
   listarResponsablesTodos,
 } from '@/datos/repositorio'
 import { semanaActual, siguienteSemana, programacionAbierta } from '@/dominio/semana'
+import { solicitudSinSalida } from '@/dominio/solicitud-sin-salida'
 import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
 import { usuarioActual } from '@/auth/sesion'
 import { puedeVer } from '@/auth/permisos'
@@ -52,9 +53,6 @@ export default async function TareasPage({
     listarSolicitudesDeArea(areaId),
     listarResponsablesTodos(),
   ])
-  // Ocultar de "Mis solicitudes" las que ya tienen ≥1 actividad CUMPLIDA (viven en Consulta).
-  const solicitudesVisibles = solicitudes.filter((s) => s._count.actividades === 0)
-
   const responsablesPorArea: Record<string, { id: string; nombre: string }[]> = {}
   for (const r of responsablesTodos) {
     if (!r.activo) continue
@@ -62,6 +60,18 @@ export default async function TareasPage({
   }
 
   const hoy = semanaActual()
+
+  // "Mis solicitudes" muestra solo lo que todavía admite alguna acción. Se ocultan:
+  //  - las que la otra área ya trabajó (pasan a /consulta), por `_count.actividades`;
+  //  - las que quedaron SIN SALIDA: programadas en semanas vencidas y sin registrar, donde
+  //    la ejecutora ya no puede ni notificar una novedad y el solicitante no puede editarlas.
+  const sinSalida = solicitudes.filter(
+    (s) => s._count.actividades === 0 && solicitudSinSalida(s, s._count.actividades, hoy),
+  )
+  const solicitudesVisibles = solicitudes.filter(
+    (s) => s._count.actividades === 0 && !solicitudSinSalida(s, s._count.actividades, hoy),
+  )
+
   const semanas: { anio: number; semana: number }[] = []
   // Ofrecer la semana en curso solo si su programación sigue abierta (lunes antes de las 11pm);
   // si ya cerró, empezar en la siguiente. Coincide con el tope del servidor (programacionAbierta).
@@ -253,6 +263,27 @@ export default async function TareasPage({
               </li>
             ))}
           </ul>
+        )}
+        {/* Las que quedaron sin salida no se borran: se resumen en una línea plegada para
+            que la lista no crezca sin freno pero quede constancia de lo pedido y no resuelto. */}
+        {sinSalida.length > 0 && (
+          <details className="mt-3 border-t border-borde pt-2 text-xs text-tierra">
+            <summary className="cursor-pointer">
+              {sinSalida.length} solicitud(es) de semanas vencidas sin registrar
+            </summary>
+            <p className="mt-1">
+              La otra área las programó pero no registró nada, y su semana ya venció: no puede
+              marcarlas ni notificar una novedad. Solo el administrador puede cerrarlas.
+            </p>
+            <ul className="mt-1 space-y-0.5">
+              {sinSalida.map((s) => (
+                <li key={s.id}>
+                  {s.descripcion} <span className="text-tierra/70">· para {s.area.nombre}</span>
+                  {s.anioSel && s.semanaSel ? ` · semana ${s.semanaSel} de ${s.anioSel}` : ''}
+                </li>
+              ))}
+            </ul>
+          </details>
         )}
       </div>
     </main>

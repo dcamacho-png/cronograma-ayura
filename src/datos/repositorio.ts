@@ -1373,6 +1373,10 @@ export function listarSolicitudesDeArea(areaId: string) {
       // Se oculta de "Mis solicitudes" cuando la otra área ya trabajó al menos una
       // actividad (cumplida, cerrada, o parcial con avances): pasan a /consulta.
       _count: { select: { actividades: { where: ACTIVIDAD_TRABAJADA } } },
+      // Solo las semanas de cada actividad: con eso la página decide si la solicitud
+      // quedó sin salida (programada en semana vencida y sin registrar). Se selecciona
+      // lo mínimo a propósito, para no traer los JSON de avances de cada actividad.
+      actividades: { select: { anio: true, semana: true } },
     },
     orderBy: { descripcion: 'asc' },
   })
