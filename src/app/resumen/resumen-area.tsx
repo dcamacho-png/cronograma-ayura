@@ -8,6 +8,7 @@ import {
 } from '@/dominio/resumen'
 import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
 import { unidadDe, unidadAbreviada, type Unidad } from '@/dominio/unidad'
+import { sinReportar } from '@/dominio/sin-registrar'
 import { normalizarAvancePorLote, type AvanceEntrada } from '@/dominio/avance-lote'
 import { etiquetaNovedad, type AusenciaResumen } from '@/dominio/ausencias'
 
@@ -136,7 +137,7 @@ export function ResumenArea({
   // Lista "realizado por actividad": suma la medida (única) por descripción.
   const medidaPorActividad = new Map<string, { valor: number; unidad: Unidad }>()
   for (const a of actividadesUnicas) {
-    if (a.estado === 'PENDIENTE') continue
+    if (sinReportar(a.estado)) continue
     const realizada = a.haRealizada ?? (a.unidad === 'ha' && a.estado === 'CUMPLIDA' ? a.haProgramada : 0)
     const prev = medidaPorActividad.get(a.descripcion)
     medidaPorActividad.set(a.descripcion, { valor: (prev?.valor ?? 0) + realizada, unidad: a.unidad })

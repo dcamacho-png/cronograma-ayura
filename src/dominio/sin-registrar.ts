@@ -39,3 +39,15 @@ export function vencidaPorAtender(v: {
   if (anioSel === null || semanaSel === null) return false
   return !esSemanaFutura(anioSel, semanaSel, { anio: v.anio, semana: v.semana })
 }
+
+// ¿Esta fila no reporta nada? `PENDIENTE` y `SIN_REGISTRAR` significan lo mismo para
+// cualquier suma de trabajo realizado: nadie reportó. La única diferencia es que una
+// todavía puede registrarse y la otra ya no.
+//
+// Existe para que no haya que acordarse de los dos estados en cada suma: antes los cálculos
+// preguntaban `estado === 'PENDIENTE'` y, al aparecer SIN_REGISTRAR, esas filas se colaban
+// (aportando 0, o su medida si alguien la había capturado). Toda suma de medidas, bultos o
+// avances debe saltarse las dos.
+export function sinReportar(estado: string): boolean {
+  return estado === 'PENDIENTE' || estado === 'SIN_REGISTRAR'
+}

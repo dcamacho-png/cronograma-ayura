@@ -1,6 +1,7 @@
-import type { Actividad } from './tipos'
+import type { Actividad, Estado } from './tipos'
 import type { Unidad } from './unidad'
 import { agruparPorActividad, estadoActividad } from './metricas'
+import { sinReportar } from './sin-registrar'
 
 export type ColorPorcentaje = 'gris' | 'verde' | 'amarillo' | 'rojo'
 
@@ -31,13 +32,16 @@ export function actividadesConCambio(actividades: Actividad[]): Actividad[] {
   return reps.sort((a, b) => b.vecesReprogramada - a.vecesReprogramada || a.dia - b.dia)
 }
 
-export function conteoPorEstado(actividades: Actividad[]): Record<string, number> {
-  const r: Record<string, number> = {
+// Tipado con `Record<Estado, number>` a propósito: si mañana aparece otro estado, `tsc`
+// obliga a decidir su casilla en vez de dejar esas actividades sin contar en ninguna.
+export function conteoPorEstado(actividades: Actividad[]): Record<Estado, number> {
+  const r: Record<Estado, number> = {
     PENDIENTE: 0,
     CUMPLIDA: 0,
     PARCIAL: 0,
     NO_CUMPLIDA: 0,
     REPROGRAMADA: 0,
+    SIN_REGISTRAR: 0,
   }
   for (const a of actividades) {
     if (a.estado in r) r[a.estado] += 1
@@ -52,7 +56,7 @@ export function hectareasRealizadas(
 ): number {
   let total = 0
   for (const f of filas) {
-    if (f.estado === 'PENDIENTE') continue
+    if (sinReportar(f.estado)) continue
     total += f.haRealizada ?? (f.estado === 'CUMPLIDA' ? f.haProgramada : 0)
   }
   return r1(total)
@@ -60,13 +64,13 @@ export function hectareasRealizadas(
 
 // Totaliza la medida realizada por unidad. La medida explícita (haRealizada)
 // gana; si no hay, solo se deriva de la ha programada cuando la unidad es 'ha'
-// y la actividad está CUMPLIDA. Las PENDIENTE se ignoran.
+// y la actividad está CUMPLIDA. Las que no reportan nada (PENDIENTE / SIN_REGISTRAR) se ignoran.
 export function medidasPorUnidad(
   filas: { estado: string; haProgramada: number; haRealizada: number | null; unidad: Unidad }[],
 ): Record<Unidad, number> {
   const tot: Record<Unidad, number> = { ha: 0, hora: 0, kg: 0, cantidad: 0 }
   for (const f of filas) {
-    if (f.estado === 'PENDIENTE') continue
+    if (sinReportar(f.estado)) continue
     const medida = f.haRealizada ?? (f.unidad === 'ha' && f.estado === 'CUMPLIDA' ? f.haProgramada : 0)
     tot[f.unidad] += medida
   }
@@ -118,14 +122,15 @@ export function finalizadasPorLabor(actividades: Actividad[]): FilaLabor[] {
     .sort((a, b) => b.total - a.total || a.descripcion.localeCompare(b.descripcion))
 }
 
-// Total de bultos aplicados del área: suma bultosPorLote de las actividades no pendientes.
+// Total de bultos aplicados del área: suma bultosPorLote de las actividades que reportaron algo
+// (una que nunca se reportó puede traer bultos asignados sin haberlos aplicado).
 // Recibe UNA fila por actividad-grupo (los bultos se comparten entre filas-hermanas).
 export function bultosAplicados(
   filas: { estado: string; bultosPorLote: Record<string, number> | null }[],
 ): number {
   let total = 0
   for (const f of filas) {
-    if (f.estado === 'PENDIENTE') continue
+    if (sinReportar(f.estado)) continue
     if (!f.bultosPorLote) continue
     for (const n of Object.values(f.bultosPorLote)) total += n
   }
@@ -153,7 +158,7 @@ export function medidasPorTractor(
     return r
   }
   for (const f of filas) {
-    if (f.estado === 'PENDIENTE') continue
+    if (sinReportar(f.estado)) continue
     if (f.avances.length > 0) {
       for (const av of f.avances) {
         if (!av.cantidad) continue
@@ -172,7 +177,7 @@ export function medidasPorTractor(
 
 // Labores realizadas por cada tractor: qué actividades hizo y con qué medida. Misma atribución
 // que `medidasPorTractor` (por avance a su tractor, o el de la actividad; si no hay avances, la
-// medida va al tractor de la actividad; ignora PENDIENTE), pero agrupando por (descripción +
+// medida va al tractor de la actividad; ignora lo que no reporta nada), pero agrupando por (descripción +
 // unidad). Devuelve, por tractor (clave '' = sin tractor), la lista ordenada por total desc.
 export type LaborTractor = { descripcion: string; unidad: Unidad; total: number }
 export function laboresPorTractor(
@@ -197,7 +202,7 @@ export function laboresPorTractor(
     else m.set(k, { descripcion, unidad, total: r1(cant) })
   }
   for (const f of filas) {
-    if (f.estado === 'PENDIENTE') continue
+    if (sinReportar(f.estado)) continue
     if (f.avances.length > 0) {
       for (const av of f.avances) add(av.maquinaId ?? f.maquinaId ?? '', f.descripcion, f.unidad, av.cantidad)
     } else {

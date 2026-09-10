@@ -77,7 +77,7 @@ describe('conteoPorEstado', () => {
       act({ estado: 'PARCIAL' }),
       act({ estado: 'PENDIENTE' }),
     ]
-    expect(conteoPorEstado(acts)).toEqual({ PENDIENTE: 1, CUMPLIDA: 2, PARCIAL: 1, NO_CUMPLIDA: 0, REPROGRAMADA: 0 })
+    expect(conteoPorEstado(acts)).toEqual({ PENDIENTE: 1, CUMPLIDA: 2, PARCIAL: 1, NO_CUMPLIDA: 0, REPROGRAMADA: 0, SIN_REGISTRAR: 0 })
   })
 })
 
@@ -283,5 +283,45 @@ describe('laboresPorTractor', () => {
     ])
     expect(m.get('')).toEqual([{ descripcion: 'Siembra', unidad: 'ha', total: 4.5 }])
     expect(m.has('A')).toBe(false)
+  })
+})
+
+// Una vencida sin registrar no reporta nada, igual que una pendiente: ninguna suma de
+// trabajo realizado puede contarla. Antes de que existiera el estado, estos cálculos
+// preguntaban solo por PENDIENTE y estas filas se colaban.
+describe('SIN_REGISTRAR no aporta trabajo realizado', () => {
+  it('se cuenta en su propia casilla, no desaparece del conteo', () => {
+    const c = conteoPorEstado([act({ estado: 'SIN_REGISTRAR' }), act({ estado: 'CUMPLIDA' })])
+    expect(c.SIN_REGISTRAR).toBe(1)
+    expect(c.CUMPLIDA).toBe(1)
+  })
+
+  it('hectareasRealizadas la ignora, igual que una pendiente', () => {
+    const conVencida = [
+      { estado: 'CUMPLIDA', haProgramada: 10, haRealizada: null },
+      { estado: 'SIN_REGISTRAR', haProgramada: 6, haRealizada: null },
+    ]
+    const conPendiente = [
+      { estado: 'CUMPLIDA', haProgramada: 10, haRealizada: null },
+      { estado: 'PENDIENTE', haProgramada: 6, haRealizada: null },
+    ]
+    expect(hectareasRealizadas(conVencida)).toBe(10)
+    expect(hectareasRealizadas(conVencida)).toBe(hectareasRealizadas(conPendiente))
+  })
+
+  it('y tampoco cuenta una medida que alguien hubiera capturado antes de que venciera', () => {
+    expect(hectareasRealizadas([{ estado: 'SIN_REGISTRAR', haProgramada: 6, haRealizada: 4 }])).toBe(0)
+    expect(medidasPorUnidad([{ estado: 'SIN_REGISTRAR', haProgramada: 6, haRealizada: 4, unidad: 'ha' }]).ha).toBe(0)
+  })
+
+  it('bultosAplicados no suma los bultos de una que nunca se reportó', () => {
+    expect(bultosAplicados([{ estado: 'SIN_REGISTRAR', bultosPorLote: { l1: 20 } }])).toBe(0)
+    expect(bultosAplicados([{ estado: 'CUMPLIDA', bultosPorLote: { l1: 20 } }])).toBe(20)
+  })
+
+  it('no aparece en las tablas de tractor ni en sus labores', () => {
+    const fila = { estado: 'SIN_REGISTRAR' as const, descripcion: 'RASTRA', unidad: 'ha' as const, haProgramada: 9, haRealizada: 4, maquinaId: 'm1', avances: [] }
+    expect(medidasPorTractor([fila]).size).toBe(0)
+    expect(laboresPorTractor([fila]).size).toBe(0)
   })
 })
