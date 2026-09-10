@@ -33,16 +33,17 @@ export function normalizarAvanceGeneral(raw: unknown): AvanceGeneralEntrada[] {
   return out
 }
 
-// Agrega el avance de un día. Una sola entrada por día: si ya existe la de ese día se
-// REEMPLAZA en su posición (misma invariante que el avance por lote, para que reabrir y
-// volver a registrar el mismo día no duplique filas en el Excel). No muta lo recibido.
+// Agrega el avance de un día. ACUMULA, igual que el avance por lote: varios viajes o
+// tareas en un mismo día son varios hechos y el total de la semana es su suma. Antes el
+// segundo registro del día reemplazaba al primero, y en labores como MOVIMIENTOS —donde
+// varios viajes por día son lo normal— eso hacía perder el día a día. Para corregir o
+// quitar una entrada están `editarAvanceGeneral` y `eliminarAvanceGeneral`.
+// No muta lo recibido.
 export function agregarAvanceGeneral(
   lista: AvanceGeneralEntrada[],
   entrada: AvanceGeneralEntrada,
 ): AvanceGeneralEntrada[] {
-  const idx = lista.findIndex((e) => e.dia === entrada.dia)
-  if (idx === -1) return [...lista, entrada]
-  return lista.map((e, i) => (i === idx ? entrada : e))
+  return [...lista, entrada]
 }
 
 // Suma de lo realizado en la semana.

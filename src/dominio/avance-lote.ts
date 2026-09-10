@@ -1,5 +1,7 @@
-// Un avance puntual de un lote en un día (cantidad incremental de ese día).
-export type AvanceEntrada = { dia: number; maquinaId: string | null; cantidad: number; centroCosto?: string | null; responsableId?: string | null; observacion?: string | null }
+// Un avance puntual de un lote en un día (cantidad incremental de ese día). `bultos` son
+// los bultos aplicados ESE día en ESE lote: van dentro de la entrada porque el avance es
+// acumulativo y un potrero puede trabajarse varios días.
+export type AvanceEntrada = { dia: number; maquinaId: string | null; cantidad: number; bultos?: number | null; centroCosto?: string | null; responsableId?: string | null; observacion?: string | null }
 // Historial de avances por lote: una lista de entradas por cada loteId.
 export type AvancePorLote = Record<string, AvanceEntrada[]>
 
@@ -76,27 +78,48 @@ export function totalAvanceLotes(
 }
 
 // Devuelve una copia de `avance` con el registro de cada lote indicado en el día dado.
-// Una sola entrada por (lote, día): si ya existe una de ese día se REEMPLAZA en su
-// posición (y se descartan duplicados viejos del mismo día); un día distinto se agrega
-// aparte. Así, al reabrir y volver a registrar el mismo día, el Excel deja solo el
-// último valor en vez de acumular el viejo y el nuevo. No muta lo recibido.
+//
+// El avance ACUMULA: cada registro es un hecho de ese día y el total del lote es la suma de
+// todas sus entradas. Un mismo (lote, día) puede tener varias —dos viajes, dos tractores,
+// mañana y tarde—; antes la segunda reemplazaba a la primera y ese trabajo se perdía. Para
+// corregir o quitar una entrada equivocada están `editarAvanceEntrada` y
+// `eliminarAvanceEntrada` (✏️/🗑 en la lista de avances). No muta lo recibido.
 export function agregarAvances(
   avance: AvancePorLote,
   dia: number,
   maquinaId: string | null,
-  entradas: { loteId: string; cantidad: number }[],
+  entradas: { loteId: string; cantidad: number; bultos?: number | null }[],
   centroCosto?: string | null,
   responsableId?: string | null,
   observacion?: string | null,
 ): AvancePorLote {
   const out: AvancePorLote = { ...avance }
-  for (const { loteId, cantidad } of entradas) {
-    const nueva: AvanceEntrada = { dia, maquinaId, cantidad, ...(centroCosto ? { centroCosto } : {}), ...(responsableId ? { responsableId } : {}), ...(observacion ? { observacion } : {}) }
-    const lista = out[loteId] ?? []
-    const idx = lista.findIndex((e) => e.dia === dia)
-    out[loteId] = idx === -1
-      ? [...lista, nueva]
-      : lista.map((e, i) => (i === idx ? nueva : e)).filter((e, i) => i === idx || e.dia !== dia)
+  for (const { loteId, cantidad, bultos } of entradas) {
+    const nueva: AvanceEntrada = {
+      dia, maquinaId, cantidad,
+      ...(bultos != null ? { bultos } : {}),
+      ...(centroCosto ? { centroCosto } : {}),
+      ...(responsableId ? { responsableId } : {}),
+      ...(observacion ? { observacion } : {}),
+    }
+    out[loteId] = [...(out[loteId] ?? []), nueva]
+  }
+  return out
+}
+
+// Bultos totales por lote: la suma de los que llevan sus entradas. Es lo que se guarda en
+// `Actividad.bultosPorLote` (la columna "Bultos por lote" del Excel y el total del área),
+// derivado del día a día para que no puedan discrepar. Un lote sin bultos en ninguna
+// entrada no aparece: así los valores heredados de lotes sin avance se conservan.
+export function totalBultosPorLote(avance: AvancePorLote): Record<string, number> {
+  const out: Record<string, number> = {}
+  for (const [loteId, entradas] of Object.entries(avance)) {
+    let suma = 0
+    let hay = false
+    for (const e of entradas) {
+      if (e.bultos != null) { suma += e.bultos; hay = true }
+    }
+    if (hay) out[loteId] = Math.round(suma * 100) / 100
   }
   return out
 }
@@ -143,13 +166,17 @@ export function editarAvanceEntrada(
   avance: AvancePorLote,
   loteId: string,
   index: number,
-  cambios: { cantidad?: number; dia?: number; observacion?: string | null },
+  cambios: { cantidad?: number; dia?: number; observacion?: string | null; bultos?: number | null },
 ): AvancePorLote {
   const lista = avance[loteId]
   if (!lista || index < 0 || index >= lista.length) return avance
   const siguiente: AvanceEntrada = { ...lista[index] }
   if (cambios.cantidad !== undefined) siguiente.cantidad = cambios.cantidad
   if (cambios.dia !== undefined) siguiente.dia = cambios.dia
+  if (cambios.bultos !== undefined) {
+    if (cambios.bultos == null) delete siguiente.bultos
+    else siguiente.bultos = cambios.bultos
+  }
   if (cambios.observacion !== undefined) {
     if (cambios.observacion) siguiente.observacion = cambios.observacion
     else delete siguiente.observacion

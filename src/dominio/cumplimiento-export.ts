@@ -88,9 +88,10 @@ export function filasCumplimiento(
         estado,
         e.cantidad,
         unidadDisplay,
-        // Los bultos son por lote (total), no por avance: se ponen SOLO en la primera fila
-        // del lote para que la columna no se duplique cuando el lote tiene varios avances.
-        idx === 0 ? (a.bultosPorLote?.[l.id] ?? '') : '',
+        // Los bultos de ESE día, que viajan en la entrada del avance. En los datos viejos
+        // no existían por día (eran un total por potrero): en ese caso se pone el total en
+        // la primera fila del lote, como antes, para no duplicarlo ni perderlo.
+        e.bultos != null ? e.bultos : (idx === 0 && !entradas.some((x) => x.bultos != null) ? (a.bultosPorLote?.[l.id] ?? '') : ''),
         e.centroCosto ?? centro,
         potreros,
         ejecutadaPor,

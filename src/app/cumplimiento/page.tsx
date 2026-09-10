@@ -9,6 +9,7 @@ import { vencidaPorAtender } from '@/dominio/sin-registrar'
 import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
 import { unidadDe, unidadAbreviada } from '@/dominio/unidad'
 import { textoLotesHechos } from '@/dominio/lotes-hechos'
+import { usaBultos } from '@/dominio/bultos'
 import { porcentajeCumplimiento, colorSemaforo, agruparPorActividad, diasDistintos, conteoEstadoActividades, tieneDiaPendiente, estadoActividad, etiquetaEstado, ordenEstadoCumplimiento } from '@/dominio/metricas'
 import type { Actividad as ActividadDominio, Estado } from '@/dominio/tipos'
 import { textoAvanceConFecha, normalizarAvancePorLote, totalAvanceLotes, lotesPendientes, type AvanceEntrada } from '@/dominio/avance-lote'
@@ -286,6 +287,7 @@ export default async function CumplimientoPage({
                           index,
                           dia: e.dia,
                           cantidad: e.cantidad,
+                          bultos: e.bultos ?? null,
                           observacion: e.observacion ?? '',
                         })),
                       )
@@ -347,6 +349,7 @@ export default async function CumplimientoPage({
                           unidad={unidadStd}
                           etiquetaPorDia={etiquetaPorDia}
                           diaLabels={DIAS}
+                          usaBultos={usaBultos(cab.descripcion)}
                           editar={usarGeneral ? editarAvanceGeneralAccion : editarAvanceAccion}
                           eliminar={usarGeneral ? eliminarAvanceGeneralAccion : eliminarAvanceAccion}
                         />

@@ -14,6 +14,7 @@ import {
   lotesRealizadosCumplida,
   editarAvanceEntrada,
   eliminarAvanceEntrada,
+  totalBultosPorLote,
   type AvanceEntrada,
 } from '@/dominio/avance-lote'
 import {
@@ -44,6 +45,18 @@ export const ACTIVIDAD_TRABAJADA: Prisma.ActividadWhereInput = {
     { estado: 'PARCIAL', NOT: { avancePorLote: { equals: Prisma.DbNull } } },
     { estado: 'PARCIAL', NOT: { avanceGeneral: { equals: Prisma.DbNull } } },
   ],
+}
+
+// Totales de bultos después de corregir o borrar avances: se recalculan desde el día a
+// día y se conservan los lotes heredados que no tienen bultos en ninguna entrada.
+function bultosTrasEditar(previos: unknown, avance: Record<string, AvanceEntrada[]>): Prisma.InputJsonValue | typeof Prisma.DbNull {
+  const heredados = (previos ?? {}) as Record<string, number>
+  const derivados = totalBultosPorLote(avance)
+  const soloHeredados = Object.fromEntries(
+    Object.entries(heredados).filter(([loteId]) => !(avance[loteId] ?? []).length),
+  )
+  const out = { ...soloHeredados, ...derivados }
+  return Object.keys(out).length ? (out as Prisma.InputJsonValue) : Prisma.DbNull
 }
 
 // Un contenedor de avance VACÍO se guarda como NULL, no como `{}` ni `[]`.
@@ -852,11 +865,10 @@ export async function registrarAvanceLoteGrupo(
   id: string,
   dia: number,
   maquinaId: string | null,
-  avances: { loteId: string; cantidad: number }[],
+  avances: { loteId: string; cantidad: number; bultos?: number | null }[],
   centroCosto?: string | null,
   responsableId?: string | null,
   observacion?: string | null,
-  bultosPorLote?: Record<string, number> | null,
 ) {
   const g = await filasHermanas(id)
   if (!g) return null
@@ -869,9 +881,10 @@ export async function registrarAvanceLoteGrupo(
     responsableId,
     observacion,
   )
-  const bultosMerge = bultosPorLote
-    ? { ...((g.base.bultosPorLote ?? {}) as Record<string, number>), ...bultosPorLote }
-    : null
+  // `bultosPorLote` pasa a ser el TOTAL derivado del día a día: los bultos de cada día
+  // viven en su entrada. Se conserva el valor heredado de los lotes que no tienen ninguna
+  // entrada con bultos (bultos capturados antes de que existiera el desglose por día).
+  const bultosMerge = { ...((g.base.bultosPorLote ?? {}) as Record<string, number>), ...totalBultosPorLote(actual) }
   await prisma.$transaction(
     g.filas
       .filter((f) => f.estado === 'PENDIENTE' || f.estado === 'PARCIAL')
@@ -881,7 +894,7 @@ export async function registrarAvanceLoteGrupo(
           data: {
             avancePorLote: avanceLoteAGuardar(actual),
             estado: 'PARCIAL',
-            ...(bultosMerge ? { bultosPorLote: bultosMerge as Prisma.InputJsonValue } : {}),
+            ...(Object.keys(bultosMerge).length ? { bultosPorLote: bultosMerge as Prisma.InputJsonValue } : {}),
           },
         }),
       ),
@@ -895,7 +908,7 @@ export async function editarAvanceEntradaGrupo(
   id: string,
   loteId: string,
   index: number,
-  cambios: { cantidad?: number; dia?: number; observacion?: string | null },
+  cambios: { cantidad?: number; dia?: number; observacion?: string | null; bultos?: number | null },
 ) {
   const g = await filasHermanas(id)
   if (!g) return null
@@ -908,7 +921,15 @@ export async function editarAvanceEntradaGrupo(
   await prisma.$transaction(
     g.filas
       .filter((f) => f.estado === 'PENDIENTE' || f.estado === 'PARCIAL')
-      .map((f) => prisma.actividad.update({ where: { id: f.id }, data: { avancePorLote: avanceLoteAGuardar(actual) } })),
+      .map((f) => prisma.actividad.update({
+        where: { id: f.id },
+        data: {
+          avancePorLote: avanceLoteAGuardar(actual),
+          // El total de bultos se recalcula: si se corrige o se borra el avance de un día,
+          // sus bultos tienen que salir del total (antes quedaba el número viejo).
+          bultosPorLote: bultosTrasEditar(g.base.bultosPorLote, actual),
+        },
+      })),
   )
   return true
 }
@@ -926,7 +947,15 @@ export async function eliminarAvanceEntradaGrupo(id: string, loteId: string, ind
   await prisma.$transaction(
     g.filas
       .filter((f) => f.estado === 'PENDIENTE' || f.estado === 'PARCIAL')
-      .map((f) => prisma.actividad.update({ where: { id: f.id }, data: { avancePorLote: avanceLoteAGuardar(actual) } })),
+      .map((f) => prisma.actividad.update({
+        where: { id: f.id },
+        data: {
+          avancePorLote: avanceLoteAGuardar(actual),
+          // El total de bultos se recalcula: si se corrige o se borra el avance de un día,
+          // sus bultos tienen que salir del total (antes quedaba el número viejo).
+          bultosPorLote: bultosTrasEditar(g.base.bultosPorLote, actual),
+        },
+      })),
   )
   return true
 }

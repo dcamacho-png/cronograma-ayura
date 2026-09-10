@@ -196,15 +196,17 @@ export async function registrarAvanceAccion(form: FormData) {
   const centroSelect = texto(form, 'centroCosto')
   const centroCosto = centroSelect === '__otra__' ? textoOpcional(form, 'centroCostoOtra') : (centroSelect || null)
   const observacion = textoOpcional(form, 'observacion')
-  const avances = lotesHechos.map((loteId) => ({ loteId, cantidad: numeroOpcional(form, `ha_${loteId}`) ?? 0 }))
-  const bultosMap: Record<string, number> = {}
-  for (const loteId of lotesHechos) {
-    const b = numeroOpcional(form, `bultos_${loteId}`)
-    if (b != null) bultosMap[loteId] = b
-  }
+  // Los bultos van DENTRO del avance de cada día: el avance es acumulativo y un potrero
+  // puede trabajarse varios días, así que un único total por potrero perdía los del
+  // segundo día. El total por potrero se deriva de las entradas en el repositorio.
+  const avances = lotesHechos.map((loteId) => ({
+    loteId,
+    cantidad: numeroOpcional(form, `ha_${loteId}`) ?? 0,
+    bultos: numeroOpcional(form, `bultos_${loteId}`),
+  }))
   await anexarLotesGrupo(id, lotesHechos)
   await setUnidadRealizadaGrupo(id, unidadElegida(form))
-  await registrarAvanceLoteGrupo(id, dia, maquinaId, avances, centroCosto, responsableId, observacion, Object.keys(bultosMap).length ? bultosMap : null)
+  await registrarAvanceLoteGrupo(id, dia, maquinaId, avances, centroCosto, responsableId, observacion)
   revalidatePath('/cumplimiento')
 }
 
@@ -260,10 +262,14 @@ export async function editarAvanceAccion(form: FormData) {
   const cantidad = numeroOpcional(form, 'cantidad') ?? 0
   const dia = Number(texto(form, 'dia'))
   const observacion = textoOpcional(form, 'observacion')
+  // `bultos` solo se toca si el formulario trae la casilla (labores que usan bultos);
+  // si no viene, la entrada conserva los que tenía.
+  const traeBultos = form.has('bultos')
   await editarAvanceEntradaGrupo(id, loteId, index, {
     cantidad,
     ...(dia >= 1 && dia <= 7 ? { dia } : {}),
     observacion,
+    ...(traeBultos ? { bultos: numeroOpcional(form, 'bultos') } : {}),
   })
   revalidatePath('/cumplimiento')
 }

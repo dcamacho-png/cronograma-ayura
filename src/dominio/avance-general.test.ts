@@ -40,12 +40,22 @@ describe('agregarAvanceGeneral', () => {
     expect(l2).toEqual([e(1, 4), e(3, 2)])
   })
 
-  it('re-registrar el mismo día REEMPLAZA en su posición (no acumula)', () => {
+  // El avance es acumulativo: varios viajes o tareas el mismo día son varios hechos, y
+  // el total de la semana es la suma. Antes el segundo registro del día borraba el primero.
+  it('re-registrar el mismo día ACUMULA otra entrada', () => {
     const lista = [e(1, 4), e(3, 2)]
-    expect(agregarAvanceGeneral(lista, e(1, 9, { observacion: 'corregido' }))).toEqual([
-      e(1, 9, { observacion: 'corregido' }),
+    expect(agregarAvanceGeneral(lista, e(1, 9, { observacion: 'segundo viaje' }))).toEqual([
+      e(1, 4),
       e(3, 2),
+      e(1, 9, { observacion: 'segundo viaje' }),
     ])
+  })
+
+  it('y el total de la semana es la suma de todas', () => {
+    let l = agregarAvanceGeneral([], e(1, 3))
+    l = agregarAvanceGeneral(l, e(1, 2))
+    l = agregarAvanceGeneral(l, e(2, 4))
+    expect(totalAvanceGeneral(l)).toBe(9)
   })
 
   it('no muta la lista recibida', () => {

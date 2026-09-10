@@ -323,3 +323,32 @@ describe('filasCumplimiento — sin registrar', () => {
     expect(fila[9]).toBe('')                // Unidad
   })
 })
+
+describe('filasCumplimiento — bultos por día', () => {
+  const dosDias = (bultosEntrada: boolean) => act({
+    estado: 'CUMPLIDA',
+    descripcion: 'ESTERCOLERO',
+    lotes: [{ id: 'l1', nombre: 'PISTAZURI1' }],
+    haRealizada: 5.2,
+    bultosPorLote: { l1: 7 },
+    avancePorLote: {
+      l1: [
+        { dia: 3, maquinaId: null, cantidad: 2.6, ...(bultosEntrada ? { bultos: 4 } : {}) },
+        { dia: 5, maquinaId: null, cantidad: 2.6, ...(bultosEntrada ? { bultos: 3 } : {}) },
+      ],
+    },
+  })
+
+  it('cada día muestra los bultos de ESE día', () => {
+    const filas = filasCumplimiento(dosDias(true), '15 jun', mapa, ctx)
+    expect(filas).toHaveLength(2)
+    expect(filas[0][10]).toBe(4)   // columna Bultos por lote, día 3
+    expect(filas[1][10]).toBe(3)   // día 5 — antes salía vacía
+  })
+
+  it('datos viejos (sin bultos por día): el total del potrero sigue saliendo en su primera fila', () => {
+    const filas = filasCumplimiento(dosDias(false), '15 jun', mapa, ctx)
+    expect(filas[0][10]).toBe(7)
+    expect(filas[1][10]).toBe('')
+  })
+})

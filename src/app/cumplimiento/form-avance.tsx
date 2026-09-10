@@ -188,6 +188,13 @@ export function FormAvance({
       <label className="flex flex-1 flex-col">Observaciones
         <input name="observacion" placeholder="¿qué se avanzó?" className="rounded-lg border border-borde bg-marfil p-1 focus:outline-none focus:ring-2 focus:ring-bosque/40" />
       </label>
+      {/* El avance acumula: registrar el mismo día otra vez agrega otra entrada (dos viajes,
+          dos tractores). Corregir se hace desde la lista de avances, no re-registrando. */}
+      <p className="text-xs text-tierra">
+        Cada registro se <b>suma</b> al avance de la semana: podés registrar el mismo día varias
+        veces (dos viajes, dos tractores). Si te equivocaste, corregí o borrá ese avance en la
+        lista de abajo — no lo registres otra vez.
+      </p>
       <button className="rounded-lg bg-bosque px-3 py-1 font-semibold text-white">Guardar avance</button>
       <button type="button" onClick={() => setAbierto(false)} className="text-tierra underline">cancelar</button>
     </form>

@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import {
   lotesPendientes, textoAvancePorLote, textoAvanceConFecha,
-  normalizarAvancePorLote, totalAvanceLotes, agregarAvances, completarAvancesCumplida, lotesRealizadosCumplida, type AvancePorLote,
+  normalizarAvancePorLote, totalAvanceLotes, agregarAvances, completarAvancesCumplida, lotesRealizadosCumplida,
+  totalBultosPorLote, type AvancePorLote,
 } from './avance-lote'
 
 const lotes = [{ id: 'a', nombre: 'L-A' }, { id: 'b', nombre: 'L-B' }, { id: 'c', nombre: 'L-C' }]
@@ -147,26 +148,81 @@ describe('lotesRealizadosCumplida', () => {
   })
 })
 
-describe('agregarAvances — reemplazo por lote+día', () => {
-  it('re-registrar el MISMO lote y día reemplaza la entrada (no la duplica)', () => {
+describe('agregarAvances — el avance ACUMULA', () => {
+  // El avance es acumulativo: cada registro es un hecho del día que se suma al final.
+  // Antes se reemplazaba la entrada del mismo (lote, día), y eso hacía perder los avances
+  // reales de una jornada con dos viajes/tractores en el mismo potrero.
+  it('re-registrar el MISMO lote y día agrega otra entrada, no reemplaza', () => {
     const base: AvancePorLote = { a: [{ dia: 1, maquinaId: 'm1', cantidad: 3 }] }
     const out = agregarAvances(base, 1, 'm2', [{ loteId: 'a', cantidad: 5 }])
-    expect(out).toEqual({ a: [{ dia: 1, maquinaId: 'm2', cantidad: 5 }] })
+    expect(out.a).toEqual([
+      { dia: 1, maquinaId: 'm1', cantidad: 3 },
+      { dia: 1, maquinaId: 'm2', cantidad: 5 },
+    ])
     expect(base).toEqual({ a: [{ dia: 1, maquinaId: 'm1', cantidad: 3 }] }) // intacto
   })
 
-  it('un día distinto en el mismo lote sí agrega una entrada nueva', () => {
-    const base: AvancePorLote = { a: [{ dia: 1, maquinaId: 'm1', cantidad: 3 }] }
-    const out = agregarAvances(base, 2, 'm1', [{ loteId: 'a', cantidad: 2 }])
-    expect(out.a).toHaveLength(2)
+  it('el total del lote es la suma de todas las entradas', () => {
+    let av: AvancePorLote = {}
+    av = agregarAvances(av, 1, null, [{ loteId: 'a', cantidad: 3 }])
+    av = agregarAvances(av, 1, null, [{ loteId: 'a', cantidad: 2 }])
+    av = agregarAvances(av, 2, null, [{ loteId: 'a', cantidad: 4 }])
+    expect(totalAvanceLotes([{ id: 'a' }], av)).toBe(9)
   })
 
-  it('conserva la posición al reemplazar y descarta duplicados viejos del mismo día', () => {
+  it('un día distinto en el mismo lote también agrega', () => {
+    const base: AvancePorLote = { a: [{ dia: 1, maquinaId: 'm1', cantidad: 3 }] }
+    expect(agregarAvances(base, 2, 'm1', [{ loteId: 'a', cantidad: 2 }]).a).toHaveLength(2)
+  })
+
+  it('respeta las entradas viejas del mismo día que ya estuvieran guardadas', () => {
     const base: AvancePorLote = {
-      a: [{ dia: 1, maquinaId: null, cantidad: 3 }, { dia: 2, maquinaId: null, cantidad: 4 }, { dia: 1, maquinaId: null, cantidad: 1 }],
+      a: [{ dia: 1, maquinaId: null, cantidad: 3 }, { dia: 2, maquinaId: null, cantidad: 4 }],
     }
     const out = agregarAvances(base, 1, 'm9', [{ loteId: 'a', cantidad: 9 }])
-    expect(out.a).toEqual([{ dia: 1, maquinaId: 'm9', cantidad: 9 }, { dia: 2, maquinaId: null, cantidad: 4 }])
+    expect(out.a).toEqual([
+      { dia: 1, maquinaId: null, cantidad: 3 },
+      { dia: 2, maquinaId: null, cantidad: 4 },
+      { dia: 1, maquinaId: 'm9', cantidad: 9 },
+    ])
+  })
+})
+
+describe('bultos por día', () => {
+  // Los bultos de cada día viajan DENTRO de la entrada del avance. Antes vivían en un
+  // único número por potrero (`Actividad.bultosPorLote`), así que al trabajar el mismo
+  // potrero dos días los del segundo día se perdían.
+  it('guarda los bultos en la entrada del día', () => {
+    const out = agregarAvances({}, 3, 'm1', [{ loteId: 'a', cantidad: 2.6, bultos: 4 }])
+    expect(out.a).toEqual([{ dia: 3, maquinaId: 'm1', cantidad: 2.6, bultos: 4 }])
+  })
+
+  it('cada día conserva los suyos', () => {
+    let av = agregarAvances({}, 3, null, [{ loteId: 'a', cantidad: 2.6, bultos: 4 }])
+    av = agregarAvances(av, 5, null, [{ loteId: 'a', cantidad: 2.6, bultos: 3 }])
+    expect(av.a.map((e) => e.bultos)).toEqual([4, 3])
+  })
+
+  it('sin bultos, la entrada no lleva el campo', () => {
+    const out = agregarAvances({}, 1, null, [{ loteId: 'a', cantidad: 2 }])
+    expect('bultos' in out.a[0]).toBe(false)
+  })
+
+  it('totalBultosPorLote suma los días de cada potrero', () => {
+    let av = agregarAvances({}, 3, null, [{ loteId: 'a', cantidad: 1, bultos: 4 }, { loteId: 'b', cantidad: 1, bultos: 10 }])
+    av = agregarAvances(av, 5, null, [{ loteId: 'a', cantidad: 1, bultos: 3 }])
+    expect(totalBultosPorLote(av)).toEqual({ a: 7, b: 10 })
+  })
+
+  it('un potrero sin bultos en ninguna entrada no aparece en los totales', () => {
+    const av = agregarAvances({}, 1, null, [{ loteId: 'a', cantidad: 2 }])
+    expect(totalBultosPorLote(av)).toEqual({})
+  })
+
+  it('editarAvanceEntrada puede corregir los bultos de un día', () => {
+    const av = agregarAvances({}, 3, null, [{ loteId: 'a', cantidad: 2, bultos: 4 }])
+    expect(editarAvanceEntrada(av, 'a', 0, { bultos: 6 }).a[0].bultos).toBe(6)
+    expect(editarAvanceEntrada(av, 'a', 0, { bultos: null }).a[0].bultos).toBeUndefined()
   })
 })
 

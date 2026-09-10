@@ -4,11 +4,14 @@ import { useState } from 'react'
 
 // `loteId`/`etiqueta` faltan en las actividades SIN potreros (bitácora general): ahí la
 // entrada se ubica solo por su índice y se muestra sin nombre de lote.
-type Entrada = { loteId?: string; etiqueta?: string; index: number; dia: number; cantidad: number; observacion: string }
+type Entrada = { loteId?: string; etiqueta?: string; index: number; dia: number; cantidad: number; observacion: string; bultos?: number | null }
 
-// Lista de avances registrados con editar (✏️, mini-form en línea: día + cantidad + observación)
-// y borrar (×). Cada avance se ubica por loteId + index (o solo por index si no hay potrero).
-// Solo se usa en actividades abiertas.
+// Lista de avances registrados con editar (✏️, mini-form en línea: día + cantidad + bultos
+// + observación) y borrar (×). Cada avance se ubica por loteId + index (o solo por index si
+// no hay potrero). Solo se usa en actividades abiertas.
+//
+// Es la forma de corregir: el avance ACUMULA (registrar el mismo día otra vez agrega otra
+// entrada), así que una entrada equivocada se arregla o se borra desde acá.
 export function AvancesEditables({
   actividadId,
   entradas,
@@ -17,12 +20,14 @@ export function AvancesEditables({
   diaLabels,
   editar,
   eliminar,
+  usaBultos = false,
 }: {
   actividadId: string
   entradas: Entrada[]
   unidad: string
   etiquetaPorDia: string[]
   diaLabels: string[]
+  usaBultos?: boolean
   editar: (f: FormData) => void | Promise<void>
   eliminar: (f: FormData) => void | Promise<void>
 }) {
@@ -50,6 +55,12 @@ export function AvancesEditables({
                 Cantidad
                 <input name="cantidad" type="number" step="any" min="0" defaultValue={e.cantidad} className="w-24 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
               </label>
+              {usaBultos && e.loteId && (
+                <label className="flex flex-col text-xs">
+                  Bultos
+                  <input name="bultos" type="number" step="any" min="0" defaultValue={e.bultos ?? ''} className="w-20 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
+                </label>
+              )}
               <label className="flex flex-1 flex-col text-xs">
                 Observación
                 <input name="observacion" defaultValue={e.observacion} className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
@@ -61,7 +72,11 @@ export function AvancesEditables({
         }
         return (
           <div key={clave} className="flex flex-wrap items-center gap-2">
-            <span>{etiquetaPorDia[e.dia]}{e.etiqueta ? ` · ${e.etiqueta}` : ''} — {e.cantidad} {unidad}{e.observacion ? ` · ${e.observacion}` : ''}</span>
+            <span>
+              {etiquetaPorDia[e.dia]}{e.etiqueta ? ` · ${e.etiqueta}` : ''} — {e.cantidad} {unidad}
+              {e.bultos != null ? ` · ${e.bultos} bultos` : ''}
+              {e.observacion ? ` · ${e.observacion}` : ''}
+            </span>
             <button type="button" onClick={() => setEditando(clave)} className="text-xs text-tierra hover:text-tinta" title="editar">✏️</button>
             <form action={eliminar} className="inline">
               <input type="hidden" name="id" value={actividadId} />
