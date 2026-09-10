@@ -1,0 +1,4339 @@
+[
+  {
+    "id": "cmr8klmlm000fic0483c5b7w6",
+    "anio": 2026,
+    "semana": 28,
+    "descripcion": "ENCALADORA",
+    "bultosPorLote": {
+      "cmqme27ot009eod5q8kpk9wq1": 80,
+      "cmqme2p4l00baod5qb9ebfxrd": 70
+    },
+    "avancePorLote": {
+      "cmqme2p4l00baod5qb9ebfxrd": [
+        {
+          "dia": 3,
+          "cantidad": 3,
+          "maquinaId": null,
+          "observacion": "SE PARTIO EL EJE DE LA ENCALADORA",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmr8kmqlj000fju04ivby6all",
+    "anio": 2026,
+    "semana": 28,
+    "descripcion": "FERTILIZACION GRANULADA",
+    "bultosPorLote": {
+      "cmqmdzzc2000god5qwq5kblck": 10,
+      "cmqme0171000ood5q8obui7ve": 8,
+      "cmqme0e5d0026od5qnan61y59": 7,
+      "cmqme0ogh003aod5qvyb28i6q": 6,
+      "cmqme0owx003cod5qce14r85j": 6,
+      "cmqme0wsd004aod5qgbxyjhn1": 10,
+      "cmqme0x8q004cod5q252dr3q4": 9,
+      "cmqme1bv1005wod5q711swo9q": 13,
+      "cmqme1y7y008aod5qn8aqj2rs": 14,
+      "cmqme22sx008uod5qkri8lwdn": 6,
+      "cmqme2395008wod5qdstk1c9v": 5,
+      "cmqme2yhd00caod5qt16ryxo0": 4,
+      "cmqme2zfm00ceod5qbkylz6pa": 4,
+      "cmqme30y100ckod5qf9q9ci10": 4,
+      "cmqme31wl00cood5qoznkkbvx": 3
+    },
+    "avancePorLote": {
+      "cmqmdzzc2000god5qwq5kblck": [
+        {
+          "dia": 3,
+          "cantidad": 9.1,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0171000ood5q8obui7ve": [
+        {
+          "dia": 2,
+          "cantidad": 7,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme05g30016od5qbrvnrf67": [
+        {
+          "dia": 2,
+          "cantidad": 8.5,
+          "maquinaId": null
+        }
+      ],
+      "cmqme0e5d0026od5qnan61y59": [
+        {
+          "dia": 2,
+          "cantidad": 6.9,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0ogh003aod5qvyb28i6q": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0owx003cod5qce14r85j": [
+        {
+          "dia": 2,
+          "cantidad": 5.6,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0wsd004aod5qgbxyjhn1": [
+        {
+          "dia": 3,
+          "cantidad": 8.4,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0x8q004cod5q252dr3q4": [
+        {
+          "dia": 3,
+          "cantidad": 9.3,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme1bv1005wod5q711swo9q": [
+        {
+          "dia": 3,
+          "cantidad": 13,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme1y7y008aod5qn8aqj2rs": [
+        {
+          "dia": 2,
+          "cantidad": 13.6,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        },
+        {
+          "dia": 2,
+          "cantidad": 13.6,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme22sx008uod5qkri8lwdn": [
+        {
+          "dia": 2,
+          "cantidad": 5.84,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme2395008wod5qdstk1c9v": [
+        {
+          "dia": 2,
+          "cantidad": 4.83,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        },
+        {
+          "dia": 2,
+          "cantidad": 4.83,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme2yhd00caod5qt16ryxo0": [
+        {
+          "dia": 2,
+          "cantidad": 4.08,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme2zfm00ceod5qbkylz6pa": [
+        {
+          "dia": 2,
+          "cantidad": 3.93,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme30y100ckod5qf9q9ci10": [
+        {
+          "dia": 2,
+          "cantidad": 3.62,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme31wl00cood5qoznkkbvx": [
+        {
+          "dia": 2,
+          "cantidad": 2.81,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmr8kmqlr000hju04c7wr9ghf",
+    "anio": 2026,
+    "semana": 28,
+    "descripcion": "FERTILIZACION GRANULADA",
+    "bultosPorLote": {
+      "cmqmdzzc2000god5qwq5kblck": 10,
+      "cmqme0171000ood5q8obui7ve": 8,
+      "cmqme0e5d0026od5qnan61y59": 7,
+      "cmqme0ogh003aod5qvyb28i6q": 6,
+      "cmqme0owx003cod5qce14r85j": 6,
+      "cmqme0wsd004aod5qgbxyjhn1": 10,
+      "cmqme0x8q004cod5q252dr3q4": 9,
+      "cmqme1bv1005wod5q711swo9q": 13,
+      "cmqme1y7y008aod5qn8aqj2rs": 14,
+      "cmqme22sx008uod5qkri8lwdn": 6,
+      "cmqme2395008wod5qdstk1c9v": 5,
+      "cmqme2yhd00caod5qt16ryxo0": 4,
+      "cmqme2zfm00ceod5qbkylz6pa": 4,
+      "cmqme30y100ckod5qf9q9ci10": 4,
+      "cmqme31wl00cood5qoznkkbvx": 3
+    },
+    "avancePorLote": {
+      "cmqmdzzc2000god5qwq5kblck": [
+        {
+          "dia": 3,
+          "cantidad": 9.1,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0171000ood5q8obui7ve": [
+        {
+          "dia": 2,
+          "cantidad": 7,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme05g30016od5qbrvnrf67": [
+        {
+          "dia": 2,
+          "cantidad": 8.5,
+          "maquinaId": null
+        }
+      ],
+      "cmqme0e5d0026od5qnan61y59": [
+        {
+          "dia": 2,
+          "cantidad": 6.9,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0ogh003aod5qvyb28i6q": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0owx003cod5qce14r85j": [
+        {
+          "dia": 2,
+          "cantidad": 5.6,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0wsd004aod5qgbxyjhn1": [
+        {
+          "dia": 3,
+          "cantidad": 8.4,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0x8q004cod5q252dr3q4": [
+        {
+          "dia": 3,
+          "cantidad": 9.3,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme1bv1005wod5q711swo9q": [
+        {
+          "dia": 3,
+          "cantidad": 13,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme1y7y008aod5qn8aqj2rs": [
+        {
+          "dia": 2,
+          "cantidad": 13.6,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        },
+        {
+          "dia": 2,
+          "cantidad": 13.6,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme22sx008uod5qkri8lwdn": [
+        {
+          "dia": 2,
+          "cantidad": 5.84,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme2395008wod5qdstk1c9v": [
+        {
+          "dia": 2,
+          "cantidad": 4.83,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        },
+        {
+          "dia": 2,
+          "cantidad": 4.83,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme2yhd00caod5qt16ryxo0": [
+        {
+          "dia": 2,
+          "cantidad": 4.08,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme2zfm00ceod5qbkylz6pa": [
+        {
+          "dia": 2,
+          "cantidad": 3.93,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme30y100ckod5qf9q9ci10": [
+        {
+          "dia": 2,
+          "cantidad": 3.62,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme31wl00cood5qoznkkbvx": [
+        {
+          "dia": 2,
+          "cantidad": 2.81,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmr8kmqlw000jju04vldcqa6e",
+    "anio": 2026,
+    "semana": 28,
+    "descripcion": "FERTILIZACION GRANULADA",
+    "bultosPorLote": {
+      "cmqmdzzc2000god5qwq5kblck": 10,
+      "cmqme0171000ood5q8obui7ve": 8,
+      "cmqme0e5d0026od5qnan61y59": 7,
+      "cmqme0ogh003aod5qvyb28i6q": 6,
+      "cmqme0owx003cod5qce14r85j": 6,
+      "cmqme0wsd004aod5qgbxyjhn1": 10,
+      "cmqme0x8q004cod5q252dr3q4": 9,
+      "cmqme1bv1005wod5q711swo9q": 13,
+      "cmqme1y7y008aod5qn8aqj2rs": 14,
+      "cmqme22sx008uod5qkri8lwdn": 6,
+      "cmqme2395008wod5qdstk1c9v": 5,
+      "cmqme2yhd00caod5qt16ryxo0": 4,
+      "cmqme2zfm00ceod5qbkylz6pa": 4,
+      "cmqme30y100ckod5qf9q9ci10": 4,
+      "cmqme31wl00cood5qoznkkbvx": 3
+    },
+    "avancePorLote": {
+      "cmqmdzzc2000god5qwq5kblck": [
+        {
+          "dia": 3,
+          "cantidad": 9.1,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0171000ood5q8obui7ve": [
+        {
+          "dia": 2,
+          "cantidad": 7,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme05g30016od5qbrvnrf67": [
+        {
+          "dia": 2,
+          "cantidad": 8.5,
+          "maquinaId": null
+        }
+      ],
+      "cmqme0e5d0026od5qnan61y59": [
+        {
+          "dia": 2,
+          "cantidad": 6.9,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0ogh003aod5qvyb28i6q": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0owx003cod5qce14r85j": [
+        {
+          "dia": 2,
+          "cantidad": 5.6,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0wsd004aod5qgbxyjhn1": [
+        {
+          "dia": 3,
+          "cantidad": 8.4,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0x8q004cod5q252dr3q4": [
+        {
+          "dia": 3,
+          "cantidad": 9.3,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme1bv1005wod5q711swo9q": [
+        {
+          "dia": 3,
+          "cantidad": 13,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme1y7y008aod5qn8aqj2rs": [
+        {
+          "dia": 2,
+          "cantidad": 13.6,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        },
+        {
+          "dia": 2,
+          "cantidad": 13.6,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme22sx008uod5qkri8lwdn": [
+        {
+          "dia": 2,
+          "cantidad": 5.84,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme2395008wod5qdstk1c9v": [
+        {
+          "dia": 2,
+          "cantidad": 4.83,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        },
+        {
+          "dia": 2,
+          "cantidad": 4.83,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme2yhd00caod5qt16ryxo0": [
+        {
+          "dia": 2,
+          "cantidad": 4.08,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme2zfm00ceod5qbkylz6pa": [
+        {
+          "dia": 2,
+          "cantidad": 3.93,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme30y100ckod5qf9q9ci10": [
+        {
+          "dia": 2,
+          "cantidad": 3.62,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme31wl00cood5qoznkkbvx": [
+        {
+          "dia": 2,
+          "cantidad": 2.81,
+          "maquinaId": null,
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmrievl0q0003jw04ifl0c1j6",
+    "anio": 2026,
+    "semana": 29,
+    "descripcion": "ENCALADORA",
+    "bultosPorLote": {
+      "cmqme22ci008sod5qmgp05ukm": 21
+    },
+    "avancePorLote": {
+      "cmqme22ci008sod5qmgp05ukm": [
+        {
+          "dia": 4,
+          "cantidad": 4,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "observacion": "74 BULTO DE CAL",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        },
+        {
+          "dia": 5,
+          "cantidad": 1,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme27ot009eod5q8kpk9wq1": [
+        {
+          "dia": 2,
+          "cantidad": 4.88,
+          "maquinaId": null,
+          "observacion": "21",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme2ggb00acod5qovl7v984": [
+        {
+          "dia": 2,
+          "cantidad": 3,
+          "maquinaId": null,
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme2kp900auod5qoxvnkpgm": [
+        {
+          "dia": 2,
+          "cantidad": 3,
+          "maquinaId": null,
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme2p4l00baod5qb9ebfxrd": [
+        {
+          "dia": 2,
+          "cantidad": 4.32,
+          "maquinaId": null,
+          "observacion": "21",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmsco9b870003jv049lpwf3sp",
+    "anio": 2026,
+    "semana": 32,
+    "descripcion": "ENCALADORA",
+    "bultosPorLote": {
+      "cmqme04zp0014od5q2jxsesr3": 201
+    },
+    "avancePorLote": {
+      "cmqme00qc000mod5qt6hc4et2": [
+        {
+          "dia": 1,
+          "cantidad": 9.9,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0ni70036od5qqcua2kgd": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0ogh003aod5qvyb28i6q": [
+        {
+          "dia": 4,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme1xrs0088od5qvr2ulqpm": [
+        {
+          "dia": 4,
+          "cantidad": 13.6,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmrievl090001jw040jqae5gw",
+    "anio": 2026,
+    "semana": 29,
+    "descripcion": "ENCALADORA",
+    "bultosPorLote": {
+      "cmqme22ci008sod5qmgp05ukm": 21
+    },
+    "avancePorLote": {
+      "cmqme22ci008sod5qmgp05ukm": [
+        {
+          "dia": 4,
+          "cantidad": 4,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "observacion": "74 BULTO DE CAL",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        },
+        {
+          "dia": 5,
+          "cantidad": 1,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme27ot009eod5q8kpk9wq1": [
+        {
+          "dia": 2,
+          "cantidad": 4.88,
+          "maquinaId": null,
+          "observacion": "21",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme2ggb00acod5qovl7v984": [
+        {
+          "dia": 2,
+          "cantidad": 3,
+          "maquinaId": null,
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme2kp900auod5qoxvnkpgm": [
+        {
+          "dia": 2,
+          "cantidad": 3,
+          "maquinaId": null,
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme2p4l00baod5qb9ebfxrd": [
+        {
+          "dia": 2,
+          "cantidad": 4.32,
+          "maquinaId": null,
+          "observacion": "21",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmrievl100005jw04upysgx62",
+    "anio": 2026,
+    "semana": 29,
+    "descripcion": "ENCALADORA",
+    "bultosPorLote": {
+      "cmqme22ci008sod5qmgp05ukm": 21
+    },
+    "avancePorLote": {
+      "cmqme22ci008sod5qmgp05ukm": [
+        {
+          "dia": 4,
+          "cantidad": 4,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "observacion": "74 BULTO DE CAL",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        },
+        {
+          "dia": 5,
+          "cantidad": 1,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme27ot009eod5q8kpk9wq1": [
+        {
+          "dia": 2,
+          "cantidad": 4.88,
+          "maquinaId": null,
+          "observacion": "21",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme2ggb00acod5qovl7v984": [
+        {
+          "dia": 2,
+          "cantidad": 3,
+          "maquinaId": null,
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme2kp900auod5qoxvnkpgm": [
+        {
+          "dia": 2,
+          "cantidad": 3,
+          "maquinaId": null,
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme2p4l00baod5qb9ebfxrd": [
+        {
+          "dia": 2,
+          "cantidad": 4.32,
+          "maquinaId": null,
+          "observacion": "21",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmsco9b8r0007jv04rifxv2sf",
+    "anio": 2026,
+    "semana": 32,
+    "descripcion": "ENCALADORA",
+    "bultosPorLote": {
+      "cmqme04zp0014od5q2jxsesr3": 201
+    },
+    "avancePorLote": {
+      "cmqme00qc000mod5qt6hc4et2": [
+        {
+          "dia": 1,
+          "cantidad": 9.9,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0ni70036od5qqcua2kgd": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0ogh003aod5qvyb28i6q": [
+        {
+          "dia": 4,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme1xrs0088od5qvr2ulqpm": [
+        {
+          "dia": 4,
+          "cantidad": 13.6,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmsadc7ae001jji04fus8d959",
+    "anio": 2026,
+    "semana": 32,
+    "descripcion": "FERTILIZACION GRANULADA",
+    "bultosPorLote": {
+      "cmqme24630090od5q5cnca35n": 6,
+      "cmqme24mf0092od5q57mvtkzh": 2,
+      "cmqme264a0098od5qk7htqqrt": 5,
+      "cmqme26mi009aod5q4y9978u1": 4,
+      "cmqme287p009god5q0xwqwyr5": 6,
+      "cmqme2yym00ccod5qhhgonjd1": 4,
+      "cmqme2zzm00cgod5qob9zceka": 4,
+      "cmqme30h200ciod5q7hteolis": 4
+    },
+    "avancePorLote": {
+      "cmqme24630090od5q5cnca35n": [
+        {
+          "dia": 1,
+          "cantidad": 2.89,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme24mf0092od5q57mvtkzh": [
+        {
+          "dia": 1,
+          "cantidad": 7.1,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme264a0098od5qk7htqqrt": [
+        {
+          "dia": 1,
+          "cantidad": 4.98,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme26mi009aod5q4y9978u1": [
+        {
+          "dia": 1,
+          "cantidad": 4.08,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme275z009cod5q2k1odpal": [
+        {
+          "dia": 2,
+          "cantidad": 4.69,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme287p009god5q0xwqwyr5": [
+        {
+          "dia": 1,
+          "cantidad": 5.27,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme2yym00ccod5qhhgonjd1": [
+        {
+          "dia": 1,
+          "cantidad": 3.97,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme2zzm00cgod5qob9zceka": [
+        {
+          "dia": 1,
+          "cantidad": 3.77,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme30h200ciod5q7hteolis": [
+        {
+          "dia": 1,
+          "cantidad": 3.65,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmru3svot0003l004bzkx5p03",
+    "anio": 2026,
+    "semana": 30,
+    "descripcion": "ENCALADORA",
+    "bultosPorLote": {
+      "cmqme04zp0014od5q2jxsesr3": 221
+    },
+    "avancePorLote": {
+      "cmqme00qc000mod5qt6hc4et2": [
+        {
+          "dia": 4,
+          "cantidad": 9.9,
+          "maquinaId": null,
+          "observacion": "SE LE PARTIO EL TIRO A LA ENCALADORA",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme04zp0014od5q2jxsesr3": [
+        {
+          "dia": 4,
+          "cantidad": 0,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        },
+        {
+          "dia": 5,
+          "cantidad": 11.6,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "observacion": "CAL 110, YESO 55 Y 66 HORTORGANIC",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmru3svp70005l004gm36ld21",
+    "anio": 2026,
+    "semana": 30,
+    "descripcion": "ENCALADORA",
+    "bultosPorLote": {
+      "cmqme04zp0014od5q2jxsesr3": 221
+    },
+    "avancePorLote": {
+      "cmqme00qc000mod5qt6hc4et2": [
+        {
+          "dia": 4,
+          "cantidad": 9.9,
+          "maquinaId": null,
+          "observacion": "SE LE PARTIO EL TIRO A LA ENCALADORA",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme04zp0014od5q2jxsesr3": [
+        {
+          "dia": 4,
+          "cantidad": 0,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        },
+        {
+          "dia": 5,
+          "cantidad": 11.6,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "observacion": "CAL 110, YESO 55 Y 66 HORTORGANIC",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmru3svpg0007l004zytks4vo",
+    "anio": 2026,
+    "semana": 30,
+    "descripcion": "ENCALADORA",
+    "bultosPorLote": {
+      "cmqme04zp0014od5q2jxsesr3": 221
+    },
+    "avancePorLote": {
+      "cmqme00qc000mod5qt6hc4et2": [
+        {
+          "dia": 4,
+          "cantidad": 9.9,
+          "maquinaId": null,
+          "observacion": "SE LE PARTIO EL TIRO A LA ENCALADORA",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme04zp0014od5q2jxsesr3": [
+        {
+          "dia": 4,
+          "cantidad": 0,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        },
+        {
+          "dia": 5,
+          "cantidad": 11.6,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "observacion": "CAL 110, YESO 55 Y 66 HORTORGANIC",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmsco9b8h0005jv04zqsrofhn",
+    "anio": 2026,
+    "semana": 32,
+    "descripcion": "ENCALADORA",
+    "bultosPorLote": {
+      "cmqme04zp0014od5q2jxsesr3": 201
+    },
+    "avancePorLote": {
+      "cmqme00qc000mod5qt6hc4et2": [
+        {
+          "dia": 1,
+          "cantidad": 9.9,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0ni70036od5qqcua2kgd": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0ogh003aod5qvyb28i6q": [
+        {
+          "dia": 4,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme1xrs0088od5qvr2ulqpm": [
+        {
+          "dia": 4,
+          "cantidad": 13.6,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmsadc7a1001hji040uzo0z9m",
+    "anio": 2026,
+    "semana": 32,
+    "descripcion": "FERTILIZACION GRANULADA",
+    "bultosPorLote": {
+      "cmqme24630090od5q5cnca35n": 6,
+      "cmqme24mf0092od5q57mvtkzh": 2,
+      "cmqme264a0098od5qk7htqqrt": 5,
+      "cmqme26mi009aod5q4y9978u1": 4,
+      "cmqme287p009god5q0xwqwyr5": 6,
+      "cmqme2yym00ccod5qhhgonjd1": 4,
+      "cmqme2zzm00cgod5qob9zceka": 4,
+      "cmqme30h200ciod5q7hteolis": 4
+    },
+    "avancePorLote": {
+      "cmqme24630090od5q5cnca35n": [
+        {
+          "dia": 1,
+          "cantidad": 2.89,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme24mf0092od5q57mvtkzh": [
+        {
+          "dia": 1,
+          "cantidad": 7.1,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme264a0098od5qk7htqqrt": [
+        {
+          "dia": 1,
+          "cantidad": 4.98,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme26mi009aod5q4y9978u1": [
+        {
+          "dia": 1,
+          "cantidad": 4.08,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme275z009cod5q2k1odpal": [
+        {
+          "dia": 2,
+          "cantidad": 4.69,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme287p009god5q0xwqwyr5": [
+        {
+          "dia": 1,
+          "cantidad": 5.27,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme2yym00ccod5qhhgonjd1": [
+        {
+          "dia": 1,
+          "cantidad": 3.97,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme2zzm00cgod5qob9zceka": [
+        {
+          "dia": 1,
+          "cantidad": 3.77,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme30h200ciod5q7hteolis": [
+        {
+          "dia": 1,
+          "cantidad": 3.65,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmru3h6b90007jp04tjrligds",
+    "anio": 2026,
+    "semana": 30,
+    "descripcion": "FERTILIZACION GRANULADA",
+    "bultosPorLote": {
+      "cmqme0tlu003wod5qd51bemwi": 11,
+      "cmqme0uza0042od5qfjidmv42": 5,
+      "cmqme11fy004uod5qtec3jbm0": 10,
+      "cmqme1m950070od5q116lrat4": 17,
+      "cmqme1mqf0072od5q87sgy4ko": 10,
+      "cmqme20z4008mod5qjy53wn52": 7,
+      "cmqme3i0o00eeod5qt7xdnwui": 10,
+      "cmqme3ih800egod5qvyit68tl": 4
+    },
+    "avancePorLote": {
+      "cmqme11fy004uod5qtec3jbm0": [
+        {
+          "dia": 2,
+          "cantidad": 9.64,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1m950070od5q116lrat4": [
+        {
+          "dia": 2,
+          "cantidad": 16.37,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1mqf0072od5q87sgy4ko": [
+        {
+          "dia": 2,
+          "cantidad": 9.24,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme20z4008mod5qjy53wn52": [
+        {
+          "dia": 2,
+          "cantidad": 6.92,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme3i0o00eeod5qt7xdnwui": [
+        {
+          "dia": 2,
+          "cantidad": 9.12,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme3ih800egod5qvyit68tl": [
+        {
+          "dia": 2,
+          "cantidad": 10,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cms0lmvfj0003l104dmajlnzm",
+    "anio": 2026,
+    "semana": 31,
+    "descripcion": "FERTILIZACION GRANULADA",
+    "bultosPorLote": {
+      "cmqme2395008wod5qdstk1c9v": 5,
+      "cmqme255f0094od5qpfrw3j6q": 6,
+      "cmqme25me0096od5qh4p42fq5": 5,
+      "cmqme27ot009eod5q8kpk9wq1": 4,
+      "cmqme2y0n00c8od5qed8z046k": 6
+    },
+    "avancePorLote": {
+      "cmqme2395008wod5qdstk1c9v": [
+        {
+          "dia": 3,
+          "cantidad": 4.83,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme255f0094od5qpfrw3j6q": [
+        {
+          "dia": 3,
+          "cantidad": 5.84,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme25me0096od5qh4p42fq5": [
+        {
+          "dia": 3,
+          "cantidad": 4.5,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme27ot009eod5q8kpk9wq1": [
+        {
+          "dia": 1,
+          "cantidad": 4.88,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme2y0n00c8od5qed8z046k": [
+        {
+          "dia": 1,
+          "cantidad": 6.2,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmrzssqru0001l704s4duuw85",
+    "anio": 2026,
+    "semana": 31,
+    "descripcion": "ENCALADORA",
+    "bultosPorLote": {
+      "cmqme4cs800hwod5q5k4xu2qs": 37,
+      "cmqme4h5f00ieod5qb6gv0wox": 52
+    },
+    "avancePorLote": {
+      "cmqme4cs800hwod5q5k4xu2qs": [
+        {
+          "dia": 2,
+          "cantidad": 2.5,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme4h5f00ieod5qb6gv0wox": [
+        {
+          "dia": 2,
+          "cantidad": 3,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmsy2lbsr000nl7044k1vh1y2",
+    "anio": 2026,
+    "semana": 34,
+    "descripcion": "ESTERCOLERO",
+    "bultosPorLote": {
+      "cmqme0m3u0030od5qb4avxsvv": 9,
+      "cmqme0qba003iod5qjcf7wc0a": 3
+    },
+    "avancePorLote": {
+      "cmqme03z10010od5qqfflyos0": [
+        {
+          "dia": 3,
+          "cantidad": 10,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme0m3u0030od5qb4avxsvv": [
+        {
+          "dia": 2,
+          "cantidad": 8.7,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme0qba003iod5qjcf7wc0a": [
+        {
+          "dia": 4,
+          "cantidad": 4.2,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        },
+        {
+          "dia": 2,
+          "cantidad": 4.2,
+          "maquinaId": null,
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmsco9b910009jv04a6ucek5n",
+    "anio": 2026,
+    "semana": 32,
+    "descripcion": "ENCALADORA",
+    "bultosPorLote": {
+      "cmqme04zp0014od5q2jxsesr3": 201
+    },
+    "avancePorLote": {
+      "cmqme00qc000mod5qt6hc4et2": [
+        {
+          "dia": 1,
+          "cantidad": 9.9,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0ni70036od5qqcua2kgd": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0ogh003aod5qvyb28i6q": [
+        {
+          "dia": 4,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme1xrs0088od5qvr2ulqpm": [
+        {
+          "dia": 4,
+          "cantidad": 13.6,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmsco9b7e0001jv04edji9wa3",
+    "anio": 2026,
+    "semana": 32,
+    "descripcion": "ENCALADORA",
+    "bultosPorLote": {
+      "cmqme04zp0014od5q2jxsesr3": 201
+    },
+    "avancePorLote": {
+      "cmqme00qc000mod5qt6hc4et2": [
+        {
+          "dia": 1,
+          "cantidad": 9.9,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0ni70036od5qqcua2kgd": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0ogh003aod5qvyb28i6q": [
+        {
+          "dia": 4,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme1xrs0088od5qvr2ulqpm": [
+        {
+          "dia": 4,
+          "cantidad": 13.6,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmrzs0i970001jp040le6st2j",
+    "anio": 2026,
+    "semana": 31,
+    "descripcion": "ENCALADORA",
+    "bultosPorLote": {
+      "cmqme04zp0014od5q2jxsesr3": 201
+    },
+    "avancePorLote": {
+      "cmqmdzynd000eod5qxotk6k4e": [
+        {
+          "dia": 1,
+          "cantidad": 5.1,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme00qc000mod5qt6hc4et2": [
+        {
+          "dia": 2,
+          "cantidad": 5,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "observacion": "TRASLADAR ENCALADORA Y SE TRABAJO CON 1 REMOLQUE",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmrzs0iaa0003jp04r4qmdzv7",
+    "anio": 2026,
+    "semana": 31,
+    "descripcion": "ENCALADORA",
+    "bultosPorLote": {
+      "cmqme04zp0014od5q2jxsesr3": 201
+    },
+    "avancePorLote": {
+      "cmqmdzynd000eod5qxotk6k4e": [
+        {
+          "dia": 1,
+          "cantidad": 5.1,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme00qc000mod5qt6hc4et2": [
+        {
+          "dia": 2,
+          "cantidad": 5,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "observacion": "TRASLADAR ENCALADORA Y SE TRABAJO CON 1 REMOLQUE",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmru3h6au0005jp04a60so4g4",
+    "anio": 2026,
+    "semana": 30,
+    "descripcion": "FERTILIZACION GRANULADA",
+    "bultosPorLote": {
+      "cmqme0tlu003wod5qd51bemwi": 11,
+      "cmqme0uza0042od5qfjidmv42": 5,
+      "cmqme11fy004uod5qtec3jbm0": 10,
+      "cmqme1m950070od5q116lrat4": 17,
+      "cmqme1mqf0072od5q87sgy4ko": 10,
+      "cmqme20z4008mod5qjy53wn52": 7,
+      "cmqme3i0o00eeod5qt7xdnwui": 10,
+      "cmqme3ih800egod5qvyit68tl": 4
+    },
+    "avancePorLote": {
+      "cmqme11fy004uod5qtec3jbm0": [
+        {
+          "dia": 2,
+          "cantidad": 9.64,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1m950070od5q116lrat4": [
+        {
+          "dia": 2,
+          "cantidad": 16.37,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1mqf0072od5q87sgy4ko": [
+        {
+          "dia": 2,
+          "cantidad": 9.24,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme20z4008mod5qjy53wn52": [
+        {
+          "dia": 2,
+          "cantidad": 6.92,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme3i0o00eeod5qt7xdnwui": [
+        {
+          "dia": 2,
+          "cantidad": 9.12,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme3ih800egod5qvyit68tl": [
+        {
+          "dia": 2,
+          "cantidad": 10,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cms9h41850005kz044koe5qut",
+    "anio": 2026,
+    "semana": 31,
+    "descripcion": "ESPARCIDOR",
+    "bultosPorLote": {
+      "cmqme0ni70036od5qqcua2kgd": 60
+    },
+    "avancePorLote": null,
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmsmk5g2f0007l104zlsg0xac",
+    "anio": 2026,
+    "semana": 33,
+    "descripcion": "FERTILIZACION GRANULADA",
+    "bultosPorLote": {
+      "cmqme22ci008sod5qmgp05ukm": 7,
+      "cmqme2395008wod5qdstk1c9v": 5,
+      "cmqme23pl008yod5qc9j4j7f2": 3,
+      "cmqme24mf0092od5q57mvtkzh": 3,
+      "cmqme25me0096od5qh4p42fq5": 4,
+      "cmqme298r009kod5qdg1sz16a": 6,
+      "cmqme2fxr00aaod5q3clvk2ci": 4,
+      "cmqme2zfm00ceod5qbkylz6pa": 4,
+      "cmqme30y100ckod5qf9q9ci10": 4,
+      "cmqme31wl00cood5qoznkkbvx": 3
+    },
+    "avancePorLote": {
+      "cmqme22ci008sod5qmgp05ukm": [
+        {
+          "dia": 2,
+          "cantidad": 6.07,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme2395008wod5qdstk1c9v": [
+        {
+          "dia": 2,
+          "cantidad": 4.8,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme23pl008yod5qc9j4j7f2": [
+        {
+          "dia": 2,
+          "cantidad": 3.29,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme24mf0092od5q57mvtkzh": [
+        {
+          "dia": 1,
+          "cantidad": 3,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme25me0096od5qh4p42fq5": [
+        {
+          "dia": 2,
+          "cantidad": 4.5,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme298r009kod5qdg1sz16a": [
+        {
+          "dia": 1,
+          "cantidad": 6.47,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme2fxr00aaod5q3clvk2ci": [
+        {
+          "dia": 2,
+          "cantidad": 4,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme2zfm00ceod5qbkylz6pa": [
+        {
+          "dia": 2,
+          "cantidad": 3.93,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme30y100ckod5qf9q9ci10": [
+        {
+          "dia": 1,
+          "cantidad": 3.62,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme31wl00cood5qoznkkbvx": [
+        {
+          "dia": 2,
+          "cantidad": 2.81,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmsmhjpal000djs04ahk1dmcd",
+    "anio": 2026,
+    "semana": 33,
+    "descripcion": "FERTILIZACION GRANULADA",
+    "bultosPorLote": {
+      "cmqmdzynd000eod5qxotk6k4e": 5,
+      "cmqme0099000kod5q46ly2ava": 5,
+      "cmqme00qc000mod5qt6hc4et2": 9,
+      "cmqme0e5d0026od5qnan61y59": 7,
+      "cmqme0wsd004aod5qgbxyjhn1": 7,
+      "cmqme0x8q004cod5q252dr3q4": 9,
+      "cmqme0z2x004kod5qea22djyc": 10,
+      "cmqme0zj5004mod5qrf4u86ko": 5,
+      "cmqme1y7y008aod5qn8aqj2rs": 14,
+      "cmqme1yoj008cod5qiek2urpf": 14,
+      "cmqme1z50008eod5qtdqui9fs": 7
+    },
+    "avancePorLote": {
+      "cmqmdzynd000eod5qxotk6k4e": [
+        {
+          "dia": 1,
+          "cantidad": 5.1,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0099000kod5q46ly2ava": [
+        {
+          "dia": 2,
+          "cantidad": 4.85,
+          "maquinaId": null,
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme00qc000mod5qt6hc4et2": [
+        {
+          "dia": 1,
+          "cantidad": 9.9,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0e5d0026od5qnan61y59": [
+        {
+          "dia": 2,
+          "cantidad": 6.9,
+          "maquinaId": null,
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0wsd004aod5qgbxyjhn1": [
+        {
+          "dia": 1,
+          "cantidad": 8.4,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0x8q004cod5q252dr3q4": [
+        {
+          "dia": 1,
+          "cantidad": 9.3,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0z2x004kod5qea22djyc": [
+        {
+          "dia": 1,
+          "cantidad": 10.39,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0zj5004mod5qrf4u86ko": [
+        {
+          "dia": 1,
+          "cantidad": 8.2,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1y7y008aod5qn8aqj2rs": [
+        {
+          "dia": 2,
+          "cantidad": 13.6,
+          "maquinaId": null,
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1yoj008cod5qiek2urpf": [
+        {
+          "dia": 2,
+          "cantidad": 13.6,
+          "maquinaId": null,
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1z50008eod5qtdqui9fs": [
+        {
+          "dia": 2,
+          "cantidad": 6.9,
+          "maquinaId": null,
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmsmhjpas000fjs046oxecrfc",
+    "anio": 2026,
+    "semana": 33,
+    "descripcion": "FERTILIZACION GRANULADA",
+    "bultosPorLote": {
+      "cmqmdzynd000eod5qxotk6k4e": 5,
+      "cmqme0099000kod5q46ly2ava": 5,
+      "cmqme00qc000mod5qt6hc4et2": 9,
+      "cmqme0e5d0026od5qnan61y59": 7,
+      "cmqme0wsd004aod5qgbxyjhn1": 7,
+      "cmqme0x8q004cod5q252dr3q4": 9,
+      "cmqme0z2x004kod5qea22djyc": 10,
+      "cmqme0zj5004mod5qrf4u86ko": 5,
+      "cmqme1y7y008aod5qn8aqj2rs": 14,
+      "cmqme1yoj008cod5qiek2urpf": 14,
+      "cmqme1z50008eod5qtdqui9fs": 7
+    },
+    "avancePorLote": {
+      "cmqmdzynd000eod5qxotk6k4e": [
+        {
+          "dia": 1,
+          "cantidad": 5.1,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0099000kod5q46ly2ava": [
+        {
+          "dia": 2,
+          "cantidad": 4.85,
+          "maquinaId": null,
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme00qc000mod5qt6hc4et2": [
+        {
+          "dia": 1,
+          "cantidad": 9.9,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0e5d0026od5qnan61y59": [
+        {
+          "dia": 2,
+          "cantidad": 6.9,
+          "maquinaId": null,
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0wsd004aod5qgbxyjhn1": [
+        {
+          "dia": 1,
+          "cantidad": 8.4,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0x8q004cod5q252dr3q4": [
+        {
+          "dia": 1,
+          "cantidad": 9.3,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0z2x004kod5qea22djyc": [
+        {
+          "dia": 1,
+          "cantidad": 10.39,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0zj5004mod5qrf4u86ko": [
+        {
+          "dia": 1,
+          "cantidad": 8.2,
+          "maquinaId": "cmqme528700lnod5qh6t5ev6g",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1y7y008aod5qn8aqj2rs": [
+        {
+          "dia": 2,
+          "cantidad": 13.6,
+          "maquinaId": null,
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1yoj008cod5qiek2urpf": [
+        {
+          "dia": 2,
+          "cantidad": 13.6,
+          "maquinaId": null,
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1z50008eod5qtdqui9fs": [
+        {
+          "dia": 2,
+          "cantidad": 6.9,
+          "maquinaId": null,
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmtqfdjr40007kw04m3ntlihn",
+    "anio": 2026,
+    "semana": 37,
+    "descripcion": "ESTERCOLERO",
+    "bultosPorLote": {
+      "cmqme0nzw0038od5qn8a5h2gq": 2,
+      "cmttkv488000dodm1fksks73n": 3
+    },
+    "avancePorLote": {
+      "cmqme0nzw0038od5qn8a5h2gq": [
+        {
+          "dia": 1,
+          "cantidad": 4.33,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2 (SE PINCHO EL TRACTOR)",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmttkv488000dodm1fksks73n": [
+        {
+          "dia": 2,
+          "cantidad": 5.79,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmtqfdjrb0009kw04rn34w9jr",
+    "anio": 2026,
+    "semana": 37,
+    "descripcion": "ESTERCOLERO",
+    "bultosPorLote": {
+      "cmqme0nzw0038od5qn8a5h2gq": 2,
+      "cmttkv488000dodm1fksks73n": 3
+    },
+    "avancePorLote": {
+      "cmqme0nzw0038od5qn8a5h2gq": [
+        {
+          "dia": 1,
+          "cantidad": 4.33,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2 (SE PINCHO EL TRACTOR)",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmttkv488000dodm1fksks73n": [
+        {
+          "dia": 2,
+          "cantidad": 5.79,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmtqfdjrg000bkw041dg63917",
+    "anio": 2026,
+    "semana": 37,
+    "descripcion": "ESTERCOLERO",
+    "bultosPorLote": {
+      "cmqme0nzw0038od5qn8a5h2gq": 2,
+      "cmttkv488000dodm1fksks73n": 3
+    },
+    "avancePorLote": {
+      "cmqme0nzw0038od5qn8a5h2gq": [
+        {
+          "dia": 1,
+          "cantidad": 4.33,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2 (SE PINCHO EL TRACTOR)",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmttkv488000dodm1fksks73n": [
+        {
+          "dia": 2,
+          "cantidad": 5.79,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmtqfdjqy0005kw04hpjdf472",
+    "anio": 2026,
+    "semana": 37,
+    "descripcion": "ESTERCOLERO",
+    "bultosPorLote": {
+      "cmqme0nzw0038od5qn8a5h2gq": 2,
+      "cmttkv488000dodm1fksks73n": 3
+    },
+    "avancePorLote": {
+      "cmqme0nzw0038od5qn8a5h2gq": [
+        {
+          "dia": 1,
+          "cantidad": 4.33,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2 (SE PINCHO EL TRACTOR)",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmttkv488000dodm1fksks73n": [
+        {
+          "dia": 2,
+          "cantidad": 5.79,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmsy2lbt2000pl704nyyla7g6",
+    "anio": 2026,
+    "semana": 34,
+    "descripcion": "ESTERCOLERO",
+    "bultosPorLote": {
+      "cmqme0m3u0030od5qb4avxsvv": 9,
+      "cmqme0qba003iod5qjcf7wc0a": 3
+    },
+    "avancePorLote": {
+      "cmqme03z10010od5qqfflyos0": [
+        {
+          "dia": 3,
+          "cantidad": 10,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme0m3u0030od5qb4avxsvv": [
+        {
+          "dia": 2,
+          "cantidad": 8.7,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme0qba003iod5qjcf7wc0a": [
+        {
+          "dia": 4,
+          "cantidad": 4.2,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        },
+        {
+          "dia": 2,
+          "cantidad": 4.2,
+          "maquinaId": null,
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmsy2lbtl000vl704088pj0tb",
+    "anio": 2026,
+    "semana": 34,
+    "descripcion": "ESTERCOLERO",
+    "bultosPorLote": {
+      "cmqme0m3u0030od5qb4avxsvv": 9,
+      "cmqme0qba003iod5qjcf7wc0a": 3
+    },
+    "avancePorLote": {
+      "cmqme03z10010od5qqfflyos0": [
+        {
+          "dia": 3,
+          "cantidad": 10,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme0m3u0030od5qb4avxsvv": [
+        {
+          "dia": 2,
+          "cantidad": 8.7,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme0qba003iod5qjcf7wc0a": [
+        {
+          "dia": 4,
+          "cantidad": 4.2,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        },
+        {
+          "dia": 2,
+          "cantidad": 4.2,
+          "maquinaId": null,
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmsy2lbt7000rl704entee75w",
+    "anio": 2026,
+    "semana": 34,
+    "descripcion": "ESTERCOLERO",
+    "bultosPorLote": {
+      "cmqme0m3u0030od5qb4avxsvv": 9,
+      "cmqme0qba003iod5qjcf7wc0a": 3
+    },
+    "avancePorLote": {
+      "cmqme03z10010od5qqfflyos0": [
+        {
+          "dia": 3,
+          "cantidad": 10,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme0m3u0030od5qb4avxsvv": [
+        {
+          "dia": 2,
+          "cantidad": 8.7,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme0qba003iod5qjcf7wc0a": [
+        {
+          "dia": 4,
+          "cantidad": 4.2,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        },
+        {
+          "dia": 2,
+          "cantidad": 4.2,
+          "maquinaId": null,
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmsy2t0od001nl704gfgqpkdj",
+    "anio": 2026,
+    "semana": 34,
+    "descripcion": "FERTILIZACION GRANULADA",
+    "bultosPorLote": {
+      "cmqme0d720022od5qpem4fskj": 10,
+      "cmqme0do90024od5q9ksudw0x": 10,
+      "cmqme0ni70036od5qqcua2kgd": 6,
+      "cmqme0nzw0038od5qn8a5h2gq": 6,
+      "cmqme0ogh003aod5qvyb28i6q": 6,
+      "cmqme0owx003cod5qce14r85j": 6,
+      "cmqme0pdr003eod5qy82irf5h": 6,
+      "cmqme0pun003god5qt014a7s6": 6,
+      "cmqme0qba003iod5qjcf7wc0a": 5,
+      "cmqme0xpk004eod5qr72m4wwe": 16,
+      "cmqme10zd004sod5q6tbjro7p": 10,
+      "cmqme12xt0050od5q6kfbgv4k": 7,
+      "cmqme1r5w007kod5q36627pxl": 20,
+      "cmqme1s5i007ood5qjop2l93c": 13,
+      "cmqme1vn90082od5qovzusyqi": 12,
+      "cmqme1wul0084od5q38k3vo17": 13,
+      "cmqme1xrs0088od5qvr2ulqpm": 15,
+      "cmqme20il008kod5qm1emndb2": 10,
+      "cmqme20z4008mod5qjy53wn52": 7,
+      "cmqme21fo008ood5q3ag1kylk": 13
+    },
+    "avancePorLote": {
+      "cmqme0d720022od5qpem4fskj": [
+        {
+          "dia": 3,
+          "cantidad": 8.4,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0do90024od5q9ksudw0x": [
+        {
+          "dia": 3,
+          "cantidad": 13,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0ni70036od5qqcua2kgd": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0nzw0038od5qn8a5h2gq": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0ogh003aod5qvyb28i6q": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0owx003cod5qce14r85j": [
+        {
+          "dia": 2,
+          "cantidad": 5.6,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0pdr003eod5qy82irf5h": [
+        {
+          "dia": 2,
+          "cantidad": 5.3,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0pun003god5qt014a7s6": [
+        {
+          "dia": 2,
+          "cantidad": 5.3,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0qba003iod5qjcf7wc0a": [
+        {
+          "dia": 2,
+          "cantidad": 4.2,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0xpk004eod5qr72m4wwe": [
+        {
+          "dia": 3,
+          "cantidad": 15,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme10zd004sod5q6tbjro7p": [
+        {
+          "dia": 4,
+          "cantidad": 9.64,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme12xt0050od5q6kfbgv4k": [
+        {
+          "dia": 4,
+          "cantidad": 6.92,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1r5w007kod5q36627pxl": [
+        {
+          "dia": 3,
+          "cantidad": 19.03,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1s5i007ood5qjop2l93c": [
+        {
+          "dia": 4,
+          "cantidad": 14.72,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1vn90082od5qovzusyqi": [
+        {
+          "dia": 4,
+          "cantidad": 9.86,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1wul0084od5q38k3vo17": [
+        {
+          "dia": 2,
+          "cantidad": 14.24,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1xrs0088od5qvr2ulqpm": [
+        {
+          "dia": 3,
+          "cantidad": 13.6,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme20il008kod5qm1emndb2": [
+        {
+          "dia": 3,
+          "cantidad": 9.86,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme20z4008mod5qjy53wn52": [
+        {
+          "dia": 4,
+          "cantidad": 6.92,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme21fo008ood5q3ag1kylk": [
+        {
+          "dia": 2,
+          "cantidad": 14.24,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmsy2lbtd000tl704k48gm89x",
+    "anio": 2026,
+    "semana": 34,
+    "descripcion": "ESTERCOLERO",
+    "bultosPorLote": {
+      "cmqme0m3u0030od5qb4avxsvv": 9,
+      "cmqme0qba003iod5qjcf7wc0a": 3
+    },
+    "avancePorLote": {
+      "cmqme03z10010od5qqfflyos0": [
+        {
+          "dia": 3,
+          "cantidad": 10,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme0m3u0030od5qb4avxsvv": [
+        {
+          "dia": 2,
+          "cantidad": 8.7,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme0qba003iod5qjcf7wc0a": [
+        {
+          "dia": 4,
+          "cantidad": 4.2,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        },
+        {
+          "dia": 2,
+          "cantidad": 4.2,
+          "maquinaId": null,
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmsy2t0o8001ll7048j401pne",
+    "anio": 2026,
+    "semana": 34,
+    "descripcion": "FERTILIZACION GRANULADA",
+    "bultosPorLote": {
+      "cmqme0d720022od5qpem4fskj": 10,
+      "cmqme0do90024od5q9ksudw0x": 10,
+      "cmqme0ni70036od5qqcua2kgd": 6,
+      "cmqme0nzw0038od5qn8a5h2gq": 6,
+      "cmqme0ogh003aod5qvyb28i6q": 6,
+      "cmqme0owx003cod5qce14r85j": 6,
+      "cmqme0pdr003eod5qy82irf5h": 6,
+      "cmqme0pun003god5qt014a7s6": 6,
+      "cmqme0qba003iod5qjcf7wc0a": 5,
+      "cmqme0xpk004eod5qr72m4wwe": 16,
+      "cmqme10zd004sod5q6tbjro7p": 10,
+      "cmqme12xt0050od5q6kfbgv4k": 7,
+      "cmqme1r5w007kod5q36627pxl": 20,
+      "cmqme1s5i007ood5qjop2l93c": 13,
+      "cmqme1vn90082od5qovzusyqi": 12,
+      "cmqme1wul0084od5q38k3vo17": 13,
+      "cmqme1xrs0088od5qvr2ulqpm": 15,
+      "cmqme20il008kod5qm1emndb2": 10,
+      "cmqme20z4008mod5qjy53wn52": 7,
+      "cmqme21fo008ood5q3ag1kylk": 13
+    },
+    "avancePorLote": {
+      "cmqme0d720022od5qpem4fskj": [
+        {
+          "dia": 3,
+          "cantidad": 8.4,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0do90024od5q9ksudw0x": [
+        {
+          "dia": 3,
+          "cantidad": 13,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0ni70036od5qqcua2kgd": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0nzw0038od5qn8a5h2gq": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0ogh003aod5qvyb28i6q": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0owx003cod5qce14r85j": [
+        {
+          "dia": 2,
+          "cantidad": 5.6,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0pdr003eod5qy82irf5h": [
+        {
+          "dia": 2,
+          "cantidad": 5.3,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0pun003god5qt014a7s6": [
+        {
+          "dia": 2,
+          "cantidad": 5.3,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0qba003iod5qjcf7wc0a": [
+        {
+          "dia": 2,
+          "cantidad": 4.2,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0xpk004eod5qr72m4wwe": [
+        {
+          "dia": 3,
+          "cantidad": 15,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme10zd004sod5q6tbjro7p": [
+        {
+          "dia": 4,
+          "cantidad": 9.64,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme12xt0050od5q6kfbgv4k": [
+        {
+          "dia": 4,
+          "cantidad": 6.92,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1r5w007kod5q36627pxl": [
+        {
+          "dia": 3,
+          "cantidad": 19.03,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1s5i007ood5qjop2l93c": [
+        {
+          "dia": 4,
+          "cantidad": 14.72,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1vn90082od5qovzusyqi": [
+        {
+          "dia": 4,
+          "cantidad": 9.86,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1wul0084od5q38k3vo17": [
+        {
+          "dia": 2,
+          "cantidad": 14.24,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1xrs0088od5qvr2ulqpm": [
+        {
+          "dia": 3,
+          "cantidad": 13.6,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme20il008kod5qm1emndb2": [
+        {
+          "dia": 3,
+          "cantidad": 9.86,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme20z4008mod5qjy53wn52": [
+        {
+          "dia": 4,
+          "cantidad": 6.92,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme21fo008ood5q3ag1kylk": [
+        {
+          "dia": 2,
+          "cantidad": 14.24,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmsy2t0oo001rl7040bu88m1o",
+    "anio": 2026,
+    "semana": 34,
+    "descripcion": "FERTILIZACION GRANULADA",
+    "bultosPorLote": {
+      "cmqme0d720022od5qpem4fskj": 10,
+      "cmqme0do90024od5q9ksudw0x": 10,
+      "cmqme0ni70036od5qqcua2kgd": 6,
+      "cmqme0nzw0038od5qn8a5h2gq": 6,
+      "cmqme0ogh003aod5qvyb28i6q": 6,
+      "cmqme0owx003cod5qce14r85j": 6,
+      "cmqme0pdr003eod5qy82irf5h": 6,
+      "cmqme0pun003god5qt014a7s6": 6,
+      "cmqme0qba003iod5qjcf7wc0a": 5,
+      "cmqme0xpk004eod5qr72m4wwe": 16,
+      "cmqme10zd004sod5q6tbjro7p": 10,
+      "cmqme12xt0050od5q6kfbgv4k": 7,
+      "cmqme1r5w007kod5q36627pxl": 20,
+      "cmqme1s5i007ood5qjop2l93c": 13,
+      "cmqme1vn90082od5qovzusyqi": 12,
+      "cmqme1wul0084od5q38k3vo17": 13,
+      "cmqme1xrs0088od5qvr2ulqpm": 15,
+      "cmqme20il008kod5qm1emndb2": 10,
+      "cmqme20z4008mod5qjy53wn52": 7,
+      "cmqme21fo008ood5q3ag1kylk": 13
+    },
+    "avancePorLote": {
+      "cmqme0d720022od5qpem4fskj": [
+        {
+          "dia": 3,
+          "cantidad": 8.4,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0do90024od5q9ksudw0x": [
+        {
+          "dia": 3,
+          "cantidad": 13,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0ni70036od5qqcua2kgd": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0nzw0038od5qn8a5h2gq": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0ogh003aod5qvyb28i6q": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0owx003cod5qce14r85j": [
+        {
+          "dia": 2,
+          "cantidad": 5.6,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0pdr003eod5qy82irf5h": [
+        {
+          "dia": 2,
+          "cantidad": 5.3,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0pun003god5qt014a7s6": [
+        {
+          "dia": 2,
+          "cantidad": 5.3,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0qba003iod5qjcf7wc0a": [
+        {
+          "dia": 2,
+          "cantidad": 4.2,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0xpk004eod5qr72m4wwe": [
+        {
+          "dia": 3,
+          "cantidad": 15,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme10zd004sod5q6tbjro7p": [
+        {
+          "dia": 4,
+          "cantidad": 9.64,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme12xt0050od5q6kfbgv4k": [
+        {
+          "dia": 4,
+          "cantidad": 6.92,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1r5w007kod5q36627pxl": [
+        {
+          "dia": 3,
+          "cantidad": 19.03,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1s5i007ood5qjop2l93c": [
+        {
+          "dia": 4,
+          "cantidad": 14.72,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1vn90082od5qovzusyqi": [
+        {
+          "dia": 4,
+          "cantidad": 9.86,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1wul0084od5q38k3vo17": [
+        {
+          "dia": 2,
+          "cantidad": 14.24,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1xrs0088od5qvr2ulqpm": [
+        {
+          "dia": 3,
+          "cantidad": 13.6,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme20il008kod5qm1emndb2": [
+        {
+          "dia": 3,
+          "cantidad": 9.86,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme20z4008mod5qjy53wn52": [
+        {
+          "dia": 4,
+          "cantidad": 6.92,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme21fo008ood5q3ag1kylk": [
+        {
+          "dia": 2,
+          "cantidad": 14.24,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmsy2t0oj001pl7042r7inp6y",
+    "anio": 2026,
+    "semana": 34,
+    "descripcion": "FERTILIZACION GRANULADA",
+    "bultosPorLote": {
+      "cmqme0d720022od5qpem4fskj": 10,
+      "cmqme0do90024od5q9ksudw0x": 10,
+      "cmqme0ni70036od5qqcua2kgd": 6,
+      "cmqme0nzw0038od5qn8a5h2gq": 6,
+      "cmqme0ogh003aod5qvyb28i6q": 6,
+      "cmqme0owx003cod5qce14r85j": 6,
+      "cmqme0pdr003eod5qy82irf5h": 6,
+      "cmqme0pun003god5qt014a7s6": 6,
+      "cmqme0qba003iod5qjcf7wc0a": 5,
+      "cmqme0xpk004eod5qr72m4wwe": 16,
+      "cmqme10zd004sod5q6tbjro7p": 10,
+      "cmqme12xt0050od5q6kfbgv4k": 7,
+      "cmqme1r5w007kod5q36627pxl": 20,
+      "cmqme1s5i007ood5qjop2l93c": 13,
+      "cmqme1vn90082od5qovzusyqi": 12,
+      "cmqme1wul0084od5q38k3vo17": 13,
+      "cmqme1xrs0088od5qvr2ulqpm": 15,
+      "cmqme20il008kod5qm1emndb2": 10,
+      "cmqme20z4008mod5qjy53wn52": 7,
+      "cmqme21fo008ood5q3ag1kylk": 13
+    },
+    "avancePorLote": {
+      "cmqme0d720022od5qpem4fskj": [
+        {
+          "dia": 3,
+          "cantidad": 8.4,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0do90024od5q9ksudw0x": [
+        {
+          "dia": 3,
+          "cantidad": 13,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0ni70036od5qqcua2kgd": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0nzw0038od5qn8a5h2gq": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0ogh003aod5qvyb28i6q": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0owx003cod5qce14r85j": [
+        {
+          "dia": 2,
+          "cantidad": 5.6,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0pdr003eod5qy82irf5h": [
+        {
+          "dia": 2,
+          "cantidad": 5.3,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0pun003god5qt014a7s6": [
+        {
+          "dia": 2,
+          "cantidad": 5.3,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0qba003iod5qjcf7wc0a": [
+        {
+          "dia": 2,
+          "cantidad": 4.2,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0xpk004eod5qr72m4wwe": [
+        {
+          "dia": 3,
+          "cantidad": 15,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme10zd004sod5q6tbjro7p": [
+        {
+          "dia": 4,
+          "cantidad": 9.64,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme12xt0050od5q6kfbgv4k": [
+        {
+          "dia": 4,
+          "cantidad": 6.92,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1r5w007kod5q36627pxl": [
+        {
+          "dia": 3,
+          "cantidad": 19.03,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1s5i007ood5qjop2l93c": [
+        {
+          "dia": 4,
+          "cantidad": 14.72,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1vn90082od5qovzusyqi": [
+        {
+          "dia": 4,
+          "cantidad": 9.86,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1wul0084od5q38k3vo17": [
+        {
+          "dia": 2,
+          "cantidad": 14.24,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1xrs0088od5qvr2ulqpm": [
+        {
+          "dia": 3,
+          "cantidad": 13.6,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme20il008kod5qm1emndb2": [
+        {
+          "dia": 3,
+          "cantidad": 9.86,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme20z4008mod5qjy53wn52": [
+        {
+          "dia": 4,
+          "cantidad": 6.92,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme21fo008ood5q3ag1kylk": [
+        {
+          "dia": 2,
+          "cantidad": 14.24,
+          "maquinaId": "cmqme52hc00lqod5qopz94aj1",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmt4ljjtm0001l5045pp5a2is",
+    "anio": 2026,
+    "semana": 34,
+    "descripcion": "FERTILIZACION GRANULADA",
+    "bultosPorLote": {
+      "cmqme22sx008uod5qkri8lwdn": 6,
+      "cmqme24630090od5q5cnca35n": 3,
+      "cmqme264a0098od5qk7htqqrt": 4,
+      "cmqme27ot009eod5q8kpk9wq1": 4,
+      "cmqme28q4009iod5qdznrwudf": 5,
+      "cmqme2y0n00c8od5qed8z046k": 4,
+      "cmqme2zfm00ceod5qbkylz6pa": 4,
+      "cmqme2zzm00cgod5qob9zceka": 4,
+      "cmqme31fg00cmod5q2vez460g": 4
+    },
+    "avancePorLote": {
+      "cmqme22sx008uod5qkri8lwdn": [
+        {
+          "dia": 4,
+          "cantidad": 5.84,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme24630090od5q5cnca35n": [
+        {
+          "dia": 4,
+          "cantidad": 2.89,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme264a0098od5qk7htqqrt": [
+        {
+          "dia": 4,
+          "cantidad": 4.98,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme27ot009eod5q8kpk9wq1": [
+        {
+          "dia": 4,
+          "cantidad": 4.88,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme28q4009iod5qdznrwudf": [
+        {
+          "dia": 4,
+          "cantidad": 4.93,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme2y0n00c8od5qed8z046k": [
+        {
+          "dia": 4,
+          "cantidad": 6.2,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme2zfm00ceod5qbkylz6pa": [
+        {
+          "dia": 4,
+          "cantidad": 3.93,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme2zzm00cgod5qob9zceka": [
+        {
+          "dia": 4,
+          "cantidad": 3.77,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme31fg00cmod5q2vez460g": [
+        {
+          "dia": 4,
+          "cantidad": 3.41,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmt4p430z000fjj042o37wmig",
+    "anio": 2026,
+    "semana": 35,
+    "descripcion": "FERTILIZACION GRANULADA",
+    "bultosPorLote": {
+      "cmqme02lm000uod5q7q9bk0u4": 4,
+      "cmqme03z10010od5qqfflyos0": 17,
+      "cmqme0qrt003kod5qvgwwydp0": 7,
+      "cmqme0tlu003wod5qd51bemwi": 11,
+      "cmqme0u25003yod5q8h8a43ki": 8,
+      "cmqme0uij0040od5qjg120sg8": 4,
+      "cmqme0zj5004mod5qrf4u86ko": 5,
+      "cmqme11fy004uod5qtec3jbm0": 10,
+      "cmqme1fda006aod5qud7m39jj": 8,
+      "cmqme1v6v0080od5q9idnwb4t": 8
+    },
+    "avancePorLote": {
+      "cmqme02lm000uod5q7q9bk0u4": [
+        {
+          "dia": 4,
+          "cantidad": 3.5,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme03z10010od5qqfflyos0": [
+        {
+          "dia": 5,
+          "cantidad": 17,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0qrt003kod5qvgwwydp0": [
+        {
+          "dia": 4,
+          "cantidad": 7,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0tlu003wod5qd51bemwi": [
+        {
+          "dia": 4,
+          "cantidad": 11,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0u25003yod5q8h8a43ki": [
+        {
+          "dia": 4,
+          "cantidad": 8,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0uij0040od5qjg120sg8": [
+        {
+          "dia": 4,
+          "cantidad": 4,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0zj5004mod5qrf4u86ko": [
+        {
+          "dia": 5,
+          "cantidad": 5,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme11fy004uod5qtec3jbm0": [
+        {
+          "dia": 4,
+          "cantidad": 9.64,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1fda006aod5qud7m39jj": [
+        {
+          "dia": 5,
+          "cantidad": 8,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1v6v0080od5q9idnwb4t": [
+        {
+          "dia": 5,
+          "cantidad": 8,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmteetcus000hjs04rw9pvf0d",
+    "anio": 2026,
+    "semana": 36,
+    "descripcion": "FERTILIZACION POLLINAZA",
+    "bultosPorLote": {
+      "cmqme2395008wod5qdstk1c9v": 127,
+      "cmqme298r009kod5qdg1sz16a": 13
+    },
+    "avancePorLote": {
+      "cmqme2395008wod5qdstk1c9v": [
+        {
+          "dia": 4,
+          "cantidad": 4.83,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme298r009kod5qdg1sz16a": [
+        {
+          "dia": 5,
+          "cantidad": 6.47,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmteetcub000fjs04qhpx12bc",
+    "anio": 2026,
+    "semana": 36,
+    "descripcion": "FERTILIZACION POLLINAZA",
+    "bultosPorLote": {
+      "cmqme2395008wod5qdstk1c9v": 127,
+      "cmqme298r009kod5qdg1sz16a": 13
+    },
+    "avancePorLote": {
+      "cmqme2395008wod5qdstk1c9v": [
+        {
+          "dia": 4,
+          "cantidad": 4.83,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ],
+      "cmqme298r009kod5qdg1sz16a": [
+        {
+          "dia": 5,
+          "cantidad": 6.47,
+          "maquinaId": "cmqme52tj00luod5qnlt5tob2",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqny0qrk0005l2041jgcl112"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmtehlcy00007jt04fiudlazb",
+    "anio": 2026,
+    "semana": 36,
+    "descripcion": "ESTERCOLERO",
+    "bultosPorLote": {
+      "cmqme02lm000uod5q7q9bk0u4": 7,
+      "cmqme031g000wod5q8rvxxlt3": 7,
+      "cmqme03id000yod5qfhprnqp7": 3,
+      "cmqme0m3u0030od5qb4avxsvv": 3,
+      "cmqme0r86003mod5qwk4luqij": 2
+    },
+    "avancePorLote": {
+      "cmqme02lm000uod5q7q9bk0u4": [
+        {
+          "dia": 3,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        },
+        {
+          "dia": 5,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme031g000wod5q8rvxxlt3": [
+        {
+          "dia": 4,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme03id000yod5qfhprnqp7": [
+        {
+          "dia": 6,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme0m3u0030od5qb4avxsvv": [
+        {
+          "dia": 2,
+          "cantidad": 8.7,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme0r86003mod5qwk4luqij": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmtehlcyh000djt041jggf1en",
+    "anio": 2026,
+    "semana": 36,
+    "descripcion": "ESTERCOLERO",
+    "bultosPorLote": {
+      "cmqme02lm000uod5q7q9bk0u4": 7,
+      "cmqme031g000wod5q8rvxxlt3": 7,
+      "cmqme03id000yod5qfhprnqp7": 3,
+      "cmqme0m3u0030od5qb4avxsvv": 3,
+      "cmqme0r86003mod5qwk4luqij": 2
+    },
+    "avancePorLote": {
+      "cmqme02lm000uod5q7q9bk0u4": [
+        {
+          "dia": 3,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        },
+        {
+          "dia": 5,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme031g000wod5q8rvxxlt3": [
+        {
+          "dia": 4,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme03id000yod5qfhprnqp7": [
+        {
+          "dia": 6,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme0m3u0030od5qb4avxsvv": [
+        {
+          "dia": 2,
+          "cantidad": 8.7,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme0r86003mod5qwk4luqij": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmtehlcyn000fjt04v07nogdd",
+    "anio": 2026,
+    "semana": 36,
+    "descripcion": "ESTERCOLERO",
+    "bultosPorLote": {
+      "cmqme02lm000uod5q7q9bk0u4": 7,
+      "cmqme031g000wod5q8rvxxlt3": 7,
+      "cmqme03id000yod5qfhprnqp7": 3,
+      "cmqme0m3u0030od5qb4avxsvv": 3,
+      "cmqme0r86003mod5qwk4luqij": 2
+    },
+    "avancePorLote": {
+      "cmqme02lm000uod5q7q9bk0u4": [
+        {
+          "dia": 3,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        },
+        {
+          "dia": 5,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme031g000wod5q8rvxxlt3": [
+        {
+          "dia": 4,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme03id000yod5qfhprnqp7": [
+        {
+          "dia": 6,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme0m3u0030od5qb4avxsvv": [
+        {
+          "dia": 2,
+          "cantidad": 8.7,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme0r86003mod5qwk4luqij": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmtehlcy50009jt04u0pbk04q",
+    "anio": 2026,
+    "semana": 36,
+    "descripcion": "ESTERCOLERO",
+    "bultosPorLote": {
+      "cmqme02lm000uod5q7q9bk0u4": 7,
+      "cmqme031g000wod5q8rvxxlt3": 7,
+      "cmqme03id000yod5qfhprnqp7": 3,
+      "cmqme0m3u0030od5qb4avxsvv": 3,
+      "cmqme0r86003mod5qwk4luqij": 2
+    },
+    "avancePorLote": {
+      "cmqme02lm000uod5q7q9bk0u4": [
+        {
+          "dia": 3,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        },
+        {
+          "dia": 5,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme031g000wod5q8rvxxlt3": [
+        {
+          "dia": 4,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme03id000yod5qfhprnqp7": [
+        {
+          "dia": 6,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme0m3u0030od5qb4avxsvv": [
+        {
+          "dia": 2,
+          "cantidad": 8.7,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme0r86003mod5qwk4luqij": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmtehlcyb000bjt04qjta4cs1",
+    "anio": 2026,
+    "semana": 36,
+    "descripcion": "ESTERCOLERO",
+    "bultosPorLote": {
+      "cmqme02lm000uod5q7q9bk0u4": 7,
+      "cmqme031g000wod5q8rvxxlt3": 7,
+      "cmqme03id000yod5qfhprnqp7": 3,
+      "cmqme0m3u0030od5qb4avxsvv": 3,
+      "cmqme0r86003mod5qwk4luqij": 2
+    },
+    "avancePorLote": {
+      "cmqme02lm000uod5q7q9bk0u4": [
+        {
+          "dia": 3,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        },
+        {
+          "dia": 5,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme031g000wod5q8rvxxlt3": [
+        {
+          "dia": 4,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme03id000yod5qfhprnqp7": [
+        {
+          "dia": 6,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme0m3u0030od5qb4avxsvv": [
+        {
+          "dia": 2,
+          "cantidad": 8.7,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme0r86003mod5qwk4luqij": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmtehlcxq0005jt040l5rjokl",
+    "anio": 2026,
+    "semana": 36,
+    "descripcion": "ESTERCOLERO",
+    "bultosPorLote": {
+      "cmqme02lm000uod5q7q9bk0u4": 7,
+      "cmqme031g000wod5q8rvxxlt3": 7,
+      "cmqme03id000yod5qfhprnqp7": 3,
+      "cmqme0m3u0030od5qb4avxsvv": 3,
+      "cmqme0r86003mod5qwk4luqij": 2
+    },
+    "avancePorLote": {
+      "cmqme02lm000uod5q7q9bk0u4": [
+        {
+          "dia": 3,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        },
+        {
+          "dia": 5,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme031g000wod5q8rvxxlt3": [
+        {
+          "dia": 4,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme03id000yod5qfhprnqp7": [
+        {
+          "dia": 6,
+          "cantidad": 2.6,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme0m3u0030od5qb4avxsvv": [
+        {
+          "dia": 2,
+          "cantidad": 8.7,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmqme0r86003mod5qwk4luqij": [
+        {
+          "dia": 2,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmt4p430o000djj047xsv3m2k",
+    "anio": 2026,
+    "semana": 35,
+    "descripcion": "FERTILIZACION GRANULADA",
+    "bultosPorLote": {
+      "cmqme02lm000uod5q7q9bk0u4": 4,
+      "cmqme03z10010od5qqfflyos0": 17,
+      "cmqme0qrt003kod5qvgwwydp0": 7,
+      "cmqme0tlu003wod5qd51bemwi": 11,
+      "cmqme0u25003yod5q8h8a43ki": 8,
+      "cmqme0uij0040od5qjg120sg8": 4,
+      "cmqme0zj5004mod5qrf4u86ko": 5,
+      "cmqme11fy004uod5qtec3jbm0": 10,
+      "cmqme1fda006aod5qud7m39jj": 8,
+      "cmqme1v6v0080od5q9idnwb4t": 8
+    },
+    "avancePorLote": {
+      "cmqme02lm000uod5q7q9bk0u4": [
+        {
+          "dia": 4,
+          "cantidad": 3.5,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme03z10010od5qqfflyos0": [
+        {
+          "dia": 5,
+          "cantidad": 17,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0qrt003kod5qvgwwydp0": [
+        {
+          "dia": 4,
+          "cantidad": 7,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0tlu003wod5qd51bemwi": [
+        {
+          "dia": 4,
+          "cantidad": 11,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0u25003yod5q8h8a43ki": [
+        {
+          "dia": 4,
+          "cantidad": 8,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0uij0040od5qjg120sg8": [
+        {
+          "dia": 4,
+          "cantidad": 4,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme0zj5004mod5qrf4u86ko": [
+        {
+          "dia": 5,
+          "cantidad": 5,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme11fy004uod5qtec3jbm0": [
+        {
+          "dia": 4,
+          "cantidad": 9.64,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1fda006aod5qud7m39jj": [
+        {
+          "dia": 5,
+          "cantidad": 8,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ],
+      "cmqme1v6v0080od5q9idnwb4t": [
+        {
+          "dia": 5,
+          "cantidad": 8,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme509f00ksod5q7eu9uvif"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmtggxshj0001l1049gws3zht",
+    "anio": 2026,
+    "semana": 36,
+    "descripcion": "FERTILIZACION GRANULADA",
+    "bultosPorLote": {
+      "cmqme024z000sod5quadxk0o3": 5,
+      "cmqme0r86003mod5qwk4luqij": 6,
+      "cmqme10gw004qod5qtoxuo7k3": 10,
+      "cmqme12fz004yod5qs64bsljs": 8,
+      "cmqme1o6t0078od5qnn29h55t": 12,
+      "cmqme3ih800egod5qvyit68tl": 5
+    },
+    "avancePorLote": {
+      "cmqme024z000sod5quadxk0o3": [
+        {
+          "dia": 3,
+          "cantidad": 4.28,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0r86003mod5qwk4luqij": [
+        {
+          "dia": 3,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme10gw004qod5qtoxuo7k3": [
+        {
+          "dia": 3,
+          "cantidad": 9.64,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme12fz004yod5qs64bsljs": [
+        {
+          "dia": 3,
+          "cantidad": 7.28,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme1o6t0078od5qnn29h55t": [
+        {
+          "dia": 3,
+          "cantidad": 12.41,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme3ih800egod5qvyit68tl": [
+        {
+          "dia": 3,
+          "cantidad": 3,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmtggxsij0003l104posp4709",
+    "anio": 2026,
+    "semana": 36,
+    "descripcion": "FERTILIZACION GRANULADA",
+    "bultosPorLote": {
+      "cmqme024z000sod5quadxk0o3": 5,
+      "cmqme0r86003mod5qwk4luqij": 6,
+      "cmqme10gw004qod5qtoxuo7k3": 10,
+      "cmqme12fz004yod5qs64bsljs": 8,
+      "cmqme1o6t0078od5qnn29h55t": 12,
+      "cmqme3ih800egod5qvyit68tl": 5
+    },
+    "avancePorLote": {
+      "cmqme024z000sod5quadxk0o3": [
+        {
+          "dia": 3,
+          "cantidad": 4.28,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0r86003mod5qwk4luqij": [
+        {
+          "dia": 3,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme10gw004qod5qtoxuo7k3": [
+        {
+          "dia": 3,
+          "cantidad": 9.64,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme12fz004yod5qs64bsljs": [
+        {
+          "dia": 3,
+          "cantidad": 7.28,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme1o6t0078od5qnn29h55t": [
+        {
+          "dia": 3,
+          "cantidad": 12.41,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme3ih800egod5qvyit68tl": [
+        {
+          "dia": 3,
+          "cantidad": 3,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmtqfdjqb0001kw04k7quaool",
+    "anio": 2026,
+    "semana": 37,
+    "descripcion": "ESTERCOLERO",
+    "bultosPorLote": {
+      "cmqme0nzw0038od5qn8a5h2gq": 2,
+      "cmttkv488000dodm1fksks73n": 3
+    },
+    "avancePorLote": {
+      "cmqme0nzw0038od5qn8a5h2gq": [
+        {
+          "dia": 1,
+          "cantidad": 4.33,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2 (SE PINCHO EL TRACTOR)",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmttkv488000dodm1fksks73n": [
+        {
+          "dia": 2,
+          "cantidad": 5.79,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmtqfdjqs0003kw04boeo0n59",
+    "anio": 2026,
+    "semana": 37,
+    "descripcion": "ESTERCOLERO",
+    "bultosPorLote": {
+      "cmqme0nzw0038od5qn8a5h2gq": 2,
+      "cmttkv488000dodm1fksks73n": 3
+    },
+    "avancePorLote": {
+      "cmqme0nzw0038od5qn8a5h2gq": [
+        {
+          "dia": 1,
+          "cantidad": 4.33,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "observacion": "SITIO 2 (SE PINCHO EL TRACTOR)",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ],
+      "cmttkv488000dodm1fksks73n": [
+        {
+          "dia": 2,
+          "cantidad": 5.79,
+          "maquinaId": "cmqme52qj00ltod5qad864mvu",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme506600kqod5qkg1wzfrq"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  },
+  {
+    "id": "cmtggxsio0005l104nfc7xj3h",
+    "anio": 2026,
+    "semana": 36,
+    "descripcion": "FERTILIZACION GRANULADA",
+    "bultosPorLote": {
+      "cmqme024z000sod5quadxk0o3": 5,
+      "cmqme0r86003mod5qwk4luqij": 6,
+      "cmqme10gw004qod5qtoxuo7k3": 10,
+      "cmqme12fz004yod5qs64bsljs": 8,
+      "cmqme1o6t0078od5qnn29h55t": 12,
+      "cmqme3ih800egod5qvyit68tl": 5
+    },
+    "avancePorLote": {
+      "cmqme024z000sod5quadxk0o3": [
+        {
+          "dia": 3,
+          "cantidad": 4.28,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme0r86003mod5qwk4luqij": [
+        {
+          "dia": 3,
+          "cantidad": 5.7,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme10gw004qod5qtoxuo7k3": [
+        {
+          "dia": 3,
+          "cantidad": 9.64,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme12fz004yod5qs64bsljs": [
+        {
+          "dia": 3,
+          "cantidad": 7.28,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme1o6t0078od5qnn29h55t": [
+        {
+          "dia": 3,
+          "cantidad": 12.41,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ],
+      "cmqme3ih800egod5qvyit68tl": [
+        {
+          "dia": 3,
+          "cantidad": 3,
+          "maquinaId": "cmqme52b800lood5qnuth220n",
+          "centroCosto": "Ceba",
+          "responsableId": "cmqme4zt900kiod5q6ec6scje"
+        }
+      ]
+    },
+    "area": {
+      "nombre": "Maquinaria"
+    }
+  }
+]

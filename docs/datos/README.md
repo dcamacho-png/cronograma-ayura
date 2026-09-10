@@ -70,3 +70,24 @@ Un `updateMany` por lista de `id` de este archivo, poniendo
 exactamente ese estado). Ojo: el cron semanal las volvería a cerrar el lunes
 siguiente a la 01:17 de Colombia, así que revertir sin desactivar el cron solo
 dura hasta el lunes.
+
+## `2026-09-09-respaldo-bultos-por-dia.json`
+
+Estado previo de las **56 actividades con bultos** (48 migradas) justo antes de
+mover los bultos al día a día: hasta entonces vivían en
+`Actividad.bultosPorLote` como UN número por potrero, así que al trabajar el
+mismo potrero dos días los del segundo se perdían. La migración le atribuye a
+cada potrero su total existente a la entrada de avance de su **primer día**,
+que es exactamente donde el Excel lo mostraba, y desde ahí cada día guarda los
+suyos.
+
+Cada registro trae `id`, `anio`, `semana`, `descripcion`, `bultosPorLote` y
+`avancePorLote` tal como estaban. Comprobado después de aplicar: los 4.860
+bultos guardados en la app siguen siendo 4.860, y en las 56 actividades el
+total por potrero coincide con la suma de su día a día (56/56).
+
+### Cómo revertir
+
+Escribir de vuelta el `avancePorLote` de cada `id` de este archivo (las
+entradas sin el campo `bultos`). Los totales de `bultosPorLote` no cambiaron
+con la migración, así que no hay que tocarlos.
