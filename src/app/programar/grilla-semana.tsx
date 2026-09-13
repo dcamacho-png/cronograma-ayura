@@ -91,21 +91,9 @@ export function GrillaSemana({
     <tr key={r.id}>
       <td className="border border-borde p-2 align-top font-medium">
         <div>{r.nombre}</div>
-        {novedades
-          .filter((n) => n.responsableId === r.id)
-          .map((n) => (
-            <div key={n.id} className="mt-1 flex items-center gap-1 text-xs font-normal text-tierra">
-              <span>{etiquetaNovedad(n.tipo).emoji} {fmtFecha(n.fechaInicio)}–{fmtFecha(n.fechaFin)}</span>
-              {editable && (
-                <form action={eliminarNovedadResponsableAccion}>
-                  <input type="hidden" name="id" value={n.id} />
-                  <input type="hidden" name="anio" value={anio} />
-                  <input type="hidden" name="semana" value={semana} />
-                  <button type="submit" aria-label="Quitar novedad" className="text-red-600 hover:underline">✕</button>
-                </form>
-              )}
-            </div>
-          ))}
+        {/* La novedad se pinta SOLO en las casillas de los días que cubre (abajo). Acá salía
+            además junto al nombre, donde se leía como si el trabajador estuviera ausente toda
+            la semana. El ✕ para quitarla vive ahora en el primer día que cubre. */}
         {editable && <FormNovedad responsableId={r.id} anio={anio} semana={semana} />}
       </td>
       {DIAS.map((_, i) => {
@@ -159,15 +147,30 @@ export function GrillaSemana({
               </div>
             ))}
             {novedades
-              .filter((n) => n.responsableId === r.id && diasCubiertos(n, fechas).includes(dia))
-              .map((n) => (
+              .filter((n) => n.responsableId === r.id)
+              .map((n) => ({ n, cubiertos: diasCubiertos(n, fechas) }))
+              .filter(({ cubiertos }) => cubiertos.includes(dia))
+              .map(({ n, cubiertos }) => (
                 <div
                   key={n.id}
-                  className={`mb-1 rounded-lg p-1 ${paraExportar ? 'text-sm' : 'text-xs'} ${COLOR_NOVEDAD[n.tipo] ?? COLOR_NOVEDAD.OTRO}`}
+                  title={`${fmtFecha(n.fechaInicio)}–${fmtFecha(n.fechaFin)}${n.nota ? ` · ${n.nota}` : ''}`}
+                  className={`mb-1 flex items-center gap-1 rounded-lg p-1 ${paraExportar ? 'text-sm' : 'text-xs'} ${COLOR_NOVEDAD[n.tipo] ?? COLOR_NOVEDAD.OTRO}`}
                 >
-                  {etiquetaNovedad(n.tipo).emoji} {etiquetaNovedad(n.tipo).label}
-                  {n.tipo === 'PERMISO' && n.horario ? ` · ${n.horario}` : ''}
-                  {(n.tipo === 'OTRO' || n.tipo === 'CUMPLEAÑOS') && n.nota ? ` · ${n.nota}` : ''}
+                  <span>
+                    {etiquetaNovedad(n.tipo).emoji} {etiquetaNovedad(n.tipo).label}
+                    {n.tipo === 'PERMISO' && n.horario ? ` · ${n.horario}` : ''}
+                    {(n.tipo === 'OTRO' || n.tipo === 'CUMPLEAÑOS') && n.nota ? ` · ${n.nota}` : ''}
+                  </span>
+                  {/* El ✕ va una sola vez por novedad: en el primer día que cubre en esta
+                      semana. Borra la novedad entera, no ese día suelto. */}
+                  {editable && cubiertos[0] === dia && (
+                    <form action={eliminarNovedadResponsableAccion} className="ml-auto">
+                      <input type="hidden" name="id" value={n.id} />
+                      <input type="hidden" name="anio" value={anio} />
+                      <input type="hidden" name="semana" value={semana} />
+                      <button type="submit" aria-label="Quitar novedad" title="Quitar novedad" className="text-red-600 hover:underline">✕</button>
+                    </form>
+                  )}
                 </div>
               ))}
           </td>
