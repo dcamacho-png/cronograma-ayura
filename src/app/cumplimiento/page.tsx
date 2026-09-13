@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { usuarioActual } from '@/auth/sesion'
 import { puedeVer, esSoloLectura } from '@/auth/permisos'
-import { listarAreas, listarMotivos, listarActividades, listarLotes, listarMaquinas, listarResponsablesPorArea, listarActividadesEstipuladas, listarVencidasSinRegistrar } from '@/datos/repositorio'
+import { listarAreas, listarMotivos, listarActividades, listarLotes, listarMaquinas, listarResponsablesPorArea, listarActividadesEstipuladas, listarVencidasSinRegistrar, listarUnidades, valorUnidad } from '@/datos/repositorio'
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, plazoCumplimientoVencido, diaActual } from '@/dominio/semana'
 import { avisarPlazoPorVencer } from '@/dominio/aviso-plazo'
 import { vencidaPorAtender } from '@/dominio/sin-registrar'
@@ -70,7 +70,7 @@ export default async function CumplimientoPage({
   // Una semana queda en solo lectura para las áreas una vez vencido el plazo (fin del domingo).
   const bloqueado = soloLectura || (!esAdmin && plazoCumplimientoVencido(anio, semana, hoy))
 
-  const [motivos, actividades, lotes, maquinas, responsablesTodos, estipuladas, vencidasCrudas] = await Promise.all([
+  const [motivos, actividades, lotes, maquinas, responsablesTodos, estipuladas, vencidasCrudas, unidadesTodas] = await Promise.all([
     listarMotivos(),
     listarActividades(areaId, anio, semana),
     listarLotes(),
@@ -78,8 +78,11 @@ export default async function CumplimientoPage({
     listarResponsablesPorArea(areaId),
     listarActividadesEstipuladas(),
     listarVencidasSinRegistrar(areaId),
+    listarUnidades(),
   ])
   const responsables = responsablesTodos.filter((r) => r.activo)
+  // Unidades que se ofrecen en los desplegables: solo las activas del catálogo de Configuración.
+  const unidades = unidadesTodas.filter((x) => x.activa).map((x) => ({ valor: valorUnidad(x.nombre), nombre: x.nombre }))
   const motivoCambioId = motivos.find((m) => m.nombre === 'Cambio de actividad')?.id ?? null
   const unidadPorNombre = Object.fromEntries(estipuladas.map((e) => [e.nombre, e.unidad]))
   // Los desplegables (reemplazo/actividad realizada) son de maquinaria: solo actividades de esa categoría.
@@ -205,6 +208,7 @@ export default async function CumplimientoPage({
 
       {responsables.length > 0 && !bloqueado && (
         <FormActividadRealizada
+          unidades={unidades}
           areaId={areaId}
           anio={anio}
           semana={semana}
@@ -229,6 +233,10 @@ export default async function CumplimientoPage({
             const nDias = diasDistintos(dias)
             // nombres de responsables distintos, en orden de aparición
             const nombresResp = [...new Map(dias.map((a) => [a.responsableId, a.responsable.nombre])).values()]
+            // Los responsables y los días de TODA la actividad (sus filas-hermanas): el avance
+            // los premarca y el cierre ofrece elegir el día.
+            const idsResp = [...new Set(dias.map((a) => a.responsableId))]
+            const diasProgramados = [...new Set(dias.map((a) => a.dia))].sort((x, y) => x - y)
             const unidad = unidadDe(unidadPorNombre, cab.descripcion)
             return (
               <li key={cab.tareaId ?? cab.id} className="tarjeta p-3">
@@ -297,6 +305,12 @@ export default async function CumplimientoPage({
                         cantidad: e.cantidad,
                         observacion: e.observacion ?? '',
                       }))
+                  // Días que ya tienen algún avance (para proponer el siguiente día programado).
+                  const diasConAvance = [...new Set(entradasAvance.map((e) => e.dia))]
+                  // Marcar "✓ Cumplida" solo fabrica el avance por potrero en las actividades
+                  // medidas en hectáreas (mismo criterio que `marcarCumplidaGrupo`); es el único
+                  // caso donde el día que se elija al cerrar tiene dónde guardarse.
+                  const registraAvanceAlCumplir = tieneLotes && unidad === 'ha'
                   const mapaMotivos = new Map(motivos.map((m) => [m.id, m.nombre]))
                   const entradasNovedad = normalizarNovedades(cab.novedades).map((n, index) => ({
                     index,
@@ -357,6 +371,7 @@ export default async function CumplimientoPage({
                         resumenAvances && <span className="text-sm text-tierra">Avances: {resumenAvances}</span>
                       )}
                       <NovedadesLista
+                        unidades={unidades}
                         actividadId={cab.id}
                         entradas={entradasNovedad}
                         editable={interactivo && !bloqueado}
@@ -380,10 +395,15 @@ export default async function CumplimientoPage({
                           )
                         ) : esMaquinaria ? (
                           <ActividadMaquinaria
+                            unidades={unidades}
                             actividadId={cab.id}
                             estado={estadoGrupo}
                             unidad={unidad}
                             dia={cab.dia}
+                            responsablesActividadIds={idsResp}
+                            diasProgramados={diasProgramados}
+                            diasConAvance={diasConAvance}
+                            registraAvanceAlCumplir={registraAvanceAlCumplir}
                             lotesActividad={cab.lotes}
                             lotesCatalogo={lotes}
                             maquinas={maquinas}
@@ -392,7 +412,6 @@ export default async function CumplimientoPage({
                             motivoCambioId={motivoCambioId}
                             haProgramada={cab.lotes.reduce((s, l) => s + (l.hectareas ?? 0), 0)}
                             responsables={responsables}
-                            responsableActividadId={cab.responsableId}
                             fincaActividad={cab.finca?.nombre ?? ''}
                             unidadRealizada={cab.unidadRealizada}
                             unidadCatalogo={unidadPorNombre[cab.descripcion] ?? ''}
@@ -410,9 +429,14 @@ export default async function CumplimientoPage({
                           />
                         ) : (
                           <ActividadEstandar
+                            unidades={unidades}
                             actividadId={cab.id}
                             estado={estadoGrupo}
                             dia={cab.dia}
+                            responsablesActividadIds={idsResp}
+                            diasProgramados={diasProgramados}
+                            diasConAvance={diasConAvance}
+                            registraAvanceAlCumplir={registraAvanceAlCumplir}
                             tieneLotes={tieneLotes}
                             lotesActividad={cab.lotes}
                             lotesCatalogo={lotes}
@@ -423,7 +447,6 @@ export default async function CumplimientoPage({
                             motivos={motivos}
                             motivoCambioId={motivoCambioId}
                             responsables={responsables}
-                            responsableActividadId={cab.responsableId}
                             fincaActividad={cab.finca?.nombre ?? ''}
                             bultosAsignados={cab.bultosPorLote as Record<string, number> | null}
                             descripcion={cab.descripcion}

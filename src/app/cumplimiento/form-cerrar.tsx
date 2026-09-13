@@ -2,6 +2,9 @@
 
 import { useState } from 'react'
 import { BloqueReemplazo } from './bloque-reemplazo'
+import type { OpcionUnidad } from '@/dominio/unidad'
+
+const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
 type Motivo = { id: string; nombre: string }
 type Lote = { id: string; nombre: string; hectareas?: number | null; finca: { nombre: string } }
@@ -14,6 +17,8 @@ type Estipulada = { id: string; nombre: string; unidad: string }
 export function FormCerrar({
   actividadId,
   diaActividad,
+  diasProgramados,
+  registraAvanceAlCumplir,
   hayPotrerosPendientes,
   esMaquinaria,
   motivos,
@@ -21,12 +26,15 @@ export function FormCerrar({
   estipuladas,
   lotes,
   maquinas,
+  unidades,
   cumplida,
   cerrarParcial,
   noSeHizo,
 }: {
   actividadId: string
   diaActividad: number
+  diasProgramados: number[]
+  registraAvanceAlCumplir: boolean
   hayPotrerosPendientes: boolean
   esMaquinaria: boolean
   motivos: Motivo[]
@@ -34,6 +42,7 @@ export function FormCerrar({
   estipuladas: Estipulada[]
   lotes: Lote[]
   maquinas: { id: string; nombre: string }[]
+  unidades: OpcionUnidad[]
   cumplida: (f: FormData) => void | Promise<void>
   cerrarParcial: (f: FormData) => void | Promise<void>
   noSeHizo: (f: FormData) => void | Promise<void>
@@ -43,6 +52,12 @@ export function FormCerrar({
   const [motivoSel, setMotivoSel] = useState('')
 
   const esCambio = motivoSel !== '' && motivoSel === motivoCambioId
+  // En una actividad de varios días hay que poder decir en cuál quedó terminada: si no,
+  // el cierre volcaba toda la medida al primer día programado sin preguntar.
+  // Solo donde el cierre DE VERDAD escribe un avance (potreros medidos en hectáreas); en las
+  // demás no hay dónde guardar ese día y el desplegable sería un control que no hace nada:
+  // ahí el día se indica con "Registrar avance", que siempre lo guarda.
+  const elegirDiaCierre = diasProgramados.length > 1 && registraAvanceAlCumplir
 
   if (modo === '') {
     return (
@@ -55,6 +70,14 @@ export function FormCerrar({
         >
           <input type="hidden" name="id" value={actividadId} />
           <button className="rounded-lg bg-bosque px-3 py-1 text-sm font-semibold text-white">✓ Cumplida</button>
+          {elegirDiaCierre && (
+            <label className="ml-2 text-xs text-tierra">
+              el{' '}
+              <select name="dia" defaultValue={diasProgramados[diasProgramados.length - 1]} className="rounded-lg border border-borde bg-marfil p-1 text-xs focus:outline-none focus:ring-2 focus:ring-bosque/40">
+                {diasProgramados.map((d) => (<option key={d} value={d}>{DIAS[d]}</option>))}
+              </select>
+            </label>
+          )}
         </form>
         <form action={cerrarParcial}>
           <input type="hidden" name="id" value={actividadId} />
@@ -102,6 +125,7 @@ export function FormCerrar({
           estipuladas={estipuladas}
           lotes={lotes}
           maquinas={maquinas}
+          unidades={unidades}
           diaActividad={diaActividad}
         />
       )}

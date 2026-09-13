@@ -8,6 +8,8 @@ import {
   listarMaquinas,
   listarResponsablesTodos,
   listarActividadesEstipuladas,
+  listarUnidades,
+  valorUnidad,
   listarLotesTodos,
   listarUsuarios,
 } from '@/datos/repositorio'
@@ -28,6 +30,10 @@ import {
   eliminarActividadEstipuladaAccion,
   renombrarActividadEstipuladaAccion,
   setUnidadActividadEstipuladaAccion,
+  crearUnidadAccion,
+  renombrarUnidadAccion,
+  setUnidadActivaAccion,
+  eliminarUnidadAccion,
   crearLoteAccion,
   eliminarLoteAccion,
   retirarLoteAccion,
@@ -60,16 +66,28 @@ export default async function ConfiguracionPage({
   const u = await usuarioActual()
   if (!u || u.rol !== 'ADMIN') redirect('/programar')
   const sp = await searchParams
-  const [areas, fincas, motivos, maquinas, responsables, estipuladas, lotes, usuarios] = await Promise.all([
+  const [areas, fincas, motivos, maquinas, responsables, estipuladas, unidades, lotes, usuarios] = await Promise.all([
     listarAreas(),
     listarFincas(),
     listarMotivos(),
     listarMaquinas(),
     listarResponsablesTodos(),
     listarActividadesEstipuladas(),
+    listarUnidades(),
     listarLotesTodos(),
     listarUsuarios(),
   ])
+  // Los desplegables solo ofrecen unidades activas; una retirada sigue visible en la
+  // actividad que ya la tenía, para no cambiarle la medida por abrir Configuración.
+  const unidadesActivas = unidades.filter((u) => u.activa)
+  const opcionesUnidad = (actual: string) => {
+    const vigentes = unidadesActivas.map((u) => ({ valor: valorUnidad(u.nombre), nombre: u.nombre }))
+    if (actual && !vigentes.some((o) => o.valor === actual)) {
+      const retirada = unidades.find((u) => valorUnidad(u.nombre) === actual)
+      vigentes.unshift({ valor: actual, nombre: `${retirada?.nombre ?? actual} (retirada)` })
+    }
+    return vigentes
+  }
 
   return (
     <main className="mx-auto max-w-6xl p-6">
@@ -178,6 +196,37 @@ export default async function ConfiguracionPage({
             <button className="rounded-lg bg-bosque px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
           </form>
         </section>
+
+        {/* Unidades de medida */}
+        <section className="tarjeta p-4">
+          <h3 className="mb-2 font-semibold text-tinta">Unidades de medida ({unidadesActivas.length})</h3>
+          <p className="mb-3 text-xs text-tierra">
+            Son las que se ofrecen al programar y al registrar un avance. Una unidad en uso no se
+            elimina: se <b>retira</b> y deja de aparecer en los desplegables, sin tocar lo ya registrado.
+          </p>
+          <ul className="mb-3 space-y-1">
+            {unidades.map((un) => (
+              <li key={un.id} className={`flex items-center gap-2 ${un.activa ? '' : 'opacity-60'}`}>
+                <form action={renombrarUnidadAccion} className="flex flex-1 items-center gap-1">
+                  <input type="hidden" name="id" value={un.id} />
+                  <input name="nombre" defaultValue={un.nombre} className="flex-1 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
+                  <button className="text-xs font-semibold text-bosque hover:underline">guardar</button>
+                </form>
+                {!un.activa && <span className="rounded-full bg-arena px-2 py-0.5 text-xs text-arcilla">retirada</span>}
+                <form action={setUnidadActivaAccion} className="inline">
+                  <input type="hidden" name="id" value={un.id} />
+                  <input type="hidden" name="activa" value={un.activa ? '0' : '1'} />
+                  <button className="text-xs text-tierra hover:underline">{un.activa ? 'retirar' : 'reactivar'}</button>
+                </form>
+                <FormEliminar accion={eliminarUnidadAccion} id={un.id} etiqueta={un.nombre} />
+              </li>
+            ))}
+          </ul>
+          <form action={crearUnidadAccion} className="flex flex-wrap gap-2">
+            <input name="nombre" required placeholder="Nueva unidad (ej. Viajes)" className="flex-1 rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
+            <button className="rounded-lg bg-bosque px-3 py-2 text-sm font-semibold text-white">+ Agregar</button>
+          </form>
+        </section>
       </Grupo>
 
       {/* ---------- Maquinaria ---------- */}
@@ -217,10 +266,7 @@ export default async function ConfiguracionPage({
                 <form action={setUnidadActividadEstipuladaAccion} className="flex items-center gap-1">
                   <input type="hidden" name="id" value={e.id} />
                   <select name="unidad" defaultValue={e.unidad} className="rounded-lg border border-borde bg-marfil p-1 text-xs focus:outline-none focus:ring-2 focus:ring-bosque/40">
-                    <option value="ha">Ha</option>
-                    <option value="hora">Hora</option>
-                    <option value="kg">Kg</option>
-                    <option value="cantidad">Cantidad</option>
+                    {opcionesUnidad(e.unidad).map((o) => (<option key={o.valor} value={o.valor}>{o.nombre}</option>))}
                   </select>
                   <button className="text-xs font-semibold text-bosque hover:underline">guardar</button>
                 </form>
@@ -231,10 +277,7 @@ export default async function ConfiguracionPage({
           <form action={crearActividadEstipuladaAccion} className="flex flex-wrap gap-2">
             <input name="nombre" required placeholder="Nueva actividad de maquinaria" className="flex-1 rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
             <select name="unidad" defaultValue="ha" className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
-              <option value="ha">Ha</option>
-              <option value="hora">Hora</option>
-              <option value="kg">Kg</option>
-              <option value="cantidad">Cantidad</option>
+              {opcionesUnidad('').map((o) => (<option key={o.valor} value={o.valor}>{o.nombre}</option>))}
             </select>
             <select name="categoria" defaultValue="maquinaria" className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
               <option value="maquinaria">Maquinaria</option>

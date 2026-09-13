@@ -65,16 +65,21 @@ export function hectareasRealizadas(
 // Totaliza la medida realizada por unidad. La medida explícita (haRealizada)
 // gana; si no hay, solo se deriva de la ha programada cuando la unidad es 'ha'
 // y la actividad está CUMPLIDA. Las que no reportan nada (PENDIENTE / SIN_REGISTRAR) se ignoran.
+//
+// Los baldes son los que aparezcan en los datos, no cuatro fijos: como las unidades se
+// administran en Configuración, cualquiera nueva ('jornales', 'viajes') tiene que sumar
+// aparte. Con baldes fijos caían todas dentro de 'ha' y el total mentía.
 export function medidasPorUnidad(
   filas: { estado: string; haProgramada: number; haRealizada: number | null; unidad: Unidad }[],
 ): Record<Unidad, number> {
-  const tot: Record<Unidad, number> = { ha: 0, hora: 0, kg: 0, cantidad: 0 }
+  const tot: Record<Unidad, number> = {}
   for (const f of filas) {
     if (sinReportar(f.estado)) continue
     const medida = f.haRealizada ?? (f.unidad === 'ha' && f.estado === 'CUMPLIDA' ? f.haProgramada : 0)
-    tot[f.unidad] += medida
+    tot[f.unidad] = (tot[f.unidad] ?? 0) + medida
   }
-  return { ha: r1(tot.ha), hora: r1(tot.hora), kg: r1(tot.kg), cantidad: r1(tot.cantidad) }
+  for (const u of Object.keys(tot)) tot[u] = r1(tot[u])
+  return tot
 }
 
 export interface TopConteo {
@@ -152,25 +157,26 @@ export function medidasPorTractor(
   }[],
 ): Map<string, Record<Unidad, number>> {
   const out = new Map<string, Record<Unidad, number>>()
-  const bucket = (id: string): Record<Unidad, number> => {
+  // Igual que en `medidasPorUnidad`: cada unidad usada abre su propio balde.
+  const sumar = (id: string, unidad: Unidad, cant: number) => {
     let r = out.get(id)
-    if (!r) { r = { ha: 0, hora: 0, kg: 0, cantidad: 0 }; out.set(id, r) }
-    return r
+    if (!r) { r = {}; out.set(id, r) }
+    r[unidad] = (r[unidad] ?? 0) + cant
   }
   for (const f of filas) {
     if (sinReportar(f.estado)) continue
     if (f.avances.length > 0) {
       for (const av of f.avances) {
         if (!av.cantidad) continue
-        bucket(av.maquinaId ?? f.maquinaId ?? '')[f.unidad] += av.cantidad
+        sumar(av.maquinaId ?? f.maquinaId ?? '', f.unidad, av.cantidad)
       }
     } else {
       const medida = f.haRealizada ?? (f.unidad === 'ha' && f.estado === 'CUMPLIDA' ? f.haProgramada : 0)
-      if (medida) bucket(f.maquinaId ?? '')[f.unidad] += medida
+      if (medida) sumar(f.maquinaId ?? '', f.unidad, medida)
     }
   }
   for (const r of out.values()) {
-    for (const u of Object.keys(r) as Unidad[]) r[u] = r1(r[u])
+    for (const u of Object.keys(r)) r[u] = r1(r[u])
   }
   return out
 }

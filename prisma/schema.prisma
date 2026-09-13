@@ -11,60 +11,60 @@ datasource db {
 }
 
 model Area {
-  id            String        @id @default(cuid())
-  nombre        String        @unique
-  maqTareas       Boolean @default(false)
-  maqProgramar    Boolean @default(false)
-  maqCumplimiento Boolean @default(false)
-  maqResumen      Boolean @default(false)
-  actividades   Actividad[]   @relation("AreaDeActividad")
-  tareasMaquina Actividad[]   @relation("AreaDeTarea")
-  responsables  Responsable[]
-  dedicaciones  DedicacionTractor[]
-  tareas      Tarea[] @relation("TareaArea")
-  solicitudes Tarea[] @relation("TareaSolicitante")
-  usuarios    Usuario[]
+  id                 String              @id @default(cuid())
+  nombre             String              @unique
+  maqTareas          Boolean             @default(false)
+  maqProgramar       Boolean             @default(false)
+  maqCumplimiento    Boolean             @default(false)
+  maqResumen         Boolean             @default(false)
+  actividades        Actividad[]         @relation("AreaDeActividad")
+  tareasMaquina      Actividad[]         @relation("AreaDeTarea")
+  responsables       Responsable[]
+  dedicaciones       DedicacionTractor[]
+  tareas             Tarea[]             @relation("TareaArea")
+  solicitudes        Tarea[]             @relation("TareaSolicitante")
+  usuarios           Usuario[]
   notasConservatorio NotaConservatorio[]
 }
 
 model Usuario {
-  id      String  @id @default(cuid())
-  usuario String  @unique
-  nombre  String
-  hash    String
-  rol     String  @default("AREA")
-  areaId  String?
-  area    Area?   @relation(fields: [areaId], references: [id])
+  id        String  @id @default(cuid())
+  usuario   String  @unique
+  nombre    String
+  hash      String
+  rol       String  @default("AREA")
+  areaId    String?
+  area      Area?   @relation(fields: [areaId], references: [id])
   pantallas String?
 }
 
 model Finca {
-  id          String      @id @default(cuid())
-  nombre      String      @unique
-  actividades Actividad[]
-  tareas      Tarea[]
-  lotes       Lote[]
-  responsables Responsable[]
+  id                 String              @id @default(cuid())
+  nombre             String              @unique
+  actividades        Actividad[]
+  tareas             Tarea[]
+  lotes              Lote[]
+  responsables       Responsable[]
   notasConservatorio NotaConservatorio[]
 }
 
 model Responsable {
-  id          String      @id @default(cuid())
+  id          String               @id @default(cuid())
   nombre      String
   areaId      String
-  area        Area        @relation(fields: [areaId], references: [id])
+  area        Area                 @relation(fields: [areaId], references: [id])
   fincaId     String?
-  finca       Finca?      @relation(fields: [fincaId], references: [id])
+  finca       Finca?               @relation(fields: [fincaId], references: [id])
   actividades Actividad[]
   novedades   NovedadResponsable[]
   ordenAseo   OrdenAseo[]
-  activo      Boolean     @default(true)
+  activo      Boolean              @default(true)
 }
 
 model Maquina {
-  id          String      @id @default(cuid())
-  nombre      String
-  actividades Actividad[]
+  id           String              @id @default(cuid())
+  nombre       String
+  actividades  Actividad[]
   dedicaciones DedicacionTractor[]
 }
 
@@ -91,7 +91,7 @@ model NovedadResponsable {
   id            String      @id @default(cuid())
   responsableId String
   responsable   Responsable @relation(fields: [responsableId], references: [id], onDelete: Cascade)
-  tipo          String      // "VACACIONES" | "PERMISO"
+  tipo          String // "VACACIONES" | "PERMISO"
   fechaInicio   DateTime    @db.Date
   fechaFin      DateTime    @db.Date
   horario       String?
@@ -102,82 +102,82 @@ model NovedadResponsable {
 }
 
 model Actividad {
-  id                String   @id @default(cuid())
+  id                String  @id @default(cuid())
   anio              Int
   semana            Int
-  dia               Int      // 1=lunes ... 7=domingo
+  dia               Int // 1=lunes ... 7=domingo
   descripcion       String
-  turno             String   @default("")
-  estado            String   @default("PENDIENTE")
+  turno             String  @default("")
+  estado            String  @default("PENDIENTE")
   nota              String?
-  vecesReprogramada Int      @default(0)
+  vecesReprogramada Int     @default(0)
   centroCosto       String?
 
   areaId        String
-  area          Area    @relation("AreaDeActividad", fields: [areaId], references: [id])
+  area          Area        @relation("AreaDeActividad", fields: [areaId], references: [id])
   fincaId       String?
-  finca         Finca?  @relation(fields: [fincaId], references: [id])
+  finca         Finca?      @relation(fields: [fincaId], references: [id])
   responsableId String
   responsable   Responsable @relation(fields: [responsableId], references: [id])
   motivoId      String?
-  motivo        Motivo?  @relation(fields: [motivoId], references: [id])
+  motivo        Motivo?     @relation(fields: [motivoId], references: [id])
 
   // Reprogramación: relación a sí misma (la actividad de origen).
   // @unique: una actividad solo puede reprogramarse una vez (evita duplicados por carrera).
-  origenId String?     @unique
-  origen   Actividad?  @relation("Reprogramacion", fields: [origenId], references: [id])
-  derivada Actividad?  @relation("Reprogramacion")
+  origenId String?    @unique
+  origen   Actividad? @relation("Reprogramacion", fields: [origenId], references: [id])
+  derivada Actividad? @relation("Reprogramacion")
 
   // Campos de maquinaria (opcionales).
-  maquinaId  String?
-  maquina    Maquina? @relation(fields: [maquinaId], references: [id])
-  tareaId    String?
-  tarea      Tarea?   @relation(fields: [tareaId], references: [id])
-  areaTareaId String?
-  areaTarea   Area?   @relation("AreaDeTarea", fields: [areaTareaId], references: [id])
-  horas      Float?
-  hectareas  Float?
-  haFaltante  Float?
-  haRealizada  Float?
+  maquinaId       String?
+  maquina         Maquina? @relation(fields: [maquinaId], references: [id])
+  tareaId         String?
+  tarea           Tarea?   @relation(fields: [tareaId], references: [id])
+  areaTareaId     String?
+  areaTarea       Area?    @relation("AreaDeTarea", fields: [areaTareaId], references: [id])
+  horas           Float?
+  hectareas       Float?
+  haFaltante      Float?
+  haRealizada     Float?
   unidadRealizada String?
-  planB        String?
-  noProgramada Boolean @default(false)
-  cerrada      Boolean @default(false)
-  bultosPorLote Json?
-  lotesHechos  Json?
-  avancePorLote Json?
+  planB           String?
+  noProgramada    Boolean  @default(false)
+  cerrada         Boolean  @default(false)
+  bultosPorLote   Json?
+  lotesHechos     Json?
+  avancePorLote   Json?
   // Bitácora día a día de las actividades SIN potreros (lista de entradas por día).
-  avanceGeneral Json?
-  novedades    Json?
-  lotes        Lote[]
+  avanceGeneral   Json?
+  novedades       Json?
+  lotes           Lote[]
 
   @@index([anio, semana, areaId])
 }
 
 model Tarea {
-  id          String      @id @default(cuid())
-  descripcion String
-  turno       String      @default("")
-  estado      String      @default("PENDIENTE")
-  anioSel     Int?
-  semanaSel   Int?
-  vecesReprogramada Int @default(0)
+  id                String @id @default(cuid())
+  descripcion       String
+  turno             String @default("")
+  estado            String @default("PENDIENTE")
+  anioSel           Int?
+  semanaSel         Int?
+  vecesReprogramada Int    @default(0)
 
-  areaId              String
-  area                Area        @relation("TareaArea", fields: [areaId], references: [id])
-  solicitadaPorAreaId String?
-  solicitadaPorArea   Area?       @relation("TareaSolicitante", fields: [solicitadaPorAreaId], references: [id])
-  fincaId     String?
-  finca       Finca?      @relation(fields: [fincaId], references: [id])
-  loteId      String?
-  lote        Lote?       @relation("TareaLoteUnico", fields: [loteId], references: [id])
-  lotes       Lote[]      @relation("TareaLotesMulti")
-  bultosPorLote Json?
-  medidaPorLote Json?
-  unidad        String?
-  detalle String?
-  observacionDevolucion String?
-  diasSugeridos String?
+  areaId                   String
+  area                     Area    @relation("TareaArea", fields: [areaId], references: [id])
+  solicitadaPorAreaId      String?
+  solicitadaPorArea        Area?   @relation("TareaSolicitante", fields: [solicitadaPorAreaId], references: [id])
+  fincaId                  String?
+  finca                    Finca?  @relation(fields: [fincaId], references: [id])
+  loteId                   String?
+  lote                     Lote?   @relation("TareaLoteUnico", fields: [loteId], references: [id])
+  lotes                    Lote[]  @relation("TareaLotesMulti")
+  bultosPorLote            Json?
+  medidaPorLote            Json?
+  unidad                   String?
+  detalle                  String?
+  observacionDevolucion    String?
+  diasSugeridos            String?
   responsablesSugeridosIds String?
 
   actividades Actividad[]
@@ -186,25 +186,36 @@ model Tarea {
 }
 
 model ActividadEstipulada {
-  id     String @id @default(cuid())
-  nombre String @unique
-  unidad String @default("ha")
+  id         String  @id @default(cuid())
+  nombre     String  @unique
+  unidad     String  @default("ha")
   maquinaria Boolean @default(true)
 }
 
+// Catálogo de unidades de medida que el ADMIN administra en Configuración. El valor que se
+// guarda en `ActividadEstipulada.unidad` y en `Actividad.unidadRealizada` es este `nombre` en
+// minúscula; `nombre` conserva la forma en que se escribió para mostrarla.
+// Una unidad con historial se RETIRA (activa=false), no se borra: sale de los desplegables
+// pero lo ya registrado con ella conserva su medida.
+model UnidadMedida {
+  id     String  @id @default(cuid())
+  nombre String  @unique
+  activa Boolean @default(true)
+}
+
 model Lote {
-  id          String      @id @default(cuid())
-  nombre      String      @unique
-  hectareas   Float?
-  tipoPasto   String?
+  id                 String              @id @default(cuid())
+  nombre             String              @unique
+  hectareas          Float?
+  tipoPasto          String?
   // Un potrero retirado (activo=false) no se ofrece al programar ni al registrar,
   // pero conserva su nombre y su medida en todo lo ya registrado.
-  activo      Boolean     @default(true)
-  fincaId     String
-  finca       Finca       @relation(fields: [fincaId], references: [id])
-  actividades Actividad[]
-  tareas      Tarea[]     @relation("TareaLoteUnico")
-  tareasMulti Tarea[]     @relation("TareaLotesMulti")
+  activo             Boolean             @default(true)
+  fincaId            String
+  finca              Finca               @relation(fields: [fincaId], references: [id])
+  actividades        Actividad[]
+  tareas             Tarea[]             @relation("TareaLoteUnico")
+  tareasMulti        Tarea[]             @relation("TareaLotesMulti")
   notasConservatorio NotaConservatorio[]
 
   @@index([fincaId])
@@ -232,7 +243,7 @@ model OrdenAseo {
   id            String      @id @default(cuid())
   anio          Int
   semana        Int
-  dia           Int          // 1=lunes … 7=domingo
+  dia           Int // 1=lunes … 7=domingo
   responsableId String
   responsable   Responsable @relation(fields: [responsableId], references: [id], onDelete: Cascade)
 

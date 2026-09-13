@@ -4,9 +4,9 @@ import { useState } from 'react'
 import { PickerReemplazoPotreros } from './picker-reemplazo-potreros'
 import { usaBultos } from '@/dominio/bultos'
 import { CENTROS_COSTO } from '@/dominio/centro-costo'
+import { etiquetaUnidad, unidadInicial, type OpcionUnidad } from '@/dominio/unidad'
 
 const DIAS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
-const UNIDADES = ['Ha', 'Hora', 'Kg', 'Cantidad', 'Bultos', 'Jornales'] // + "Otro" (texto libre)
 
 type Lote = { id: string; nombre: string; hectareas?: number | null; finca: { nombre: string } }
 type Estipulada = { id: string; nombre: string; unidad: string }
@@ -20,6 +20,7 @@ export function FormActividadRealizada({
   lotes,
   maquinas,
   estipuladas,
+  unidades,
   accion,
 }: {
   areaId: string
@@ -30,28 +31,27 @@ export function FormActividadRealizada({
   lotes: Lote[]
   maquinas: { id: string; nombre: string }[]
   estipuladas: Estipulada[]
+  unidades: OpcionUnidad[]
   accion: (formData: FormData) => void | Promise<void>
 }) {
   // Descripción: en maquinaria se elige del catálogo (o "Otra" texto); en estándar es texto libre.
   const [desc, setDesc] = useState('')
   const [descOtra, setDescOtra] = useState('')
   const [centroCosto, setCentroCosto] = useState('')
-  const [unidadSel, setUnidadSel] = useState(esMaquinaria ? 'Ha' : 'Cantidad')
-  const [unidadOtraTxt, setUnidadOtraTxt] = useState('')
+  const [unidadSel, setUnidadSel] = useState(unidadInicial(unidades, esMaquinaria ? 'ha' : 'cantidad'))
 
   // Al elegir una actividad del catálogo, fijar su unidad por defecto (editable).
-  const matchUnidad = (u: string | undefined) => UNIDADES.find((x) => x.toLowerCase() === (u ?? '').toLowerCase())
   const elegirDesc = (v: string) => {
     setDesc(v)
-    const u = matchUnidad(estipuladas.find((x) => x.nombre === v)?.unidad)
-    if (u) setUnidadSel(u)
+    const u = (estipuladas.find((x) => x.nombre === v)?.unidad ?? '').trim().toLowerCase()
+    if (u && unidades.some((o) => o.valor === u)) setUnidadSel(u)
   }
   const esOtra = desc === '__otra__'
   // Descripción efectiva (para saber si usa bultos): en maquinaria el catálogo o el texto "Otra";
   // en estándar el texto libre (guardado en `desc`).
   const descripcionActual = esMaquinaria ? (esOtra ? descOtra : desc) : desc
   const conBultos = usaBultos(descripcionActual)
-  const unidadLabel = unidadSel === 'Otro' ? (unidadOtraTxt.trim() || 'medida') : unidadSel
+  const unidadLabel = unidades.find((o) => o.valor === unidadSel)?.nombre ?? etiquetaUnidad(unidadSel)
 
   return (
     <form action={accion} className="mb-6 flex flex-wrap items-end gap-2 rounded-xl border border-borde bg-arena p-3">
@@ -111,20 +111,13 @@ export function FormActividadRealizada({
         Unidad
         <select
           name="unidad"
-          value={unidadSel === 'Otro' ? 'otro' : unidadSel.toLowerCase()}
-          onChange={(e) => setUnidadSel(e.target.value === 'otro' ? 'Otro' : e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1))}
+          value={unidadSel}
+          onChange={(e) => setUnidadSel(e.target.value)}
           className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
         >
-          {UNIDADES.map((u) => (<option key={u} value={u.toLowerCase()}>{u}</option>))}
-          <option value="otro">Otro…</option>
+          {unidades.map((u) => (<option key={u.valor} value={u.valor}>{u.nombre}</option>))}
         </select>
       </label>
-      {unidadSel === 'Otro' && (
-        <label className="flex flex-col text-xs">
-          Unidad (texto)
-          <input name="unidadOtra" value={unidadOtraTxt} onChange={(e) => setUnidadOtraTxt(e.target.value)} placeholder="ej. bultos" className="w-28 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
-        </label>
-      )}
       <label className="flex flex-col text-xs">
         Medida total (si no eliges potreros)
         <input name="medida" type="number" step="any" min="0" placeholder="opcional" className="w-32 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />

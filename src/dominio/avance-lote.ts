@@ -1,9 +1,26 @@
 // Un avance puntual de un lote en un día (cantidad incremental de ese día). `bultos` son
 // los bultos aplicados ESE día en ESE lote: van dentro de la entrada porque el avance es
 // acumulativo y un potrero puede trabajarse varios días.
-export type AvanceEntrada = { dia: number; maquinaId: string | null; cantidad: number; bultos?: number | null; centroCosto?: string | null; responsableId?: string | null; observacion?: string | null }
+// `responsableIds`: quiénes hicieron ESE avance. Es una lista porque una labor la puede hacer
+// más de un trabajador el mismo día; antes era un único `responsableId`, que además pisaba en
+// el Excel a los demás responsables de la actividad. Los avances viejos con `responsableId` se
+// leen como lista de uno (ver `normalizarAvancePorLote`).
+export type AvanceEntrada = { dia: number; maquinaId: string | null; cantidad: number; bultos?: number | null; centroCosto?: string | null; responsableIds?: string[]; observacion?: string | null }
 // Historial de avances por lote: una lista de entradas por cada loteId.
 export type AvancePorLote = Record<string, AvanceEntrada[]>
+
+// Una entrada tal como pudo quedar guardada: con la lista nueva o con el `responsableId`
+// único de antes.
+type EntradaGuardada = AvanceEntrada & { responsableId?: string | null }
+
+// Deja la entrada con `responsableIds` venga como venga: si trae el `responsableId` viejo lo
+// convierte en lista de uno. Sin responsables el campo no aparece (contenedor vacío = ausente).
+function normalizarEntrada(e: EntradaGuardada): AvanceEntrada {
+  const { responsableId, responsableIds, ...resto } = e
+  const lista = (responsableIds ?? []).filter(Boolean)
+  const ids = lista.length > 0 ? lista : (responsableId ? [responsableId] : [])
+  return { ...resto, ...(ids.length > 0 ? { responsableIds: ids } : {}) }
+}
 
 // Normaliza el JSON guardado: acepta la forma vieja (un objeto por lote) y la
 // nueva (lista por lote); devuelve siempre la nueva. Un valor que no es arreglo
@@ -14,7 +31,7 @@ export function normalizarAvancePorLote(
   if (!raw) return {}
   const out: AvancePorLote = {}
   for (const [loteId, v] of Object.entries(raw)) {
-    out[loteId] = Array.isArray(v) ? v : [v]
+    out[loteId] = (Array.isArray(v) ? v : [v]).map(normalizarEntrada)
   }
   return out
 }
@@ -90,16 +107,17 @@ export function agregarAvances(
   maquinaId: string | null,
   entradas: { loteId: string; cantidad: number; bultos?: number | null }[],
   centroCosto?: string | null,
-  responsableId?: string | null,
+  responsableIds?: string[] | null,
   observacion?: string | null,
 ): AvancePorLote {
   const out: AvancePorLote = { ...avance }
+  const quienes = (responsableIds ?? []).filter(Boolean)
   for (const { loteId, cantidad, bultos } of entradas) {
     const nueva: AvanceEntrada = {
       dia, maquinaId, cantidad,
       ...(bultos != null ? { bultos } : {}),
       ...(centroCosto ? { centroCosto } : {}),
-      ...(responsableId ? { responsableId } : {}),
+      ...(quienes.length > 0 ? { responsableIds: quienes } : {}),
       ...(observacion ? { observacion } : {}),
     }
     out[loteId] = [...(out[loteId] ?? []), nueva]
@@ -151,13 +169,13 @@ export function completarAvancesCumplida(
   lotes: { id: string; hectareas?: number | null }[],
   avance: AvancePorLote,
   dia: number,
-  responsableId?: string | null,
+  responsableIds?: string[] | null,
 ): AvancePorLote {
   const faltantes = lotes
     .filter((l) => !(avance[l.id] ?? []).length)
     .map((l) => ({ loteId: l.id, cantidad: l.hectareas ?? 0 }))
   if (faltantes.length === 0) return avance
-  return agregarAvances(avance, dia, null, faltantes, null, responsableId)
+  return agregarAvances(avance, dia, null, faltantes, null, responsableIds)
 }
 
 // Devuelve una copia de `avance` con la entrada (loteId, index) modificada en los campos
@@ -194,4 +212,18 @@ export function eliminarAvanceEntrada(avance: AvancePorLote, loteId: string, ind
   if (restante.length) out[loteId] = restante
   else delete out[loteId]
   return out
+}
+
+// Día que propone el formulario de avance: el primer día programado que todavía no tiene
+// ningún avance. Una actividad programada a varios días ofrecía siempre el primero, así que
+// registrar el segundo día exigía acordarse de cambiar el desplegable; ahora el día adicional
+// se propone solo. Si ya se registraron todos (o no hay días programados), no fuerza nada.
+export function diaSugeridoAvance(
+  diasProgramados: number[],
+  diasConAvance: number[],
+  diaActividad: number,
+): number {
+  const hechos = new Set(diasConAvance)
+  const ordenados = [...diasProgramados].sort((a, b) => a - b)
+  return ordenados.find((d) => !hechos.has(d)) ?? ordenados[0] ?? diaActividad
 }

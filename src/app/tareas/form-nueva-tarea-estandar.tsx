@@ -2,26 +2,28 @@
 
 import { useState } from 'react'
 import { PickerLotesBultos } from './picker-lotes-bultos'
+import { unidadInicial, type OpcionUnidad } from '@/dominio/unidad'
 
-const UNIDADES = ['Ha', 'Hora', 'Kg', 'Cantidad', 'Bultos', 'Jornales'] // + "Otro" (texto libre)
 type Lote = { id: string; nombre: string; finca: { nombre: string } }
 type Estipulada = { id: string; nombre: string }
 
 // Alta de tarea estándar (espejo del de maquinaria): actividad del catálogo estándar +
-// "Otra…", unidad de la lista ampliada, y uno o varios lotes con su valor de medida.
+// "Otra…", unidad del catálogo de Configuración, y uno o varios lotes con su valor de medida.
 export function FormNuevaTareaEstandar({
   areaId,
   estipuladas,
   lotes,
+  unidades,
   accion,
 }: {
   areaId: string
   estipuladas: Estipulada[]
   lotes: Lote[]
+  unidades: OpcionUnidad[]
   accion: (formData: FormData) => void | Promise<void>
 }) {
   const [estipulada, setEstipulada] = useState('')
-  const [unidadSel, setUnidadSel] = useState('Jornales')
+  const [unidadSel, setUnidadSel] = useState(unidadInicial(unidades, 'jornales'))
 
   return (
     <form action={accion} className="flex flex-wrap items-end gap-2 rounded-xl border border-borde p-4">
@@ -51,20 +53,13 @@ export function FormNuevaTareaEstandar({
         Unidad
         <select
           name="unidad"
-          value={unidadSel === 'Otro' ? 'otro' : unidadSel.toLowerCase()}
-          onChange={(e) => setUnidadSel(e.target.value === 'otro' ? 'Otro' : e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1))}
+          value={unidadSel}
+          onChange={(e) => setUnidadSel(e.target.value)}
           className="rounded-lg border border-borde bg-marfil p-2 focus:outline-none focus:ring-2 focus:ring-bosque/40"
         >
-          {UNIDADES.map((u) => (<option key={u} value={u.toLowerCase()}>{u}</option>))}
-          <option value="otro">Otro…</option>
+          {unidades.map((u) => (<option key={u.valor} value={u.valor}>{u.nombre}</option>))}
         </select>
       </label>
-      {unidadSel === 'Otro' && (
-        <label className="flex flex-col text-sm">
-          Unidad (texto)
-          <input name="unidadOtra" placeholder="ej. viajes" className="w-28 rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
-        </label>
-      )}
       <label className="flex flex-col text-sm">
         Lotes y medida por lote
         <PickerLotesBultos lotes={lotes} campo="medida" placeholder="medida" />

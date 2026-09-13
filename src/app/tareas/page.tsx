@@ -7,6 +7,8 @@ import {
   listarLotes,
   listarSolicitudesDeArea,
   listarResponsablesTodos,
+  listarUnidades,
+  valorUnidad,
 } from '@/datos/repositorio'
 import { semanaActual, siguienteSemana, programacionAbierta } from '@/dominio/semana'
 import { solicitudSinSalida } from '@/dominio/solicitud-sin-salida'
@@ -46,13 +48,16 @@ export default async function TareasPage({
   const areaActual = areas.find((a) => a.id === areaId)!
   const esMaquinaria = esMaquinariaVar(areaActual, 'tareas')
 
-  const [tareas, estipuladas, lotes, solicitudes, responsablesTodos] = await Promise.all([
+  const [tareas, estipuladas, lotes, solicitudes, responsablesTodos, unidadesTodas] = await Promise.all([
     listarTareasPendientes(areaId),
     listarActividadesEstipuladas(),
     listarLotes(),
     listarSolicitudesDeArea(areaId),
     listarResponsablesTodos(),
+    listarUnidades(),
   ])
+  // Solo las unidades activas del catálogo de Configuración llegan a los desplegables.
+  const unidades = unidadesTodas.filter((x) => x.activa).map((x) => ({ valor: valorUnidad(x.nombre), nombre: x.nombre }))
   const responsablesPorArea: Record<string, { id: string; nombre: string }[]> = {}
   for (const r of responsablesTodos) {
     if (!r.activo) continue
@@ -112,7 +117,7 @@ export default async function TareasPage({
           {esMaquinaria ? (
             <FormNuevaTareaMaquinaria areaId={areaId} estipuladas={estipuladasMaq} lotes={lotes} accion={crearTareaAccion} />
           ) : (
-            <FormNuevaTareaEstandar areaId={areaId} estipuladas={estipuladasEst} lotes={lotes} accion={crearTareaAccion} />
+            <FormNuevaTareaEstandar areaId={areaId} estipuladas={estipuladasEst} lotes={lotes} unidades={unidades} accion={crearTareaAccion} />
           )}
         </div>
         <FormSolicitar
@@ -120,6 +125,7 @@ export default async function TareasPage({
           areas={areas.map((a) => ({ id: a.id, nombre: a.nombre, maqTareas: a.maqTareas }))}
           estipuladas={estipuladasMaq}
           lotes={lotes}
+          unidades={unidades}
           accion={crearSolicitudAccion}
           responsablesPorArea={responsablesPorArea}
         />

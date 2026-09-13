@@ -1,6 +1,7 @@
 'use client'
 
 import type { Estado } from '@/dominio/tipos'
+import type { OpcionUnidad } from '@/dominio/unidad'
 import { FormCerrar } from './form-cerrar'
 import { FormAvance } from './form-avance'
 
@@ -25,7 +26,11 @@ export function ActividadEstandar({
   motivos,
   motivoCambioId,
   responsables,
-  responsableActividadId,
+  responsablesActividadIds,
+  diasProgramados,
+  diasConAvance,
+  registraAvanceAlCumplir,
+  unidades,
   fincaActividad,
   bultosAsignados,
   descripcion,
@@ -51,7 +56,11 @@ export function ActividadEstandar({
   motivos: Motivo[]
   motivoCambioId: string | null
   responsables: { id: string; nombre: string }[]
-  responsableActividadId: string
+  responsablesActividadIds: string[]
+  diasProgramados: number[]
+  diasConAvance: number[]
+  registraAvanceAlCumplir: boolean
+  unidades: OpcionUnidad[]
   fincaActividad: string
   bultosAsignados?: Record<string, number> | null
   descripcion?: string
@@ -89,7 +98,9 @@ export function ActividadEstandar({
         diaActividad={dia}
         esMaquinaria={false}
         responsables={responsables}
-        responsableDefault={responsableActividadId}
+        responsablesActividadIds={responsablesActividadIds}
+        diasProgramados={diasProgramados}
+        diasConAvance={diasConAvance}
         maquinas={[]}
         lotesActividad={lotesActividad}
         lotesCatalogo={lotesCatalogo}
@@ -98,6 +109,7 @@ export function ActividadEstandar({
         descripcion={descripcion}
         unidadActual={unidadRealizada}
         unidadCatalogo={unidadCatalogo}
+        unidades={unidades}
         lotesPendientesIds={lotesPendientesIds}
         accion={registrarAvance}
         accionGeneral={registrarAvanceGeneral}
@@ -107,12 +119,15 @@ export function ActividadEstandar({
         <FormCerrar
           actividadId={actividadId}
           diaActividad={dia}
+          diasProgramados={diasProgramados}
+          registraAvanceAlCumplir={registraAvanceAlCumplir}
           hayPotrerosPendientes={hayPotrerosPendientes}
           esMaquinaria={false}
           motivos={motivos}
           motivoCambioId={motivoCambioId}
           estipuladas={estipuladas}
           lotes={lotesCatalogo}
+          unidades={unidades}
           maquinas={[]}
           cumplida={marcarCumplida}
           cerrarParcial={cerrarParcial}

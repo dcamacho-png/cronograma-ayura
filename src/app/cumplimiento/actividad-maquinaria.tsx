@@ -1,6 +1,6 @@
 'use client'
 
-import type { Unidad } from '@/dominio/unidad'
+import type { OpcionUnidad, Unidad } from '@/dominio/unidad'
 import type { Estado } from '@/dominio/tipos'
 import { FormAvance } from './form-avance'
 import { FormCerrar } from './form-cerrar'
@@ -26,7 +26,11 @@ export function ActividadMaquinaria({
   motivoCambioId,
   haProgramada,
   responsables,
-  responsableActividadId,
+  responsablesActividadIds,
+  diasProgramados,
+  diasConAvance,
+  registraAvanceAlCumplir,
+  unidades,
   fincaActividad,
   unidadRealizada,
   unidadCatalogo,
@@ -54,7 +58,11 @@ export function ActividadMaquinaria({
   motivoCambioId: string | null
   haProgramada: number
   responsables: { id: string; nombre: string }[]
-  responsableActividadId: string
+  responsablesActividadIds: string[]
+  diasProgramados: number[]
+  diasConAvance: number[]
+  registraAvanceAlCumplir: boolean
+  unidades: OpcionUnidad[]
   fincaActividad: string
   unidadRealizada: string | null
   unidadCatalogo?: string
@@ -79,7 +87,9 @@ export function ActividadMaquinaria({
         diaActividad={dia}
         esMaquinaria={true}
         responsables={responsables}
-        responsableDefault={responsableActividadId}
+        responsablesActividadIds={responsablesActividadIds}
+        diasProgramados={diasProgramados}
+        diasConAvance={diasConAvance}
         maquinas={maquinas}
         lotesActividad={lotesActividad}
         lotesCatalogo={lotesCatalogo}
@@ -88,6 +98,7 @@ export function ActividadMaquinaria({
         descripcion={descripcion}
         unidadActual={unidadRealizada}
         unidadCatalogo={unidadCatalogo}
+        unidades={unidades}
         lotesPendientesIds={lotesPendientesIds}
         accion={registrarAvance}
         accionGeneral={registrarAvanceGeneral}
@@ -96,12 +107,15 @@ export function ActividadMaquinaria({
         <FormCerrar
           actividadId={actividadId}
           diaActividad={dia}
+          diasProgramados={diasProgramados}
+          registraAvanceAlCumplir={registraAvanceAlCumplir}
           hayPotrerosPendientes={hayPotrerosPendientes}
           esMaquinaria={true}
           motivos={motivos}
           motivoCambioId={motivoCambioId}
           estipuladas={estipuladas}
           lotes={lotesCatalogo}
+          unidades={unidades}
           maquinas={maquinas}
           cumplida={marcarCumplida}
           cerrarParcial={cerrarParcial}

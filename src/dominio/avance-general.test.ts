@@ -6,7 +6,7 @@ import {
 } from './avance-general'
 
 const e = (dia: number, cantidad: number, extra: Partial<AvanceGeneralEntrada> = {}): AvanceGeneralEntrada => ({
-  dia, cantidad, maquinaId: null, centroCosto: null, responsableId: null, observacion: null, ...extra,
+  dia, cantidad, maquinaId: null, centroCosto: null, responsableIds: [], observacion: null, ...extra,
 })
 
 describe('normalizarAvanceGeneral', () => {
@@ -22,10 +22,16 @@ describe('normalizarAvanceGeneral', () => {
     ])
   })
 
-  it('conserva máquina, centro de costo, responsable y observación', () => {
+  it('conserva máquina, centro de costo, responsables y observación', () => {
     expect(normalizarAvanceGeneral([
-      { dia: 3, cantidad: 8, maquinaId: 'm1', centroCosto: 'Ceba', responsableId: 'r1', observacion: 'taller' },
-    ])).toEqual([e(3, 8, { maquinaId: 'm1', centroCosto: 'Ceba', responsableId: 'r1', observacion: 'taller' })])
+      { dia: 3, cantidad: 8, maquinaId: 'm1', centroCosto: 'Ceba', responsableIds: ['r1', 'r2'], observacion: 'taller' },
+    ])).toEqual([e(3, 8, { maquinaId: 'm1', centroCosto: 'Ceba', responsableIds: ['r1', 'r2'], observacion: 'taller' })])
+  })
+
+  it('lee los avances viejos de un solo responsableId como lista de uno', () => {
+    expect(normalizarAvanceGeneral([
+      { dia: 3, cantidad: 8, responsableId: 'r1' },
+    ])).toEqual([e(3, 8, { responsableIds: ['r1'] })])
   })
 
   it('una cantidad no numérica cuenta como 0 (la entrada del día no se pierde)', () => {

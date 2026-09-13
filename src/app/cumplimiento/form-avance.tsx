@@ -3,14 +3,17 @@
 import { useState } from 'react'
 import { CENTROS_COSTO } from '@/dominio/centro-costo'
 import { usaBultos } from '@/dominio/bultos'
+import { diaSugeridoAvance } from '@/dominio/avance-lote'
+import { etiquetaUnidad, opcionesConActual, unidadInicial, type OpcionUnidad } from '@/dominio/unidad'
 
 const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
-const UNIDADES = ['Ha', 'Hora', 'Kg', 'Cantidad', 'Bultos', 'Jornales'] // + "Otro" (texto libre)
 type Lote = { id: string; nombre: string; hectareas?: number | null; finca: { nombre: string } }
 
-// Un avance puede registrar varios potreros a la vez: día, responsable, unidad (por actividad),
+// Un avance puede registrar varios potreros a la vez: día, trabajadores, unidad (por actividad),
 // observación, tabla por potrero (casilla + ha = medida + bultos en fertilización), anexar
 // potreros no asignados, y —en maquinaria— tractor + centro de costo.
+// Los trabajadores van en CASILLAS, no en un desplegable: una labor la pueden hacer varios el
+// mismo día, y con un solo responsable el Excel mostraba a uno y tapaba a los demás.
 // Si la actividad NO tiene potreros (taller, movimientos, coordinación…), el mismo formulario
 // captura UNA cantidad del día y va a `accionGeneral` (bitácora día a día). Sin esa rama el
 // envío se perdía en silencio, porque la acción por potrero exige al menos una casilla.
@@ -19,7 +22,9 @@ export function FormAvance({
   diaActividad,
   esMaquinaria,
   responsables,
-  responsableDefault,
+  responsablesActividadIds,
+  diasProgramados,
+  diasConAvance,
   maquinas,
   lotesActividad,
   lotesCatalogo,
@@ -28,6 +33,7 @@ export function FormAvance({
   descripcion,
   unidadActual,
   unidadCatalogo,
+  unidades,
   lotesPendientesIds,
   accion,
   accionGeneral,
@@ -36,7 +42,9 @@ export function FormAvance({
   diaActividad: number
   esMaquinaria: boolean
   responsables: { id: string; nombre: string }[]
-  responsableDefault: string
+  responsablesActividadIds: string[]
+  diasProgramados: number[]
+  diasConAvance: number[]
   maquinas: { id: string; nombre: string }[]
   lotesActividad: { id: string; nombre: string; hectareas?: number | null }[]
   lotesCatalogo: Lote[]
@@ -45,6 +53,7 @@ export function FormAvance({
   descripcion?: string
   unidadActual?: string | null
   unidadCatalogo?: string
+  unidades: OpcionUnidad[]
   lotesPendientesIds?: string[]
   accion: (f: FormData) => void | Promise<void>
   accionGeneral?: (f: FormData) => void | Promise<void>
@@ -55,13 +64,16 @@ export function FormAvance({
   const [fincaAnexar, setFincaAnexar] = useState(fincaDefault)
   const [loteAnexar, setLoteAnexar] = useState('')
   // Unidad por defecto: la ya registrada (unidadActual) si existe; si no, la del catálogo de
-  // la actividad (unidadCatalogo); si no, genérica. Siempre editable.
+  // la actividad (unidadCatalogo); si no, genérica. Siempre editable, pero solo de la lista
+  // que el ADMIN administra en Configuración (una unidad retirada que ya estaba registrada
+  // sigue ofreciéndose para no cambiarle la medida a la actividad).
   const fuenteUnidad = ((unidadActual ?? '').trim() || (unidadCatalogo ?? '').trim())
-  const conocida = UNIDADES.find((u) => u.toLowerCase() === fuenteUnidad.toLowerCase())
-  const [unidadSel, setUnidadSel] = useState(conocida ?? (fuenteUnidad ? 'Otro' : (esMaquinaria ? 'Ha' : 'Cantidad')))
-  const [unidadOtraTxt, setUnidadOtraTxt] = useState(conocida ? '' : fuenteUnidad)
+  const opcionesUnidad = opcionesConActual(unidades, fuenteUnidad)
+  const [unidadSel, setUnidadSel] = useState(
+    unidadInicial(opcionesUnidad, fuenteUnidad || (esMaquinaria ? 'ha' : 'cantidad')),
+  )
   // Etiqueta que se muestra al lado de cada potrero: la unidad elegida arriba (no "ha" fijo).
-  const unidadLote = unidadSel === 'Otro' ? (unidadOtraTxt.trim() || 'medida') : unidadSel
+  const unidadLote = opcionesUnidad.find((o) => o.valor === unidadSel)?.nombre ?? etiquetaUnidad(unidadSel)
   const conBultos = descripcion ? usaBultos(descripcion) : false
   const filasPotreros = [...lotesActividad, ...anexados]
   // Sin potreros (ni anexados) la medida es una sola cantidad del día, no una por lote.
@@ -77,6 +89,10 @@ export function FormAvance({
     ?? (lotesActividad.length > 0 ? fincaDeId(lotesActividad[0].id) : null)
     ?? (anexados.length > 0 ? fincaDeId(anexados[0].id) : null)
   const fincaAnexActiva = fincaAncla ?? fincaAnexar
+  // Los trabajadores asignados al programar vienen marcados; se pueden desmarcar o sumar otros.
+  const asignados = new Set(responsablesActividadIds)
+  const programados = new Set(diasProgramados)
+  const diaSugerido = diaSugeridoAvance(diasProgramados, diasConAvance, diaActividad)
 
   if (!abierto) {
     return (
@@ -89,15 +105,23 @@ export function FormAvance({
     <form action={sinPotreros && accionGeneral ? accionGeneral : accion} className="flex w-full flex-wrap items-end gap-2 rounded-lg border border-borde bg-arena/40 p-2 text-xs">
       <input type="hidden" name="id" value={actividadId} />
       <label className="flex flex-col">Día
-        <select name="dia" defaultValue={diaActividad} className="rounded-lg border border-borde bg-marfil p-1 focus:outline-none focus:ring-2 focus:ring-bosque/40">
-          {[1, 2, 3, 4, 5, 6, 7].map((d) => (<option key={d} value={d}>{DIAS[d]}</option>))}
+        <select name="dia" defaultValue={diaSugerido} className="rounded-lg border border-borde bg-marfil p-1 focus:outline-none focus:ring-2 focus:ring-bosque/40">
+          {[1, 2, 3, 4, 5, 6, 7].map((d) => (
+            <option key={d} value={d}>{DIAS[d]}{programados.has(d) ? ' (programado)' : ''}</option>
+          ))}
         </select>
       </label>
-      <label className="flex flex-col">Responsable
-        <select name="responsableId" defaultValue={responsableDefault} className="rounded-lg border border-borde bg-marfil p-1 focus:outline-none focus:ring-2 focus:ring-bosque/40">
-          {responsables.map((r) => (<option key={r.id} value={r.id}>{r.nombre}</option>))}
-        </select>
-      </label>
+      <fieldset className="flex flex-col gap-1">
+        <legend className="mb-0.5">¿Quién lo hizo? (marca a todos)</legend>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-borde bg-marfil p-1">
+          {responsables.map((r) => (
+            <label key={r.id} className="flex items-center gap-1">
+              <input type="checkbox" name="responsableId" value={r.id} defaultChecked={asignados.has(r.id)} className="accent-bosque" />
+              {r.nombre}
+            </label>
+          ))}
+        </div>
+      </fieldset>
       {esMaquinaria && (
         <>
           <label className="flex flex-col">Tractor
@@ -123,19 +147,13 @@ export function FormAvance({
       <label className="flex flex-col">Unidad
         <select
           name="unidad"
-          value={unidadSel === 'Otro' ? 'otro' : unidadSel.toLowerCase()}
-          onChange={(e) => setUnidadSel(e.target.value === 'otro' ? 'Otro' : e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1))}
+          value={unidadSel}
+          onChange={(e) => setUnidadSel(e.target.value)}
           className="rounded-lg border border-borde bg-marfil p-1 focus:outline-none focus:ring-2 focus:ring-bosque/40"
         >
-          {UNIDADES.map((u) => (<option key={u} value={u.toLowerCase()}>{u}</option>))}
-          <option value="otro">Otro…</option>
+          {opcionesUnidad.map((u) => (<option key={u.valor} value={u.valor}>{u.nombre}</option>))}
         </select>
       </label>
-      {unidadSel === 'Otro' && (
-        <label className="flex flex-col">Unidad (texto)
-          <input name="unidadOtra" value={unidadOtraTxt} onChange={(e) => setUnidadOtraTxt(e.target.value)} placeholder="ej. bultos" className="w-28 rounded-lg border border-borde bg-marfil p-1 focus:outline-none focus:ring-2 focus:ring-bosque/40" />
-        </label>
-      )}
       <div className="flex w-full flex-col gap-2 rounded-lg border border-borde bg-arena p-2">
         <span className="font-semibold text-tinta">{sinPotreros ? 'Medida del día' : 'Potreros realizados'}</span>
         {sinPotreros ? (

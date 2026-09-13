@@ -67,13 +67,13 @@ export async function agregarActividadRealizadaAccion(form: FormData) {
   const maquinaId = textoOpcional(form, 'maquinaId')
   const loteIds = form.getAll('npLoteId').map((v) => String(v).trim()).filter(Boolean)
   // Una entrada de avance por lote (medida = cantidad; observación por lote) + bultos por lote.
-  const avancePorLote: Record<string, { dia: number; maquinaId: string | null; cantidad: number; centroCosto?: string; responsableId?: string; observacion?: string }[]> = {}
+  const avancePorLote: Record<string, { dia: number; maquinaId: string | null; cantidad: number; centroCosto?: string; responsableIds?: string[]; observacion?: string }[]> = {}
   const bultosPorLote: Record<string, number> = {}
   for (const loteId of loteIds) {
     const cantidad = numeroOpcional(form, `npMedida_${loteId}`) ?? 0
     const obs = textoOpcional(form, `npObs_${loteId}`)
     avancePorLote[loteId] = [{
-      dia, maquinaId, cantidad, responsableId,
+      dia, maquinaId, cantidad, responsableIds: [responsableId],
       ...(centroCosto ? { centroCosto } : {}),
       ...(obs ? { observacion: obs } : {}),
     }]
@@ -140,7 +140,9 @@ export async function marcarCumplidaActividadAccion(form: FormData) {
   const id = texto(form, 'id')
   if (!id) return
   if (await bloqueadaActividad(id)) return
-  await marcarCumplidaGrupo(id)
+  // `dia` solo viene cuando la actividad abarca varios días y el usuario eligió en cuál quedó.
+  const dia = Number(texto(form, 'dia'))
+  await marcarCumplidaGrupo(id, Number.isInteger(dia) ? dia : null)
   revalidatePath('/cumplimiento')
 }
 
@@ -154,11 +156,10 @@ export async function setLotesActividadAccion(form: FormData) {
   revalidatePath('/cumplimiento')
 }
 
-// Resuelve la unidad elegida: si es "otro", usa el texto libre; si no, el valor del select.
+// Resuelve la unidad elegida. Siempre es un valor del catálogo de Configuración (ya no hay
+// texto libre); 'cantidad' solo cubre el caso de un formulario sin el campo.
 function unidadElegida(form: FormData): string {
-  const u = texto(form, 'unidad')
-  if (u === 'otro') return texto(form, 'unidadOtra') || 'otro'
-  return u || 'cantidad'
+  return texto(form, 'unidad').toLowerCase() || 'cantidad'
 }
 
 // Lee el bloque de "cambio" (reemplazo) del form con los name-s del contrato. Devuelve null si
@@ -167,8 +168,7 @@ function leerReemplazo(form: FormData, diaFallback?: number) {
   const sel = texto(form, 'reemplazoDescripcion')
   const descripcion = sel === '__otra__' ? texto(form, 'reemplazoDescripcionOtra') : sel
   if (!descripcion) return null
-  const unidadSel = texto(form, 'reemplazoUnidad')
-  const unidad = unidadSel === 'otro' ? texto(form, 'reemplazoUnidadOtra') || 'otro' : unidadSel || 'ha'
+  const unidad = texto(form, 'reemplazoUnidad').toLowerCase() || 'ha'
   const maquinaId = textoOpcional(form, 'reemplazoMaquinaId')
   const loteIds = form.getAll('reemplazoLoteId').map(String).filter(Boolean)
   const medida: Record<string, number> = {}
@@ -191,7 +191,9 @@ export async function registrarAvanceAccion(form: FormData) {
   if (await bloqueadaActividad(id)) return
   const lotesHechos = form.getAll('loteHecho').map((v) => String(v))
   if (lotesHechos.length === 0) return
-  const responsableId = textoOpcional(form, 'responsableId')
+  // Varios trabajadores pueden haber hecho la misma labor ese día: el formulario manda una
+  // casilla por cada uno, no un único desplegable.
+  const responsableIds = form.getAll('responsableId').map((v) => String(v).trim()).filter(Boolean)
   const maquinaId = textoOpcional(form, 'maquinaId')
   const centroSelect = texto(form, 'centroCosto')
   const centroCosto = centroSelect === '__otra__' ? textoOpcional(form, 'centroCostoOtra') : (centroSelect || null)
@@ -206,7 +208,7 @@ export async function registrarAvanceAccion(form: FormData) {
   }))
   await anexarLotesGrupo(id, lotesHechos)
   await setUnidadRealizadaGrupo(id, unidadElegida(form))
-  await registrarAvanceLoteGrupo(id, dia, maquinaId, avances, centroCosto, responsableId, observacion)
+  await registrarAvanceLoteGrupo(id, dia, maquinaId, avances, centroCosto, responsableIds, observacion)
   revalidatePath('/cumplimiento')
 }
 
@@ -224,7 +226,7 @@ export async function registrarAvanceGeneralAccion(form: FormData) {
     cantidad: numeroOpcional(form, 'cantidad') ?? 0,
     maquinaId: textoOpcional(form, 'maquinaId'),
     centroCosto,
-    responsableId: textoOpcional(form, 'responsableId'),
+    responsableIds: form.getAll('responsableId').map((v) => String(v).trim()).filter(Boolean),
     observacion: textoOpcional(form, 'observacion'),
   }, unidadElegida(form))
   revalidatePath('/cumplimiento')

@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, setResponsableActivo, setResponsableFinca, crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, setUnidadActividadEstipulada, crearLote, eliminarLote, setLoteActivo, crearUsuario, cambiarContrasena, eliminarUsuario, BloqueoError, setPantallasUsuario, setVariantesArea } from '@/datos/repositorio'
+import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, setResponsableActivo, setResponsableFinca, crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, setUnidadActividadEstipulada, crearUnidad, renombrarUnidad, setUnidadActiva, eliminarUnidad, crearLote, eliminarLote, setLoteActivo, crearUsuario, cambiarContrasena, eliminarUsuario, BloqueoError, setPantallasUsuario, setVariantesArea } from '@/datos/repositorio'
 import { usuarioActual } from '@/auth/sesion'
 import { normalizarUnidad } from '@/dominio/unidad'
 
@@ -154,6 +154,53 @@ export async function setUnidadActividadEstipuladaAccion(form: FormData) {
     revalidatePath('/cumplimiento')
     revalidatePath('/resumen')
   }, 'Unidad actualizada.')
+}
+
+// ---- Unidades de medida ----
+// Se leen en los formularios de Cumplimiento y Tareas y en los totales de Resumen, así que
+// un cambio refresca esas tres pantallas (Router Cache).
+function refrescarPantallasUnidades() {
+  revalidatePath('/cumplimiento')
+  revalidatePath('/tareas')
+  revalidatePath('/resumen')
+}
+
+export async function crearUnidadAccion(form: FormData) {
+  const nombre = texto(form, 'nombre')
+  if (!nombre) faltanDatos()
+  await correr(async () => {
+    await crearUnidad(nombre)
+    refrescarPantallasUnidades()
+  }, 'Unidad agregada.')
+}
+
+export async function renombrarUnidadAccion(form: FormData) {
+  const id = texto(form, 'id')
+  const nombre = texto(form, 'nombre')
+  if (!id || !nombre) faltanDatos()
+  await correr(async () => {
+    await renombrarUnidad(id, nombre)
+    refrescarPantallasUnidades()
+  }, 'Unidad actualizada.')
+}
+
+export async function setUnidadActivaAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (!id) faltanDatos()
+  const activa = texto(form, 'activa') === '1'
+  await correr(async () => {
+    await setUnidadActiva(id, activa)
+    refrescarPantallasUnidades()
+  }, activa ? 'Unidad reactivada.' : 'Unidad retirada.')
+}
+
+export async function eliminarUnidadAccion(form: FormData) {
+  const id = texto(form, 'id')
+  if (!id) faltanDatos()
+  await correr(async () => {
+    await eliminarUnidad(id)
+    refrescarPantallasUnidades()
+  }, 'Unidad eliminada.')
 }
 
 export async function crearLoteAccion(form: FormData) {

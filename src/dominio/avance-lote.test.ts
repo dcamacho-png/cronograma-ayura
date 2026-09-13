@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   lotesPendientes, textoAvancePorLote, textoAvanceConFecha,
   normalizarAvancePorLote, totalAvanceLotes, agregarAvances, completarAvancesCumplida, lotesRealizadosCumplida,
-  totalBultosPorLote, type AvancePorLote,
+  totalBultosPorLote, diaSugeridoAvance, type AvancePorLote,
 } from './avance-lote'
 
 const lotes = [{ id: 'a', nombre: 'L-A' }, { id: 'b', nombre: 'L-B' }, { id: 'c', nombre: 'L-C' }]
@@ -238,21 +238,21 @@ describe('agregarAvances — centro de costo', () => {
   })
 })
 
-describe('agregarAvances — responsable', () => {
-  it('guarda responsableId en la entrada', () => {
-    const out = agregarAvances({}, 3, 'M1', [{ loteId: 'l1', cantidad: 4 }], 'Ceba', 'R9')
-    expect(out.l1).toEqual([{ dia: 3, maquinaId: 'M1', cantidad: 4, centroCosto: 'Ceba', responsableId: 'R9' }])
+describe('agregarAvances — responsables', () => {
+  it('guarda los responsables en la entrada', () => {
+    const out = agregarAvances({}, 3, 'M1', [{ loteId: 'l1', cantidad: 4 }], 'Ceba', ['R9'])
+    expect(out.l1).toEqual([{ dia: 3, maquinaId: 'M1', cantidad: 4, centroCosto: 'Ceba', responsableIds: ['R9'] }])
   })
-  it('sin responsableId → entrada sin ese campo', () => {
+  it('sin responsables → entrada sin ese campo', () => {
     const out = agregarAvances({}, 1, null, [{ loteId: 'l1', cantidad: 2 }])
-    expect(out.l1[0].responsableId ?? null).toBeNull()
+    expect(out.l1[0].responsableIds ?? null).toBeNull()
   })
 })
 
 describe('agregarAvances — observación', () => {
   it('guarda la observación en cada entrada nueva', () => {
-    const out = agregarAvances({}, 2, 'M1', [{ loteId: 'l1', cantidad: 3 }, { loteId: 'l2', cantidad: 1 }], 'Ceba', 'R9', 'llovió a media mañana')
-    expect(out.l1[0]).toMatchObject({ dia: 2, maquinaId: 'M1', cantidad: 3, centroCosto: 'Ceba', responsableId: 'R9', observacion: 'llovió a media mañana' })
+    const out = agregarAvances({}, 2, 'M1', [{ loteId: 'l1', cantidad: 3 }, { loteId: 'l2', cantidad: 1 }], 'Ceba', ['R9'], 'llovió a media mañana')
+    expect(out.l1[0]).toMatchObject({ dia: 2, maquinaId: 'M1', cantidad: 3, centroCosto: 'Ceba', responsableIds: ['R9'], observacion: 'llovió a media mañana' })
     expect(out.l2[0].observacion).toBe('llovió a media mañana')
   })
   it('sin observación → entrada sin ese campo', () => {
@@ -340,5 +340,62 @@ describe('completarAvancesCumplida', () => {
       c: [{ dia: 1, maquinaId: null, cantidad: 1 }],
     }
     expect(completarAvancesCumplida(lotesHa, previo, 3)).toBe(previo)
+  })
+})
+
+describe('varios trabajadores en un mismo avance', () => {
+  it('agregarAvances guarda la lista de responsables que hicieron la labor', () => {
+    const a = agregarAvances({}, 2, null, [{ loteId: 'l1', cantidad: 5 }], null, ['r1', 'r2'])
+    expect(a.l1).toEqual([{ dia: 2, maquinaId: null, cantidad: 5, responsableIds: ['r1', 'r2'] }])
+  })
+
+  it('sin responsables no deja el campo vacío en el JSON', () => {
+    // Un contenedor vacío guardado es peor que ausente: el SQL lo ve "con datos".
+    expect(agregarAvances({}, 2, null, [{ loteId: 'l1', cantidad: 5 }], null, []).l1[0])
+      .toEqual({ dia: 2, maquinaId: null, cantidad: 5 })
+    expect(agregarAvances({}, 2, null, [{ loteId: 'l1', cantidad: 5 }]).l1[0])
+      .toEqual({ dia: 2, maquinaId: null, cantidad: 5 })
+  })
+
+  it('normalizar lee los avances viejos de un solo responsableId como lista de uno', () => {
+    const a = normalizarAvancePorLote({
+      l1: [{ dia: 1, maquinaId: null, cantidad: 3, responsableId: 'r9' } as never],
+    })
+    expect(a.l1).toEqual([{ dia: 1, maquinaId: null, cantidad: 3, responsableIds: ['r9'] }])
+  })
+
+  it('normalizar no inventa responsables donde no los había', () => {
+    const a = normalizarAvancePorLote({ l1: [{ dia: 1, maquinaId: null, cantidad: 3 }] })
+    expect(a.l1).toEqual([{ dia: 1, maquinaId: null, cantidad: 3 }])
+  })
+
+  it('completarAvancesCumplida atribuye el cierre a todos los responsables de la actividad', () => {
+    const a = completarAvancesCumplida([{ id: 'l1', hectareas: 4 }], {}, 3, ['r1', 'r2'])
+    expect(a.l1).toEqual([{ dia: 3, maquinaId: null, cantidad: 4, responsableIds: ['r1', 'r2'] }])
+  })
+})
+
+describe('diaSugeridoAvance', () => {
+  it('propone el primer día programado que todavía no tiene avance', () => {
+    // Actividad de lunes a miércoles con el lunes ya registrado: propone el martes,
+    // que es justo el "día adicional" que antes había que acordarse de cambiar a mano.
+    expect(diaSugeridoAvance([1, 2, 3], [1], 1)).toBe(2)
+    expect(diaSugeridoAvance([1, 2, 3], [1, 2], 1)).toBe(3)
+  })
+
+  it('sin avances propone el primer día programado', () => {
+    expect(diaSugeridoAvance([2, 4], [], 2)).toBe(2)
+  })
+
+  it('con todos los días ya registrados vuelve al primero (se puede registrar de nuevo)', () => {
+    expect(diaSugeridoAvance([1, 2], [1, 2], 1)).toBe(1)
+  })
+
+  it('sin días programados usa el día de la actividad', () => {
+    expect(diaSugeridoAvance([], [], 5)).toBe(5)
+  })
+
+  it('los días con avance fuera de lo programado no corren la sugerencia', () => {
+    expect(diaSugeridoAvance([3], [6], 3)).toBe(3)
   })
 })

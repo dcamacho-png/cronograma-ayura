@@ -108,7 +108,8 @@ describe('medidasPorUnidad', () => {
       { estado: 'PENDIENTE', haProgramada: 9, haRealizada: 9, unidad: 'ha' },     // ignorada
       { estado: 'PARCIAL', haProgramada: 4, haRealizada: 1, unidad: 'ha' },       // 1 ha
     ])
-    expect(tot).toEqual({ ha: 6, hora: 6, kg: 100, cantidad: 0 })
+    // Solo aparecen las unidades que realmente se usaron: los baldes ya no son fijos.
+    expect(tot).toEqual({ ha: 6, hora: 6, kg: 100 })
   })
 
   it('totaliza la unidad cantidad desde la medida explícita', () => {
@@ -117,7 +118,18 @@ describe('medidasPorUnidad', () => {
       { estado: 'PARCIAL', haProgramada: 0, haRealizada: 3, unidad: 'cantidad' },
       { estado: 'PENDIENTE', haProgramada: 9, haRealizada: 9, unidad: 'cantidad' }, // ignorada
     ])
-    expect(tot).toEqual({ ha: 0, hora: 0, kg: 0, cantidad: 15 })
+    expect(tot).toEqual({ cantidad: 15 })
+  })
+
+  it('una unidad agregada en Configuración suma aparte, no dentro de ha', () => {
+    const tot = medidasPorUnidad([
+      { estado: 'CUMPLIDA', haProgramada: 0, haRealizada: 8, unidad: 'jornales' },
+      { estado: 'PARCIAL', haProgramada: 0, haRealizada: 4, unidad: 'jornales' },
+      { estado: 'CUMPLIDA', haProgramada: 2, haRealizada: null, unidad: 'ha' },
+      // No se deriva de la ha programada en una unidad que no es 'ha'.
+      { estado: 'CUMPLIDA', haProgramada: 30, haRealizada: null, unidad: 'jornales' },
+    ])
+    expect(tot).toEqual({ jornales: 12, ha: 2 })
   })
 })
 
@@ -192,24 +204,31 @@ describe('medidasPorTractor', () => {
     const m = medidasPorTractor([
       fila({ unidad: 'ha', avances: [{ maquinaId: 'A', cantidad: 3 }, { maquinaId: 'B', cantidad: 2 }] }),
     ])
-    expect(m.get('A')).toEqual({ ha: 3, hora: 0, kg: 0, cantidad: 0 })
-    expect(m.get('B')).toEqual({ ha: 2, hora: 0, kg: 0, cantidad: 0 })
+    expect(m.get('A')).toEqual({ ha: 3 })
+    expect(m.get('B')).toEqual({ ha: 2 })
   })
   it('sin avances usa haRealizada y el tractor de la actividad', () => {
     const m = medidasPorTractor([fila({ unidad: 'hora', haRealizada: 5, maquinaId: 'A' })])
-    expect(m.get('A')).toEqual({ ha: 0, hora: 5, kg: 0, cantidad: 0 })
+    expect(m.get('A')).toEqual({ hora: 5 })
   })
   it('sin avances, unidad ha CUMPLIDA sin haRealizada usa haProgramada', () => {
     const m = medidasPorTractor([fila({ unidad: 'ha', haProgramada: 4, haRealizada: null, maquinaId: 'A' })])
-    expect(m.get('A')).toEqual({ ha: 4, hora: 0, kg: 0, cantidad: 0 })
+    expect(m.get('A')).toEqual({ ha: 4 })
   })
   it('tractor nulo cae en la clave vacía', () => {
     const m = medidasPorTractor([fila({ unidad: 'kg', haRealizada: 7, maquinaId: null })])
-    expect(m.get('')).toEqual({ ha: 0, hora: 0, kg: 7, cantidad: 0 })
+    expect(m.get('')).toEqual({ kg: 7 })
   })
   it('ignora PENDIENTE', () => {
     const m = medidasPorTractor([fila({ estado: 'PENDIENTE', haRealizada: 9, maquinaId: 'A' })])
     expect(m.size).toBe(0)
+  })
+  it('mezcla unidades del catálogo en el mismo tractor sin confundirlas', () => {
+    const m = medidasPorTractor([
+      fila({ unidad: 'jornales', haRealizada: 3, maquinaId: 'A' }),
+      fila({ unidad: 'ha', haRealizada: 10, maquinaId: 'A' }),
+    ])
+    expect(m.get('A')).toEqual({ jornales: 3, ha: 10 })
   })
 })
 
@@ -311,7 +330,8 @@ describe('SIN_REGISTRAR no aporta trabajo realizado', () => {
 
   it('y tampoco cuenta una medida que alguien hubiera capturado antes de que venciera', () => {
     expect(hectareasRealizadas([{ estado: 'SIN_REGISTRAR', haProgramada: 6, haRealizada: 4 }])).toBe(0)
-    expect(medidasPorUnidad([{ estado: 'SIN_REGISTRAR', haProgramada: 6, haRealizada: 4, unidad: 'ha' }]).ha).toBe(0)
+    // Sin baldes fijos, "no aporta" es directamente no tener ninguna unidad totalizada.
+    expect(medidasPorUnidad([{ estado: 'SIN_REGISTRAR', haProgramada: 6, haRealizada: 4, unidad: 'ha' }])).toEqual({})
   })
 
   it('bultosAplicados no suma los bultos de una que nunca se reportó', () => {

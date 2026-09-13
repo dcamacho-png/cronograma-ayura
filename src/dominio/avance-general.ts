@@ -6,7 +6,9 @@ export type AvanceGeneralEntrada = {
   cantidad: number
   maquinaId?: string | null
   centroCosto?: string | null
-  responsableId?: string | null
+  // Quiénes hicieron ese día. Lista, porque una labor la pueden hacer varios trabajadores;
+  // los avances viejos traían un único `responsableId` y se leen como lista de uno.
+  responsableIds?: string[]
   observacion?: string | null
 }
 
@@ -19,14 +21,16 @@ export function normalizarAvanceGeneral(raw: unknown): AvanceGeneralEntrada[] {
   const out: AvanceGeneralEntrada[] = []
   for (const v of raw) {
     if (!v || typeof v !== 'object') continue
-    const x = v as { dia?: unknown; cantidad?: unknown; maquinaId?: unknown; centroCosto?: unknown; responsableId?: unknown; observacion?: unknown }
+    const x = v as { dia?: unknown; cantidad?: unknown; maquinaId?: unknown; centroCosto?: unknown; responsableId?: unknown; responsableIds?: unknown; observacion?: unknown }
     if (typeof x.dia !== 'number') continue
+    const lista = Array.isArray(x.responsableIds) ? x.responsableIds.filter((r): r is string => typeof r === 'string' && r !== '') : []
+    const unico = texto(x.responsableId)
     out.push({
       dia: x.dia,
       cantidad: typeof x.cantidad === 'number' && Number.isFinite(x.cantidad) ? x.cantidad : 0,
       maquinaId: texto(x.maquinaId),
       centroCosto: texto(x.centroCosto),
-      responsableId: texto(x.responsableId),
+      responsableIds: lista.length > 0 ? lista : (unico ? [unico] : []),
       observacion: texto(x.observacion),
     })
   }

@@ -72,6 +72,10 @@ export function filasCumplimiento(
   const detalle = a.detalle ?? ''
   const potreros = textoLotesHechos(a.lotes, a.lotesHechos)
   const avances = normalizarAvancePorLote(a.avancePorLote)
+  // Quiénes hicieron ESE avance. Una labor la puede hacer más de un trabajador, así que van
+  // todos; vacío ⇒ el llamador cae a los responsables de la actividad.
+  const quienes = (ids: string[] | undefined) =>
+    (ids ?? []).map((id) => ctx.nombreResponsable?.(id) ?? '').filter(Boolean).join(', ')
 
   const filas: (string | number)[][] = []
   for (const l of a.lotes) {
@@ -80,7 +84,7 @@ export function filasCumplimiento(
       filas.push([
         DIAS[e.dia] ?? '',
         ctx.fechaDeDia(e.dia),
-        (ctx.nombreResponsable?.(e.responsableId ?? null)) || a.responsable.nombre,
+        quienes(e.responsableIds) || a.responsable.nombre,
         a.descripcion,
         ctx.nombreMaquina(e.maquinaId) || (a.maquina?.nombre ?? ''),
         l.nombre,
@@ -109,7 +113,7 @@ export function filasCumplimiento(
     return general.map((e) => [
       DIAS[e.dia] ?? '',
       ctx.fechaDeDia(e.dia),
-      (ctx.nombreResponsable?.(e.responsableId ?? null)) || a.responsable.nombre,
+      quienes(e.responsableIds) || a.responsable.nombre,
       a.descripcion,
       ctx.nombreMaquina(e.maquinaId ?? null) || (a.maquina?.nombre ?? ''),
       '',

@@ -667,6 +667,85 @@ export function setUnidadActividadEstipulada(id: string, unidad: string) {
   return prisma.actividadEstipulada.update({ where: { id }, data: { unidad } })
 }
 
+// ---- Unidades de medida (catálogo de Configuración) ----
+
+// Todas las unidades, activas primero. Quien arma un desplegable filtra por `activa`;
+// Configuración las necesita todas para poder reactivar una retirada.
+export function listarUnidades() {
+  return prisma.unidadMedida.findMany({ orderBy: [{ activa: 'desc' }, { nombre: 'asc' }] })
+}
+
+// El valor que viaja en los formularios y queda guardado es el nombre en minúscula.
+export function valorUnidad(nombre: string): string {
+  return nombre.trim().toLowerCase()
+}
+
+// Crea la unidad rechazando duplicados que solo difieren en mayúsculas o espacios:
+// "Jornales" y "jornales" serían la misma unidad guardada y dos filas en el catálogo.
+export async function crearUnidad(nombre: string) {
+  const limpio = nombre.trim()
+  const existentes = await prisma.unidadMedida.findMany({ select: { nombre: true } })
+  if (existentes.some((u) => valorUnidad(u.nombre) === valorUnidad(limpio))) {
+    throw new BloqueoError(`Ya existe la unidad "${limpio}".`)
+  }
+  return prisma.unidadMedida.create({ data: { nombre: limpio } })
+}
+
+// Renombrar cambia el rótulo del catálogo. Si cambia también el valor guardado (el nombre en
+// minúscula), arrastra lo ya registrado con la unidad vieja para que nada quede huérfano.
+export async function renombrarUnidad(id: string, nombre: string) {
+  const limpio = nombre.trim()
+  const actual = await prisma.unidadMedida.findUnique({ where: { id } })
+  if (!actual) throw new BloqueoError('Esa unidad ya no existe.')
+  const otras = await prisma.unidadMedida.findMany({ where: { id: { not: id } }, select: { nombre: true } })
+  if (otras.some((u) => valorUnidad(u.nombre) === valorUnidad(limpio))) {
+    throw new BloqueoError(`Ya existe la unidad "${limpio}".`)
+  }
+  const viejo = valorUnidad(actual.nombre)
+  const nuevo = valorUnidad(limpio)
+  return prisma.$transaction(async (tx) => {
+    const u = await tx.unidadMedida.update({ where: { id }, data: { nombre: limpio } })
+    if (viejo !== nuevo) {
+      await tx.actividadEstipulada.updateMany({ where: { unidad: viejo }, data: { unidad: nuevo } })
+      await tx.actividad.updateMany({ where: { unidadRealizada: viejo }, data: { unidadRealizada: nuevo } })
+      await tx.tarea.updateMany({ where: { unidad: viejo }, data: { unidad: nuevo } })
+    }
+    return u
+  })
+}
+
+export function setUnidadActiva(id: string, activa: boolean) {
+  return prisma.unidadMedida.update({ where: { id }, data: { activa } })
+}
+
+// Cuántas cosas usan esta unidad (catálogo de actividades, medidas registradas, banco de tareas).
+async function referenciasUnidad(valor: string) {
+  const [estipuladas, actividades, tareas] = await Promise.all([
+    prisma.actividadEstipulada.count({ where: { unidad: valor } }),
+    prisma.actividad.count({ where: { unidadRealizada: valor } }),
+    prisma.tarea.count({ where: { unidad: valor } }),
+  ])
+  return { estipuladas, actividades, tareas }
+}
+
+// Borra la unidad SOLO si nada la usa; si algo la usa, se retira (activa=false) para que
+// salga de los desplegables sin perder la medida de lo ya registrado.
+export async function eliminarUnidad(id: string) {
+  const u = await prisma.unidadMedida.findUnique({ where: { id } })
+  if (!u) throw new BloqueoError('Esa unidad ya no existe.')
+  const refs = await referenciasUnidad(valorUnidad(u.nombre))
+  const partes: string[] = []
+  if (refs.estipuladas) partes.push(`${refs.estipuladas} actividad(es) del catálogo`)
+  if (refs.actividades) partes.push(`${refs.actividades} medida(s) registrada(s)`)
+  if (refs.tareas) partes.push(`${refs.tareas} tarea(s) del banco`)
+  if (partes.length > 0) {
+    throw new BloqueoError(
+      `No se puede eliminar "${u.nombre}": la usan ${partes.join(', ')}. Retirala en vez de eliminarla.`,
+    )
+  }
+  return prisma.unidadMedida.delete({ where: { id } })
+}
+
 export function obtenerUsuarioPorLogin(usuario: string) {
   return prisma.usuario.findUnique({ where: { usuario } })
 }
@@ -867,7 +946,7 @@ export async function registrarAvanceLoteGrupo(
   maquinaId: string | null,
   avances: { loteId: string; cantidad: number; bultos?: number | null }[],
   centroCosto?: string | null,
-  responsableId?: string | null,
+  responsableIds?: string[] | null,
   observacion?: string | null,
 ) {
   const g = await filasHermanas(id)
@@ -878,7 +957,7 @@ export async function registrarAvanceLoteGrupo(
     maquinaId,
     avances,
     centroCosto,
-    responsableId,
+    responsableIds,
     observacion,
   )
   // `bultosPorLote` pasa a ser el TOTAL derivado del día a día: los bultos de cada día
@@ -1056,9 +1135,15 @@ export async function registrarAvanceObservacionGrupo(id: string, nota: string) 
 
 // Cierra la actividad: todas las filas no cumplidas pasan a CUMPLIDA. Si hay lotes,
 // haRealizada = suma de avances de los lotes vigentes (igual en todas las filas).
-export async function marcarCumplidaGrupo(id: string) {
+// `dia`: el día en que quedó terminada. Una actividad programada a varios días volcaba todo
+// al primero sin poder elegir; por eso el cierre lo puede indicar.
+export async function marcarCumplidaGrupo(id: string, dia?: number | null) {
   const g = await filasHermanas(id)
   if (!g) return null
+  const diaCierre = dia != null && dia >= 1 && dia <= 7 ? dia : g.base.dia
+  // El avance que se fabrica al cerrar queda a nombre de TODOS los responsables de la
+  // actividad: antes no llevaba ninguno y el Excel caía al de la fila representativa.
+  const responsablesGrupo = [...new Set(g.filas.map((f) => f.responsableId))]
   const tieneLotes = g.base.lotes.length > 0
   const avanceActual = normalizarAvancePorLote(g.base.avancePorLote as Record<string, AvanceEntrada | AvanceEntrada[]> | null)
   // Al cumplir directo, SOLO las actividades medidas en HA (área) materializan el avance con las
@@ -1070,7 +1155,7 @@ export async function marcarCumplidaGrupo(id: string) {
   // realizados"); si no hay ninguna señal, todos (cumplida directa = actividad completa).
   // Así el Excel no lista lotes asignados que no se trabajaron al marcar Cumplida.
   const lotesDesglose = lotesRealizadosCumplida(g.base.lotes, avanceActual, g.base.lotesHechos as string[] | null)
-  const avanceCompleto = (tieneLotes && esHa) ? completarAvancesCumplida(lotesDesglose, avanceActual, g.base.dia) : avanceActual
+  const avanceCompleto = (tieneLotes && esHa) ? completarAvancesCumplida(lotesDesglose, avanceActual, diaCierre, responsablesGrupo) : avanceActual
   const total = totalAvanceLotes(g.base.lotes, avanceCompleto)
   // Sin potreros, la medida sale de la bitácora día a día (si no hay, se respeta lo ya capturado).
   const general = tieneLotes ? [] : normalizarAvanceGeneral(g.base.avanceGeneral)

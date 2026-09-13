@@ -131,7 +131,9 @@ export function ResumenArea({
   const totalTractorTexto = (t: string) => {
     const r = porTractor.get(t)
     if (!r) return ''
-    return (['ha', 'hora', 'kg', 'cantidad'] as Unidad[]).filter((u) => r[u] > 0).map((u) => `${r[u]} ${unidadAbreviada(u)}`).join(' · ')
+    // Recorre las unidades que realmente trae el tractor: con la lista fija de cuatro, una
+    // unidad agregada en Configuración (jornales, viajes…) no se mostraba nunca.
+    return Object.keys(r).sort().filter((u) => r[u] > 0).map((u) => `${r[u]} ${unidadAbreviada(u)}`).join(' · ')
   }
 
   // Lista "realizado por actividad": suma la medida (única) por descripción.

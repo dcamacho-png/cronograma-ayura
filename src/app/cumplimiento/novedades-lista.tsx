@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { BloqueReemplazo } from './bloque-reemplazo'
+import type { OpcionUnidad } from '@/dominio/unidad'
 
 type Entrada = { index: number; dia: number; motivoId: string; motivo: string; observacion: string }
 type Lote = { id: string; nombre: string; hectareas?: number | null; finca: { nombre: string } }
@@ -21,6 +22,7 @@ export function NovedadesLista({
   estipuladas,
   lotes,
   maquinas,
+  unidades,
   diaActividad,
   agregar,
   editar,
@@ -36,6 +38,7 @@ export function NovedadesLista({
   estipuladas: Estipulada[]
   lotes: Lote[]
   maquinas: { id: string; nombre: string }[]
+  unidades: OpcionUnidad[]
   diaActividad: number
   agregar: (f: FormData) => void | Promise<void>
   editar: (f: FormData) => void | Promise<void>
@@ -116,6 +119,7 @@ export function NovedadesLista({
                 estipuladas={estipuladas}
                 lotes={lotes}
                 maquinas={maquinas}
+                unidades={unidades}
                 diaActividad={diaActividad}
                 mostrarDia={false}
               />

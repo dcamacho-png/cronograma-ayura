@@ -63,12 +63,10 @@ function numeroOpcional(form: FormData, clave: string): number | null {
   return Number.isFinite(n) ? n : null
 }
 
-// Resuelve la unidad elegida en el formulario estándar: "otro"→texto libre; vacío→null.
+// Resuelve la unidad elegida en el formulario estándar; vacío→null. Siempre viene del
+// catálogo de Configuración: ya no hay texto libre, así que no hay nada que desambiguar.
 function unidadElegida(form: FormData): string | null {
-  const u = texto(form, 'unidad')
-  if (!u) return null
-  if (u === 'otro') return texto(form, 'unidadOtra') || 'otro'
-  return u
+  return textoOpcional(form, 'unidad')?.toLowerCase() ?? null
 }
 
 export async function crearTareaAccion(form: FormData) {

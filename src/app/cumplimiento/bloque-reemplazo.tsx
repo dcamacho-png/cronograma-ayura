@@ -2,13 +2,12 @@
 
 import { useState } from 'react'
 import { PickerReemplazoPotreros } from './picker-reemplazo-potreros'
-import { etiquetaMedida, normalizarUnidad, type Unidad } from '@/dominio/unidad'
+import { etiquetaMedida, etiquetaUnidad, normalizarUnidad, unidadInicial, type OpcionUnidad, type Unidad } from '@/dominio/unidad'
 import { usaBultos } from '@/dominio/bultos'
 
 type Lote = { id: string; nombre: string; hectareas?: number | null; finca: { nombre: string } }
 type Estipulada = { id: string; nombre: string; unidad: string }
 
-const UNIDADES = ['Ha', 'Hora', 'Kg', 'Cantidad', 'Bultos', 'Jornales'] // + "Otro"
 const DIAS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
 // Bloque "actividad que se hizo en su lugar" (cambio). Estado propio; emite los name-s del
@@ -19,6 +18,7 @@ export function BloqueReemplazo({
   estipuladas,
   lotes,
   maquinas,
+  unidades,
   diaActividad,
   mostrarDia = true,
 }: {
@@ -26,11 +26,12 @@ export function BloqueReemplazo({
   estipuladas: Estipulada[]
   lotes: Lote[]
   maquinas: { id: string; nombre: string }[]
+  unidades: OpcionUnidad[]
   diaActividad: number
   mostrarDia?: boolean
 }) {
   const [reemplazoDesc, setReemplazoDesc] = useState('')
-  const [reemplazoUnidadSel, setReemplazoUnidadSel] = useState('Jornales')
+  const [reemplazoUnidadSel, setReemplazoUnidadSel] = useState(unidadInicial(unidades, 'jornales'))
   const [reemplazoDia, setReemplazoDia] = useState(String(diaActividad))
 
   const unidadPorNombre = new Map(estipuladas.map((e) => [e.nombre, normalizarUnidad(e.unidad)]))
@@ -88,20 +89,13 @@ export function BloqueReemplazo({
             Unidad
             <select
               name="reemplazoUnidad"
-              value={reemplazoUnidadSel === 'Otro' ? 'otro' : reemplazoUnidadSel.toLowerCase()}
-              onChange={(e) => setReemplazoUnidadSel(e.target.value === 'otro' ? 'Otro' : e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1))}
+              value={reemplazoUnidadSel}
+              onChange={(e) => setReemplazoUnidadSel(e.target.value)}
               className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
             >
-              {UNIDADES.map((u) => (<option key={u} value={u.toLowerCase()}>{u}</option>))}
-              <option value="otro">Otro…</option>
+              {unidades.map((u) => (<option key={u.valor} value={u.valor}>{u.nombre}</option>))}
             </select>
           </label>
-          {reemplazoUnidadSel === 'Otro' && (
-            <label className="flex flex-col text-xs">
-              Unidad (texto)
-              <input name="reemplazoUnidadOtra" placeholder="ej. jornales" className="w-28 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
-            </label>
-          )}
         </>
       )}
       {mostrarDia && (
@@ -117,7 +111,7 @@ export function BloqueReemplazo({
         <PickerReemplazoPotreros
           lotes={lotes}
           conBultos={usaBultos(reemplazoDesc)}
-          unidadLabel={esMaquinaria ? etiquetaMedida(reemplazoUnidad) : reemplazoUnidadSel === 'Otro' ? 'medida' : reemplazoUnidadSel}
+          unidadLabel={esMaquinaria ? etiquetaMedida(reemplazoUnidad) : (unidades.find((o) => o.valor === reemplazoUnidadSel)?.nombre ?? etiquetaUnidad(reemplazoUnidadSel))}
         />
       </label>
     </div>

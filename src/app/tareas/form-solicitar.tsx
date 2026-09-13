@@ -4,8 +4,8 @@ import { useState } from 'react'
 import { PickerLotesBultos } from './picker-lotes-bultos'
 import { usaBultos } from '@/dominio/bultos'
 import { CasillasDias, CasillasColaboradores } from './campos-sugerencia'
+import { unidadInicial, type OpcionUnidad } from '@/dominio/unidad'
 
-const UNIDADES = ['Ha', 'Hora', 'Kg', 'Cantidad', 'Bultos', 'Jornales'] // + "Otro" (texto libre)
 type Lote = { id: string; nombre: string; finca: { nombre: string } }
 type Estipulada = { id: string; nombre: string }
 type Area = { id: string; nombre: string; maqTareas: boolean }
@@ -15,6 +15,7 @@ export function FormSolicitar({
   areas,
   estipuladas,
   lotes,
+  unidades,
   accion,
   responsablesPorArea,
 }: {
@@ -22,12 +23,13 @@ export function FormSolicitar({
   areas: Area[]
   estipuladas: Estipulada[]
   lotes: Lote[]
+  unidades: OpcionUnidad[]
   accion: (formData: FormData) => void | Promise<void>
   responsablesPorArea: Record<string, { id: string; nombre: string }[]>
 }) {
   const [areaEjecutoraId, setAreaEjecutoraId] = useState('')
   const [estipulada, setEstipulada] = useState('')
-  const [unidadSel, setUnidadSel] = useState('Jornales')
+  const [unidadSel, setUnidadSel] = useState(unidadInicial(unidades, 'jornales'))
   const esMaquinaria = areas.find((a) => a.id === areaEjecutoraId)?.maqTareas ?? false
   const conBultos = usaBultos(estipulada)
   const responsablesB = responsablesPorArea[areaEjecutoraId] ?? []
@@ -92,20 +94,13 @@ export function FormSolicitar({
             Unidad
             <select
               name="unidad"
-              value={unidadSel === 'Otro' ? 'otro' : unidadSel.toLowerCase()}
-              onChange={(e) => setUnidadSel(e.target.value === 'otro' ? 'Otro' : e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1))}
+              value={unidadSel}
+              onChange={(e) => setUnidadSel(e.target.value)}
               className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
             >
-              {UNIDADES.map((u) => (<option key={u} value={u.toLowerCase()}>{u}</option>))}
-              <option value="otro">Otro…</option>
+              {unidades.map((u) => (<option key={u.valor} value={u.valor}>{u.nombre}</option>))}
             </select>
           </label>
-          {unidadSel === 'Otro' && (
-            <label className="flex flex-col text-sm">
-              Unidad (texto)
-              <input name="unidadOtra" placeholder="ej. viajes" className="w-28 rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
-            </label>
-          )}
           <label className="flex flex-col text-sm">
             Lotes y medida por lote (opcional)
             <PickerLotesBultos lotes={lotes} campo="medida" placeholder="medida" />

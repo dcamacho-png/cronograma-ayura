@@ -238,12 +238,12 @@ describe('filasCumplimiento — Finca y Observación (columnas nuevas)', () => {
   })
 })
 
-describe('filasCumplimiento — responsable del avance + unidad de actividad', () => {
-  it('usa el responsable de la entrada (fallback al de la actividad) y la unidad de la actividad', () => {
+describe('filasCumplimiento — responsables del avance + unidad de actividad', () => {
+  it('usa los responsables de la entrada (fallback al de la actividad) y la unidad de la actividad', () => {
     const a = act({
       unidadRealizada: 'jornales',
       avancePorLote: { l1: [
-        { dia: 1, maquinaId: null, cantidad: 2, responsableId: 'R2' },
+        { dia: 1, maquinaId: null, cantidad: 2, responsableIds: ['R2'] },
         { dia: 2, maquinaId: null, cantidad: 3 },
       ] },
     })
@@ -252,6 +252,20 @@ describe('filasCumplimiento — responsable del avance + unidad de actividad', (
     expect(filas[0][2]).toBe('RESP-R2')
     expect(filas[1][2]).toBe('Ana')       // fallback al responsable de la actividad
     expect(filas[0][9]).toBe('jornales')  // unidad de la actividad (verbatim)
+  })
+
+  it('lista a TODOS los que hicieron el avance, no solo al primero', () => {
+    const a = act({
+      avancePorLote: { l1: [{ dia: 1, maquinaId: null, cantidad: 2, responsableIds: ['R2', 'R7'] }] },
+    })
+    expect(filasCumplimiento(a, '15 jun', mapa, ctx)[0][2]).toBe('RESP-R2, RESP-R7')
+  })
+
+  it('un avance viejo con un único responsableId sigue saliendo igual', () => {
+    const a = act({
+      avancePorLote: { l1: [{ dia: 1, maquinaId: null, cantidad: 2, responsableId: 'R2' } as never] },
+    })
+    expect(filasCumplimiento(a, '15 jun', mapa, ctx)[0][2]).toBe('RESP-R2')
   })
 })
 
@@ -279,8 +293,8 @@ describe('filasCumplimiento — avance general (actividad SIN potreros)', () => 
     const a = sinLotes({
       estado: 'CUMPLIDA',
       avanceGeneral: [
-        { dia: 1, cantidad: 4, maquinaId: 'm1', centroCosto: 'Ceba', responsableId: 'r1', observacion: 'cambio de aceite' },
-        { dia: 3, cantidad: 2, maquinaId: null, centroCosto: null, responsableId: null, observacion: null },
+        { dia: 1, cantidad: 4, maquinaId: 'm1', centroCosto: 'Ceba', responsableIds: ['r1'], observacion: 'cambio de aceite' },
+        { dia: 3, cantidad: 2, maquinaId: null, centroCosto: null, responsableIds: [], observacion: null },
       ],
     })
     expect(filasCumplimiento(a, '15 jun', mapa, ctx)).toEqual([
