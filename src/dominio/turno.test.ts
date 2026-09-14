@@ -42,4 +42,11 @@ describe('horarioComun', () => {
   it('varias actividades sin horario dan vacío, no un falso conflicto', () => {
     expect(horarioComun(['', ''])).toBe('')
   })
+
+  it('ignora las actividades sin horario en vez de tomarlas como discrepancia', () => {
+    // Al asignar una tarea nueva a un día que ya tenía horario, la nueva entra sin él.
+    // Si contara como distinta, la franja del día se vaciaría sola en pantalla.
+    expect(horarioComun(['7am-12pm', ''])).toBe('7am-12pm')
+    expect(horarioComun(['', '1pm-5pm', ''])).toBe('1pm-5pm')
+  })
 })

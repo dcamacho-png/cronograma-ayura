@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation'
 import { usuarioActual } from '@/auth/sesion'
 import { listarAreas, listarResponsablesPorArea, listarActividades } from '@/datos/repositorio'
 import { semanaActual, fechasDeSemana } from '@/dominio/semana'
-import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
 import { GrillaSemana } from '../grilla-semana'
 import { AutoImprimir } from '../../_componentes/auto-imprimir'
 
@@ -50,7 +49,6 @@ export default async function ExportarPage({
               fechas={fechas}
               responsables={responsables}
               actividades={actividades}
-              esMaquinaria={esMaquinariaVar(area, 'programar')}
               paraExportar
             />
           </div>

@@ -231,7 +231,6 @@ export default async function ProgramarPage({
           actividades={actividadesCronograma}
           novedades={novedades}
           turnoEditable={programable && !soloLectura}
-          esMaquinaria={esMaquinaria}
           conOrdenAseo
           ordenAseo={ordenAseo}
           todosResponsables={todosResponsables}
@@ -270,7 +269,6 @@ export default async function ProgramarPage({
               responsables={g.responsables}
               actividades={actividadesCronograma}
               novedades={novedades}
-              esMaquinaria={esMaquinaria}
               conOrdenAseo
               ordenAseo={ordenAseo}
               paraExportar

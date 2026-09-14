@@ -7,11 +7,14 @@ export function turnoPorDia(dia: number): string {
 }
 
 // El horario es del DÍA de cada trabajador, no de cada actividad: la casilla al pie de la
-// casilla de la grilla muestra el que comparten todas las actividades de ese día. Si difieren
-// —pasa con lo programado antes, cuando cada actividad llevaba el suyo— devuelve vacío, y
-// escribir uno los unifica.
+// casilla de la grilla muestra el que comparten las actividades de ese día. Si difieren —pasa
+// con lo programado antes, cuando cada actividad llevaba el suyo— devuelve vacío, y escribir
+// uno los unifica.
+//
+// Las actividades SIN horario no cuentan como discrepancia: una tarea recién asignada entra
+// sin horario, y si contara, la franja del día se vaciaría sola en pantalla.
 export function horarioComun(turnos: string[]): string {
-  const limpios = turnos.map((t) => t.trim())
-  if (limpios.length === 0) return ''
-  return limpios.every((t) => t === limpios[0]) ? limpios[0] : ''
+  const conHorario = turnos.map((t) => t.trim()).filter(Boolean)
+  if (conHorario.length === 0) return ''
+  return conHorario.every((t) => t === conHorario[0]) ? conHorario[0] : ''
 }

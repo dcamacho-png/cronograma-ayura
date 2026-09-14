@@ -53,7 +53,6 @@ export function GrillaSemana({
   actividades,
   novedades = [],
   turnoEditable = false,
-  esMaquinaria,
   paraExportar = false,
   conOrdenAseo = false,
   ordenAseo = [],
@@ -67,7 +66,6 @@ export function GrillaSemana({
   actividades: ActividadGrilla[]
   novedades?: NovedadGrilla[]
   turnoEditable?: boolean
-  esMaquinaria: boolean
   paraExportar?: boolean
   conOrdenAseo?: boolean
   ordenAseo?: AsignacionOrdenAseo[]
@@ -137,9 +135,16 @@ export function GrillaSemana({
                 )}
               </div>
             ))}
-            {esMaquinaria && celdas.length > 0 && (
-              editable ? (
-                <form action={setHorarioDiaAccion} className="mt-1 flex items-center gap-1 border-t border-borde pt-1">
+            {/* Horario del día de ESTE trabajador: una franja para todo lo que haga ese día,
+                en todas las áreas. Va en píldora terracota para que resalte contra el verde
+                de las actividades y se lea de un vistazo en la grilla impresa. */}
+            {celdas.length > 0 && (() => {
+              const horario = horarioComun(celdas.map((c) => c.turno))
+              return editable ? (
+                <form
+                  action={setHorarioDiaAccion}
+                  className="mt-1 flex items-center gap-1 rounded-full border border-arcilla/50 bg-arena px-2 py-0.5"
+                >
                   <input type="hidden" name="responsableId" value={r.id} />
                   <input type="hidden" name="anio" value={anio} />
                   <input type="hidden" name="semana" value={semana} />
@@ -148,20 +153,22 @@ export function GrillaSemana({
                   <input
                     aria-label={`Horario ${DIAS[i]}`}
                     name="turno"
-                    defaultValue={horarioComun(celdas.map((c) => c.turno))}
+                    defaultValue={horario}
                     placeholder="7am-12pm"
-                    className="w-20 rounded-lg border border-borde bg-marfil p-0.5 text-xs focus:outline-none focus:ring-2 focus:ring-bosque/40"
+                    className="w-20 bg-transparent text-xs font-bold text-arcilla placeholder:font-normal placeholder:text-tierra focus:outline-none"
                   />
-                  <button type="submit" className="rounded-lg bg-bosque px-1.5 text-xs font-semibold text-white">✓</button>
+                  <button type="submit" aria-label="Guardar horario" className="text-xs font-bold text-arcilla hover:underline">✓</button>
                 </form>
               ) : (
-                horarioComun(celdas.map((c) => c.turno)) && (
-                  <div className={`mt-1 border-t border-borde pt-1 text-tierra ${paraExportar ? 'text-sm' : 'text-xs'}`}>
-                    🕐 {horarioComun(celdas.map((c) => c.turno))}
+                horario && (
+                  <div
+                    className={`mt-1 inline-flex items-center gap-1 rounded-full border border-arcilla/50 bg-arena px-2 py-0.5 font-bold text-arcilla ${paraExportar ? 'text-sm' : 'text-xs'}`}
+                  >
+                    🕐 {horario}
                   </div>
                 )
               )
-            )}
+            })()}
             {novedades
               .filter((n) => n.responsableId === r.id)
               .map((n) => ({ n, cubiertos: diasCubiertos(n, fechas) }))
