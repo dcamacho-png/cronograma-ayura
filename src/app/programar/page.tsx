@@ -16,7 +16,7 @@ import {
 import { siguienteSemana, semanaAnterior, semanaActual, fechasDeSemana, diaActual, esDiaPasado, programacionAbierta } from '@/dominio/semana'
 import { esMaquinaria as esMaquinariaVar } from '@/dominio/variante'
 import { textoSugerencia } from '@/dominio/sugerencia'
-import { asignarTareaAccion, devolverAlBancoAccion, dedicarTractorAccion } from './acciones'
+import { asignarTareaAccion, devolverAlBancoAccion, dedicarTractorAccion, setHorarioTodosAccion } from './acciones'
 import { AsignarTareaForm } from './asignar-tarea-form'
 import { GrillaSemana } from './grilla-semana'
 import { BotonDescargarImagen } from './boton-descargar-imagen'
@@ -226,6 +226,38 @@ export default async function ProgramarPage({
             </a>
           )}
         </div>
+      )}
+      {/* Practicidad: casi siempre todos entran a la misma hora. Se pone de una para la
+          semana y después se corrige la excepción de quien la tenga, en su propia casilla. */}
+      {programable && !soloLectura && (
+        <form
+          action={setHorarioTodosAccion}
+          className="mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-arcilla/40 bg-arena/60 p-3 text-xs"
+        >
+          <input type="hidden" name="areaId" value={areaId} />
+          <input type="hidden" name="anio" value={anio} />
+          <input type="hidden" name="semana" value={semana} />
+          <span className="font-bold text-arcilla">🕐 Horario para todos</span>
+          <input
+            name="turno"
+            required
+            placeholder="7am-4pm"
+            aria-label="Horario para todos"
+            className="w-24 rounded-lg border border-borde bg-marfil p-1 focus:outline-none focus:ring-2 focus:ring-bosque/40"
+          />
+          <span className="text-tierra">en:</span>
+          {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((d, i) => (
+            <label key={d} className="flex items-center gap-1">
+              <input type="checkbox" name="dia" value={i + 1} defaultChecked className="accent-bosque" />
+              {d}
+            </label>
+          ))}
+          <button className="rounded-lg bg-bosque px-3 py-1 font-semibold text-white">Aplicar a todos</button>
+          <span className="w-full text-tierra">
+            Pisa el horario que ya tengan esos días. El sábado suele ser distinto: aplicá primero
+            lunes a viernes y después el sábado aparte.
+          </span>
+        </form>
       )}
       <div className="mb-6">
         <GrillaSemana

@@ -409,6 +409,22 @@ export function listarActividadesDeSemanas(semanas: { anio: number; semana: numb
 // Fija el horario de TODAS las actividades de un trabajador en un día: el horario es del día,
 // no de cada actividad (una persona no está en dos franjas a la vez). Reemplaza al viejo
 // `actualizarActividad`, que editaba el turno de una actividad suelta.
+// Mismo horario para TODOS los trabajadores del área en los días dados de una semana. Es la
+// practicidad de "todos entran a la misma hora": se aplica de una y después se corrige la
+// excepción de quien la tenga, en su propia casilla. Pisa lo que hubiera en esos días.
+export function setHorarioSemana(
+  areaId: string,
+  anio: number,
+  semana: number,
+  dias: number[],
+  turno: string,
+) {
+  return prisma.actividad.updateMany({
+    where: { areaId, anio, semana, dia: { in: dias } },
+    data: { turno },
+  })
+}
+
 export function setHorarioDia(
   responsableId: string,
   anio: number,

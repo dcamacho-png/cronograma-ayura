@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearResponsable, setHorarioDia, asignarTarea, quitarSeleccionTarea, devolverAAsignacion, devolverGrillaAlBanco, devolverActividadReprogramadaAlBanco, dedicarTractor, crearNovedadResponsable, eliminarNovedadResponsable, areaDeActividad, areaDeTarea, areaDeResponsable, areaDeNovedadResponsable, areaDedicacionTractor, agregarOrdenAseo, quitarOrdenAseo } from '@/datos/repositorio'
+import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearResponsable, setHorarioDia, setHorarioSemana, asignarTarea, quitarSeleccionTarea, devolverAAsignacion, devolverGrillaAlBanco, devolverActividadReprogramadaAlBanco, dedicarTractor, crearNovedadResponsable, eliminarNovedadResponsable, areaDeActividad, areaDeTarea, areaDeResponsable, areaDeNovedadResponsable, areaDedicacionTractor, agregarOrdenAseo, quitarOrdenAseo } from '@/datos/repositorio'
 import { semanaAnterior, semanaActual, diaActual, esDiaPasado, programacionAbierta } from '@/dominio/semana'
 import type { Asignacion } from '@/dominio/programacion'
 import { usuarioActual } from '@/auth/sesion'
@@ -103,6 +103,26 @@ export async function crearResponsableAccion(form: FormData) {
   if (!nombre || !areaId || !(await autorizado(areaId))) return
   await crearResponsable(nombre, areaId)
   revalidatePath('/programar')
+}
+
+// Mismo horario para todos los trabajadores del área en los días marcados. Exige una hora
+// escrita: con el campo vacío borraría los horarios de la semana entera de un clic.
+export async function setHorarioTodosAccion(form: FormData) {
+  const areaId = texto(form, 'areaId')
+  if (!areaId || !(await autorizado(areaId))) return
+  const anio = Number(texto(form, 'anio'))
+  const semana = Number(texto(form, 'semana'))
+  if (!Number.isInteger(anio) || !Number.isInteger(semana) || !programacionAbierta(anio, semana)) return
+  const turno = texto(form, 'turno')
+  if (!turno) return
+  const dias = form
+    .getAll('dia')
+    .map((v) => Number(String(v)))
+    .filter((d) => Number.isInteger(d) && d >= 1 && d <= 7)
+  if (dias.length === 0) return
+  const { count } = await setHorarioSemana(areaId, anio, semana, dias, turno)
+  const msg = `Horario "${turno}" aplicado a ${count} actividad(es). Ajustá la excepción de quien la tenga en su casilla.`
+  redirect(`/programar?area=${areaId}&anio=${anio}&semana=${semana}&aviso=${encodeURIComponent(msg)}`)
 }
 
 // Horario de un trabajador en UN día: se escribe en todas sus actividades de ese día.
