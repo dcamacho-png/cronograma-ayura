@@ -407,11 +407,19 @@ export function listarActividadesDeSemanas(semanas: { anio: number; semana: numb
   })
 }
 
-// Actualiza los campos editables de una actividad (descripción y turno).
-export function actualizarActividad(id: string, descripcion: string, turno: string) {
-  return prisma.actividad.update({
-    where: { id },
-    data: { descripcion, turno },
+// Fija el horario de TODAS las actividades de un trabajador en un día: el horario es del día,
+// no de cada actividad (una persona no está en dos franjas a la vez). Reemplaza al viejo
+// `actualizarActividad`, que editaba el turno de una actividad suelta.
+export function setHorarioDia(
+  responsableId: string,
+  anio: number,
+  semana: number,
+  dia: number,
+  turno: string,
+) {
+  return prisma.actividad.updateMany({
+    where: { responsableId, anio, semana, dia },
+    data: { turno },
   })
 }
 

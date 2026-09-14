@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { turnoPorDia } from './turno'
+import { turnoPorDia, horarioComun } from './turno'
 
 describe('turnoPorDia', () => {
   it('lunes a jueves es 7am-4pm', () => {
@@ -16,5 +16,30 @@ describe('turnoPorDia', () => {
   })
   it('domingo no tiene turno por defecto', () => {
     expect(turnoPorDia(7)).toBe('')
+  })
+})
+
+describe('horarioComun', () => {
+  it('devuelve el horario que comparten las actividades del día', () => {
+    expect(horarioComun(['7am-12pm', '7am-12pm'])).toBe('7am-12pm')
+    expect(horarioComun(['1pm-5pm'])).toBe('1pm-5pm')
+  })
+
+  it('queda vacío si las actividades del día traen horarios distintos', () => {
+    // Pasa con lo programado ANTES de que el horario fuera del día: cada actividad tenía el
+    // suyo. La casilla arranca vacía y, al escribir uno, los unifica.
+    expect(horarioComun(['7am-12pm', '1pm-5pm'])).toBe('')
+  })
+
+  it('ignora espacios de más al comparar', () => {
+    expect(horarioComun([' 7am-12pm', '7am-12pm '])).toBe('7am-12pm')
+  })
+
+  it('sin actividades no hay horario', () => {
+    expect(horarioComun([])).toBe('')
+  })
+
+  it('varias actividades sin horario dan vacío, no un falso conflicto', () => {
+    expect(horarioComun(['', ''])).toBe('')
   })
 })

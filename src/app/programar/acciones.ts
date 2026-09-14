@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearResponsable, actualizarActividad, asignarTarea, quitarSeleccionTarea, devolverAAsignacion, devolverGrillaAlBanco, devolverActividadReprogramadaAlBanco, dedicarTractor, crearNovedadResponsable, eliminarNovedadResponsable, areaDeActividad, areaDeTarea, areaDeResponsable, areaDeNovedadResponsable, areaDedicacionTractor, agregarOrdenAseo, quitarOrdenAseo } from '@/datos/repositorio'
+import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearResponsable, setHorarioDia, asignarTarea, quitarSeleccionTarea, devolverAAsignacion, devolverGrillaAlBanco, devolverActividadReprogramadaAlBanco, dedicarTractor, crearNovedadResponsable, eliminarNovedadResponsable, areaDeActividad, areaDeTarea, areaDeResponsable, areaDeNovedadResponsable, areaDedicacionTractor, agregarOrdenAseo, quitarOrdenAseo } from '@/datos/repositorio'
 import { semanaAnterior, semanaActual, diaActual, esDiaPasado, programacionAbierta } from '@/dominio/semana'
 import type { Asignacion } from '@/dominio/programacion'
 import { usuarioActual } from '@/auth/sesion'
@@ -105,16 +105,17 @@ export async function crearResponsableAccion(form: FormData) {
   revalidatePath('/programar')
 }
 
-export async function actualizarActividadAccion(form: FormData) {
-  const id = texto(form, 'id')
-  if (!id || !(await autorizadoActividad(id))) return
-  const descripcion = texto(form, 'descripcion')
-  const turno = texto(form, 'turno')
+// Horario de un trabajador en UN día: se escribe en todas sus actividades de ese día.
+// Autoriza por el responsable (su área), igual que las novedades.
+export async function setHorarioDiaAccion(form: FormData) {
+  const responsableId = texto(form, 'responsableId')
+  if (!responsableId || !(await autorizadoResponsable(responsableId))) return
   const anio = Number(texto(form, 'anio'))
   const semana = Number(texto(form, 'semana'))
-  if (!id || !descripcion) return
-  if (!Number.isInteger(anio) || !Number.isInteger(semana) || !programacionAbierta(anio, semana)) return
-  await actualizarActividad(id, descripcion, turno)
+  const dia = Number(texto(form, 'dia'))
+  if (!Number.isInteger(anio) || !Number.isInteger(semana) || !(dia >= 1 && dia <= 7)) return
+  if (!programacionAbierta(anio, semana)) return
+  await setHorarioDia(responsableId, anio, semana, dia, texto(form, 'turno'))
   revalidatePath('/programar')
 }
 

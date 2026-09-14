@@ -1,8 +1,9 @@
 import { Fragment } from 'react'
 import { InfoLotes } from '../_componentes/info-lotes'
-import { actualizarActividadAccion, devolverAAsignacionAccion, devolverGrillaAlBancoAccion, devolverActividadAlBancoAccion, eliminarNovedadResponsableAccion, agregarOrdenAseoAccion, quitarOrdenAseoAccion } from './acciones'
+import { setHorarioDiaAccion, devolverAAsignacionAccion, devolverGrillaAlBancoAccion, devolverActividadAlBancoAccion, eliminarNovedadResponsableAccion, agregarOrdenAseoAccion, quitarOrdenAseoAccion } from './acciones'
 import { agruparResponsablesPorFinca, hayFincasAsignadas } from '@/dominio/responsables-finca'
 import { diasCubiertos, etiquetaNovedad, type TipoNovedad } from '@/dominio/ausencias'
+import { horarioComun } from '@/dominio/turno'
 import { agruparOrdenAseoPorDia, type AsignacionOrdenAseo } from '@/dominio/orden-aseo'
 import { FormNovedad } from './form-novedad'
 
@@ -104,18 +105,8 @@ export function GrillaSemana({
             {celdas.map((a) => (
               <div key={a.id} className="mb-1 rounded-lg bg-green-50 p-1">
                 <div>{a.descripcion}</div>
-                {esMaquinaria && (editable ? (
-                  <form action={actualizarActividadAccion} className="mt-0.5 flex items-center gap-1">
-                    <input type="hidden" name="id" value={a.id} />
-                    <input type="hidden" name="descripcion" value={a.descripcion} />
-                    <input type="hidden" name="anio" value={anio} />
-                    <input type="hidden" name="semana" value={semana} />
-                    <input aria-label="Turno" name="turno" defaultValue={a.turno} className="w-20 rounded-lg border border-borde bg-marfil p-0.5 text-xs focus:outline-none focus:ring-2 focus:ring-bosque/40" />
-                    <button type="submit" className="rounded-lg bg-bosque px-1.5 text-xs font-semibold text-white">✓</button>
-                  </form>
-                ) : (
-                  a.turno && <div className={`text-tierra ${paraExportar ? 'text-sm' : 'text-xs'}`}>{a.turno}</div>
-                ))}
+                {/* El horario ya NO se edita por actividad: es del día del trabajador y vive
+                    al pie de esta casilla (una persona no trabaja en dos franjas a la vez). */}
                 {a.maquina && <div className={`text-tierra ${paraExportar ? 'text-sm' : 'text-xs'}`}>🚜 {a.maquina.nombre}</div>}
                 {a.finca && <div className={`text-tierra ${paraExportar ? 'text-sm' : 'text-xs'}`}>🏠 {a.finca.nombre}</div>}
                 {a.tarea?.detalle && <div className={`whitespace-pre-line text-tierra ${paraExportar ? 'text-sm' : 'text-xs'}`}>📝 {a.tarea.detalle}</div>}
@@ -146,6 +137,31 @@ export function GrillaSemana({
                 )}
               </div>
             ))}
+            {esMaquinaria && celdas.length > 0 && (
+              editable ? (
+                <form action={setHorarioDiaAccion} className="mt-1 flex items-center gap-1 border-t border-borde pt-1">
+                  <input type="hidden" name="responsableId" value={r.id} />
+                  <input type="hidden" name="anio" value={anio} />
+                  <input type="hidden" name="semana" value={semana} />
+                  <input type="hidden" name="dia" value={dia} />
+                  <span className="text-xs" aria-hidden="true">🕐</span>
+                  <input
+                    aria-label={`Horario ${DIAS[i]}`}
+                    name="turno"
+                    defaultValue={horarioComun(celdas.map((c) => c.turno))}
+                    placeholder="7am-12pm"
+                    className="w-20 rounded-lg border border-borde bg-marfil p-0.5 text-xs focus:outline-none focus:ring-2 focus:ring-bosque/40"
+                  />
+                  <button type="submit" className="rounded-lg bg-bosque px-1.5 text-xs font-semibold text-white">✓</button>
+                </form>
+              ) : (
+                horarioComun(celdas.map((c) => c.turno)) && (
+                  <div className={`mt-1 border-t border-borde pt-1 text-tierra ${paraExportar ? 'text-sm' : 'text-xs'}`}>
+                    🕐 {horarioComun(celdas.map((c) => c.turno))}
+                  </div>
+                )
+              )
+            )}
             {novedades
               .filter((n) => n.responsableId === r.id)
               .map((n) => ({ n, cubiertos: diasCubiertos(n, fechas) }))
