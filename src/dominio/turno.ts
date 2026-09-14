@@ -1,15 +1,11 @@
-// Turno (horario) por defecto según el día: 1=lunes … 7=domingo.
-export function turnoPorDia(dia: number): string {
-  if (dia >= 1 && dia <= 4) return '7am-4pm'
-  if (dia === 5) return '7am-3pm'
-  if (dia === 6) return '7am-12pm'
-  return ''
-}
+// El horario es del DÍA de cada trabajador, no de cada actividad, y es TEXTO LIBRE: cualquier
+// hora que quien programa escriba. No hay turnos de referencia — antes existía un `turnoPorDia`
+// (lun-jue 7am-4pm, vie 7am-3pm, sáb 7am-12pm) que se estampaba solo al asignar, y hacía
+// parecer que hubiera jornadas predefinidas.
 
-// El horario es del DÍA de cada trabajador, no de cada actividad: la casilla al pie de la
-// casilla de la grilla muestra el que comparten las actividades de ese día. Si difieren —pasa
-// con lo programado antes, cuando cada actividad llevaba el suyo— devuelve vacío, y escribir
-// uno los unifica.
+// El horario que muestra la casilla al pie del día: el que comparten las actividades de ese
+// día. Si difieren —pasa con lo programado antes, cuando cada actividad llevaba el suyo—
+// devuelve vacío, y escribir uno los unifica.
 //
 // Las actividades SIN horario no cuentan como discrepancia: una tarea recién asignada entra
 // sin horario, y si contara, la franja del día se vaciaría sola en pantalla.

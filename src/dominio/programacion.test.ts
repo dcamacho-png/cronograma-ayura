@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { duplicarActividades, detectarConflictosAsignacion, turnoEfectivo } from './programacion'
-import type { CasillaOcupada } from './programacion'
+import { duplicarActividades, tractoresOcupados, conflictosMaquinaEntreResponsables } from './programacion'
+import type { CasillaOcupada, Asignacion } from './programacion'
 import type { Actividad } from './tipos'
 
 function act(parcial: Partial<Actividad>): Actividad {
@@ -60,84 +60,61 @@ function ocupada(p: Partial<CasillaOcupada>): CasillaOcupada {
   return { dia: 1, turno: '7am-4pm', maquinaId: null, responsableId: 'r1', ...p }
 }
 
-describe('turnoEfectivo', () => {
-  it('usa el turno escrito si no está vacío', () => {
-    expect(turnoEfectivo('  noche  ', 1)).toBe('noche')
-  })
-  it('cae al turno por defecto del día si está vacío', () => {
-    expect(turnoEfectivo('', 6)).toBe('7am-12pm')
-  })
-})
-
-describe('detectarConflictosAsignacion', () => {
-  it('sin choques no devuelve conflictos', () => {
-    const exist = [ocupada({ dia: 1, turno: '7am-4pm', maquinaId: 'm1', responsableId: 'r1' })]
-    const c = detectarConflictosAsignacion(exist, [2], 'r2', { 2: 'm2' }, '7am-4pm')
-    expect(c).toEqual([])
+describe('tractoresOcupados', () => {
+  // El aviso es POR DÍA, no por hora: el horario es texto libre que se escribe después, en la
+  // grilla, así que comparar franjas no dice nada. Y es una recomendación: no bloquea.
+  it('sin choques no avisa nada', () => {
+    const exist = [ocupada({ dia: 1, maquinaId: 'm1' })]
+    expect(tractoresOcupados(exist, [2], 'r2', { 2: 'm2' })).toEqual([])
   })
 
-  it('detecta máquina ocupada en el mismo día+turno', () => {
+  it('avisa si el tractor ya está tomado ESE DÍA, sin importar la hora', () => {
     const exist = [ocupada({ dia: 1, turno: '7am-4pm', maquinaId: 'm1', responsableId: 'rX' })]
-    const c = detectarConflictosAsignacion(exist, [1], 'rNueva', { 1: 'm1' }, '7am-4pm')
-    expect(c).toEqual([{ dia: 1, tipo: 'maquina', responsableId: 'rNueva' }])
+    expect(tractoresOcupados(exist, [1], 'rNueva', { 1: 'm1' })).toEqual([
+      { dia: 1, tipo: 'maquina', responsableId: 'rNueva' },
+    ])
+    // Antes, con otra franja horaria, el tractor se daba por libre y no avisaba.
+    const otraHora = [ocupada({ dia: 1, turno: '1pm-5pm', maquinaId: 'm1', responsableId: 'rX' })]
+    expect(tractoresOcupados(otraHora, [1], 'rNueva', { 1: 'm1' })).toEqual([
+      { dia: 1, tipo: 'maquina', responsableId: 'rNueva' },
+    ])
+    const sinHora = [ocupada({ dia: 1, turno: '', maquinaId: 'm1', responsableId: 'rX' })]
+    expect(tractoresOcupados(sinHora, [1], 'rNueva', { 1: 'm1' })).toEqual([
+      { dia: 1, tipo: 'maquina', responsableId: 'rNueva' },
+    ])
   })
 
-  it('la misma máquina está libre si es otro turno', () => {
-    const exist = [ocupada({ dia: 1, turno: '7am-4pm', maquinaId: 'm1', responsableId: 'rX' })]
-    const c = detectarConflictosAsignacion(exist, [1], 'rNueva', { 1: 'm1' }, 'noche')
-    expect(c).toEqual([])
+  it('no avisa por el responsable: una persona puede tener varias tareas el mismo día', () => {
+    const exist = [ocupada({ dia: 3, maquinaId: null, responsableId: 'r1' })]
+    expect(tractoresOcupados(exist, [3], 'r1', {})).toEqual([])
   })
 
-  it('detecta responsable con otra tarea en el mismo día+turno', () => {
-    const exist = [ocupada({ dia: 3, turno: '7am-4pm', maquinaId: null, responsableId: 'r1' })]
-    const c = detectarConflictosAsignacion(exist, [3], 'r1', {}, '7am-4pm')
-    expect(c).toEqual([{ dia: 3, tipo: 'responsable', responsableId: 'r1' }])
+  it('sin tractor elegido no hay nada que avisar', () => {
+    const exist = [ocupada({ dia: 1, maquinaId: 'm1' })]
+    expect(tractoresOcupados(exist, [1], 'r2', { 1: null })).toEqual([])
   })
 
-  it('el mismo responsable está libre en otro turno', () => {
-    const exist = [ocupada({ dia: 3, turno: 'mañana', responsableId: 'r1' })]
-    const c = detectarConflictosAsignacion(exist, [3], 'r1', {}, 'tarde')
-    expect(c).toEqual([])
-  })
-
-  it('usa el turno por defecto del día cuando el turno va vacío', () => {
-    // sábado por defecto = 7am-12pm
-    const exist = [ocupada({ dia: 6, turno: '7am-12pm', responsableId: 'r1' })]
-    const c = detectarConflictosAsignacion(exist, [6], 'r1', {}, '')
-    expect(c).toEqual([{ dia: 6, tipo: 'responsable', responsableId: 'r1' }])
-  })
-
-  it('puede reportar máquina y responsable el mismo día', () => {
+  it('avisa un día por cada día tomado', () => {
     const exist = [
-      ocupada({ dia: 2, turno: '7am-4pm', maquinaId: 'm1', responsableId: 'rA' }),
-      ocupada({ dia: 2, turno: '7am-4pm', maquinaId: 'm9', responsableId: 'r1' }),
+      ocupada({ dia: 2, maquinaId: 'm1', responsableId: 'rA' }),
+      ocupada({ dia: 4, maquinaId: 'm1', responsableId: 'rB' }),
     ]
-    const c = detectarConflictosAsignacion(exist, [2], 'r1', { 2: 'm1' }, '7am-4pm')
-    expect(c).toContainEqual({ dia: 2, tipo: 'responsable', responsableId: 'r1' })
-    expect(c).toContainEqual({ dia: 2, tipo: 'maquina', responsableId: 'r1' })
-  })
-})
-
-import { conflictosMaquinaEntreResponsables } from './programacion'
-import type { Asignacion } from './programacion'
-
-describe('detectarConflictosAsignacion — responsableId', () => {
-  it('rellena responsableId en los conflictos', () => {
-    const exist: CasillaOcupada[] = [{ dia: 1, turno: '7am-4pm', maquinaId: 'm1', responsableId: 'r1' }]
-    const c = detectarConflictosAsignacion(exist, [1], 'r1', {}, '7am-4pm')
-    expect(c).toEqual([{ dia: 1, tipo: 'responsable', responsableId: 'r1' }])
+    expect(tractoresOcupados(exist, [2, 3, 4], 'r1', { 2: 'm1', 3: 'm1', 4: 'm1' })).toEqual([
+      { dia: 2, tipo: 'maquina', responsableId: 'r1' },
+      { dia: 4, tipo: 'maquina', responsableId: 'r1' },
+    ])
   })
 })
 
 describe('conflictosMaquinaEntreResponsables', () => {
-  const base = (over: Partial<Asignacion>): Asignacion => ({ responsableId: 'r', dias: [], turno: '7am-4pm', maquinaPorDia: {}, ...over })
+  const base = (over: Partial<Asignacion>): Asignacion => ({ responsableId: 'r', dias: [], maquinaPorDia: {}, ...over })
 
-  it('sin conflicto si usan máquinas distintas el mismo día+turno', () => {
+  it('sin conflicto si usan máquinas distintas el mismo día', () => {
     const a = [base({ responsableId: 'r1', dias: [1], maquinaPorDia: { 1: 'm1' } }), base({ responsableId: 'r2', dias: [1], maquinaPorDia: { 1: 'm2' } })]
     expect(conflictosMaquinaEntreResponsables(a)).toEqual([])
   })
 
-  it('conflicto si dos responsables usan la misma máquina el mismo día+turno', () => {
+  it('conflicto si dos responsables usan la misma máquina el mismo día', () => {
     const a = [base({ responsableId: 'r1', dias: [1], maquinaPorDia: { 1: 'm1' } }), base({ responsableId: 'r2', dias: [1], maquinaPorDia: { 1: 'm1' } })]
     expect(conflictosMaquinaEntreResponsables(a)).toEqual([{ dia: 1, tipo: 'maquina', responsableId: 'r2' }])
   })
@@ -152,7 +129,7 @@ describe('conflictosMaquinaEntreResponsables', () => {
     expect(conflictosMaquinaEntreResponsables(a)).toEqual([])
   })
 
-  it('con 3 responsables en la misma máquina/día/turno marca al 2º y al 3º (el 1º queda libre)', () => {
+  it('con 3 responsables en la misma máquina/día marca al 2º y al 3º (el 1º queda libre)', () => {
     const a = [
       base({ responsableId: 'r1', dias: [1], maquinaPorDia: { 1: 'm1' } }),
       base({ responsableId: 'r2', dias: [1], maquinaPorDia: { 1: 'm1' } }),

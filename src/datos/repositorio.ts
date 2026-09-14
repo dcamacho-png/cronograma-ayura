@@ -1,8 +1,7 @@
 import { prisma } from './prisma'
 import { Prisma } from '@prisma/client'
 import { hashPassword } from '@/auth/password'
-import { duplicarActividades, detectarConflictosAsignacion, conflictosMaquinaEntreResponsables } from '@/dominio/programacion'
-import { turnoPorDia } from '@/dominio/turno'
+import { duplicarActividades, tractoresOcupados, conflictosMaquinaEntreResponsables } from '@/dominio/programacion'
 import type { BorradorActividad, Conflicto, Asignacion } from '@/dominio/programacion'
 import type { Actividad as ActividadDominio } from '@/dominio/tipos'
 import type { Semana } from '@/dominio/semana'
@@ -577,11 +576,10 @@ export async function asignarTarea(
   tareaId: string,
   asignaciones: Asignacion[],
   loteIdFallback: string | null,
-  esMaquinaria = true,
 ): Promise<
   | { ok: false; motivo: 'tarea' }
-  | { ok: false; motivo: 'conflicto'; conflictos: Conflicto[] }
-  | { ok: true; creadas: number }
+  // Siempre asigna: `avisos` son recomendaciones (tractor ya tomado ese día), no un rechazo.
+  | { ok: true; creadas: number; avisos: Conflicto[] }
 > {
   const tarea = await prisma.tarea.findUnique({ where: { id: tareaId }, include: { lotes: true } })
   if (!tarea || tarea.anioSel === null || tarea.semanaSel === null) return { ok: false, motivo: 'tarea' }
@@ -610,20 +608,19 @@ export async function asignarTarea(
       where: { anio, semana, dia: { in: diasTodos } },
       select: { dia: true, turno: true, maquinaId: true, responsableId: true },
     })
-    const conflictosRaw = [
-      ...asigs.flatMap((a) => detectarConflictosAsignacion(existentes, a.dias, a.responsableId, a.maquinaPorDia, a.turno)),
+    // Tractor ya tomado ese día: es un AVISO, no un bloqueo. La asignación se hace igual y el
+    // mensaje queda para que quien programa decida si lo deja así o lo mueve.
+    const avisosRaw = [
+      ...asigs.flatMap((a) => tractoresOcupados(existentes, a.dias, a.responsableId, a.maquinaPorDia)),
       ...conflictosMaquinaEntreResponsables(asigs),
     ]
     const vistos = new Set<string>()
-    const conflictos = conflictosRaw.filter((c) => {
+    const avisos = avisosRaw.filter((c) => {
       const k = `${c.dia}-${c.tipo}-${c.responsableId ?? ''}`
       if (vistos.has(k)) return false
       vistos.add(k)
       return true
     })
-    if (conflictos.length > 0) {
-      return { ok: false as const, motivo: 'conflicto' as const, conflictos }
-    }
     let creadas = 0
     for (const a of asigs) {
       for (const dia of a.dias) {
@@ -633,7 +630,8 @@ export async function asignarTarea(
             semana,
             dia,
             descripcion: tarea.descripcion,
-            turno: esMaquinaria ? (a.turno.trim() || turnoPorDia(dia)) : '',
+            // Sin horario: se escribe día a día en la grilla, con la hora que sea.
+            turno: '',
             vecesReprogramada: tarea.vecesReprogramada,
             areaId: tarea.areaId,
             fincaId,
@@ -649,7 +647,7 @@ export async function asignarTarea(
       }
     }
     await tx.tarea.update({ where: { id: tarea.id }, data: { estado: 'PROGRAMADA' } })
-    return { ok: true as const, creadas }
+    return { ok: true as const, creadas, avisos }
   })
 }
 

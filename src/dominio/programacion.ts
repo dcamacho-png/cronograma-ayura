@@ -1,12 +1,4 @@
 import type { Actividad } from './tipos'
-import { turnoPorDia } from './turno'
-
-// El turno que realmente queda en una actividad: el escrito a mano o, si está
-// vacío, el turno por defecto del día.
-export function turnoEfectivo(turno: string, dia: number): string {
-  return turno.trim() || turnoPorDia(dia)
-}
-
 // Una actividad ya existente en la semana, vista como "casilla ocupada".
 export interface CasillaOcupada {
   dia: number
@@ -22,41 +14,43 @@ export interface Conflicto {
   responsableId?: string
 }
 
-// Detecta choques al asignar: una máquina no puede repetirse en el mismo
-// día+turno, y un responsable no puede tener dos tareas en el mismo día+turno.
-// `existentes` son las actividades ya guardadas en la semana destino.
-export function detectarConflictosAsignacion(
+// Tractores ya tomados en los días que se van a asignar. Es un AVISO, no un bloqueo: la
+// asignación se hace igual y quien programa decide.
+//
+// Se mira POR DÍA, no por franja horaria. El horario es texto libre que se escribe después en
+// la grilla y puede ser cualquier hora; comparar franjas daba falsos "libre" (dos textos
+// distintos no significan que no se pisen) y falsos "ocupado" (dos textos iguales por venir de
+// un horario de referencia que nadie puso).
+//
+// Del responsable no se avisa nada: una persona puede tener varias tareas en un mismo día —en
+// las áreas estándar siempre se pudo—, así que avisarlo sería ruido.
+export function tractoresOcupados(
   existentes: CasillaOcupada[],
   dias: number[],
   responsableId: string,
   maquinaPorDia: Record<number, string | null>,
-  turno: string,
 ): Conflicto[] {
-  const conflictos: Conflicto[] = []
+  const avisos: Conflicto[] = []
   for (const dia of dias) {
-    const turno_ = turnoEfectivo(turno, dia)
-    const enCasilla = existentes.filter((e) => e.dia === dia && e.turno === turno_)
-    if (enCasilla.some((e) => e.responsableId === responsableId)) {
-      conflictos.push({ dia, tipo: 'responsable', responsableId })
-    }
     const maqId = maquinaPorDia[dia] ?? null
-    if (maqId && enCasilla.some((e) => e.maquinaId === maqId)) {
-      conflictos.push({ dia, tipo: 'maquina', responsableId })
+    if (!maqId) continue
+    if (existentes.some((e) => e.dia === dia && e.maquinaId === maqId)) {
+      avisos.push({ dia, tipo: 'maquina', responsableId })
     }
   }
-  return conflictos
+  return avisos
 }
 
-// Una asignación por responsable: sus días, su turno y su máquina por día.
+// Una asignación por responsable: sus días y su máquina por día. Sin turno: el horario ya no
+// se fija al asignar, se escribe día a día en la grilla.
 export interface Asignacion {
   responsableId: string
   dias: number[]
-  turno: string
   maquinaPorDia: Record<number, string | null>
 }
 
-// Conflicto de máquina ENTRE responsables del mismo envío: si dos asignaciones
-// usan la misma máquina (no nula) en el mismo día + turno efectivo.
+// Aviso de máquina repetida ENTRE responsables del mismo envío: dos asignaciones que usan la
+// misma máquina (no nula) el mismo DÍA. Igual que `tractoresOcupados`: recomendación, no bloqueo.
 export function conflictosMaquinaEntreResponsables(asignaciones: Asignacion[]): Conflicto[] {
   const conflictos: Conflicto[] = []
   const vistas = new Set<string>()
@@ -64,7 +58,7 @@ export function conflictosMaquinaEntreResponsables(asignaciones: Asignacion[]): 
     for (const dia of a.dias) {
       const maqId = a.maquinaPorDia[dia] ?? null
       if (!maqId) continue
-      const key = `${dia}-${turnoEfectivo(a.turno, dia)}-${maqId}`
+      const key = `${dia}-${maqId}`
       if (vistas.has(key)) {
         conflictos.push({ dia, tipo: 'maquina', responsableId: a.responsableId })
       } else {

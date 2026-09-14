@@ -27,7 +27,7 @@ import { agruparResponsablesPorFinca } from '@/dominio/responsables-finca'
 export default async function ProgramarPage({
   searchParams,
 }: {
-  searchParams: Promise<{ area?: string; anio?: string; semana?: string; error?: string }>
+  searchParams: Promise<{ area?: string; anio?: string; semana?: string; error?: string; aviso?: string }>
 }) {
   const sp = await searchParams
   const areas = await listarAreas()
@@ -118,6 +118,12 @@ export default async function ProgramarPage({
       {sp.error && (
         <div className="mb-4 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-800">
           ⚠️ {sp.error}
+        </div>
+      )}
+      {/* Recomendación: la acción SÍ se hizo. Por eso va en ámbar y no en rojo. */}
+      {sp.aviso && (
+        <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">
+          💡 {sp.aviso}
         </div>
       )}
 

@@ -128,7 +128,6 @@ export async function asignarTareaAccion(form: FormData) {
   if (!programacionAbierta(anioForm, semanaForm)) return
   const hoy = { ...semanaActual(), dia: diaActual() }
   const loteId = textoOpcional(form, 'loteId')
-  const esMaquinaria = texto(form, 'esMaquinaria') === '1'
 
   const nombres: Record<string, string> = {}
   const asignaciones: Asignacion[] = []
@@ -140,30 +139,26 @@ export async function asignarTareaAccion(form: FormData) {
       .filter((d) => Number.isInteger(d) && d >= 1 && d <= 7)
       .filter((d) => !esDiaPasado(anioForm, semanaForm, d, hoy))
     if (dias.length === 0) continue
-    const turno = texto(form, `turno_${rid}`)
     const maquinaPorDia: Record<number, string | null> = {}
     for (const dia of dias) {
       maquinaPorDia[dia] = textoOpcional(form, `maquina_${rid}_${dia}`) || null
     }
-    asignaciones.push({ responsableId: rid, dias, turno, maquinaPorDia })
+    asignaciones.push({ responsableId: rid, dias, maquinaPorDia })
   }
 
   if (!tareaId || asignaciones.length === 0) return
-  const res = await asignarTarea(tareaId, asignaciones, loteId, esMaquinaria)
-  if (res.ok === false && res.motivo === 'conflicto') {
-    const partes = res.conflictos.map((c) => {
+  const res = await asignarTarea(tareaId, asignaciones, loteId)
+  // La tarea queda asignada aunque el tractor ya estuviera tomado: se avisa, no se bloquea.
+  if (res.ok && res.avisos.length > 0) {
+    const partes = res.avisos.map((c) => {
       const nombre = (c.responsableId && nombres[c.responsableId]) || 'Responsable'
-      const detalle =
-        c.tipo === 'responsable'
-          ? 'ya tiene una tarea en ese turno'
-          : 'la máquina ya está ocupada en ese turno'
-      return `${nombre} — ${DIAS_CORTOS[c.dia]}: ${detalle}`
+      return `${nombre} — ${DIAS_CORTOS[c.dia]}`
     })
-    const msg = `No se asignó. ${partes.join(' · ')}`
+    const msg = `Asignada. Revisá: ese tractor ya tenía trabajo ese día · ${partes.join(' · ')}`
     const areaId = texto(form, 'areaId')
     const anio = texto(form, 'anio')
     const semana = texto(form, 'semana')
-    redirect(`/programar?area=${areaId}&anio=${anio}&semana=${semana}&error=${encodeURIComponent(msg)}`)
+    redirect(`/programar?area=${areaId}&anio=${anio}&semana=${semana}&aviso=${encodeURIComponent(msg)}`)
   }
   revalidatePath('/programar')
 }

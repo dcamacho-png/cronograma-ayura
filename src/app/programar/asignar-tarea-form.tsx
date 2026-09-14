@@ -1,8 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { turnoPorDia } from '@/dominio/turno'
-import { turnoEfectivo } from '@/dominio/programacion'
 
 const DIAS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
@@ -39,8 +37,8 @@ export function AsignarTareaForm({
 }) {
   const [responsableIds, setResponsableIds] = useState<string[]>(responsables[0] ? [responsables[0].id] : [])
   const [respAbierto, setRespAbierto] = useState(false)
-  const [porResp, setPorResp] = useState<Record<string, { dias: number[]; turno: string }>>(
-    responsables[0] ? { [responsables[0].id]: { dias: [], turno: esMaquinaria ? turnoPorDia(1) : '' } } : {},
+  const [porResp, setPorResp] = useState<Record<string, { dias: number[] }>>(
+    responsables[0] ? { [responsables[0].id]: { dias: [] } } : {},
   )
 
   const toggleResp = (id: string) => {
@@ -50,13 +48,11 @@ export function AsignarTareaForm({
         const { [id]: _quitado, ...resto } = prev
         return resto
       }
-      return { ...prev, [id]: { dias: [], turno: esMaquinaria ? turnoPorDia(1) : '' } }
+      return { ...prev, [id]: { dias: [] } }
     })
   }
   const setDiasResp = (id: string, dias: number[]) =>
-    setPorResp((prev) => ({ ...prev, [id]: { ...(prev[id] ?? { dias: [], turno: '' }), dias } }))
-  const setTurnoResp = (id: string, turno: string) =>
-    setPorResp((prev) => ({ ...prev, [id]: { ...(prev[id] ?? { dias: [], turno: '' }), turno } }))
+    setPorResp((prev) => ({ ...prev, [id]: { ...(prev[id] ?? { dias: [] }), dias } }))
   const toggleDiaResp = (id: string, d: number) => {
     if (diasPasados.includes(d)) return
     const cur = porResp[id]?.dias ?? []
@@ -66,15 +62,6 @@ export function AsignarTareaForm({
   const nombresSel = responsables.filter((r) => responsableIds.includes(r.id)).map((r) => r.nombre)
   const totalDias = responsableIds.reduce((s, rid) => s + (porResp[rid]?.dias.length ?? 0), 0)
 
-  // Conflicto en vivo por responsable: responsable ya ocupado en día+turno (contra la BD).
-  const conflictosResp = responsableIds.flatMap((rid) => {
-    const info = porResp[rid]
-    if (!info) return [] as { rid: string; dia: number }[]
-    return [...info.dias]
-      .sort((a, b) => a - b)
-      .filter((d) => ocupacion.some((o) => o.dia === d && o.turno === turnoEfectivo(info.turno, d) && o.responsableId === rid))
-      .map((d) => ({ rid, dia: d }))
-  })
 
   const seleccionados = responsables.filter((r) => responsableIds.includes(r.id))
 
@@ -84,7 +71,6 @@ export function AsignarTareaForm({
       <input type="hidden" name="areaId" value={areaId} />
       <input type="hidden" name="anio" value={anio} />
       <input type="hidden" name="semana" value={semana} />
-      <input type="hidden" name="esMaquinaria" value={esMaquinaria ? '1' : ''} />
 
       {/* Encabezado: qué se va a programar (claro y prominente, antes de los controles). */}
       <div className="flex flex-col gap-0.5">
@@ -133,8 +119,9 @@ export function AsignarTareaForm({
             ))}
           </div>
         </div>
+        {/* Solo exige haber marcado algún día: el tractor ya tomado avisa, no impide asignar. */}
         <button
-          disabled={totalDias === 0 || conflictosResp.length > 0}
+          disabled={totalDias === 0}
           className="ml-auto rounded-lg bg-bosque px-3 py-1 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-arena disabled:text-tierra"
         >
           Asignar →
@@ -142,7 +129,7 @@ export function AsignarTareaForm({
       </div>
 
       {seleccionados.map((r) => {
-        const info = porResp[r.id] ?? { dias: [], turno: '' }
+        const info = porResp[r.id] ?? { dias: [] }
         return (
           <div key={r.id} className="flex flex-col gap-2 rounded-lg border border-borde bg-arena/30 p-2">
             <input type="hidden" name={`respNombre_${r.id}`} value={r.nombre} />
@@ -177,37 +164,28 @@ export function AsignarTareaForm({
                   })}
                 </div>
               </div>
-              {esMaquinaria && (
-                <label className="flex flex-col text-xs">
-                  Turno
-                  <input
-                    name={`turno_${r.id}`}
-                    value={info.turno}
-                    onChange={(e) => setTurnoResp(r.id, e.target.value)}
-                    className="w-28 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40"
-                  />
-                </label>
-              )}
             </div>
             {esMaquinaria && info.dias.length > 0 && (
               <div className="flex w-full flex-col gap-1 text-xs">
                 <span className="text-tierra">Máquina por día (solo disponibles · opcional)</span>
                 {[...info.dias].sort((a, b) => a - b).map((dia) => {
-                  const turnoEf = turnoEfectivo(info.turno, dia)
+                  // Ocupadas ESE DÍA, sin mirar la hora: el horario se escribe después en la
+                  // grilla, así que acá no hay franja con la cual comparar. Y no se esconden:
+                  // se marcan, porque es una recomendación y no un bloqueo.
                   const ocupadas = new Set(
-                    ocupacion.filter((o) => o.dia === dia && o.turno === turnoEf).map((o) => o.maquinaId),
+                    ocupacion.filter((o) => o.dia === dia).map((o) => o.maquinaId),
                   )
-                  const disponibles = maquinas.filter((m) => !ocupadas.has(m.id))
                   return (
                     <label key={dia} className="flex items-center gap-1">
                       <span className="w-8">{DIAS[dia - 1]}</span>
                       <select name={`maquina_${r.id}_${dia}`} className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
                         <option value="">— sin máquina —</option>
-                        {disponibles.map((m) => (
-                          <option key={m.id} value={m.id}>{m.nombre}</option>
+                        {maquinas.map((m) => (
+                          <option key={m.id} value={m.id}>
+                            {m.nombre}{ocupadas.has(m.id) ? ' — ya tiene trabajo ese día' : ''}
+                          </option>
                         ))}
                       </select>
-                      {disponibles.length === 0 && <span className="text-amber-600">sin máquinas libres este turno</span>}
                     </label>
                   )
                 })}
@@ -217,11 +195,6 @@ export function AsignarTareaForm({
         )
       })}
 
-      {conflictosResp.length > 0 && (
-        <p className="w-full text-xs font-medium text-red-700">
-          ⚠️ Conflicto de turno: {conflictosResp.map((c) => `${responsables.find((r) => r.id === c.rid)?.nombre ?? ''} (${DIAS[c.dia - 1]})`).join(', ')}
-        </p>
-      )}
     </form>
   )
 }
