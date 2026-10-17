@@ -26,6 +26,7 @@ import {
   eliminarResponsableAccion,
   cambiarEstadoResponsableAccion,
   cambiarFincaResponsableAccion,
+  cambiarAreaResponsableAccion,
   crearActividadEstipuladaAccion,
   eliminarActividadEstipuladaAccion,
   renombrarActividadEstipuladaAccion,
@@ -40,11 +41,13 @@ import {
   reactivarLoteAccion,
   crearUsuarioAccion,
   cambiarContrasenaAccion,
+  renombrarUsuarioAccion,
   eliminarUsuarioAccion,
   actualizarPantallasUsuarioAccion,
   actualizarVariantesAreaAccion,
 } from './acciones'
 import { FormEliminar } from './form-eliminar'
+import { ResponsablesInactivos } from './responsables-inactivos'
 import { LotesLista } from './lotes-lista'
 import { UsuarioPantallas } from './usuario-pantallas'
 import { AreaVariantes } from './area-variantes'
@@ -292,15 +295,26 @@ export default async function ConfiguracionPage({
       <Grupo titulo="Personas">
         {/* Responsables */}
         <section className="tarjeta p-4 md:col-span-2">
-          <h3 className="mb-2 font-semibold text-tinta">Responsables ({responsables.length})</h3>
+          {/* Solo los activos a la vista: los dados de baja van aparte (abajo, cerrados) para que
+              la lista no crezca sin fin con gente que ya no trabaja. */}
+          <h3 className="mb-2 font-semibold text-tinta">Responsables activos ({responsables.filter((r) => r.activo).length})</h3>
           <ul className="mb-3 flex flex-col gap-2">
-            {responsables.map((r) => (
+            {responsables.filter((r) => r.activo).map((r) => (
               <li key={r.id} className="flex flex-wrap items-center gap-2 rounded bg-arena px-2 py-1 text-sm">
-                <span className={r.activo ? '' : 'text-tierra/60'}>
+                <span>
                   {r.nombre} <span className="text-tierra">· {r.area.nombre}</span>
                   <span className="text-tierra"> · 🏠 {r.finca?.nombre ?? 'sin finca'}</span>
-                  {!r.activo && <span className="text-tierra/60"> · (inactivo)</span>}
                 </span>
+                {/* Cambiar de área: lo pendiente de hoy en adelante se va con el trabajador. */}
+                <form action={cambiarAreaResponsableAccion} className="flex items-center gap-1">
+                  <input type="hidden" name="id" value={r.id} />
+                  <select name="areaId" defaultValue={r.areaId} aria-label={`Área de ${r.nombre}`} className="rounded-lg border border-borde bg-marfil p-1 text-xs focus:outline-none focus:ring-2 focus:ring-bosque/40">
+                    {areas.map((a) => (
+                      <option key={a.id} value={a.id}>{a.nombre}</option>
+                    ))}
+                  </select>
+                  <button className="rounded-lg bg-bosque px-1.5 py-0.5 text-xs font-semibold text-white">✓</button>
+                </form>
                 <form action={cambiarFincaResponsableAccion} className="flex items-center gap-1">
                   <input type="hidden" name="id" value={r.id} />
                   <select name="fincaId" defaultValue={r.fincaId ?? ''} className="rounded-lg border border-borde bg-marfil p-1 text-xs focus:outline-none focus:ring-2 focus:ring-bosque/40">
@@ -313,10 +327,8 @@ export default async function ConfiguracionPage({
                 </form>
                 <form action={cambiarEstadoResponsableAccion}>
                   <input type="hidden" name="id" value={r.id} />
-                  <input type="hidden" name="activo" value={r.activo ? '0' : '1'} />
-                  <button className="text-xs font-semibold text-bosque hover:underline">
-                    {r.activo ? 'Dar de baja' : 'Reactivar'}
-                  </button>
+                  <input type="hidden" name="activo" value="0" />
+                  <button className="text-xs font-semibold text-bosque hover:underline">Dar de baja</button>
                 </form>
                 {r._count.actividades === 0 && (
                   <FormEliminar accion={eliminarResponsableAccion} id={r.id} etiqueta={r.nombre} />
@@ -324,6 +336,12 @@ export default async function ConfiguracionPage({
               </li>
             ))}
           </ul>
+          <ResponsablesInactivos
+            inactivos={responsables
+              .filter((r) => !r.activo)
+              .map((r) => ({ id: r.id, nombre: r.nombre, areaNombre: r.area.nombre, fincaNombre: r.finca?.nombre ?? null }))}
+            reactivar={cambiarEstadoResponsableAccion}
+          />
           <form action={crearResponsableAccion} className="flex flex-wrap gap-2">
             <input name="nombre" required placeholder="Nombre del responsable" className="flex-1 rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
             <select name="areaId" required className="rounded-lg border border-borde bg-marfil p-2 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
@@ -356,6 +374,13 @@ export default async function ConfiguracionPage({
                   pantallas={us.pantallas}
                   accion={actualizarPantallasUsuarioAccion}
                 />
+                {/* Login y nombre editables, igual que la contraseña al lado. */}
+                <form action={renombrarUsuarioAccion} className="flex items-center gap-1">
+                  <input type="hidden" name="id" value={us.id} />
+                  <input name="usuario" required defaultValue={us.usuario} aria-label={`Usuario (login) de ${us.nombre}`} title="Usuario (login)" className="w-28 rounded-lg border border-borde bg-marfil p-1 text-xs focus:outline-none focus:ring-2 focus:ring-bosque/40" />
+                  <input name="nombre" required defaultValue={us.nombre} aria-label={`Nombre de ${us.usuario}`} title="Nombre" className="w-36 rounded-lg border border-borde bg-marfil p-1 text-xs focus:outline-none focus:ring-2 focus:ring-bosque/40" />
+                  <button className="text-xs font-semibold text-bosque hover:underline">guardar</button>
+                </form>
                 <form action={cambiarContrasenaAccion} className="flex items-center gap-1">
                   <input type="hidden" name="id" value={us.id} />
                   <input name="password" required placeholder="nueva contraseña" className="rounded-lg border border-borde bg-marfil p-1 text-xs focus:outline-none focus:ring-2 focus:ring-bosque/40" />

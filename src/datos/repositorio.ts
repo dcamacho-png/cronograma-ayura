@@ -26,6 +26,7 @@ import {
 } from '@/dominio/avance-general'
 import { normalizarNovedades, agregarNovedad, eliminarNovedad, editarNovedad } from '@/dominio/novedades'
 import { puedeBorrarse, textoReferencias, type ReferenciasLote } from '@/dominio/lote-retiro'
+import { desdeHoy, type Dia } from '@/dominio/cambio-area'
 
 // Espejo en SQL de `trabajoRegistrado` (src/dominio/trabajo-registrado.ts): la actividad
 // que el área ejecutora ya trabajó. Se usa para sacar la solicitud de "Mis solicitudes"
@@ -389,6 +390,31 @@ export function setResponsableFinca(id: string, fincaId: string | null) {
 
 export function setResponsableActivo(id: string, activo: boolean) {
   return prisma.responsable.update({ where: { id }, data: { activo } })
+}
+
+// Pasa un trabajador a otra área. Sus actividades PENDIENTES de hoy en adelante se mueven con
+// él (así aparecen en Programar y Cumplimiento del área nueva); lo ya pasado o ya registrado
+// se queda en el área anterior. La tarea del banco de origen no se toca: sigue siendo del área
+// que la creó. Todo en una transacción para no dejar al trabajador a medio mover.
+export async function cambiarAreaResponsable(id: string, areaId: string, hoy: Dia) {
+  return prisma.$transaction(async (tx) => {
+    const r = await tx.responsable.update({
+      where: { id },
+      data: { areaId },
+      select: { nombre: true, area: { select: { nombre: true } } },
+    })
+    const { count } = await tx.actividad.updateMany({
+      where: {
+        responsableId: id,
+        estado: 'PENDIENTE',
+        cerrada: false,
+        areaId: { not: areaId },
+        OR: desdeHoy(hoy),
+      },
+      data: { areaId },
+    })
+    return { nombre: r.nombre, areaNombre: r.area.nombre, movidas: count }
+  })
 }
 
 // Actividades de un conjunto de semanas (todas las áreas), para el tablero mensual.
@@ -796,6 +822,13 @@ export function crearUsuario(
 
 export function cambiarContrasena(id: string, password: string) {
   return prisma.usuario.update({ where: { id }, data: { hash: hashPassword(password) } })
+}
+
+// Cambia el login y el nombre visible de un usuario. La sesión va por id, así que quien ya
+// estaba adentro sigue adentro; a partir de ahora entra con el login nuevo. Un login repetido
+// lo frena la base de datos (único) y llega como "ya existe".
+export function renombrarUsuario(id: string, usuario: string, nombre: string) {
+  return prisma.usuario.update({ where: { id }, data: { usuario, nombre } })
 }
 
 export function eliminarUsuario(id: string) {

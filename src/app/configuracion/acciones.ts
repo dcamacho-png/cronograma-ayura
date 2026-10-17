@@ -2,9 +2,10 @@
 
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, setResponsableActivo, setResponsableFinca, crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, setUnidadActividadEstipulada, crearUnidad, renombrarUnidad, setUnidadActiva, eliminarUnidad, crearLote, eliminarLote, setLoteActivo, crearUsuario, cambiarContrasena, eliminarUsuario, BloqueoError, setPantallasUsuario, setVariantesArea } from '@/datos/repositorio'
+import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, setResponsableActivo, setResponsableFinca, cambiarAreaResponsable,crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, setUnidadActividadEstipulada, crearUnidad, renombrarUnidad, setUnidadActiva, eliminarUnidad, crearLote, eliminarLote, setLoteActivo, crearUsuario, cambiarContrasena, renombrarUsuario, eliminarUsuario, BloqueoError, setPantallasUsuario, setVariantesArea } from '@/datos/repositorio'
 import { usuarioActual } from '@/auth/sesion'
 import { normalizarUnidad } from '@/dominio/unidad'
+import { semanaActual, diaActual } from '@/dominio/semana'
 
 function texto(form: FormData, clave: string): string {
   const v = form.get(clave)
@@ -25,14 +26,15 @@ function mensajeError(e: unknown): string {
   return 'Ocurrió un error. Intenta de nuevo.'
 }
 
-// Ejecuta la operación y redirige a /configuracion con un aviso de éxito o error.
-async function correr(fn: () => Promise<unknown>, okMsg: string): Promise<never> {
+// Ejecuta la operación y redirige a /configuracion con un aviso de éxito o error. El aviso
+// puede armarse con el resultado (p. ej. cuántas actividades se movieron).
+async function correr<T>(fn: () => Promise<T>, okMsg: string | ((r: T) => string)): Promise<never> {
   const u = await usuarioActual()
   if (!u || u.rol !== 'ADMIN') redirect('/')
   let url: string
   try {
-    await fn()
-    url = `/configuracion?ok=${encodeURIComponent(okMsg)}`
+    const r = await fn()
+    url = `/configuracion?ok=${encodeURIComponent(typeof okMsg === 'function' ? okMsg(r) : okMsg)}`
   } catch (e) {
     url = `/configuracion?error=${encodeURIComponent(mensajeError(e))}`
   }
@@ -120,6 +122,18 @@ export async function cambiarFincaResponsableAccion(form: FormData) {
   if (!id) faltanDatos()
   const fincaId = textoOpcional(form, 'fincaId')
   await correr(() => setResponsableFinca(id, fincaId), 'Finca del responsable actualizada.')
+}
+
+export async function cambiarAreaResponsableAccion(form: FormData) {
+  const id = texto(form, 'id')
+  const areaId = texto(form, 'areaId')
+  if (!id || !areaId) faltanDatos()
+  await correr(
+    () => cambiarAreaResponsable(id, areaId, { ...semanaActual(), dia: diaActual() }),
+    (r) =>
+      `${r.nombre} pasó a ${r.areaNombre}` +
+      (r.movidas > 0 ? ` · ${r.movidas} actividad(es) pendiente(s) pasaron también a esa área.` : ' · no tenía actividades pendientes por mover.'),
+  )
 }
 
 export async function crearActividadEstipuladaAccion(form: FormData) {
@@ -249,6 +263,14 @@ export async function cambiarContrasenaAccion(form: FormData) {
   const password = texto(form, 'password')
   if (!id || !password) faltanDatos()
   await correr(() => cambiarContrasena(id, password), 'Contraseña actualizada.')
+}
+
+export async function renombrarUsuarioAccion(form: FormData) {
+  const id = texto(form, 'id')
+  const usuario = texto(form, 'usuario')
+  const nombre = texto(form, 'nombre')
+  if (!id || !usuario || !nombre) faltanDatos()
+  await correr(() => renombrarUsuario(id, usuario, nombre), `Usuario actualizado: ahora entra como "${usuario}".`)
 }
 
 export async function eliminarUsuarioAccion(form: FormData) {
