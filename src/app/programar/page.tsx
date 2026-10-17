@@ -22,7 +22,11 @@ import { GrillaSemana } from './grilla-semana'
 import { BotonDescargarImagen } from './boton-descargar-imagen'
 import { BotonCompartirWhatsapp } from './boton-compartir-whatsapp'
 import { GrillaTractor } from './grilla-tractor'
-import { agruparResponsablesPorFinca } from '@/dominio/responsables-finca'
+import { repartirEnFotos, hayFincasAsignadas } from '@/dominio/responsables-finca'
+
+// Máximo de trabajadores por foto al compartir/descargar. Con más, la imagen queda tan alta
+// que WhatsApp la achica y el texto se lee borroso.
+const TRABAJADORES_POR_FOTO = 4
 
 export default async function ProgramarPage({
   searchParams,
@@ -93,9 +97,18 @@ export default async function ProgramarPage({
   const responsablesActivos = responsables.filter((r) => r.activo)
   const nombrePorResp = new Map(responsables.map((r) => [r.id, r.nombre]))
   const actividadesCronograma = actividades.filter((a) => !a.noProgramada)
-  // Para compartir/descargar: una foto por finca (grupo). Así cada imagen es más corta y
-  // nítida (WhatsApp comprime menos). Sin fincas asignadas → un solo grupo (una foto).
-  const partesExport = agruparResponsablesPorFinca(responsablesActivos)
+  // Para compartir/descargar: fotos de una sola finca y de pocos trabajadores. Así cada imagen
+  // es corta y nítida (WhatsApp comprime menos); una finca grande se parte en varias parejas.
+  // Peso de cada fila = lo alto que sale: su día con más actividades (la casilla más alta
+  // manda). Una fila vacía pesa poco, pero algo: igual ocupa su renglón.
+  const pesoFila = (r: { id: string }) => {
+    const porDia = [1, 2, 3, 4, 5, 6, 7].map(
+      (d) => actividadesCronograma.filter((a) => a.responsableId === r.id && a.dia === d).length,
+    )
+    return Math.max(0.4, ...porDia)
+  }
+  const partesExport = repartirEnFotos(responsablesActivos, TRABAJADORES_POR_FOTO, pesoFila)
+  const conFincas = hayFincasAsignadas(partesExport)
   const targetsExport = partesExport.map((_, i) => ({
     id: `grilla-export-${i}`,
     nombre: `cronograma-${areaActual.nombre}-S${semana}-${anio}${partesExport.length > 1 ? `-${i + 1}` : ''}.png`,
@@ -296,7 +309,7 @@ export default async function ProgramarPage({
             {partesExport.length > 1 && (
               <div className="mb-1 text-base font-semibold text-bosque">
                 Parte {i + 1} de {partesExport.length}
-                {g.finca ? ` · 🏠 ${g.finca}` : ''}
+                {conFincas ? ` · 🏠 ${g.finca ?? 'Sin finca'}` : ''}
               </div>
             )}
             <GrillaSemana
