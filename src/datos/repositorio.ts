@@ -772,6 +772,12 @@ export function obtenerUsuarioPorLogin(usuario: string) {
   return prisma.usuario.findUnique({ where: { usuario } })
 }
 
+// Un administrador cualquiera (el más antiguo): el correo semanal del resumen entra con su
+// sesión para abrir el PDF de todas las áreas, que solo ve un ADMIN.
+export function primerAdmin() {
+  return prisma.usuario.findFirst({ where: { rol: 'ADMIN' }, orderBy: { id: 'asc' }, select: { id: true } })
+}
+
 export function listarUsuarios() {
   return prisma.usuario.findMany({ include: { area: true }, orderBy: { usuario: 'asc' } })
 }

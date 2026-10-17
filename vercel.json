@@ -1,6 +1,7 @@
 {
   "crons": [
     { "path": "/api/backup-drive", "schedule": "59 4 * * *" },
-    { "path": "/api/cerrar-vencidas", "schedule": "17 6 * * 1" }
+    { "path": "/api/cerrar-vencidas", "schedule": "17 6 * * 1" },
+    { "path": "/api/resumen-correo", "schedule": "0 17 * * 1" }
   ]
 }

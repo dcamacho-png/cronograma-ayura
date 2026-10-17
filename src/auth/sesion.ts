@@ -17,9 +17,18 @@ function firmar(id: string): string {
   return createHmac('sha256', obtenerSecreto()).update(id).digest('hex')
 }
 
+export const NOMBRE_COOKIE_SESION = COOKIE
+
+// Valor firmado de la cookie de sesión. Lo usa también el correo semanal del resumen: el
+// navegador interno que arma el PDF entra como el admin con esta misma cookie, así que no
+// hace falta abrir otra puerta a la página del resumen.
+export function valorCookieSesion(usuarioId: string): string {
+  return `${usuarioId}.${firmar(usuarioId)}`
+}
+
 export async function crearSesion(usuarioId: string) {
   const c = await cookies()
-  c.set(COOKIE, `${usuarioId}.${firmar(usuarioId)}`, {
+  c.set(COOKIE, valorCookieSesion(usuarioId), {
     httpOnly: true,
     sameSite: 'lax',
     path: '/',

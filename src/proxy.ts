@@ -8,7 +8,7 @@ export function proxy(req: NextRequest) {
   // saltarse la redirección a /login: sin esto reciben un 307 y no hacen nada — el
   // error que ya pasó una vez con el respaldo a Drive.
   const p = req.nextUrl.pathname
-  if (p.startsWith('/api/backup-drive') || p.startsWith('/api/cerrar-vencidas')) {
+  if (p.startsWith('/api/backup-drive') || p.startsWith('/api/cerrar-vencidas') || p.startsWith('/api/resumen-correo')) {
     return NextResponse.next()
   }
   const tieneSesion = req.cookies.has('sesion')
