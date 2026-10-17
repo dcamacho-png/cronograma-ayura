@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { PickerLotesBultos } from './picker-lotes-bultos'
 import { CasillasDias, CasillasColaboradores } from './campos-sugerencia'
+import { opcionesActividad } from '@/dominio/opciones-actividad'
 
 type Estipulada = { id: string; nombre: string }
 type Lote = { id: string; nombre: string; finca: { nombre: string } }
@@ -42,6 +43,7 @@ export function FormEditarSolicitud({
     lotesActuales.map((l) => [l.id, bultosActuales?.[l.id] != null ? String(bultosActuales[l.id]) : '']),
   )
   const [abierto, setAbierto] = useState(false)
+  const [estipulada, setEstipulada] = useState(descripcion)
   if (!abierto) {
     return (
       <button type="button" onClick={() => setAbierto(true)} className="text-sm text-bosque hover:underline">
@@ -53,14 +55,23 @@ export function FormEditarSolicitud({
     <form action={accion} className="mt-1 flex w-full flex-col gap-2 rounded-lg border border-borde bg-arena p-2 text-sm">
       <input type="hidden" name="id" value={id} />
       {esMaquinaria ? (
-        <label className="flex flex-col text-xs">
-          Actividad
-          <select name="estipulada" defaultValue={descripcion} className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
-            {estipuladas.map((e) => (
-              <option key={e.id} value={e.nombre}>{e.nombre}</option>
-            ))}
-          </select>
-        </label>
+        <>
+          <label className="flex flex-col text-xs">
+            Actividad
+            <select name="estipulada" value={estipulada} onChange={(e) => setEstipulada(e.target.value)} className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40">
+              {opcionesActividad(estipuladas.map((e) => e.nombre), descripcion).map((nombre) => (
+                <option key={nombre} value={nombre}>{nombre}</option>
+              ))}
+              <option value="__otra__">Otra…</option>
+            </select>
+          </label>
+          {estipulada === '__otra__' && (
+            <label className="flex flex-col text-xs">
+              Otra (escribe la actividad)
+              <input name="otra" required placeholder="¿Qué actividad?" className="rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
+            </label>
+          )}
+        </>
       ) : (
         <label className="flex flex-col text-xs">
           Actividad
