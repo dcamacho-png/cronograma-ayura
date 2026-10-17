@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { crearArea, crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, setResponsableActivo, setResponsableFinca, cambiarAreaResponsable,crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, setUnidadActividadEstipulada, crearUnidad, renombrarUnidad, setUnidadActiva, eliminarUnidad, crearLote, eliminarLote, setLoteActivo, crearUsuario, cambiarContrasena, renombrarUsuario, eliminarUsuario, BloqueoError, setPantallasUsuario, setVariantesArea } from '@/datos/repositorio'
+import { crearArea, renombrarArea,crearFinca, crearMotivo, crearMaquina, crearResponsable, eliminarArea, eliminarFinca, eliminarMotivo, eliminarMaquina, eliminarResponsable, setResponsableActivo, setResponsableFinca, cambiarAreaResponsable,crearActividadEstipulada, eliminarActividadEstipulada, renombrarActividadEstipulada, setUnidadActividadEstipulada, crearUnidad, renombrarUnidad, setUnidadActiva, eliminarUnidad, crearLote, eliminarLote, setLoteActivo, crearUsuario, cambiarContrasena, renombrarUsuario, eliminarUsuario, BloqueoError, setPantallasUsuario, setVariantesArea } from '@/datos/repositorio'
 import { usuarioActual } from '@/auth/sesion'
 import { normalizarUnidad } from '@/dominio/unidad'
 import { semanaActual, diaActual } from '@/dominio/semana'
@@ -49,6 +49,13 @@ export async function crearAreaAccion(form: FormData) {
   const nombre = texto(form, 'nombre')
   if (!nombre) faltanDatos()
   await correr(() => crearArea(nombre), 'Área agregada.')
+}
+
+export async function renombrarAreaAccion(form: FormData) {
+  const id = texto(form, 'id')
+  const nombre = texto(form, 'nombre')
+  if (!id || !nombre) faltanDatos()
+  await correr(() => renombrarArea(id, nombre), `Área renombrada a "${nombre}".`)
 }
 
 export async function crearFincaAccion(form: FormData) {

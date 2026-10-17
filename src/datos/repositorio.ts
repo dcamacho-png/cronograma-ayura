@@ -365,6 +365,12 @@ export function crearArea(nombre: string) {
   return prisma.area.create({ data: { nombre } })
 }
 
+// Solo cambia el nombre: todo lo del área (responsables, actividades, usuarios) va por id, así
+// que se ve con el nombre nuevo en todas las pantallas. Un nombre repetido lo frena el único.
+export function renombrarArea(id: string, nombre: string) {
+  return prisma.area.update({ where: { id }, data: { nombre } })
+}
+
 export function crearFinca(nombre: string) {
   return prisma.finca.create({ data: { nombre } })
 }

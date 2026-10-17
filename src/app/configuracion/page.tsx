@@ -15,6 +15,7 @@ import {
 } from '@/datos/repositorio'
 import {
   crearAreaAccion,
+  renombrarAreaAccion,
   crearFincaAccion,
   crearMotivoAccion,
   crearMaquinaAccion,
@@ -116,10 +117,15 @@ export default async function ConfiguracionPage({
         {/* Áreas */}
         <section className="tarjeta p-4">
           <h3 className="mb-2 font-semibold text-tinta">Áreas ({areas.length})</h3>
-          <ul className="mb-3 flex flex-wrap gap-2">
+          <ul className="mb-3 flex flex-col gap-2">
             {areas.map((a) => (
-              <li key={a.id} className="flex items-center gap-1 rounded bg-arena px-2 py-1 text-sm">
-                <span>{a.nombre}</span>
+              <li key={a.id} className="flex items-center gap-2 rounded bg-arena px-2 py-1 text-sm">
+                {/* Nombre editable: así se renombra un área sin tocar sus datos. */}
+                <form action={renombrarAreaAccion} className="flex flex-1 items-center gap-1">
+                  <input type="hidden" name="id" value={a.id} />
+                  <input name="nombre" required defaultValue={a.nombre} aria-label={`Nombre del área ${a.nombre}`} className="flex-1 rounded-lg border border-borde bg-marfil p-1 text-sm focus:outline-none focus:ring-2 focus:ring-bosque/40" />
+                  <button className="text-xs font-semibold text-bosque hover:underline">guardar</button>
+                </form>
                 <FormEliminar accion={eliminarAreaAccion} id={a.id} etiqueta={a.nombre} />
               </li>
             ))}
