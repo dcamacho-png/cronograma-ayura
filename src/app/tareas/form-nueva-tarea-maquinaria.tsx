@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { SelectFincaLote } from '../_componentes/select-finca-lote'
 import { PickerLotesBultos } from './picker-lotes-bultos'
 import { usaBultos } from '@/dominio/bultos'
 
@@ -53,12 +52,9 @@ export function FormNuevaTareaMaquinaria({
         </label>
       )}
       <label className="flex flex-col text-sm">
-        {conBultos ? 'Lotes y bultos por lote' : 'Finca y lote'}
-        {conBultos ? (
-          <PickerLotesBultos key={envios} lotes={lotes} />
-        ) : (
-          <SelectFincaLote key={envios} lotes={lotes} name="loteId" emitirFinca />
-        )}
+        {conBultos ? 'Lotes y bultos por lote' : 'Finca y lotes'}
+        {/* Mismo selector con búsqueda en los dos casos; sin bultos, solo se marcan lotes. */}
+        <PickerLotesBultos key={envios} lotes={lotes} sinCantidad={!conBultos} />
       </label>
       <label className="flex w-full flex-col text-sm">
         Detalle / instrucciones (opcional)
