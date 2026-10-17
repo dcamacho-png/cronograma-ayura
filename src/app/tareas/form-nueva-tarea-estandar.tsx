@@ -24,9 +24,15 @@ export function FormNuevaTareaEstandar({
 }) {
   const [estipulada, setEstipulada] = useState('')
   const [unidadSel, setUnidadSel] = useState(unidadInicial(unidades, 'jornales'))
+  // Cada envío remonta el selector de lotes para que la siguiente tarea no herede los de esta.
+  const [envios, setEnvios] = useState(0)
+  const enviar = async (fd: FormData) => {
+    await accion(fd)
+    setEnvios((n) => n + 1)
+  }
 
   return (
-    <form action={accion} className="flex flex-wrap items-end gap-2 rounded-xl border border-borde p-4">
+    <form action={enviar} className="flex flex-wrap items-end gap-2 rounded-xl border border-borde p-4">
       <input type="hidden" name="areaId" value={areaId} />
       <label className="flex flex-col text-sm">
         Actividad (lista)
@@ -62,7 +68,7 @@ export function FormNuevaTareaEstandar({
       </label>
       <label className="flex flex-col text-sm">
         Lotes y medida por lote
-        <PickerLotesBultos lotes={lotes} campo="medida" placeholder="medida" />
+        <PickerLotesBultos key={envios} lotes={lotes} campo="medida" placeholder="medida" />
       </label>
       <label className="flex w-full flex-col text-sm">
         Detalle / instrucciones (opcional)

@@ -21,9 +21,15 @@ export function FormNuevaTareaMaquinaria({
 }) {
   const [estipulada, setEstipulada] = useState('')
   const conBultos = usaBultos(estipulada)
+  // Cada envío remonta el selector de lotes para que la siguiente tarea no herede los de esta.
+  const [envios, setEnvios] = useState(0)
+  const enviar = async (fd: FormData) => {
+    await accion(fd)
+    setEnvios((n) => n + 1)
+  }
 
   return (
-    <form action={accion} className="flex flex-wrap items-end gap-2 rounded-xl border border-borde p-4">
+    <form action={enviar} className="flex flex-wrap items-end gap-2 rounded-xl border border-borde p-4">
       <input type="hidden" name="areaId" value={areaId} />
       <label className="flex flex-col text-sm">
         Actividad (lista)
@@ -49,9 +55,9 @@ export function FormNuevaTareaMaquinaria({
       <label className="flex flex-col text-sm">
         {conBultos ? 'Lotes y bultos por lote' : 'Finca y lote'}
         {conBultos ? (
-          <PickerLotesBultos lotes={lotes} />
+          <PickerLotesBultos key={envios} lotes={lotes} />
         ) : (
-          <SelectFincaLote lotes={lotes} name="loteId" emitirFinca />
+          <SelectFincaLote key={envios} lotes={lotes} name="loteId" emitirFinca />
         )}
       </label>
       <label className="flex w-full flex-col text-sm">

@@ -7,6 +7,7 @@ const DIAS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 export function AsignarTareaForm({
   tareaId,
   descripcion,
+  detalle,
   finca,
   lotesTarea,
   bultosPorLote,
@@ -22,6 +23,7 @@ export function AsignarTareaForm({
 }: {
   tareaId: string
   descripcion: string
+  detalle: string | null
   finca: string | null
   lotesTarea: { id: string; nombre: string }[]
   bultosPorLote?: Record<string, number> | null
@@ -88,6 +90,8 @@ export function AsignarTareaForm({
               : 'Sin lote'}
           </span>
         </div>
+        {/* Las observaciones de quien creó la tarea: sin ellas se programaba a ciegas. */}
+        {detalle && <div className="whitespace-pre-line text-xs text-tierra">📝 {detalle}</div>}
       </div>
 
       <div className="flex flex-wrap items-center gap-2">

@@ -33,9 +33,16 @@ export function FormSolicitar({
   const esMaquinaria = areas.find((a) => a.id === areaEjecutoraId)?.maqTareas ?? false
   const conBultos = usaBultos(estipulada)
   const responsablesB = responsablesPorArea[areaEjecutoraId] ?? []
+  // Cada envío remonta el selector de lotes: guarda su selección en estado y, sin esto, la
+  // siguiente solicitud arrancaba con los potreros de la anterior ya marcados.
+  const [envios, setEnvios] = useState(0)
+  const enviar = async (fd: FormData) => {
+    await accion(fd)
+    setEnvios((n) => n + 1)
+  }
 
   return (
-    <form action={accion} className="flex flex-col gap-2 rounded-xl border border-borde bg-arena p-4">
+    <form action={enviar} className="flex flex-col gap-2 rounded-xl border border-borde bg-arena p-4">
       <h2 className="font-semibold text-arcilla">📨 Solicitar a otra área</h2>
       <input type="hidden" name="solicitanteAreaId" value={solicitanteAreaId} />
       <label className="flex flex-col text-sm">
@@ -73,7 +80,7 @@ export function FormSolicitar({
           )}
           <label className="flex flex-col text-sm">
             {conBultos ? 'Lotes y bultos por lote' : 'Lotes'}
-            <PickerLotesBultos lotes={lotes} sinCantidad={!conBultos} />
+            <PickerLotesBultos key={envios} lotes={lotes} sinCantidad={!conBultos} />
           </label>
           <label className="flex flex-col text-sm">
             Detalle / instrucciones (opcional)
@@ -103,7 +110,7 @@ export function FormSolicitar({
           </label>
           <label className="flex flex-col text-sm">
             Lotes y medida por lote (opcional)
-            <PickerLotesBultos lotes={lotes} campo="medida" placeholder="medida" />
+            <PickerLotesBultos key={envios} lotes={lotes} campo="medida" placeholder="medida" />
           </label>
           <label className="flex flex-col text-sm">
             Descripción (opcional)
