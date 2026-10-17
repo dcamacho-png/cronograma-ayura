@@ -45,7 +45,7 @@ export function repartirEnFotos<T extends ConFinca>(
 function partirParejo<T>(orden: T[], maxPorParte: number, peso: (r: T) => number): T[][] {
   const n = orden.length
   if (n === 0) return []
-  const k = Math.ceil(n / Math.max(1, maxPorParte))
+  const k = Math.max(1, Math.ceil(n / Math.max(1, maxPorParte))) // sin tope (Infinity) → 1 parte
   const pesos = orden.map(peso)
   const acum = [0]
   for (const p of pesos) acum.push(acum[acum.length - 1] + p)

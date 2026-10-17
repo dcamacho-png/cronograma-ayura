@@ -35,6 +35,11 @@ describe('repartirEnFotos', () => {
     expect(repartirEnFotos([], 4)).toEqual([])
   })
 
+  it('sin tope (ganadería): una foto por finca, 6 en Acajure + 5 en Entremontes → 2 fotos', () => {
+    const fotos = repartirEnFotos([...nombres(6, 'Acajure'), ...nombres(5, 'Entremontes')], Infinity)
+    expect(fotos.map((f) => [f.finca, f.responsables.length])).toEqual([['Acajure', 6], ['Entremontes', 5]])
+  })
+
   it('hasta el máximo → una sola foto', () => {
     const fotos = repartirEnFotos(nombres(4, null), 4)
     expect(fotos).toHaveLength(1)

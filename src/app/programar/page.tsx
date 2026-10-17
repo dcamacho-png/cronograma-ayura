@@ -24,9 +24,10 @@ import { BotonCompartirWhatsapp } from './boton-compartir-whatsapp'
 import { GrillaTractor } from './grilla-tractor'
 import { repartirEnFotos, hayFincasAsignadas } from '@/dominio/responsables-finca'
 
-// Máximo de trabajadores por foto al compartir/descargar. Con más, la imagen queda tan alta
-// que WhatsApp la achica y el texto se lee borroso.
-const TRABAJADORES_POR_FOTO = 4
+// Máximo de trabajadores por foto al compartir/descargar en maquinaria. Con más, la imagen
+// queda tan alta que WhatsApp la achica y el texto se lee borroso. Las demás áreas (ganadería,
+// nelore...) tienen pocos por finca y prefieren una sola foto por finca.
+const TRABAJADORES_POR_FOTO_MAQUINARIA = 4
 
 export default async function ProgramarPage({
   searchParams,
@@ -97,8 +98,8 @@ export default async function ProgramarPage({
   const responsablesActivos = responsables.filter((r) => r.activo)
   const nombrePorResp = new Map(responsables.map((r) => [r.id, r.nombre]))
   const actividadesCronograma = actividades.filter((a) => !a.noProgramada)
-  // Para compartir/descargar: fotos de una sola finca y de pocos trabajadores. Así cada imagen
-  // es corta y nítida (WhatsApp comprime menos); una finca grande se parte en varias parejas.
+  // Para compartir/descargar: una foto por finca. En maquinaria, además, una finca grande se
+  // parte en varias fotos parejas de pocos trabajadores, para que cada imagen sea corta y nítida.
   // Peso de cada fila = lo alto que sale: su día con más actividades (la casilla más alta
   // manda). Una fila vacía pesa poco, pero algo: igual ocupa su renglón.
   const pesoFila = (r: { id: string }) => {
@@ -107,7 +108,11 @@ export default async function ProgramarPage({
     )
     return Math.max(0.4, ...porDia)
   }
-  const partesExport = repartirEnFotos(responsablesActivos, TRABAJADORES_POR_FOTO, pesoFila)
+  const partesExport = repartirEnFotos(
+    responsablesActivos,
+    esMaquinaria ? TRABAJADORES_POR_FOTO_MAQUINARIA : Infinity,
+    pesoFila,
+  )
   const conFincas = hayFincasAsignadas(partesExport)
   const targetsExport = partesExport.map((_, i) => ({
     id: `grilla-export-${i}`,
