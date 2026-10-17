@@ -1,5 +1,10 @@
 # Correo semanal del resumen — cambio en Apps Script
 
+> **Estado (2026-10-17): en pausa.** Se decidió no usar el correo por ahora y se quitó el cron
+> de `vercel.json`. La ruta `/api/resumen-correo` sigue en el código: para activarlo, hacer los
+> pasos de abajo en Apps Script y volver a agregar a `vercel.json`
+> `{ "path": "/api/resumen-correo", "schedule": "0 17 * * 1" }`.
+
 Cada lunes a las 12 m (hora de Colombia; en el plan Hobby de Vercel puede llegar entre las
 12:00 y las 12:59) la app llama a `/api/resumen-correo`. Esa ruta arma el PDF del resumen de
 todas las áreas y se lo manda a la **misma Web App de Apps Script** que hace la copia a Drive
