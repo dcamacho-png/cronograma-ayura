@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { pantallasDe, puedeVer, esSoloLectura, puedeMarcarConservatorio, puedeMutarArea } from './permisos'
+import { pantallasDe, puedeVer, esSoloLectura, puedeMarcarConservatorio, puedeMutarArea, puedeDedicarTractor } from './permisos'
 
 describe('pantallasDe', () => {
   it('ADMIN ve todo, incluida configuracion', () => {
@@ -105,5 +105,30 @@ describe('puedeMutarArea', () => {
   it('AREA sin área asignada nunca muta', () => {
     expect(puedeMutarArea({ rol: 'AREA', areaId: null }, 'a1')).toBe(false)
     expect(puedeMutarArea({ rol: 'AREA', areaId: null }, null)).toBe(false)
+  })
+})
+
+describe('puedeDedicarTractor', () => {
+  const variante = (maq: boolean) => ({ maqTareas: maq, maqProgramar: maq, maqCumplimiento: maq, maqResumen: maq })
+  const maquinaria = { rol: 'AREA', areaId: 'maq', area: variante(true) }
+  const ganaderia = { rol: 'AREA', areaId: 'gan', area: variante(false) }
+
+  it('maquinaria (dueña de los tractores) dedica a cualquier área, y puede quitarla', () => {
+    expect(puedeDedicarTractor(maquinaria, 'gan')).toBe(true)
+    expect(puedeDedicarTractor(maquinaria, 'nel')).toBe(true)
+  })
+
+  it('maquinaria no pasa con un área no resuelta (dedicación inexistente)', () => {
+    expect(puedeDedicarTractor(maquinaria, null)).toBe(false)
+  })
+
+  it('otra área solo se dedica el tractor a sí misma', () => {
+    expect(puedeDedicarTractor(ganaderia, 'gan')).toBe(true)
+    expect(puedeDedicarTractor(ganaderia, 'nel')).toBe(false)
+  })
+
+  it('ADMIN siempre; VISOR nunca', () => {
+    expect(puedeDedicarTractor({ rol: 'ADMIN', areaId: null, area: null }, 'gan')).toBe(true)
+    expect(puedeDedicarTractor({ rol: 'VISOR', areaId: 'maq', area: variante(true) }, 'gan')).toBe(false)
   })
 })

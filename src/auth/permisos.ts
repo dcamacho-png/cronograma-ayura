@@ -1,3 +1,5 @@
+import { esMaquinaria, type AreaVariante } from '@/dominio/variante'
+
 export type UsuarioPermiso = { rol: string; pantallas: string | null }
 
 export const PANTALLAS_ASIGNABLES = ['tareas', 'programar', 'cumplimiento', 'resumen', 'tablero', 'consulta', 'conservatorio'] as const
@@ -36,6 +38,18 @@ export function puedeMutarArea(
   if (u.rol === 'ADMIN') return true
   if (u.rol === 'VISOR') return false
   return u.areaId != null && areaId != null && u.areaId === areaId
+}
+
+// ¿Puede dedicar (o quitar) un tractor a `areaObjetivo` un día? Maquinaria es la dueña de los
+// tractores: los reparte a cualquier área, y la lista de su grilla por tractor solo trae las
+// OTRAS áreas — con `puedeMutarArea` a secas nunca podía guardar nada (el área elegida nunca
+// era la suya) y la selección se perdía sin aviso. Las demás áreas siguen pudiendo solo la suya.
+export function puedeDedicarTractor(
+  u: { rol: string; areaId: string | null; area: AreaVariante | null },
+  areaObjetivo: string | null,
+): boolean {
+  if (u.rol === 'AREA' && u.area && esMaquinaria(u.area, 'programar') && areaObjetivo != null) return true
+  return puedeMutarArea(u, areaObjetivo)
 }
 
 // Marcar/reabrir temas del Conservatorio: solo gerencia (Visor) y admin.

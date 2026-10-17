@@ -6,7 +6,7 @@ import { crearActividadDesdeLotes, eliminarActividad, duplicarSemana, crearRespo
 import { semanaAnterior, semanaActual, diaActual, esDiaPasado, programacionAbierta } from '@/dominio/semana'
 import type { Asignacion } from '@/dominio/programacion'
 import { usuarioActual } from '@/auth/sesion'
-import { puedeMutarArea, puedeVer, esSoloLectura } from '@/auth/permisos'
+import { puedeMutarArea, puedeVer, esSoloLectura, puedeDedicarTractor } from '@/auth/permisos'
 
 const DIAS_CORTOS = ['', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
@@ -233,10 +233,11 @@ export async function dedicarTractorAccion(form: FormData) {
   const dia = Number(texto(form, 'dia'))
   if (!maquinaId || !Number.isInteger(anio) || !Number.isInteger(semana) || !Number.isInteger(dia)) return
   if (!programacionAbierta(anio, semana)) return
-  // Al dedicar: el área objetivo debe ser la del usuario. Al quitar: debe ser el
-  // dueño de la dedicación existente (no se puede quitar la de otra área).
+  // Al dedicar: el área objetivo. Al quitar: la dueña de la dedicación existente.
+  // Maquinaria puede con cualquiera; otra área, solo con la suya (ver puedeDedicarTractor).
   const areaObjetivo = areaId ?? (await areaDedicacionTractor(maquinaId, anio, semana, dia))?.areaId ?? null
-  if (!(await autorizado(areaObjetivo))) return
+  const u = await usuarioActual()
+  if (!u || !puedeDedicarTractor(u, areaObjetivo)) return
   await dedicarTractor(maquinaId, areaId, anio, semana, dia)
   revalidatePath('/programar')
 }
