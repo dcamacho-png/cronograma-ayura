@@ -212,6 +212,42 @@ export function cumplimientoPorArea(actividades: Actividad[]): FilaArea[] {
   return filas
 }
 
+export interface FilaAreaPonderada {
+  areaId: string
+  actividades: number // actividades establecidas del área (agrupadas por tareaId)
+  porcentaje: number // % de cumplimiento del área, con decimales
+  peso: number // % que el área representa del total de actividades establecidas
+  aporte: number // puntos que el área aporta al % general (porcentaje × peso / 100)
+}
+
+// Cumplimiento ponderado por área: cada área pesa según cuántas actividades establecidas
+// tiene sobre el total. La suma de los aportes es el % general, así ambos cuadran siempre.
+// Agrupa primero por área y luego por actividad, para que una tarea con filas en dos áreas
+// cuente en cada una (y en el total) de la misma forma.
+export function cumplimientoPonderadoPorArea(
+  actividades: Actividad[],
+): { filas: FilaAreaPonderada[]; total: number; general: number | null } {
+  const parciales: { areaId: string; actividades: number; suma: number }[] = []
+  for (const [areaId, acts] of agrupar(actividades, (a) => a.areaId)) {
+    let suma = 0
+    const grupos = agruparPorActividad(acts)
+    for (const dias of grupos.values()) suma += fraccionActividad(dias)
+    parciales.push({ areaId, actividades: grupos.size, suma })
+  }
+  const total = parciales.reduce((acc, p) => acc + p.actividades, 0)
+  const filas = parciales
+    .map((p) => ({
+      areaId: p.areaId,
+      actividades: p.actividades,
+      porcentaje: (p.suma / p.actividades) * 100,
+      peso: (p.actividades / total) * 100,
+      aporte: (p.suma / total) * 100,
+    }))
+    .sort((a, b) => b.aporte - a.aporte)
+  const general = total === 0 ? null : filas.reduce((acc, f) => acc + f.aporte, 0)
+  return { filas, total, general }
+}
+
 export interface PuntoTendencia {
   anio: number
   semana: number

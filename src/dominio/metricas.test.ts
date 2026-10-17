@@ -536,3 +536,32 @@ describe('SIN_REGISTRAR en las métricas', () => {
     expect(tieneDiaPendiente([{ estado: 'SIN_REGISTRAR' }])).toBe(false)
   })
 })
+
+import { cumplimientoPonderadoPorArea } from './metricas'
+
+describe('cumplimientoPonderadoPorArea', () => {
+  it('pondera cada área por sus actividades establecidas y los aportes suman el general', () => {
+    // maiz: 3 actividades (1 cumplida, 2 pendientes) = 33.3%; riego: 1 cumplida = 100%
+    const acts = [
+      act({ id: 'a', areaId: 'maiz', estado: 'CUMPLIDA' }),
+      act({ id: 'b', areaId: 'maiz', estado: 'PENDIENTE' }),
+      act({ id: 'c', areaId: 'maiz', estado: 'PENDIENTE' }),
+      act({ id: 'd', areaId: 'riego', estado: 'CUMPLIDA' }),
+    ]
+    const { filas, total, general } = cumplimientoPonderadoPorArea(acts)
+    expect(total).toBe(4)
+    const maiz = filas.find((f) => f.areaId === 'maiz')!
+    const riego = filas.find((f) => f.areaId === 'riego')!
+    expect(maiz.actividades).toBe(3)
+    expect(maiz.peso).toBeCloseTo(75)
+    expect(maiz.porcentaje).toBeCloseTo(33.333)
+    expect(maiz.aporte).toBeCloseTo(25)
+    expect(riego.peso).toBeCloseTo(25)
+    expect(riego.aporte).toBeCloseTo(25)
+    // 2 de 4 actividades cumplidas = 50 (el promedio simple de áreas daría 66.7)
+    expect(general).toBeCloseTo(50)
+  })
+  it('sin actividades: general null y sin filas', () => {
+    expect(cumplimientoPonderadoPorArea([])).toEqual({ filas: [], total: 0, general: null })
+  })
+})

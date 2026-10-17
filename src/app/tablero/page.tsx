@@ -5,9 +5,8 @@ import { puedeVer } from '@/auth/permisos'
 import { listarAreas, listarMotivos, listarActividadesDeSemanas } from '@/datos/repositorio'
 import { semanasDelMes, mesActual } from '@/dominio/semana'
 import {
-  porcentajeCumplimiento,
   porcentajeReprogramadas,
-  cumplimientoPorArea,
+  cumplimientoPonderadoPorArea,
   tendenciaSemanal,
   motivosFrecuentes,
   colorSemaforo,
@@ -51,16 +50,18 @@ export default async function TableroPage({
   ])
 
   const dominio = actividades as unknown as ActividadDominio[]
-  const pctGeneral = porcentajeCumplimiento(dominio)
+  const ponderado = cumplimientoPonderadoPorArea(dominio)
+  const pctGeneral = ponderado.general === null ? null : Math.round(ponderado.general)
   const pctRep = porcentajeReprogramadas(dominio)
-  const porArea = cumplimientoPorArea(dominio)
   const tendencia = tendenciaSemanal(dominio)
   const motivosTop = motivosFrecuentes(dominio)
   const recurrentes = actividadesRecurrentes(
     actividades.map((a) => ({ descripcion: a.descripcion, areaNombre: a.area.nombre, vecesReprogramada: a.vecesReprogramada })),
   )
 
-  const pctPorAreaId = new Map(porArea.map((f) => [f.areaId, f.porcentaje]))
+  const pctPorAreaId = new Map(ponderado.filas.map((f) => [f.areaId, Math.round(f.porcentaje)]))
+  const nombreArea = new Map(areas.map((a) => [a.id, a.nombre]))
+  const dec = (n: number) => n.toLocaleString('es-CO', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
   const nombreMotivo = new Map(motivos.map((m) => [m.id, m.nombre]))
   const maxMotivo = motivosTop.reduce((m, x) => Math.max(m, x.conteo), 0)
 
@@ -113,6 +114,52 @@ export default async function TableroPage({
           )
         })}
       </div>
+
+      <h2 className="mb-1 text-lg font-semibold text-tinta">⚖️ Cumplimiento ponderado por área</h2>
+      <p className="mb-3 text-sm text-tierra">
+        Cada área pesa según sus actividades establecidas sobre el total del mes. La suma de los aportes es el cumplimiento general.
+      </p>
+      {ponderado.filas.length === 0 ? (
+        <p className="mb-8 text-sm text-tierra">No hay actividades establecidas este mes.</p>
+      ) : (
+        <div className="mb-8 overflow-x-auto tarjeta">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-borde text-left text-tierra">
+                <th className="p-3 font-medium">Área</th>
+                <th className="p-3 text-right font-medium">Actividades</th>
+                <th className="p-3 text-right font-medium">Peso</th>
+                <th className="p-3 text-right font-medium">Cumplimiento</th>
+                <th className="p-3 text-right font-medium">Aporte al general</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ponderado.filas.map((f) => (
+                <tr key={f.areaId} className="border-b border-borde last:border-0">
+                  <td className="p-3 font-medium">{nombreArea.get(f.areaId) ?? 'Área'}</td>
+                  <td className="p-3 text-right">{f.actividades}</td>
+                  <td className="p-3 text-right">{dec(f.peso)}%</td>
+                  <td className="p-3 text-right font-semibold" style={{ color: COLOR_HEX[colorPorcentaje(f.porcentaje)] }}>
+                    {dec(f.porcentaje)}%
+                  </td>
+                  <td className="p-3 text-right">{dec(f.aporte)} pts</td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr className="border-t-2 border-borde font-bold">
+                <td className="p-3">Total</td>
+                <td className="p-3 text-right">{ponderado.total}</td>
+                <td className="p-3 text-right">100%</td>
+                <td className="p-3 text-right" style={{ color: COLOR_HEX[colorPorcentaje(ponderado.general)] }}>
+                  {ponderado.general === null ? '—' : `${dec(ponderado.general)}%`}
+                </td>
+                <td className="p-3 text-right">{ponderado.general === null ? '—' : `${dec(ponderado.general)} pts`}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      )}
 
       <h2 className="mb-3 text-lg font-semibold text-tinta">📈 Tendencia semana a semana</h2>
       {tendencia.length === 0 ? (
